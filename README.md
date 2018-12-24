@@ -1,1 +1,2 @@
-Lightweight Library to store Data in two dimensional time format.
+# barbelhisto
+A lightweiht easy to use bullet proof library to store data in two dimensional format.
