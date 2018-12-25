@@ -4,12 +4,12 @@ A lightweiht easy to use bullet proof library to store the history of changes of
 
 The library implements Martin Fowlers Temporal Pattern that can be found here: https://martinfowler.com/eaaDev/timeNarrative.html
 
-# Who will need barbelhisto?
+# Who needs barbelhisto?
 
 Whe you use barbelhisto to store an read data you can find answers to these questions:
 
-- What was the effective state of my domain object two weeks ago?
-- What will be the effective state of my domain object in two weeks?
+- What was the effective state of my domain objects two weeks ago?
+- What will be the effective state of my domain objects in two weeks?
 - When were the changes to domain objects stored in the system?
 
 Even more complicated:
