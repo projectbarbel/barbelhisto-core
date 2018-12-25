@@ -1,6 +1,6 @@
 # barbelhisto
 
-A lightweiht easy to use bullet proof library to store the history of changes of domain objects in two dimensional format.
+A lightweiht easy to use bullet proof library to store the history of changes of domain objects in two dimensional format. barbelhisto tracks two time dimensions for you: when a change was recorded in the system (record time) and when this change is opposed to become effecive or valid (effective time).
 
 The library implements Martin Fowlers Temporal Pattern that can be found here: https://martinfowler.com/eaaDev/timeNarrative.html
 
