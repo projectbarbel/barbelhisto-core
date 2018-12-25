@@ -19,5 +19,15 @@ Even more complicated:
 
 This library enables you to store your data in a format that enables you to answer these questions.
 
+# Supported backends
+
+In general barbelhisto is implemented idepentently of the targeted data store. Build in data stores supported are:
+
+- mongodb
+- redis
+- cassandra
+
+You can easily implement your own dao object to integrate any data store you want to use.
+
 # Getting started
 
