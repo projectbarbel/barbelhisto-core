@@ -33,4 +33,6 @@ You can easily implement your own dao object to integrate any data store you wan
 
 # Getting started
 
-Maven Central
+Maven Central link
+Example code using the API
+Demo App
