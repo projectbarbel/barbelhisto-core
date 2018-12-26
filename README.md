@@ -2,7 +2,7 @@
 
 A lightweiht easy to use bullet proof Java library to store the history of changes of domain objects in bi-temporal format. 
 
-barbelhisto tracks two time dimensions for you: when a change to a domain object was recorded in the system (record time) and when this change is opposed to become effective or valid (effective time).
+barbelhisto tracks two time dimensions for you: firstly, when a change to a domain object was recorded in the system (record time) and secondly, when this change is opposed to become effective or valid from a business viewpoint (effective time).
 
 The library implements Martin Fowlers Temporal Pattern that can be found here: https://martinfowler.com/eaaDev/timeNarrative.html
 
