@@ -9,18 +9,11 @@
 	<name>BarbelHisto java library</name>
 	<description>BarbelHisto - LGPL Java library</description>
 	<packaging>jar</packaging>
-	<url>https://mysite.com</url>
 
 	<organization>
-		<name>My Organization</name>
-		<url>https://myorganization.com</url>
+		<name>Project Barbel</name>
+		<url>https://github.com/projectbarbel</url>
 	</organization>
-
-	<scm>
-		<connection>...</connection>
-		<developerConnection>...</developerConnection>
-		<url>...</url>
-	</scm>
 
 	<licenses>
 		<license>
@@ -32,8 +25,8 @@
 
 	<developers>
 		<developer>
-			<name>Me</name>
-			<email>me@mysite.com</email>
+			<name>Niklas Schlimm</name>
+			<email>https://github.com/nschlimm</email>
 		</developer>
 	</developers>
 
@@ -82,20 +75,6 @@
 					<execution>
 						<goals>
 							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-gpg-plugin</artifactId>
-				<version>1.4</version>
-				<executions>
-					<execution>
-						<id>sign-artifacts</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>sign</goal>
 						</goals>
 					</execution>
 				</executions>
