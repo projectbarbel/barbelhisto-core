@@ -21,15 +21,25 @@ Even more complicated:
 
 This library enables you to store your data in a format that enables you to answer these questions.
 
-# Supported backends
+# Features
 
-In general barbelhisto is implemented idepentently of the targeted data store. Build in data stores supported are:
+- bi-temporal data storage for No SQL and SQL data stores
+- small easy-to-use API (as simple as bi-temporal data storage can get)
+- manage different time zones of client and server
+- build-in database support for different data stores
+- provides basic functionality, extendible for individual needs
+- remember every change to the data, nothing is ever going to be deleted
+- build-in thread safety by minimizing mutability
+
+# Build-in backends
+
+In general barbelhisto is implemented idepentently of the targeted data store. Build in data stores already implemented are:
 
 - mongoDB
 - Redis
 - Cassandra
 
-You can easily implement your own dao object to integrate any data store you want to use.
+You can easily implement your own DAO object to integrate any data store you want to use.
 
 # Getting started
 

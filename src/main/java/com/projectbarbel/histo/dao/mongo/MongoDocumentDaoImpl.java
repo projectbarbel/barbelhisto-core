@@ -1,8 +1,16 @@
-package com.projectbarbel.histo.dao;
+package com.projectbarbel.histo.dao.mongo;
 
+import com.mongodb.client.MongoClient;
+import com.projectbarbel.histo.dao.DocumentDao;
 import com.projectbarbel.histo.model.AbstractValueObject;
 
 public class MongoDocumentDaoImpl<T extends AbstractValueObject> implements DocumentDao<T> {
+
+	private MongoClient client;
+	
+	public MongoDocumentDaoImpl(MongoClient client) {
+		this.client = client;
+	}
 
 	@Override
 	public T createDocument(T document) {
@@ -27,6 +35,5 @@ public class MongoDocumentDaoImpl<T extends AbstractValueObject> implements Docu
 		// TODO Auto-generated method stub
 		
 	}
-
-
+	
 }

@@ -23,7 +23,7 @@ import org.junit.Test;
  *                                       Local Date: 2019-01-13T18:46:00.000	
  *          Instant of Local Date in Epoche Seconds: 1547401560					<- point in time
  *                UTC Date/Time of previous Instant: 2019-01-13T17:46:00.000
- *  UTC Instant representing the initial Local Date: 1547405160
+ *  UTC Instant representing the initial Local Date: 1547405160					-> 2019-01-13T18:46:00.000 UTC
  *        Difference betweent Local und UTC Instant: -3600
  * 
  * 

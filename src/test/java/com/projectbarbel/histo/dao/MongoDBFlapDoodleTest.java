@@ -3,58 +3,21 @@ package com.projectbarbel.histo.dao;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-
 import org.bson.Document;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.CreateCollectionOptions;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 
-import de.flapdoodle.embed.mongo.MongodExecutable;
-import de.flapdoodle.embed.mongo.MongodProcess;
-import de.flapdoodle.embed.mongo.MongodStarter;
-import de.flapdoodle.embed.mongo.config.MongodConfigBuilder;
-import de.flapdoodle.embed.mongo.config.Net;
-import de.flapdoodle.embed.mongo.distribution.Version;
-import de.flapdoodle.embed.process.runtime.Network;
+public class MongoDBFlapDoodleTest {
 
-public class MongoDocumentDaoImplTest {
-
-	private static final MongodStarter starter = MongodStarter.getDefaultInstance();
-
-	private static MongodExecutable _mongodExe;
-	private static MongodProcess _mongod;
-	private static MongoClient _mongo;
-
-	@BeforeClass
-	public static void before() throws IOException {
-		try {
-			_mongodExe = starter.prepare(new MongodConfigBuilder().version(Version.Main.PRODUCTION)
-					.net(new Net("localhost", 12345, Network.localhostIsIPv6())).build());
-			_mongod = _mongodExe.start();
-			_mongo = MongoClients.create("mongodb://localhost:12345");
-		} catch (Exception e) {
-			_mongod.stop();
-			_mongodExe.stop();
-			throw e;
-		}
-	}
-
-	@AfterClass 
-	public static void after() {
-		_mongod.stop();
-		_mongodExe.stop();
-	}
-
+	private MongoClient _mongo = FlapDoodleEmbeddedMongoClient.MONGOCLIENT.get();
+	
 	@Before
 	public void setUp() {
 		_mongo.getDatabase("test").drop();
