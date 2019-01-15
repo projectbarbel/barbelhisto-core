@@ -1,24 +1,19 @@
 package com.projectbarbel.histo.model;
 
-import java.time.Instant;
 import java.util.Objects;
 
-public class DefaultValueObject extends AbstractValueObject<DefaultValueObject> {
+public class DefaultValueObject implements Bitemporal {
 
+	private final BitemporalStamp bitemporalStamp;
 	private final String data;
 
-	public DefaultValueObject(String documentId, Instant effectiveFrom, Instant effectiveUntil, Instant createdAt,
-			String createdBy, Instant inactivatedAt, ObjectState status, String inactivatedBy, String activity,
-			String data) {
-		super(documentId, effectiveFrom, effectiveUntil, createdAt, createdBy, inactivatedAt, status, inactivatedBy,
-				activity);
+	public DefaultValueObject(BitemporalStamp stamp, String data) {
+		this.bitemporalStamp = stamp;
 		this.data = data;
 	}
 
 	public DefaultValueObject(DefaultValueObject template) {
-		super(template.getDocumentId(), template.getEffectiveFrom(), template.getEffectiveUntil(),
-				template.getCreatedAt(), template.getCreatedBy(), template.getInactivatedAt(), template.getStatus(),
-				template.getInactivatedBy(), template.getActivity());
+		this.bitemporalStamp = template.getBitemporalStamp();
 		this.data = template.getData();
 	}
 
@@ -30,31 +25,22 @@ public class DefaultValueObject extends AbstractValueObject<DefaultValueObject> 
 	public boolean equals(Object o) {
 		if (o == this)
 			return true;
-		if (!(o instanceof AbstractValueObject)) {
+		if (!(o instanceof DefaultValueObject)) {
 			return false;
 		}
 		DefaultValueObject defaultValueObject = (DefaultValueObject) o;
-		return Objects.equals(documentId, defaultValueObject.getDocumentId())
-				&& Objects.equals(effectiveFrom, defaultValueObject.getEffectiveFrom())
-				&& Objects.equals(effectiveUntil, defaultValueObject.getEffectiveUntil())
-				&& Objects.equals(createdAt, defaultValueObject.getCreatedAt())
-				&& Objects.equals(createdBy, defaultValueObject.getCreatedBy())
-				&& Objects.equals(inactivatedAt, defaultValueObject.getInactivatedAt())
-				&& Objects.equals(status, defaultValueObject.getStatus())
-				&& Objects.equals(inactivatedBy, defaultValueObject.getInactivatedBy())
-				&& Objects.equals(activity, defaultValueObject.getActivity())
-				&& Objects.equals(data, defaultValueObject.getData());
+		return Objects.equals(data, defaultValueObject.getData())
+				&& Objects.equals(bitemporalStamp, defaultValueObject.getBitemporalStamp());
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(documentId, effectiveFrom, effectiveUntil, createdAt, createdBy, inactivatedAt, status,
-				inactivatedBy, activity, data);
+		return Objects.hash(bitemporalStamp, data);
 	}
 
 	@Override
-	public DefaultValueObject get() {
-		return new DefaultValueObject(this);
+	public BitemporalStamp getBitemporalStamp() {
+		return bitemporalStamp;
 	}
 
 }

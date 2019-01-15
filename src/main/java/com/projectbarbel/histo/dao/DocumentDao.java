@@ -1,15 +1,22 @@
 package com.projectbarbel.histo.dao;
 
-import com.projectbarbel.histo.model.AbstractValueObject;
+import com.projectbarbel.histo.model.Bitemporal;
 
-public interface DocumentDao<T extends AbstractValueObject> { 
+/**
+ * 
+ * @author niklasschlimm
+ *
+ * @param <T> the bi-temporal document type to store with a concrete DAO implementation
+ * @param <O> the type of object id that is used by the concrete data store
+ */
+public interface DocumentDao<T extends Bitemporal, O> { 
 
-    T createDocument(T document);
+    O createDocument(T document);
 
-    T updateDocument(T document);
+    O updateDocument(T document);
 
-    void deleteDocument(String uniqueId);
+    void deleteDocument(O objectId);
 
-    void readDocument(String uniqueId);
+    void readDocument(O objectId);
     
 }

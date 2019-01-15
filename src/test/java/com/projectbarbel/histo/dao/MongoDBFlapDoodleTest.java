@@ -4,6 +4,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,6 +31,8 @@ public class MongoDBFlapDoodleTest {
 		MongoCollection<Document> col = db.getCollection("testCol");
 		Document document = new Document("name", "Café Con Leche");
 		col.insertOne(document);
+		ObjectId _id = document.getObjectId("_id");
+		assertTrue(_id!=null);
 		assertTrue(col.countDocuments() == 1);
 	}
 
