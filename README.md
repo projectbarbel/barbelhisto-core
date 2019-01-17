@@ -30,6 +30,7 @@ This library enables you to store your data in a format that enables you to answ
 - provides basic functionality, extendible for individual needs
 - remember every change to the data, nothing is ever going to be deleted
 - build-in thread safety by minimizing mutability
+- implemented in plain Java with no dependencies
 
 # Build-in backends
 

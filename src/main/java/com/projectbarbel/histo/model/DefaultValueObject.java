@@ -43,4 +43,9 @@ public class DefaultValueObject implements Bitemporal {
 		return bitemporalStamp;
 	}
 
+	@Override
+	public String toString() {
+		return "DefaultValueObject [bitemporalStamp=" + bitemporalStamp + ", data=" + data + "]";
+	}
+
 }

@@ -2,8 +2,7 @@ package com.projectbarbel.histo.model;
 
 import java.time.Instant;
 import java.util.Objects;
-
-import org.apache.commons.lang3.ObjectUtils;
+import javax.annotation.Generated;
 
 public final class BitemporalStamp {
 	protected final String documentId;
@@ -16,21 +15,31 @@ public final class BitemporalStamp {
 	protected final String inactivatedBy;
 	protected final String activity;
 
+	@Generated("SparkTools")
+	private BitemporalStamp(Builder builder) {
+		this.documentId = builder.documentId;
+		this.effectiveFrom = builder.effectiveFrom;
+		this.effectiveUntil = builder.effectiveUntil;
+		this.createdAt = builder.createdAt;
+		this.createdBy = builder.createdBy;
+		this.inactivatedAt = builder.inactivatedAt;
+		this.status = builder.status;
+		this.inactivatedBy = builder.inactivatedBy;
+		this.activity = builder.activity;
+	}
+
 	public BitemporalStamp(String documentId, Instant effectiveFrom, Instant effectiveUntil, Instant createdAt,
 			String createdBy, Instant inactivatedAt, ObjectState status, String inactivatedBy, String activity) {
 		super();
-		if (!ObjectUtils.allNotNull(documentId, effectiveFrom, effectiveUntil, createdAt,
-			createdBy, inactivatedAt, status, inactivatedBy, activity))
-				throw new IllegalArgumentException("Cannot create BitemporalStamp. Must not contain any null value.");
-		this.documentId = documentId;
-		this.effectiveFrom = effectiveFrom;
-		this.effectiveUntil = effectiveUntil;
-		this.createdAt = createdAt;
-		this.createdBy = createdBy;
-		this.inactivatedAt = inactivatedAt;
-		this.status = status;
-		this.inactivatedBy = inactivatedBy;
-		this.activity = activity;
+		this.documentId = Objects.requireNonNull(documentId, "documentId");
+		this.effectiveFrom = Objects.requireNonNull(effectiveFrom, "effectiveFrom");
+		this.effectiveUntil = Objects.requireNonNull(effectiveUntil, "effectiveUntil");
+		this.createdAt = Objects.requireNonNull(createdAt, "createdAt");
+		this.createdBy = Objects.requireNonNull(createdBy, "createdBy");
+		this.inactivatedAt = Objects.requireNonNull(inactivatedAt, "inactivatedAt");
+		this.status = Objects.requireNonNull(status, "status");
+		this.inactivatedBy = Objects.requireNonNull(inactivatedBy, "inactivatedBy");
+		this.activity = Objects.requireNonNull(activity, "activity");
 	}
 
 	public BitemporalStamp(BitemporalStamp template) {
@@ -106,6 +115,83 @@ public final class BitemporalStamp {
 				+ effectiveUntil + ", createdAt=" + createdAt + ", createdBy=" + createdBy + ", inactivatedAt="
 				+ inactivatedAt + ", status=" + status + ", inactivatedBy=" + inactivatedBy + ", activity=" + activity
 				+ "]";
+	}
+
+	/**
+	 * Creates builder to build {@link BitemporalStamp}.
+	 * @return created builder
+	 */
+	@Generated("SparkTools")
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	/**
+	 * Builder to build {@link BitemporalStamp}.
+	 */
+	@Generated("SparkTools")
+	public static final class Builder {
+		private String documentId;
+		private Instant effectiveFrom;
+		private Instant effectiveUntil;
+		private Instant createdAt;
+		private String createdBy;
+		private Instant inactivatedAt;
+		private ObjectState status;
+		private String inactivatedBy;
+		private String activity;
+
+		private Builder() {
+		}
+
+		public Builder withDocumentId(String documentId) {
+			this.documentId = documentId;
+			return this;
+		}
+
+		public Builder withEffectiveFrom(Instant effectiveFrom) {
+			this.effectiveFrom = effectiveFrom;
+			return this;
+		}
+
+		public Builder withEffectiveUntil(Instant effectiveUntil) {
+			this.effectiveUntil = effectiveUntil;
+			return this;
+		}
+
+		public Builder withCreatedAt(Instant createdAt) {
+			this.createdAt = createdAt;
+			return this;
+		}
+
+		public Builder withCreatedBy(String createdBy) {
+			this.createdBy = createdBy;
+			return this;
+		}
+
+		public Builder withInactivatedAt(Instant inactivatedAt) {
+			this.inactivatedAt = inactivatedAt;
+			return this;
+		}
+
+		public Builder withStatus(ObjectState status) {
+			this.status = status;
+			return this;
+		}
+
+		public Builder withInactivatedBy(String inactivatedBy) {
+			this.inactivatedBy = inactivatedBy;
+			return this;
+		}
+
+		public Builder withActivity(String activity) {
+			this.activity = activity;
+			return this;
+		}
+
+		public BitemporalStamp build() {
+			return new BitemporalStamp(this);
+		}
 	}
 
 }

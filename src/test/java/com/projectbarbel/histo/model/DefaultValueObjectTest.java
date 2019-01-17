@@ -117,42 +117,42 @@ public class DefaultValueObjectTest {
 		assertNotNull(stamp);
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected=NullPointerException.class)
 	public void testArgumentValidationInConstructor_documentId () {
 		new BitemporalStamp(EnhancedRandom.random(BitemporalStamp.class, "documentId"));
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected=NullPointerException.class)
 	public void testArgumentValidationInConstructor_effectiveFrom () {
 		new BitemporalStamp(EnhancedRandom.random(BitemporalStamp.class, "effectiveFrom"));
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected=NullPointerException.class)
 	public void testArgumentValidationInConstructor_createdAt () {
 		new BitemporalStamp(EnhancedRandom.random(BitemporalStamp.class, "createdAt"));
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected=NullPointerException.class)
 	public void testArgumentValidationInConstructor_createdBy () {
 		new BitemporalStamp(EnhancedRandom.random(BitemporalStamp.class, "createdBy"));
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected=NullPointerException.class)
 	public void testArgumentValidationInConstructor_inactivatedAt () {
 		new BitemporalStamp(EnhancedRandom.random(BitemporalStamp.class, "inactivatedAt"));
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected=NullPointerException.class)
 	public void testArgumentValidationInConstructor_status () {
 		new BitemporalStamp(EnhancedRandom.random(BitemporalStamp.class, "status"));
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected=NullPointerException.class)
 	public void testArgumentValidationInConstructor_inactivatedBy () {
 		new BitemporalStamp(EnhancedRandom.random(BitemporalStamp.class, "inactivatedBy"));
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected=NullPointerException.class)
 	public void testArgumentValidationInConstructor_activity () {
 		new BitemporalStamp(EnhancedRandom.random(BitemporalStamp.class, "activity"));
 	}
