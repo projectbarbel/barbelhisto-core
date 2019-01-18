@@ -44,10 +44,10 @@ public class MongoDocumentDaoImpl_Delete_IntegrationTest {
 	public void testDeleteDocument() {
 		DefaultMongoValueObject object = EnhancedRandom.random(DefaultMongoValueObject.class);
 		Optional<ObjectId> oid = dao.createDocument(object);
-		DefaultMongoValueObject doc = col.find(Filters.eq("_id", oid.get())).first();
+		DefaultMongoValueObject doc = col.find(Filters.eq("objectId", oid.get())).first();
 		assertNotNull(doc);
 		dao.deleteDocument(oid.get());
-		boolean hasnext = col.find(Filters.eq("_id", oid.get())).iterator().hasNext();
+		boolean hasnext = col.find(Filters.eq("objectId", oid.get())).iterator().hasNext();
 		assertFalse(hasnext);
 	}
 

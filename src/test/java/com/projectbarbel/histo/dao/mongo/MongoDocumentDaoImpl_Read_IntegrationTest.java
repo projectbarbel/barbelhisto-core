@@ -34,7 +34,7 @@ public class MongoDocumentDaoImpl_Read_IntegrationTest {
 	public void testReadDocument() {
 		DefaultMongoValueObject object = EnhancedRandom.random(DefaultMongoValueObject.class);
 		col.insertOne(object);
-		assertTrue("document should be present",dao.readDocument(object.getId()).isPresent());
+		assertTrue("document should be present",dao.readDocument(object.getObjectId()).isPresent());
 	}
 
 }

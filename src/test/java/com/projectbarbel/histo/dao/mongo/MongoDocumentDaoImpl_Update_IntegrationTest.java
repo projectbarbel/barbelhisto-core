@@ -46,9 +46,9 @@ public class MongoDocumentDaoImpl_Update_IntegrationTest {
 	    DefaultMongoValueObject object = EnhancedRandom.random(DefaultMongoValueObject.class);
 		Optional<ObjectId> oid = dao.createDocument(object);
 		DefaultMongoValueObject doc = col.find(Filters.eq("_id", oid.orElse(new ObjectId()))).first();
-		DefaultMongoValueObject changedObj = new DefaultMongoValueObject(object.getId(), object.getBitemporalStamp(), "new data");
+		DefaultMongoValueObject changedObj = new DefaultMongoValueObject(object.getObjectId(), object.getBitemporalStamp(), "new data");
 		Optional<ObjectId> newId = dao.updateDocument(oid.orElse(new ObjectId()), changedObj);
-		DefaultMongoValueObject updatedObj = col.find(Filters.eq("_id", newId.orElse(new ObjectId()))).first();
+		DefaultMongoValueObject updatedObj = col.find(Filters.eq("objectId", newId.orElse(new ObjectId()))).first();
 		assertEquals(changedObj, updatedObj);
 		assertTrue(updatedObj.getData().equals("new data"));
 		assertNotEquals(updatedObj, doc);
@@ -59,7 +59,7 @@ public class MongoDocumentDaoImpl_Update_IntegrationTest {
 	    DefaultMongoValueObject object = EnhancedRandom.random(DefaultMongoValueObject.class);
 	    Optional<ObjectId> oid = dao.createDocument(object);
 		Optional<ObjectId> updatedOid = dao.updateDocument(oid.orElse(new ObjectId()), object);
-		DefaultMongoValueObject updatedDoc = col.find(Filters.eq("_id", updatedOid.orElse(new ObjectId()))).first();
+		DefaultMongoValueObject updatedDoc = col.find(Filters.eq("objectId", updatedOid.orElse(new ObjectId()))).first();
 		assertEquals(updatedDoc.getData(), object.getData());
 		assertEquals(updatedDoc, object);
 	}

@@ -42,7 +42,7 @@ public class MongoDocumentDaoImpl_Create_IntegrationTest {
 	public void testCreateDocument() {
 		DefaultMongoValueObject object = EnhancedRandom.random(DefaultMongoValueObject.class);
 		dao.createDocument(object);
-		DefaultMongoValueObject doc = col.find(Filters.eq("_id", object.getId())).first();
+		DefaultMongoValueObject doc = col.find(Filters.eq("_id", object.getObjectId())).first();
 		assertNotNull(doc);
 	}
 

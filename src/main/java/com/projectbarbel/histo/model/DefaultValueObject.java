@@ -1,51 +1,69 @@
 package com.projectbarbel.histo.model;
 
 import java.util.Objects;
+import java.util.UUID;
 
-public class DefaultValueObject implements Bitemporal {
+public class DefaultValueObject implements Bitemporal<String> {
 
-	private final BitemporalStamp bitemporalStamp;
-	private final String data;
+    private final String objectId;
+    private final BitemporalStamp bitemporalStamp;
+    private final String data;
 
-	public DefaultValueObject(BitemporalStamp stamp, String data) {
-		this.bitemporalStamp = stamp;
-		this.data = data;
-	}
+    public DefaultValueObject(String objectId, BitemporalStamp bitemporalStamp, String data) {
+        super();
+        this.objectId = objectId;
+        this.bitemporalStamp = bitemporalStamp;
+        this.data = data;
+    }
 
-	public DefaultValueObject(DefaultValueObject template) {
-		this.bitemporalStamp = template.getBitemporalStamp();
-		this.data = template.getData();
-	}
+    public DefaultValueObject(BitemporalStamp stamp, String data) {
+        this.objectId = UUID.randomUUID().toString();
+        this.bitemporalStamp = stamp;
+        this.data = data;
+    }
 
-	public String getData() {
-		return data;
-	}
+    public DefaultValueObject(DefaultValueObject template) {
+        this.objectId = template.getObjectId();
+        this.bitemporalStamp = template.getBitemporalStamp();
+        this.data = template.getData();
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (o == this)
-			return true;
-		if (!(o instanceof DefaultValueObject)) {
-			return false;
-		}
-		DefaultValueObject defaultValueObject = (DefaultValueObject) o;
-		return Objects.equals(data, defaultValueObject.getData())
-				&& Objects.equals(bitemporalStamp, defaultValueObject.getBitemporalStamp());
-	}
+    public String getData() {
+        return data;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(bitemporalStamp, data);
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof DefaultValueObject)) {
+            return false;
+        }
+        DefaultValueObject defaultValueObject = (DefaultValueObject) o;
+        return Objects.equals(objectId, defaultValueObject.getObjectId())
+                && Objects.equals(data, defaultValueObject.getData())
+                && Objects.equals(bitemporalStamp, defaultValueObject.getBitemporalStamp());
+    }
 
-	@Override
-	public BitemporalStamp getBitemporalStamp() {
-		return bitemporalStamp;
-	}
+    @Override
+    public int hashCode() {
+        return Objects.hash(objectId, bitemporalStamp, data);
+    }
 
-	@Override
-	public String toString() {
-		return "DefaultValueObject [bitemporalStamp=" + bitemporalStamp + ", data=" + data + "]";
-	}
+    @Override
+    public BitemporalStamp getBitemporalStamp() {
+        return bitemporalStamp;
+    }
+
+    @Override
+    public String toString() {
+        return "DefaultValueObject [objectId=" + objectId + ", bitemporalStamp=" + bitemporalStamp + ", data=" + data
+                + "]";
+    }
+
+    @Override
+    public String getObjectId() {
+        return objectId;
+    }
 
 }

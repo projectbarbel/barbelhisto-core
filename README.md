@@ -8,11 +8,11 @@ The library implements Martin Fowlers Temporal Pattern that can be found here: h
 
 # Who needs barbelhisto?
 
-Whe you use barbelhisto to store an read data you can find answers to these questions:
+When you use barbelhisto to store and read data you can find answers to these questions:
 
-- What was the effective state of my domain objects two weeks ago?
+- What changes to domain objects were stored the last two weeks?
+- When will the state of domain objects become effective?
 - What will be the effective state of my domain objects in two weeks?
-- When were the changes to domain objects stored in the system?
 
 Even more complicated:
 

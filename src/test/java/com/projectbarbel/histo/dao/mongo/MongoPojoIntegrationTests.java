@@ -37,14 +37,14 @@ public class MongoPojoIntegrationTests {
 	public void testReadDocument_byId() {
 	    DefaultMongoValueObject object = EnhancedRandom.random(DefaultMongoValueObject.class);
 	    col.insertOne(object);
-	    assertFalse("should not be found by id", col.find(Filters.eq("id", object.getId())).iterator().hasNext());
+	    assertFalse("should not be found by id", col.find(Filters.eq("id", object.getObjectId())).iterator().hasNext());
 	}
 	
 	@Test
 	public void testReadDocument_by_id() {
 	    DefaultMongoValueObject object = EnhancedRandom.random(DefaultMongoValueObject.class);
 	    col.insertOne(object);
-	    assertTrue("should be found by _id", col.find(Filters.eq("_id", object.getId())).iterator().hasNext());
+	    assertTrue("should be found by _id", col.find(Filters.eq("objectId", object.getObjectId())).iterator().hasNext());
 	}
 	
 }

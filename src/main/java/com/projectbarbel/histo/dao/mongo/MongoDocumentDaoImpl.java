@@ -29,7 +29,7 @@ public class MongoDocumentDaoImpl implements DocumentDao<DefaultMongoValueObject
 		Objects.requireNonNull(document, "document must not be null when creating a document");
 		MongoCollection<DefaultMongoValueObject> col = client.getDatabase(databaseName).getCollection(collectionName, DefaultMongoValueObject.class);
 		col.insertOne(document);
-		return Optional.of(document.getId());
+		return Optional.of(document.getObjectId());
 	}
 
 	@Override
@@ -37,22 +37,22 @@ public class MongoDocumentDaoImpl implements DocumentDao<DefaultMongoValueObject
 		Objects.requireNonNull(objectId, "objectId must not be null when updating a document");
 		Objects.requireNonNull(document, "document must not be null when updating a document");
 		MongoCollection<DefaultMongoValueObject> col = client.getDatabase(databaseName).getCollection(collectionName, DefaultMongoValueObject.class);
-		DefaultMongoValueObject newDoc = col.findOneAndReplace(Filters.eq("_id", objectId), document);
-		return Optional.of(newDoc.getId());
+		DefaultMongoValueObject newDoc = col.findOneAndReplace(Filters.eq("objectId", objectId), document);
+		return Optional.of(newDoc.getObjectId());
 	}
 
 	@Override
 	public long deleteDocument(ObjectId objectId) {
 		Objects.requireNonNull(objectId, "objectId must not be null when deleting a document");
 		MongoCollection<Document> col = client.getDatabase(databaseName).getCollection(collectionName);
-		return col.deleteOne(Filters.eq("_id", objectId)).getDeletedCount();
+		return col.deleteOne(Filters.eq("objectId", objectId)).getDeletedCount();
 	}
 
 	@Override
 	public Optional<DefaultMongoValueObject> readDocument(ObjectId objectId) {
 		Objects.requireNonNull(objectId, "objectId must not be null when deleting a document");
 		MongoCollection<DefaultMongoValueObject> col = client.getDatabase(databaseName).getCollection(collectionName, DefaultMongoValueObject.class);
-		FindIterable<DefaultMongoValueObject> docs = col.find(Filters.eq("_id", objectId));
+		FindIterable<DefaultMongoValueObject> docs = col.find(Filters.eq("objectId", objectId));
 		if (docs.iterator().hasNext()) {
 			return Optional.of(docs.first());
 		} else {
