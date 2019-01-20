@@ -8,14 +8,15 @@ import org.bson.codecs.Codec;
 import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
 
+import com.projectbarbel.histo.model.BitemporalObjectState;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.BitemporalStamp.Builder;
-import com.projectbarbel.histo.model.ObjectState;
 
 public class BitemporalCodec implements Codec<BitemporalStamp> {
 
     @Override
     public void encode(BsonWriter writer, BitemporalStamp value, EncoderContext encoderContext) {
+        assert writer != null && value != null && encoderContext != null;
         writer.writeStartDocument();
         writer.writeString("documentId", value.getDocumentId());
         writer.writeStartDocument("effectiveFrom");
@@ -48,6 +49,7 @@ public class BitemporalCodec implements Codec<BitemporalStamp> {
 
     @Override
     public BitemporalStamp decode(BsonReader reader, DecoderContext decoderContext) {
+        assert reader != null && decoderContext != null;
         Builder builder = BitemporalStamp.builder();
         reader.readStartDocument();
         builder.withDocumentId(reader.readString("documentId"));
@@ -56,7 +58,7 @@ public class BitemporalCodec implements Codec<BitemporalStamp> {
         builder.withCreatedAt(readInstant(reader, builder, "createdAt"));
         builder.withCreatedBy(reader.readString("createdBy"));
         builder.withInactivatedAt(readInstant(reader, builder, "inactivatedAt"));
-        builder.withStatus(ObjectState.valueOf(reader.readString("status")));
+        builder.withStatus(BitemporalObjectState.valueOf(reader.readString("status")));
         builder.withInactivatedBy(reader.readString("inactivatedBy"));
         builder.withActivity(reader.readString("activity"));
         reader.readEndDocument();

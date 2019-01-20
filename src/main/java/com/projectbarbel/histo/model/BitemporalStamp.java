@@ -11,7 +11,7 @@ public final class BitemporalStamp {
 	protected final Instant createdAt;
 	protected final String createdBy;
 	protected final Instant inactivatedAt;
-	protected final ObjectState status;
+	protected final BitemporalObjectState status;
 	protected final String inactivatedBy;
 	protected final String activity;
 
@@ -29,7 +29,7 @@ public final class BitemporalStamp {
 	}
 
 	public BitemporalStamp(String documentId, Instant effectiveFrom, Instant effectiveUntil, Instant createdAt,
-			String createdBy, Instant inactivatedAt, ObjectState status, String inactivatedBy, String activity) {
+			String createdBy, Instant inactivatedAt, BitemporalObjectState status, String inactivatedBy, String activity) {
 		super();
 		this.documentId = Objects.requireNonNull(documentId, "documentId");
 		this.effectiveFrom = Objects.requireNonNull(effectiveFrom, "effectiveFrom");
@@ -72,7 +72,7 @@ public final class BitemporalStamp {
 		return inactivatedAt;
 	}
 
-	public ObjectState getStatus() {
+	public BitemporalObjectState getStatus() {
 		return status;
 	}
 
@@ -137,7 +137,7 @@ public final class BitemporalStamp {
 		private Instant createdAt;
 		private String createdBy;
 		private Instant inactivatedAt;
-		private ObjectState status;
+		private BitemporalObjectState status;
 		private String inactivatedBy;
 		private String activity;
 
@@ -174,7 +174,7 @@ public final class BitemporalStamp {
 			return this;
 		}
 
-		public Builder withStatus(ObjectState status) {
+		public Builder withStatus(BitemporalObjectState status) {
 			this.status = status;
 			return this;
 		}

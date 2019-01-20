@@ -74,6 +74,18 @@ public class BitemporalCodecTest {
         assertEquals(stamp, decodedBitemporalStamp);
     }
 
+    @Test(expected=AssertionError.class)
+    public void noNulls_encode() {
+        BitemporalCodec codec = new BitemporalCodec();
+        codec.encode(null, null, null);
+    }
+    
+    @Test(expected=AssertionError.class)
+    public void noNulls_decode() {
+        BitemporalCodec codec = new BitemporalCodec();
+        codec.decode(null, null);
+    }
+    
     private BsonInput createInputBuffer() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         buffer.pipe(baos);

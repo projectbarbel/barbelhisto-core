@@ -12,7 +12,7 @@ import com.projectbarbel.histo.model.Bitemporal;
  * @param <T> the application's document type to store with a concrete DAO implementation
  * @param <O> the object id type that is used by the application as unique object identifier
  */
-public interface DocumentDao<T extends Bitemporal, O> { 
+public interface DocumentDao<T extends Bitemporal<O>, O> { 
 
     Optional<O> createDocument(T document);
 

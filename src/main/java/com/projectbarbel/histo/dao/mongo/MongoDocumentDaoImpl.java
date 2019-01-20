@@ -3,6 +3,7 @@ package com.projectbarbel.histo.dao.mongo;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.apache.commons.lang3.Validate;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -26,7 +27,7 @@ public class MongoDocumentDaoImpl implements DocumentDao<DefaultMongoValueObject
 
 	@Override
 	public Optional<ObjectId> createDocument(DefaultMongoValueObject document) {
-		Objects.requireNonNull(document, "document must not be null when creating a document");
+		Validate.notNull(document, "document must not be null when creating a document");
 		MongoCollection<DefaultMongoValueObject> col = client.getDatabase(databaseName).getCollection(collectionName, DefaultMongoValueObject.class);
 		col.insertOne(document);
 		return Optional.of(document.getObjectId());
@@ -34,8 +35,8 @@ public class MongoDocumentDaoImpl implements DocumentDao<DefaultMongoValueObject
 
 	@Override
 	public Optional<ObjectId> updateDocument(ObjectId objectId, DefaultMongoValueObject document) {
-		Objects.requireNonNull(objectId, "objectId must not be null when updating a document");
-		Objects.requireNonNull(document, "document must not be null when updating a document");
+	    Validate.notNull(objectId, "objectId must not be null when updating a document");
+	    Validate.notNull(document, "document must not be null when updating a document");
 		MongoCollection<DefaultMongoValueObject> col = client.getDatabase(databaseName).getCollection(collectionName, DefaultMongoValueObject.class);
 		DefaultMongoValueObject newDoc = col.findOneAndReplace(Filters.eq("objectId", objectId), document);
 		return Optional.of(newDoc.getObjectId());
@@ -43,14 +44,14 @@ public class MongoDocumentDaoImpl implements DocumentDao<DefaultMongoValueObject
 
 	@Override
 	public long deleteDocument(ObjectId objectId) {
-		Objects.requireNonNull(objectId, "objectId must not be null when deleting a document");
+	    Validate.notNull(objectId, "objectId must not be null when deleting a document");
 		MongoCollection<Document> col = client.getDatabase(databaseName).getCollection(collectionName);
 		return col.deleteOne(Filters.eq("objectId", objectId)).getDeletedCount();
 	}
 
 	@Override
 	public Optional<DefaultMongoValueObject> readDocument(ObjectId objectId) {
-		Objects.requireNonNull(objectId, "objectId must not be null when deleting a document");
+	    Validate.notNull(objectId, "objectId must not be null when deleting a document");
 		MongoCollection<DefaultMongoValueObject> col = client.getDatabase(databaseName).getCollection(collectionName, DefaultMongoValueObject.class);
 		FindIterable<DefaultMongoValueObject> docs = col.find(Filters.eq("objectId", objectId));
 		if (docs.iterator().hasNext()) {

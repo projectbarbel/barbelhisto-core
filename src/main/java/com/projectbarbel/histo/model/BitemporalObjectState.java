@@ -1,5 +1,5 @@
 package com.projectbarbel.histo.model;
 
-public enum ObjectState {
+public enum BitemporalObjectState {
 	ACTIVE, INACTIVE, PENDING;
 }

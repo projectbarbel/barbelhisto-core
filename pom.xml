@@ -100,6 +100,11 @@
 			<artifactId>mongodb-driver-sync</artifactId>
 			<version>3.9.1</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.8.1</version>
+		</dependency>
 		<!-- Test Scope libraries -->
 		<dependency>
 			<groupId>org.mockito</groupId>
