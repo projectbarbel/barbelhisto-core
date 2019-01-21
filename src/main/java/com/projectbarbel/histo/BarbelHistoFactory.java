@@ -1,54 +1,65 @@
 package com.projectbarbel.histo;
 
 import java.util.Arrays;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.apache.commons.lang3.Validate;
 
-@FunctionalInterface
-public interface BarbelHistoFactory<T> {
-    enum FactoryType {
+public final class BarbelHistoFactory<T> {
+    
+    public enum FactoryType {
 
-        DAO((options) -> supplierInstanceByClassName("com.projectbarbel.histo.dao.classname", options)),
-        SERVICE((options) -> supplierInstanceByClassName("com.projectbarbel.histo.service.classname", options));
+        DAO((options) -> supplierBySupplierClassName(options.getDaoClassName())),
+        SERVICE((options) -> supplierBySupplierClassName(options.getServiceClassName()));
 
-        private final BarbelHistoFactory<?> constructor;
+        private final Function<BarbelHistoOptions, Supplier<?>> composer;
 
-        FactoryType(BarbelHistoFactory<?> constructor) {
-            this.constructor = constructor;
+        FactoryType(Function<BarbelHistoOptions, Supplier<?>> composer) {
+            this.composer = composer;
         }
 
-        private BarbelHistoFactory<?> getConstructor() {
-            return this.constructor;
+        private Supplier<?> getSupplier(BarbelHistoOptions options) {
+            return this.composer.apply(options);
         }
     }
 
-    T create(BarbelHistoOptions options);
-
-    @SuppressWarnings("unchecked")
-    static <I> BarbelHistoFactory<I> createFactory(FactoryType type) {
-        Validate.notNull(type);
-        return (BarbelHistoFactory<I>) type.getConstructor();
+    public static Supplier<?> createFactory(FactoryType type, BarbelHistoOptions options) {
+        Validate.noNullElements(Arrays.asList(type, options));
+        options.validate();
+        return type.getSupplier(options);
     }
 
-    static BarbelHistoFactory<?> createFactory(String type) {
-        Validate.notNull(type);
-        return FactoryType.valueOf(type.trim().toUpperCase()).getConstructor();
+    public static Supplier<?> createFactory(String type, BarbelHistoOptions options) {
+        Validate.noNullElements(Arrays.asList(type, options));
+        options.validate();
+        return FactoryType.valueOf(type.trim().toUpperCase()).getSupplier(options);
     }
 
     @SuppressWarnings("unchecked")
-    static <O> O supplierInstanceByClassName(String propertyName, BarbelHistoOptions options) {
-        Validate.noNullElements(Arrays.asList(propertyName, options));
+    public static <O> Supplier<O> createFactory(FactoryType type) {
+        Validate.notNull(type);
+        return (Supplier<O>) type.getSupplier(BarbelHistoOptions.DEFAULT_CONFIG);
+    }
+    
+    public static Supplier<?> createFactory(String type) {
+        Validate.notNull(type);
+        return FactoryType.valueOf(type.trim().toUpperCase()).getSupplier(BarbelHistoOptions.DEFAULT_CONFIG);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static <O extends Supplier<O>> O supplierBySupplierClassName(String supplierClassName) {
+        Validate.noNullElements(Arrays.asList(supplierClassName));
         try {
-            return (O) ((Supplier<O>)Class.forName(options.getOption(propertyName).orElse("")).newInstance()).get();
+            return (O)Class.forName(supplierClassName).newInstance();
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("The class name in property " + propertyName + " cannot be found.", e);
+            throw new RuntimeException("The class " + supplierClassName + " cannot be found.", e);
         } catch (ClassCastException e) {
-            throw new RuntimeException("The class name in property " + propertyName + " must be of type java.util.function.Supplier!", e);
+            throw new RuntimeException("The class " + supplierClassName + " must be of type java.util.function.Supplier!", e);
         } catch (InstantiationException e) {
-            throw new RuntimeException("The class name in property " + propertyName + " could not be instintiated. Check that it has a public default constructor without any arguments.", e);
+            throw new RuntimeException("The class " + supplierClassName + " could not be instintiated. Check that it has a public default constructor without any arguments.", e);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException("The class name in property " + propertyName + " could not be instintiated. Check access rights.", e);
+            throw new RuntimeException("The class " + supplierClassName  + " could not be instintiated. Check access rights.", e);
         }
     }
 

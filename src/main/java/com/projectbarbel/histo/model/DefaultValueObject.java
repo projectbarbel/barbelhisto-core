@@ -2,12 +2,20 @@ package com.projectbarbel.histo.model;
 
 import java.util.Objects;
 import java.util.UUID;
+import javax.annotation.Generated;
 
 public class DefaultValueObject implements Bitemporal<String> {
 
     private final String objectId;
     private final BitemporalStamp bitemporalStamp;
     private final String data;
+
+    @Generated("SparkTools")
+    private DefaultValueObject(Builder builder) {
+        this.objectId = builder.objectId;
+        this.bitemporalStamp = builder.bitemporalStamp;
+        this.data = builder.data;
+    }
 
     public DefaultValueObject(String objectId, BitemporalStamp bitemporalStamp, String data) {
         super();
@@ -64,6 +72,47 @@ public class DefaultValueObject implements Bitemporal<String> {
     @Override
     public String getObjectId() {
         return objectId;
+    }
+
+    /**
+     * Creates builder to build {@link DefaultValueObject}.
+     * @return created builder
+     */
+    @Generated("SparkTools")
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
+     * Builder to build {@link DefaultValueObject}.
+     */
+    @Generated("SparkTools")
+    public static final class Builder {
+        private String objectId;
+        private BitemporalStamp bitemporalStamp;
+        private String data;
+
+        private Builder() {
+        }
+
+        public Builder withObjectId(String objectId) {
+            this.objectId = objectId;
+            return this;
+        }
+
+        public Builder withBitemporalStamp(BitemporalStamp bitemporalStamp) {
+            this.bitemporalStamp = bitemporalStamp;
+            return this;
+        }
+
+        public Builder withData(String data) {
+            this.data = data;
+            return this;
+        }
+
+        public DefaultValueObject build() {
+            return new DefaultValueObject(this);
+        }
     }
 
 }
