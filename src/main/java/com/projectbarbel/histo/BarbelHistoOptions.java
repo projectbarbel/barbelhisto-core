@@ -15,13 +15,11 @@ public class BarbelHistoOptions {
 
     public final static BarbelHistoOptions DEFAULT_CONFIG = builder().withDaoClassName("com.projectbarbel.histo.dao.DocumentDao$ProxySupplier")
             .withServiceClassName("com.projectbarbel.histo.service.DocumentService$DocumentServiceProxy").build();
-    private final Map<String, String> options;
     private final String daoClassName;
     private final String serviceClassName;
 
     @Generated("SparkTools")
     private BarbelHistoOptions(Builder builder) {
-        this.options = builder.options;
         this.daoClassName = builder.daoClassName;
         this.serviceClassName = builder.serviceClassName;
     }
@@ -34,17 +32,13 @@ public class BarbelHistoOptions {
         return serviceClassName;
     }
 
-    public void addOption(String key, String value) {
-        options.put(key, value);
-    }
-
-    public Optional<String> getOption(String key) {
-        return Optional.ofNullable(options.get(key));
+    public void validate() {
+        Validate.validState(daoClassName!=null, "daoClassName must not be null");
+        Validate.validState(serviceClassName!=null, "serviceClassName must not be null");
     }
 
     /**
      * Creates builder to build {@link BarbelHistoOptions}.
-     * 
      * @return created builder
      */
     @Generated("SparkTools")
@@ -57,16 +51,10 @@ public class BarbelHistoOptions {
      */
     @Generated("SparkTools")
     public static final class Builder {
-        private Map<String, String> options = Collections.emptyMap();
         private String daoClassName;
         private String serviceClassName;
 
         private Builder() {
-        }
-
-        public Builder withOptions(Map<String, String> options) {
-            this.options = options;
-            return this;
         }
 
         public Builder withDaoClassName(String daoClassName) {
@@ -82,11 +70,6 @@ public class BarbelHistoOptions {
         public BarbelHistoOptions build() {
             return new BarbelHistoOptions(this);
         }
-    }
-
-    public void validate() {
-        Validate.validState(daoClassName!=null, "daoClassName must not be null");
-        Validate.validState(serviceClassName!=null, "serviceClassName must not be null");
     }
 
 }

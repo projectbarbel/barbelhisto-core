@@ -70,8 +70,7 @@ public class BarbelHistoFactoryTest {
 
     @Test(expected = RuntimeException.class)
     public void testInstanceByClassName_GenerateString() {
-        BarbelHistoOptions.DEFAULT_CONFIG.addOption("string", "java.lang.String");
-        BarbelHistoFactory.supplierBySupplierClassName("string");
+        BarbelHistoFactory.supplierBySupplierClassName("java.jang.String");
     }
 
     @Test(expected = IllegalArgumentException.class)
