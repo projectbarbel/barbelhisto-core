@@ -6,8 +6,11 @@ import org.apache.commons.lang3.Validate;
 
 public class BarbelHistoOptions {
 
-    public final static BarbelHistoOptions DEFAULT_CONFIG = builder().withDaoSupplierClassName("com.projectbarbel.histo.dao.DocumentDao$ProxySupplier")
-            .withServiceSupplierClassName("com.projectbarbel.histo.service.DocumentService$DocumentServiceProxy").build();
+    public final static BarbelHistoOptions DEFAULT_CONFIG = builder()
+            .withDaoSupplierClassName("com.projectbarbel.histo.dao.DefaultDocumentDao$DefaultDaoSupplier")
+            .withServiceSupplierClassName(
+                    "com.projectbarbel.histo.service.DefaultDocumentService$DefaultDocumentServiceSupplier")
+            .build();
     private final String daoSupplierClassName;
     private final String serviceSupplierClassName;
 
@@ -26,12 +29,13 @@ public class BarbelHistoOptions {
     }
 
     public void validate() {
-        Validate.validState(daoSupplierClassName!=null, "daoClassName must not be null");
-        Validate.validState(serviceSupplierClassName!=null, "serviceClassName must not be null");
+        Validate.validState(daoSupplierClassName != null, "daoClassName must not be null");
+        Validate.validState(serviceSupplierClassName != null, "serviceClassName must not be null");
     }
 
     /**
      * Creates builder to build {@link BarbelHistoOptions}.
+     * 
      * @return created builder
      */
     @Generated("SparkTools")

@@ -4,8 +4,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.Before;
@@ -15,7 +13,6 @@ import org.junit.Test;
 import com.projectbarbel.histo.BarbelHistoFactory;
 import com.projectbarbel.histo.BarbelHistoFactory.FactoryType;
 import com.projectbarbel.histo.BarbelHistoOptions;
-import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.DefaultValueObject;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
@@ -26,8 +23,7 @@ public class DefaultDocumentDaoTest {
     
     @BeforeClass
     public static void beforeClass() {
-        BarbelHistoOptions opts = BarbelHistoOptions.builder().withDaoSupplierClassName("com.projectbarbel.histo.dao.DefaultDocumentDao$DefaultDaoSupplier").withServiceSupplierClassName("").build();
-        dao = BarbelHistoFactory.createProduct(FactoryType.DAO, opts);
+        dao = BarbelHistoFactory.createProduct(FactoryType.DAO, BarbelHistoOptions.DEFAULT_CONFIG);
     }
 
     @Before

@@ -58,7 +58,6 @@ public class DefaultDocumentDao implements DocumentDao<DefaultValueObject, Strin
 
     @Override
     public List<DefaultValueObject> readJournal() {
-        // TODO Auto-generated method stub
         return null;
     }
 

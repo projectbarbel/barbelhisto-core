@@ -1,10 +1,22 @@
 package com.projectbarbel.histo.model;
 
+import static com.projectbarbel.histo.BarbelHistoHelper.effectiveDateToEffectiveUTCInstant;
+import static com.projectbarbel.histo.BarbelHistoHelper.transactionTimeToTransactionInstant;
+
+import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 
 import javax.annotation.Generated;
 
+/**
+ * All instants representing utc time stamps.
+ * 
+ * @author niklasschlimm
+ *
+ */
 public final class BitemporalStamp {
 	protected final String documentId;
 	protected final Instant effectiveFrom;
@@ -15,6 +27,16 @@ public final class BitemporalStamp {
 	protected final BitemporalObjectState status;
 	protected final String inactivatedBy;
 	protected final String activity;
+
+    public static BitemporalStamp instance(String documentId, LocalDate effectiveFrom,
+            LocalDate effectiveUntil, String activity, String user, ZonedDateTime inactivatedAt, String inactivatedBy) {
+        return BitemporalStamp.builder().withActivity(activity).withCreatedAt(Instant.now(Clock.systemUTC()))
+                .withCreatedBy(user).withDocumentId(documentId)
+                .withEffectiveFrom(effectiveDateToEffectiveUTCInstant(effectiveFrom))
+                .withEffectiveUntil(effectiveDateToEffectiveUTCInstant(effectiveUntil))
+                .withInactivatedAt(transactionTimeToTransactionInstant(inactivatedAt)).withInactivatedBy(inactivatedBy)
+                .withStatus(BitemporalObjectState.ACTIVE).build();
+    }
 
 	@Generated("SparkTools")
 	private BitemporalStamp(Builder builder) {
