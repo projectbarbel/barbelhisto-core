@@ -53,7 +53,7 @@ public class DefaultMongoValueObject implements Bitemporal<ObjectId> {
             return false;
         }
         DefaultMongoValueObject defaultValueObject = (DefaultMongoValueObject) o;
-        return Objects.equals(objectId, defaultValueObject.getObjectId())
+        return Objects.equals(objectId, defaultValueObject.getVersionId())
                 && Objects.equals(data, defaultValueObject.getData())
                 && Objects.equals(bitemporalStamp, defaultValueObject.getBitemporalStamp());
     }
@@ -69,8 +69,16 @@ public class DefaultMongoValueObject implements Bitemporal<ObjectId> {
     }
 
     @Override
-    public ObjectId getObjectId() {
+    public ObjectId getVersionId() {
+        return objectId;
+    }
+    
+    public ObjectId getId() {
         return objectId;
     }
 
+    public ObjectId getObjectId() {
+        return objectId;
+    }
+    
 }

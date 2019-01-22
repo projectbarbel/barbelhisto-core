@@ -2,36 +2,37 @@ package com.projectbarbel.histo.model;
 
 import java.util.Objects;
 import java.util.UUID;
+
 import javax.annotation.Generated;
 
 public class DefaultValueObject implements Bitemporal<String> {
 
-    private final String objectId;
+    private final String versionId;
     private final BitemporalStamp bitemporalStamp;
     private final String data;
 
     @Generated("SparkTools")
     private DefaultValueObject(Builder builder) {
-        this.objectId = builder.objectId;
+        this.versionId = builder.versionId;
         this.bitemporalStamp = builder.bitemporalStamp;
         this.data = builder.data;
     }
 
     public DefaultValueObject(String objectId, BitemporalStamp bitemporalStamp, String data) {
         super();
-        this.objectId = objectId;
+        this.versionId = objectId;
         this.bitemporalStamp = bitemporalStamp;
         this.data = data;
     }
 
     public DefaultValueObject(BitemporalStamp stamp, String data) {
-        this.objectId = UUID.randomUUID().toString();
+        this.versionId = UUID.randomUUID().toString();
         this.bitemporalStamp = stamp;
         this.data = data;
     }
 
     public DefaultValueObject(DefaultValueObject template) {
-        this.objectId = template.getObjectId();
+        this.versionId = template.getVersionId();
         this.bitemporalStamp = template.getBitemporalStamp();
         this.data = template.getData();
     }
@@ -48,14 +49,14 @@ public class DefaultValueObject implements Bitemporal<String> {
             return false;
         }
         DefaultValueObject defaultValueObject = (DefaultValueObject) o;
-        return Objects.equals(objectId, defaultValueObject.getObjectId())
+        return Objects.equals(versionId, defaultValueObject.getVersionId())
                 && Objects.equals(data, defaultValueObject.getData())
                 && Objects.equals(bitemporalStamp, defaultValueObject.getBitemporalStamp());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(objectId, bitemporalStamp, data);
+        return Objects.hash(versionId, bitemporalStamp, data);
     }
 
     @Override
@@ -65,13 +66,13 @@ public class DefaultValueObject implements Bitemporal<String> {
 
     @Override
     public String toString() {
-        return "DefaultValueObject [objectId=" + objectId + ", bitemporalStamp=" + bitemporalStamp + ", data=" + data
+        return "DefaultValueObject [objectId=" + versionId + ", bitemporalStamp=" + bitemporalStamp + ", data=" + data
                 + "]";
     }
 
     @Override
-    public String getObjectId() {
-        return objectId;
+    public String getVersionId() {
+        return versionId;
     }
 
     /**
@@ -88,15 +89,15 @@ public class DefaultValueObject implements Bitemporal<String> {
      */
     @Generated("SparkTools")
     public static final class Builder {
-        private String objectId;
+        private String versionId;
         private BitemporalStamp bitemporalStamp;
         private String data;
 
         private Builder() {
         }
 
-        public Builder withObjectId(String objectId) {
-            this.objectId = objectId;
+        public Builder withVersionId(String versionId) {
+            this.versionId = versionId;
             return this;
         }
 

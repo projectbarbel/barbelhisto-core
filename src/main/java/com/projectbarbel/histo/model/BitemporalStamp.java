@@ -2,6 +2,7 @@ package com.projectbarbel.histo.model;
 
 import java.time.Instant;
 import java.util.Objects;
+
 import javax.annotation.Generated;
 
 public final class BitemporalStamp {

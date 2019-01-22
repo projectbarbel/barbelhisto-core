@@ -11,30 +11,26 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.CreateCollectionOptions;
-import com.mongodb.client.model.Filters;
+import com.projectbarbel.histo.BarbelHistoFactory;
+import com.projectbarbel.histo.BarbelHistoFactory.FactoryType;
+import com.projectbarbel.histo.BarbelHistoOptions;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
 public class MongoDocumentDaoImpl_Update_IntegrationTest {
 
-	private static MongoDocumentDaoImpl dao;
-	private final static MongoClient _mongo = FlapDoodleEmbeddedMongoClient.MONGOCLIENT.get();
-	private MongoCollection<DefaultMongoValueObject> col;
+    private static MongoDocumentDaoImpl dao;
+    
+    @BeforeClass
+    public static void beforeClass() {
+        BarbelHistoOptions opts = BarbelHistoOptions.builder().withDaoSupplierClassName("com.projectbarbel.histo.dao.mongo.FlapDoodleEmbeddedMongoClientDaoSupplier").withServiceSupplierClassName("").build();
+        dao = BarbelHistoFactory.createProduct(FactoryType.DAO, opts);
+    }
 
-	@BeforeClass
-	public static void beforeClass() {
-		dao = new MongoDocumentDaoImpl(FlapDoodleEmbeddedMongoClient.MONGOCLIENT.get(), "test", "testCol");
-	}
-
-	@Before
-	public void setUp() {
-		_mongo.getDatabase("test").drop();
-		_mongo.getDatabase("test").createCollection("testCol", new CreateCollectionOptions().capped(false));
-		col = _mongo.getDatabase("test").getCollection("testCol", DefaultMongoValueObject.class);
-	}
+    @Before
+    public void setUp() {
+        dao.reset();
+    }
 
 	@Test(expected = NullPointerException.class)
 	public void testCreateDocument_null() {
@@ -45,10 +41,10 @@ public class MongoDocumentDaoImpl_Update_IntegrationTest {
 	public void testUpdateDocument_updateData() {
 	    DefaultMongoValueObject object = EnhancedRandom.random(DefaultMongoValueObject.class);
 		Optional<ObjectId> oid = dao.createDocument(object);
-		DefaultMongoValueObject doc = col.find(Filters.eq("_id", oid.orElse(new ObjectId()))).first();
-		DefaultMongoValueObject changedObj = new DefaultMongoValueObject(object.getObjectId(), object.getBitemporalStamp(), "new data");
+		DefaultMongoValueObject doc = dao.readDocument(oid.get()).get();
+		DefaultMongoValueObject changedObj = new DefaultMongoValueObject(object.getVersionId(), object.getBitemporalStamp(), "new data");
 		Optional<ObjectId> newId = dao.updateDocument(oid.orElse(new ObjectId()), changedObj);
-		DefaultMongoValueObject updatedObj = col.find(Filters.eq("objectId", newId.orElse(new ObjectId()))).first();
+		DefaultMongoValueObject updatedObj = dao.readDocument(newId.orElse(new ObjectId())).get();
 		assertEquals(changedObj, updatedObj);
 		assertTrue(updatedObj.getData().equals("new data"));
 		assertNotEquals(updatedObj, doc);
@@ -59,7 +55,7 @@ public class MongoDocumentDaoImpl_Update_IntegrationTest {
 	    DefaultMongoValueObject object = EnhancedRandom.random(DefaultMongoValueObject.class);
 	    Optional<ObjectId> oid = dao.createDocument(object);
 		Optional<ObjectId> updatedOid = dao.updateDocument(oid.orElse(new ObjectId()), object);
-		DefaultMongoValueObject updatedDoc = col.find(Filters.eq("objectId", updatedOid.orElse(new ObjectId()))).first();
+		DefaultMongoValueObject updatedDoc = dao.readDocument(updatedOid.orElse(new ObjectId())).get();
 		assertEquals(updatedDoc.getData(), object.getData());
 		assertEquals(updatedDoc, object);
 	}

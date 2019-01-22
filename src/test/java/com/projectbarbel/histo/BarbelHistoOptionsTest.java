@@ -11,12 +11,12 @@ public class BarbelHistoOptionsTest {
 
     @Test(expected=IllegalStateException.class)
     public void testValidate_missingDaoClassName() {
-        BarbelHistoOptions.builder().withDaoClassName("").build().validate();
+        BarbelHistoOptions.builder().withDaoSupplierClassName("").build().validate();
     }
     
     @Test(expected=IllegalStateException.class)
     public void testValidate_missingServiceClassName() {
-        BarbelHistoOptions.builder().withServiceClassName("").build().validate();
+        BarbelHistoOptions.builder().withServiceSupplierClassName("").build().validate();
     }
     
 }

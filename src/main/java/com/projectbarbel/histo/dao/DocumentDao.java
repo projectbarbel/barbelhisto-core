@@ -1,6 +1,7 @@
 package com.projectbarbel.histo.dao;
 
 import java.lang.reflect.Proxy;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -42,5 +43,9 @@ public interface DocumentDao<T extends Bitemporal<O>, O> {
     long deleteDocument(O objectId);
 
     Optional<T> readDocument(O objectId);
+
+    void reset();
+
+    List<DefaultValueObject> readJournal();
 
 }

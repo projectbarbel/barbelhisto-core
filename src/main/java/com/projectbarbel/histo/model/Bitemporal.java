@@ -9,7 +9,16 @@ package com.projectbarbel.histo.model;
  */
 public interface Bitemporal<O> {
 
-	BitemporalStamp getBitemporalStamp();
-	O getObjectId();
-	
+    BitemporalStamp getBitemporalStamp();
+
+    /**
+     * The unique ID of the value object version (not the documentId)
+     * @return version id
+     */
+    O getVersionId();
+
+    default String getDocumentId() {
+        return getBitemporalStamp().getDocumentId();
+    }
+    
 }

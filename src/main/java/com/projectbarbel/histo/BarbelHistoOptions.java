@@ -1,40 +1,33 @@
 package com.projectbarbel.histo;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-
 import javax.annotation.Generated;
 
 import org.apache.commons.lang3.Validate;
 
 public class BarbelHistoOptions {
 
-    public static final String DAO_SUPPLIER_CLASSNAME = "com.projectbarbel.histo.dao.supplier.classname";
-    public static final String SERVICE_SUPPLIER_CLASSNAME = "com.projectbarbel.histo.service.supplier.classname";
-
-    public final static BarbelHistoOptions DEFAULT_CONFIG = builder().withDaoClassName("com.projectbarbel.histo.dao.DocumentDao$ProxySupplier")
-            .withServiceClassName("com.projectbarbel.histo.service.DocumentService$DocumentServiceProxy").build();
-    private final String daoClassName;
-    private final String serviceClassName;
+    public final static BarbelHistoOptions DEFAULT_CONFIG = builder().withDaoSupplierClassName("com.projectbarbel.histo.dao.DocumentDao$ProxySupplier")
+            .withServiceSupplierClassName("com.projectbarbel.histo.service.DocumentService$DocumentServiceProxy").build();
+    private final String daoSupplierClassName;
+    private final String serviceSupplierClassName;
 
     @Generated("SparkTools")
     private BarbelHistoOptions(Builder builder) {
-        this.daoClassName = builder.daoClassName;
-        this.serviceClassName = builder.serviceClassName;
+        this.daoSupplierClassName = builder.daoSupplierClassName;
+        this.serviceSupplierClassName = builder.serviceSupplierClassName;
     }
 
-    public String getDaoClassName() {
-        return daoClassName;
+    public String getDaoSupplierClassName() {
+        return daoSupplierClassName;
     }
 
-    public String getServiceClassName() {
-        return serviceClassName;
+    public String getServiceSupplierClassName() {
+        return serviceSupplierClassName;
     }
 
     public void validate() {
-        Validate.validState(daoClassName!=null, "daoClassName must not be null");
-        Validate.validState(serviceClassName!=null, "serviceClassName must not be null");
+        Validate.validState(daoSupplierClassName!=null, "daoClassName must not be null");
+        Validate.validState(serviceSupplierClassName!=null, "serviceClassName must not be null");
     }
 
     /**
@@ -51,19 +44,19 @@ public class BarbelHistoOptions {
      */
     @Generated("SparkTools")
     public static final class Builder {
-        private String daoClassName;
-        private String serviceClassName;
+        private String daoSupplierClassName;
+        private String serviceSupplierClassName;
 
         private Builder() {
         }
 
-        public Builder withDaoClassName(String daoClassName) {
-            this.daoClassName = daoClassName;
+        public Builder withDaoSupplierClassName(String daoSupplierClassName) {
+            this.daoSupplierClassName = daoSupplierClassName;
             return this;
         }
 
-        public Builder withServiceClassName(String serviceClassName) {
-            this.serviceClassName = serviceClassName;
+        public Builder withServiceSupplierClassName(String serviceSupplierClassName) {
+            this.serviceSupplierClassName = serviceSupplierClassName;
             return this;
         }
 

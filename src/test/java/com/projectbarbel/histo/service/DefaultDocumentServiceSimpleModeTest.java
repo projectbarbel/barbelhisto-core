@@ -6,12 +6,17 @@ import org.junit.Test;
 
 import com.projectbarbel.histo.model.DefaultValueObject;
 
-public class DocumentServiceTest {
+public class DefaultDocumentServiceSimpleModeTest {
 
     @Test
     public void testProxy_create() {
         DocumentService<DefaultValueObject, String> service = DocumentService.proxy();
         assertEquals(service.save(DefaultValueObject.builder().build()).get(), "not implemented");
+    }
+    
+    @Test
+    public void testCreateInitialDocument() {
+        
     }
 
 }

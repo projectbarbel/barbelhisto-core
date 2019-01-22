@@ -15,7 +15,7 @@ import io.github.benas.randombeans.api.EnhancedRandom;
 
 public class MongoPojoIntegrationTests {
 
-	private final static MongoClient _mongo = FlapDoodleEmbeddedMongoClient.MONGOCLIENT.get();
+	private final static MongoClient _mongo = FlapDoodleEmbeddedMongoClientDaoSupplier.MONGOCLIENT.getMongo();
 	private MongoCollection<DefaultMongoValueObject> col;
 
 	@Before
@@ -37,14 +37,14 @@ public class MongoPojoIntegrationTests {
 	public void testReadDocument_byId() {
 	    DefaultMongoValueObject object = EnhancedRandom.random(DefaultMongoValueObject.class);
 	    col.insertOne(object);
-	    assertFalse("should not be found by id", col.find(Filters.eq("id", object.getObjectId())).iterator().hasNext());
+	    assertFalse("should not be found by id", col.find(Filters.eq("id", object.getVersionId())).iterator().hasNext());
 	}
 	
 	@Test
 	public void testReadDocument_by_id() {
 	    DefaultMongoValueObject object = EnhancedRandom.random(DefaultMongoValueObject.class);
 	    col.insertOne(object);
-	    assertTrue("should be found by _id", col.find(Filters.eq("objectId", object.getObjectId())).iterator().hasNext());
+	    assertTrue("should be found by _id", col.find(Filters.eq("objectId", object.getVersionId())).iterator().hasNext());
 	}
 	
 }

@@ -1,4 +1,5 @@
-package com.projectbarbel.histo.dao;
+package com.projectbarbel.histo;
+
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -7,9 +8,9 @@ import java.util.function.Supplier;
 
 import org.junit.Test;
 
-import com.projectbarbel.histo.BarbelHistoFactory;
 import com.projectbarbel.histo.BarbelHistoFactory.FactoryType;
-import com.projectbarbel.histo.BarbelHistoOptions;
+import com.projectbarbel.histo.dao.DocumentDao;
+import com.projectbarbel.histo.model.DefaultValueObject;
 import com.projectbarbel.histo.service.DocumentService.DocumentServiceProxy;
 
 public class BarbelHistoFactoryTest {
@@ -21,18 +22,18 @@ public class BarbelHistoFactoryTest {
 
     @Test(expected = RuntimeException.class)
     public void testCreateDaoFactory_withConfig_wrongName() {
-        BarbelHistoFactory.createFactory(FactoryType.DAO, BarbelHistoOptions.builder().withDaoClassName("bla").build());
+        BarbelHistoFactory.createFactory(FactoryType.DAO, BarbelHistoOptions.builder().withDaoSupplierClassName("bla").build());
     }
 
     @Test()
     public void testCreateDaoFactory_withConfig_serviceClass() {
-        Supplier<?> supplier = BarbelHistoFactory.createFactory(FactoryType.DAO, BarbelHistoOptions.builder().withDaoClassName("com.projectbarbel.histo.service.DocumentService$DocumentServiceProxy").withServiceClassName("").build());
+        Supplier<?> supplier = BarbelHistoFactory.createFactory(FactoryType.DAO, BarbelHistoOptions.builder().withDaoSupplierClassName("com.projectbarbel.histo.service.DocumentService$DocumentServiceProxy").withServiceSupplierClassName("").build());
         assertTrue(supplier instanceof DocumentServiceProxy);
     }
     
     @Test()
     public void testCreateDaoFactory_withConfig_serviceClass_stringFactoryName() {
-        Supplier<?> supplier = BarbelHistoFactory.createFactory("DAO", BarbelHistoOptions.builder().withDaoClassName("com.projectbarbel.histo.service.DocumentService$DocumentServiceProxy").withServiceClassName("").build());
+        Supplier<?> supplier = BarbelHistoFactory.createFactory("DAO", BarbelHistoOptions.builder().withDaoSupplierClassName("com.projectbarbel.histo.service.DocumentService$DocumentServiceProxy").withServiceSupplierClassName("").build());
         assertTrue(supplier instanceof DocumentServiceProxy);
     }
     
@@ -43,12 +44,12 @@ public class BarbelHistoFactoryTest {
     
     @Test(expected=IllegalStateException.class)
     public void testCreateDaoFactory_withConfig_StringFactoryType_ConfigValueIsNull() {
-        BarbelHistoFactory.createFactory("DAO", BarbelHistoOptions.builder().withDaoClassName(null).build());
+        BarbelHistoFactory.createFactory("DAO", BarbelHistoOptions.builder().withDaoSupplierClassName(null).build());
     }
     
     @Test(expected=IllegalStateException.class)
     public void testCreateDaoFactory_withConfig_EnumFactoryType_ConfigValueIsNull() {
-        BarbelHistoFactory.createFactory(FactoryType.DAO, BarbelHistoOptions.builder().withDaoClassName(null).build());
+        BarbelHistoFactory.createFactory(FactoryType.DAO, BarbelHistoOptions.builder().withDaoSupplierClassName(null).build());
     }
     
     @Test()
@@ -58,11 +59,30 @@ public class BarbelHistoFactoryTest {
     }
 
     @Test()
+    public void testCreateFactoryFactoryType_DefaultDaoProduct() {
+        DocumentDao<DefaultValueObject, String> dao = BarbelHistoFactory.createProduct(FactoryType.DAO);
+        assertNotNull(dao);
+    }
+    
+    @Test()
+    public void testCreateFactoryFactoryTypeWithOptions_DefaultDaoProduct() {
+        DocumentDao<DefaultValueObject, String> dao = BarbelHistoFactory.createProduct(FactoryType.DAO, BarbelHistoOptions.DEFAULT_CONFIG);
+        assertNotNull(dao);
+    }
+    
+    @Test()
     public void testCreateFactoryFactoryType_DefaultServiceFactory() {
         Supplier<?> factory = BarbelHistoFactory.createFactory(FactoryType.SERVICE);
         assertNotNull(factory);
     }
 
+    @Test()
+    public void testCreateFactoryFactoryType_DefaultServiceFactory_callTwice_ShouldBeSameFactory() {
+        Supplier<?> factory1 = BarbelHistoFactory.createFactory(FactoryType.SERVICE);
+        Supplier<?> factory2 = BarbelHistoFactory.createFactory(FactoryType.SERVICE);
+        assertTrue(factory1==factory2);
+    }
+    
     @Test(expected = RuntimeException.class)
     public void testInstanceByClassName_UnknownClass() {
         BarbelHistoFactory.supplierBySupplierClassName("some.senseless.classpath.NonExistingClass");
