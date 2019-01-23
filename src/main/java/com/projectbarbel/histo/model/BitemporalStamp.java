@@ -38,6 +38,12 @@ public final class BitemporalStamp {
                 .withStatus(BitemporalObjectState.ACTIVE).build();
     }
 
+    public BitemporalStamp(BitemporalStamp template) {
+        this(template.getDocumentId(), template.getEffectiveFrom(), template.getEffectiveUntil(),
+                template.getCreatedAt(), template.getCreatedBy(), template.getInactivatedAt(), template.getStatus(),
+                template.getInactivatedBy(), template.getActivity());
+    }
+
 	@Generated("SparkTools")
 	private BitemporalStamp(Builder builder) {
 		this.documentId = builder.documentId;
@@ -51,7 +57,7 @@ public final class BitemporalStamp {
 		this.activity = builder.activity;
 	}
 
-	public BitemporalStamp(String documentId, Instant effectiveFrom, Instant effectiveUntil, Instant createdAt,
+	private BitemporalStamp(String documentId, Instant effectiveFrom, Instant effectiveUntil, Instant createdAt,
 			String createdBy, Instant inactivatedAt, BitemporalObjectState status, String inactivatedBy, String activity) {
 		super();
 		this.documentId = Objects.requireNonNull(documentId, "documentId");
@@ -63,12 +69,6 @@ public final class BitemporalStamp {
 		this.status = Objects.requireNonNull(status, "status");
 		this.inactivatedBy = Objects.requireNonNull(inactivatedBy, "inactivatedBy");
 		this.activity = Objects.requireNonNull(activity, "activity");
-	}
-
-	public BitemporalStamp(BitemporalStamp template) {
-		this(template.getDocumentId(), template.getEffectiveFrom(), template.getEffectiveUntil(),
-				template.getCreatedAt(), template.getCreatedBy(), template.getInactivatedAt(), template.getStatus(),
-				template.getInactivatedBy(), template.getActivity());
 	}
 
 	public String getDocumentId() {

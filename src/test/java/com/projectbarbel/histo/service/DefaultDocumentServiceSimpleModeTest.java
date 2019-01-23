@@ -46,4 +46,11 @@ public class DefaultDocumentServiceSimpleModeTest {
         assertTrue(oid.isPresent());
     }
 
+    @Test
+    public void testCreateSecondVersion() {
+        DefaultValueObject object = EnhancedRandom.random(DefaultValueObject.class);
+        Optional<String> oid = service.save(object);
+        assertTrue(oid.isPresent());
+    }
+    
 }
