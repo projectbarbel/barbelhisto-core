@@ -4,10 +4,18 @@ import java.lang.reflect.Field;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
-public class DefaultPojoCopierSupplier implements Supplier<BiFunction<? extends Bitemporal<?>, ? extends BitemporalStamp, ? extends Bitemporal<?>>>{
+public class DefaultPojoCopier implements BiFunction<Bitemporal<?>, BitemporalStamp, Bitemporal<?>>{
+
+    public static class DefaultPojoCopierSupplier implements Supplier<DefaultPojoCopier>{
+
+        @Override
+        public DefaultPojoCopier get() {
+            return new DefaultPojoCopier();
+        }
+    }
 
     @SuppressWarnings("unchecked")
-    public static <O extends Bitemporal<?>> O flatCopyWithNewStamp(Bitemporal<?> from, BitemporalStamp stamp) {
+    public <O extends Bitemporal<?>> O flatCopyWithNewStamp(Bitemporal<?> from, BitemporalStamp stamp) {
         Class<?> clazz = from.getClass();
         Field[] fields = clazz.getDeclaredFields();
         Object to = null;
@@ -35,12 +43,12 @@ public class DefaultPojoCopierSupplier implements Supplier<BiFunction<? extends 
         } catch (NoSuchFieldException e) {
             throw new RuntimeException("Cannot find field in class " + clazz.getName() + " to create new Version!", e);
         }
-        return (O)to;
+        return (O) to;
     }
 
     @Override
-    public BiFunction<? extends Bitemporal<?>, ? extends BitemporalStamp, ? extends Bitemporal<?>> get() {
-        return DefaultPojoCopierSupplier::flatCopyWithNewStamp;
+    public Bitemporal<?> apply(Bitemporal<?> objectFrom, BitemporalStamp newStamp) {
+        return flatCopyWithNewStamp(objectFrom, newStamp);
     }
 
 }

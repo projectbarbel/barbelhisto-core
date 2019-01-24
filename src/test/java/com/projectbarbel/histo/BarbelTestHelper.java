@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 import com.projectbarbel.histo.model.BitemporalStamp;
+import com.projectbarbel.histo.model.DefaultPojoCopierTest.APojo;
 import com.projectbarbel.histo.model.DefaultValueObject;
 import com.projectbarbel.histo.model.EffectivePeriod;
 import com.projectbarbel.histo.model.RecordPeriod;
@@ -20,6 +21,12 @@ public class BarbelTestHelper {
     
     public static <T> T random(Class<T> clazz, String... excludedFields) {
         return EnhancedRandomBuilder.aNewEnhancedRandomBuilder().randomize(new FieldDefinition<BitemporalStamp, Serializable>("versionId", Serializable.class, BitemporalStamp.class), new Supplier<String>() {
+
+            @Override
+            public String get() {
+                return UUID.randomUUID().toString();
+            }
+        }).randomize(new FieldDefinition<APojo, Serializable>("sabbel", Serializable.class, APojo.class), new Supplier<String>() {
 
             @Override
             public String get() {

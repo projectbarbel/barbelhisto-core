@@ -53,5 +53,10 @@ public class DefaultDocumentServiceTest {
         assertTrue(oid.isPresent());
         fail("fehlen diverse tests");
     }
+
+    @Test
+    public void testSave() throws Exception {
+        throw new RuntimeException("not yet implemented");
+    }
     
 }

@@ -11,7 +11,7 @@ public class BarbelHistoOptions {
             .withServiceSupplierClassName(
                     "com.projectbarbel.histo.service.DefaultDocumentService$DefaultDocumentServiceSupplier")
             .withIdSupplierClassName("com.projectbarbel.histo.model.DefaultIDGeneratorSupplier")
-            .withPojoCopierSupplierClassName("com.projectbarbel.histo.model.DefaultPojoCopierSupplier")
+            .withPojoCopierSupplierClassName("com.projectbarbel.histo.model.DefaultPojoCopier$DefaultPojoCopierSupplier")
             .build();
     /**
      * Config used when no config is passed to a method or object, i.e. global default config
