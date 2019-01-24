@@ -4,8 +4,8 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.projectbarbel.histo.BarbelHistoFactory;
-import com.projectbarbel.histo.BarbelHistoOptions;
 import com.projectbarbel.histo.BarbelHistoFactory.FactoryType;
+import com.projectbarbel.histo.BarbelHistoOptions;
 import com.projectbarbel.histo.dao.DocumentDao;
 import com.projectbarbel.histo.model.DefaultValueObject;
 

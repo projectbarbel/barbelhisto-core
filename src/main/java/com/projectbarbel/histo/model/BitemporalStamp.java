@@ -11,6 +11,8 @@ import java.util.Objects;
 
 import javax.annotation.Generated;
 
+import com.projectbarbel.histo.model.Bitemporal.EffectivePeriod;
+
 /**
  * All instants representing utc time stamps.
  * 
@@ -18,7 +20,37 @@ import javax.annotation.Generated;
  *
  */
 public final class BitemporalStamp {
-	protected final String documentId;
+
+    public final static Instant NOT_INACTIVATED = Instant.ofEpochMilli(Long.MAX_VALUE);
+    public final static String NOBODY = "NOBODY";
+    
+    public static class RecordPeriod {
+        public Instant createdAt;
+        public Instant inactivatedAt;
+        public BitemporalObjectState state;
+        public String inactivatedBy = NOBODY;
+        public static RecordPeriod valid() {
+            RecordPeriod rp = new RecordPeriod();
+            return rp.createdAt(Instant.now(Clock.systemUTC())).activate();
+        }
+        private RecordPeriod createdAt(Instant createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
+        public RecordPeriod inactivate(String inactivatedBy) {
+            this.inactivatedAt = Instant.now(Clock.systemUTC());
+            this.state = BitemporalObjectState.INACTIVE;
+            this.inactivatedBy  = inactivatedBy;
+            return this;
+        }
+        public RecordPeriod activate() {
+            this.state = BitemporalObjectState.ACTIVE;
+            this.inactivatedAt = NOT_INACTIVATED;
+            return this;
+        }
+    }
+
+    protected final String documentId;
 	protected final Instant effectiveFrom;
 	protected final Instant effectiveUntil;
 	protected final Instant createdAt;
@@ -29,15 +61,24 @@ public final class BitemporalStamp {
 	protected final String activity;
 
     public static BitemporalStamp instance(String documentId, LocalDate effectiveFrom,
-            LocalDate effectiveUntil, String activity, String user, ZonedDateTime inactivatedAt, String inactivatedBy) {
+            LocalDate effectiveUntil, String activity, String user, BitemporalObjectState state, ZonedDateTime inactivatedAt, String inactivatedBy) {
         return BitemporalStamp.builder().withActivity(activity).withCreatedAt(Instant.now(Clock.systemUTC()))
                 .withCreatedBy(user).withDocumentId(documentId)
                 .withEffectiveFrom(effectiveDateToEffectiveUTCInstant(effectiveFrom))
                 .withEffectiveUntil(effectiveDateToEffectiveUTCInstant(effectiveUntil))
                 .withInactivatedAt(transactionTimeToTransactionInstant(inactivatedAt)).withInactivatedBy(inactivatedBy)
-                .withStatus(BitemporalObjectState.ACTIVE).build();
+                .withStatus(state).build();
     }
 
+    public static BitemporalStamp instance(String activity, String user, String documentId, EffectivePeriod effectivePeriod, RecordPeriod recordPeriod) {
+        return BitemporalStamp.builder().withActivity(activity).withCreatedAt(Instant.now(Clock.systemUTC()))
+                .withCreatedBy(user).withDocumentId(documentId)
+                .withEffectiveFrom(effectiveDateToEffectiveUTCInstant(effectivePeriod.from))
+                .withEffectiveUntil(effectiveDateToEffectiveUTCInstant(effectivePeriod.until))
+                .withInactivatedAt(recordPeriod.inactivatedAt).withInactivatedBy(recordPeriod.inactivatedBy)
+                .withStatus(recordPeriod.state).build();
+    }
+    
     public BitemporalStamp(BitemporalStamp template) {
         this(template.getDocumentId(), template.getEffectiveFrom(), template.getEffectiveUntil(),
                 template.getCreatedAt(), template.getCreatedBy(), template.getInactivatedAt(), template.getStatus(),
@@ -46,15 +87,15 @@ public final class BitemporalStamp {
 
 	@Generated("SparkTools")
 	private BitemporalStamp(Builder builder) {
-		this.documentId = builder.documentId;
-		this.effectiveFrom = builder.effectiveFrom;
-		this.effectiveUntil = builder.effectiveUntil;
-		this.createdAt = builder.createdAt;
-		this.createdBy = builder.createdBy;
-		this.inactivatedAt = builder.inactivatedAt;
-		this.status = builder.status;
-		this.inactivatedBy = builder.inactivatedBy;
-		this.activity = builder.activity;
+		this.documentId = Objects.requireNonNull(builder.documentId);
+		this.effectiveFrom = Objects.requireNonNull(builder.effectiveFrom);
+		this.effectiveUntil = Objects.requireNonNull(builder.effectiveUntil);
+		this.createdAt = Objects.requireNonNull(builder.createdAt);
+		this.createdBy = Objects.requireNonNull(builder.createdBy);
+		this.inactivatedAt = Objects.requireNonNull(builder.inactivatedAt);
+		this.status = Objects.requireNonNull(builder.status);
+		this.inactivatedBy = Objects.requireNonNull(builder.inactivatedBy);
+		this.activity = Objects.requireNonNull(builder.activity);
 	}
 
 	private BitemporalStamp(String documentId, Instant effectiveFrom, Instant effectiveUntil, Instant createdAt,

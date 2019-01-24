@@ -2,6 +2,7 @@ package com.projectbarbel.histo.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Optional;
 
@@ -16,7 +17,7 @@ import com.projectbarbel.histo.model.DefaultValueObject;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
-public class DefaultDocumentServiceSimpleModeTest {
+public class DefaultDocumentServiceTest {
 
     private DocumentService<DefaultValueObject, String> service;
     private DefaultDocumentDao dao;
@@ -51,6 +52,7 @@ public class DefaultDocumentServiceSimpleModeTest {
         DefaultValueObject object = EnhancedRandom.random(DefaultValueObject.class);
         Optional<String> oid = service.save(object);
         assertTrue(oid.isPresent());
+        fail("fehlen diverse tests");
     }
     
 }
