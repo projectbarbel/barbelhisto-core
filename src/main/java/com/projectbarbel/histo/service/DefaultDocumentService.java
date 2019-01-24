@@ -15,7 +15,7 @@ public class DefaultDocumentService implements DocumentService<DefaultValueObjec
 
         @Override
         public DefaultDocumentService get() {
-            return new DefaultDocumentService(BarbelHistoFactory.createProduct(FactoryType.DAO, BarbelHistoOptions.DEFAULT_CONFIG));
+            return new DefaultDocumentService(BarbelHistoFactory.createProduct(FactoryType.DAO, BarbelHistoOptions.ACTIVE_CONFIG));
         }
         
     }

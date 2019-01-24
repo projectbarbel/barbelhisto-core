@@ -44,7 +44,7 @@ public class Journal<T extends Bitemporal<O>, O> {
     public Journal<T, O> sortByEffectiveDate() {
         journal = journal.entrySet()
                 .stream()
-                .sorted(Map.Entry.comparingByValue((v1,v2)->v1.getEffectiveFromIntant().compareTo(v2.getEffectiveFromIntant())))
+                .sorted(Map.Entry.comparingByValue((v1,v2)->v1.getEffectiveFromInstant().compareTo(v2.getEffectiveFromInstant())))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
         return this;
     }

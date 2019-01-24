@@ -3,7 +3,6 @@ package com.projectbarbel.histo.model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
@@ -13,7 +12,7 @@ import java.util.stream.Collectors;
 
 import org.junit.Test;
 
-import io.github.benas.randombeans.api.EnhancedRandom;
+import com.projectbarbel.histo.BarbelTestHelper;
 
 public class DefaultValueObjectTest {
 
@@ -23,7 +22,7 @@ public class DefaultValueObjectTest {
 	 */
 	@Test
 	public void testHashCode_isCorrect() {
-		final DefaultValueObject obj = EnhancedRandom.random(DefaultValueObject.class);
+		final DefaultValueObject obj = BarbelTestHelper.random(DefaultValueObject.class);
 		assertEquals(obj.hashCode(), Objects.hash(getFieldsByReflection(obj)));
 	}
 
@@ -58,7 +57,7 @@ public class DefaultValueObjectTest {
 	 */
 	@Test
 	public void testHashCode_sameInstance() {
-		final DefaultValueObject obj = EnhancedRandom.random(DefaultValueObject.class);
+		final DefaultValueObject obj = BarbelTestHelper.random(DefaultValueObject.class);
 		assertEquals(obj.hashCode(), obj.hashCode());
 	}
 
@@ -67,8 +66,8 @@ public class DefaultValueObjectTest {
 	 */
 	@Test
 	public void testHashCode_differentInstances() {
-		final DefaultValueObject obj1 = EnhancedRandom.random(DefaultValueObject.class);
-		final DefaultValueObject obj2 = EnhancedRandom.random(DefaultValueObject.class);
+		final DefaultValueObject obj1 = BarbelTestHelper.random(DefaultValueObject.class);
+		final DefaultValueObject obj2 = BarbelTestHelper.random(DefaultValueObject.class);
 		assertNotEquals(obj1.hashCode(), obj2.hashCode());
 	}
 
@@ -77,7 +76,7 @@ public class DefaultValueObjectTest {
 	 */
 	@Test
 	public void testEqualsObject_sameInstance() {
-		final DefaultValueObject obj = EnhancedRandom.random(DefaultValueObject.class);
+		final DefaultValueObject obj = BarbelTestHelper.random(DefaultValueObject.class);
 		assertTrue(obj.equals(obj));
 	}
 
@@ -86,8 +85,8 @@ public class DefaultValueObjectTest {
 	 */
 	@Test
 	public void testEqualsObject_differentInstance_differentValues() {
-		final DefaultValueObject obj1 = EnhancedRandom.random(DefaultValueObject.class);
-		final DefaultValueObject obj2 = EnhancedRandom.random(DefaultValueObject.class);
+		final DefaultValueObject obj1 = BarbelTestHelper.random(DefaultValueObject.class);
+		final DefaultValueObject obj2 = BarbelTestHelper.random(DefaultValueObject.class);
 		assertFalse(obj1.equals(obj2));
 	}
 	
@@ -96,7 +95,7 @@ public class DefaultValueObjectTest {
 	 */
 	@Test
 	public void testEqualsObject_differentInstance_sameValues() {
-		final DefaultValueObject obj1 = EnhancedRandom.random(DefaultValueObject.class);
+		final DefaultValueObject obj1 = BarbelTestHelper.random(DefaultValueObject.class);
 		final DefaultValueObject obj2 = new DefaultValueObject(obj1);
 		assertTrue(obj1.equals(obj2));
 	}
@@ -106,55 +105,9 @@ public class DefaultValueObjectTest {
 	 */
 	@Test
 	public void testEqualsObject_differentInstance_differentValues_CopyConstructor() {
-		final DefaultValueObject obj1 = EnhancedRandom.random(DefaultValueObject.class);
-		final DefaultValueObject obj2 = new DefaultValueObject(EnhancedRandom.random(DefaultValueObject.class));
+		final DefaultValueObject obj1 = BarbelTestHelper.random(DefaultValueObject.class);
+		final DefaultValueObject obj2 = new DefaultValueObject(BarbelTestHelper.random(DefaultValueObject.class));
 		assertFalse(obj1.equals(obj2));
 	}
 
-	@Test()
-	public void testArgumentValidationInConstructor_Valid() {
-		BitemporalStamp stamp = new BitemporalStamp(EnhancedRandom.random(BitemporalStamp.class));
-		assertNotNull(stamp);
-	}
-	
-	@Test(expected=NullPointerException.class)
-	public void testArgumentValidationInConstructor_documentId () {
-		new BitemporalStamp(EnhancedRandom.random(BitemporalStamp.class, "documentId"));
-	}
-	
-	@Test(expected=NullPointerException.class)
-	public void testArgumentValidationInConstructor_effectiveFrom () {
-		new BitemporalStamp(EnhancedRandom.random(BitemporalStamp.class, "effectiveFrom"));
-	}
-
-	@Test(expected=NullPointerException.class)
-	public void testArgumentValidationInConstructor_createdAt () {
-		new BitemporalStamp(EnhancedRandom.random(BitemporalStamp.class, "createdAt"));
-	}
-	
-	@Test(expected=NullPointerException.class)
-	public void testArgumentValidationInConstructor_createdBy () {
-		new BitemporalStamp(EnhancedRandom.random(BitemporalStamp.class, "createdBy"));
-	}
-	
-	@Test(expected=NullPointerException.class)
-	public void testArgumentValidationInConstructor_inactivatedAt () {
-		new BitemporalStamp(EnhancedRandom.random(BitemporalStamp.class, "inactivatedAt"));
-	}
-	
-	@Test(expected=NullPointerException.class)
-	public void testArgumentValidationInConstructor_status () {
-		new BitemporalStamp(EnhancedRandom.random(BitemporalStamp.class, "status"));
-	}
-	
-	@Test(expected=NullPointerException.class)
-	public void testArgumentValidationInConstructor_inactivatedBy () {
-		new BitemporalStamp(EnhancedRandom.random(BitemporalStamp.class, "inactivatedBy"));
-	}
-	
-	@Test(expected=NullPointerException.class)
-	public void testArgumentValidationInConstructor_activity () {
-		new BitemporalStamp(EnhancedRandom.random(BitemporalStamp.class, "activity"));
-	}
-	
 }

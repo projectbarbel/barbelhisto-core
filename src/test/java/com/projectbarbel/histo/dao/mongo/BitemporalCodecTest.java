@@ -25,9 +25,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
+import com.projectbarbel.histo.BarbelTestHelper;
 import com.projectbarbel.histo.model.BitemporalStamp;
-
-import io.github.benas.randombeans.api.EnhancedRandom;
 
 public class BitemporalCodecTest {
 
@@ -49,7 +48,7 @@ public class BitemporalCodecTest {
     public void testEncode_StringsWritten() {
         BsonWriter writer = mock(BsonWriter.class);
         BitemporalCodec codec = new BitemporalCodec();
-        BitemporalStamp stamp = EnhancedRandom.random(BitemporalStamp.class);
+        BitemporalStamp stamp = BarbelTestHelper.random(BitemporalStamp.class);
         doNothing().when(writer).writeString(anyString(), anyString());
 
         codec.encode(writer, stamp, EncoderContext.builder().build()); // <- the test call
@@ -57,16 +56,16 @@ public class BitemporalCodecTest {
         ArgumentCaptor<String> documentCapture = ArgumentCaptor.forClass(String.class);
         verify(writer, times(5)).writeString(documentCapture.capture(),documentCapture.capture());
         assertEquals(documentCapture.getAllValues().get(1), stamp.getDocumentId());
-        assertEquals(documentCapture.getAllValues().get(3), stamp.getCreatedBy());
-        assertEquals(documentCapture.getAllValues().get(5), stamp.getStatus().name());
-        assertEquals(documentCapture.getAllValues().get(7), stamp.getInactivatedBy());
+        assertEquals(documentCapture.getAllValues().get(3), stamp.getRecordTime().createdBy);
+        assertEquals(documentCapture.getAllValues().get(5), stamp.getRecordTime().state.name());
+        assertEquals(documentCapture.getAllValues().get(7), stamp.getRecordTime().inactivatedBy);
         assertEquals(documentCapture.getAllValues().get(9), stamp.getActivity());
     }
 
     @Test
     public void testEncode_EncodeDecode_equals() throws IOException {
         BitemporalCodec codec = new BitemporalCodec();
-        BitemporalStamp stamp = EnhancedRandom.random(BitemporalStamp.class);
+        BitemporalStamp stamp = BarbelTestHelper.random(BitemporalStamp.class);
         codec.encode(writer, stamp, EncoderContext.builder().build());
         BsonInput bsonInput = createInputBuffer();
         BitemporalStamp decodedBitemporalStamp = codec.decode(new BsonBinaryReader(bsonInput),

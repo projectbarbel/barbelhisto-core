@@ -15,7 +15,10 @@ public final class BarbelHistoFactory<T> {
     public enum FactoryType {
 
         DAO((options) -> supplierBySupplierClassName(options.getDaoSupplierClassName())),
-        SERVICE((options) -> supplierBySupplierClassName(options.getServiceSupplierClassName()));
+        SERVICE((options) -> supplierBySupplierClassName(options.getServiceSupplierClassName())),
+        POJOCOPIER((options) -> supplierBySupplierClassName(options.getPojoCopierSupplierClassName())),
+        IDSUPPLIER((options) -> supplierBySupplierClassName(options.getIdSupplierClassName()));
+        
 
         private final Function<BarbelHistoOptions, Supplier<?>> composer;
 
@@ -45,12 +48,12 @@ public final class BarbelHistoFactory<T> {
     @SuppressWarnings("unchecked")
     public static <O> Supplier<O> createFactory(FactoryType type) {
         Validate.notNull(type);
-        return (Supplier<O>) type.getSupplier(BarbelHistoOptions.DEFAULT_CONFIG);
+        return (Supplier<O>) type.getSupplier(BarbelHistoOptions.ACTIVE_CONFIG);
     }
 
     public static Supplier<?> createFactory(String type) {
         Validate.notNull(type);
-        return FactoryType.valueOf(type.trim().toUpperCase()).getSupplier(BarbelHistoOptions.DEFAULT_CONFIG);
+        return FactoryType.valueOf(type.trim().toUpperCase()).getSupplier(BarbelHistoOptions.ACTIVE_CONFIG);
     }
 
     @SuppressWarnings("unchecked")

@@ -1,15 +1,17 @@
 package com.projectbarbel.histo;
 
-
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.time.LocalDate;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 import org.junit.Test;
 
 import com.projectbarbel.histo.BarbelHistoFactory.FactoryType;
 import com.projectbarbel.histo.dao.DocumentDao;
+import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.DefaultValueObject;
 import com.projectbarbel.histo.service.DocumentService.DocumentServiceProxy;
 
@@ -22,36 +24,42 @@ public class BarbelHistoFactoryTest {
 
     @Test(expected = RuntimeException.class)
     public void testCreateDaoFactory_withConfig_wrongName() {
-        BarbelHistoFactory.createFactory(FactoryType.DAO, BarbelHistoOptions.builder().withDaoSupplierClassName("bla").build());
+        BarbelHistoFactory.createFactory(FactoryType.DAO,
+                BarbelHistoOptions.builder().withDaoSupplierClassName("bla").build());
     }
 
     @Test()
     public void testCreateDaoFactory_withConfig_serviceClass() {
-        Supplier<?> supplier = BarbelHistoFactory.createFactory(FactoryType.DAO, BarbelHistoOptions.builder().withDaoSupplierClassName("com.projectbarbel.histo.service.DocumentService$DocumentServiceProxy").withServiceSupplierClassName("").build());
+        Supplier<?> supplier = BarbelHistoFactory.createFactory(FactoryType.DAO, BarbelHistoOptions.builder()
+                .withDaoSupplierClassName("com.projectbarbel.histo.service.DocumentService$DocumentServiceProxy")
+                .withServiceSupplierClassName("").build());
         assertTrue(supplier instanceof DocumentServiceProxy);
     }
-    
+
     @Test()
     public void testCreateDaoFactory_withConfig_serviceClass_stringFactoryName() {
-        Supplier<?> supplier = BarbelHistoFactory.createFactory("DAO", BarbelHistoOptions.builder().withDaoSupplierClassName("com.projectbarbel.histo.service.DocumentService$DocumentServiceProxy").withServiceSupplierClassName("").build());
+        Supplier<?> supplier = BarbelHistoFactory.createFactory("DAO", BarbelHistoOptions.builder()
+                .withDaoSupplierClassName("com.projectbarbel.histo.service.DocumentService$DocumentServiceProxy")
+                .withServiceSupplierClassName("").build());
         assertTrue(supplier instanceof DocumentServiceProxy);
     }
-    
-    @Test(expected=IllegalArgumentException.class)
+
+    @Test(expected = IllegalArgumentException.class)
     public void testCreateDaoFactory_withConfig_ConfigIsNull() {
         BarbelHistoFactory.createFactory("DAO", null);
     }
-    
-    @Test(expected=IllegalStateException.class)
+
+    @Test(expected = IllegalStateException.class)
     public void testCreateDaoFactory_withConfig_StringFactoryType_ConfigValueIsNull() {
         BarbelHistoFactory.createFactory("DAO", BarbelHistoOptions.builder().withDaoSupplierClassName(null).build());
     }
-    
-    @Test(expected=IllegalStateException.class)
+
+    @Test(expected = IllegalStateException.class)
     public void testCreateDaoFactory_withConfig_EnumFactoryType_ConfigValueIsNull() {
-        BarbelHistoFactory.createFactory(FactoryType.DAO, BarbelHistoOptions.builder().withDaoSupplierClassName(null).build());
+        BarbelHistoFactory.createFactory(FactoryType.DAO,
+                BarbelHistoOptions.builder().withDaoSupplierClassName(null).build());
     }
-    
+
     @Test()
     public void testCreateFactoryFactoryType_DefaultDaoFactory() {
         Supplier<?> factory = BarbelHistoFactory.createFactory(FactoryType.DAO);
@@ -63,13 +71,20 @@ public class BarbelHistoFactoryTest {
         DocumentDao<DefaultValueObject, String> dao = BarbelHistoFactory.createProduct(FactoryType.DAO);
         assertNotNull(dao);
     }
-    
+
+    @Test
+    public void testCreateFactoryFactoryType_DefaultIDSupplier() throws Exception {
+        Supplier<String> supplier = BarbelHistoFactory.createProduct(FactoryType.IDSUPPLIER);
+        assertNotNull(supplier);
+    }
+
     @Test()
     public void testCreateFactoryFactoryTypeWithOptions_DefaultDaoProduct() {
-        DocumentDao<DefaultValueObject, String> dao = BarbelHistoFactory.createProduct(FactoryType.DAO, BarbelHistoOptions.DEFAULT_CONFIG);
+        DocumentDao<DefaultValueObject, String> dao = BarbelHistoFactory.createProduct(FactoryType.DAO,
+                BarbelHistoOptions.ACTIVE_CONFIG);
         assertNotNull(dao);
     }
-    
+
     @Test()
     public void testCreateFactoryFactoryType_DefaultServiceFactory() {
         Supplier<?> factory = BarbelHistoFactory.createFactory(FactoryType.SERVICE);
@@ -80,9 +95,9 @@ public class BarbelHistoFactoryTest {
     public void testCreateFactoryFactoryType_DefaultServiceFactory_callTwice_ShouldBeSameFactory() {
         Supplier<?> factory1 = BarbelHistoFactory.createFactory(FactoryType.SERVICE);
         Supplier<?> factory2 = BarbelHistoFactory.createFactory(FactoryType.SERVICE);
-        assertTrue(factory1==factory2);
+        assertTrue(factory1 == factory2);
     }
-    
+
     @Test(expected = RuntimeException.class)
     public void testInstanceByClassName_UnknownClass() {
         BarbelHistoFactory.supplierBySupplierClassName("some.senseless.classpath.NonExistingClass");
@@ -96,5 +111,11 @@ public class BarbelHistoFactoryTest {
     @Test(expected = IllegalArgumentException.class)
     public void testInstanceByClassName_NullValuePassed() {
         BarbelHistoFactory.supplierBySupplierClassName(null);
+    }
+
+    @Test
+    public void testCreateProductFactoryType() throws Exception {
+        BiFunction<Bitemporal<?>, LocalDate, Bitemporal<?>> supplier = BarbelHistoFactory.createProduct(FactoryType.POJOCOPIER);
+        assertNotNull(supplier);
     }
 }

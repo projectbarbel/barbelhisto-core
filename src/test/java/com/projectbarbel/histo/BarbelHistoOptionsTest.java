@@ -6,7 +6,7 @@ public class BarbelHistoOptionsTest {
 
     @Test
     public void testValidate_DefaultConfig_shouldBeValid() {
-        BarbelHistoOptions.DEFAULT_CONFIG.validate();
+        BarbelHistoOptions.ACTIVE_CONFIG.validate();
     }
 
     @Test(expected=IllegalStateException.class)

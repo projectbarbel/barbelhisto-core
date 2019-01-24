@@ -56,7 +56,7 @@ public class MongoDocumentDaoImpl implements DocumentDao<DefaultMongoValueObject
 
 	@Override
 	public Optional<DefaultMongoValueObject> readDocument(ObjectId objectId) {
-	    Validate.notNull(objectId, "objectId must not be null when deleting a document");
+	    Validate.notNull(objectId, "objectId must not be null when reading a document");
 		FindIterable<DefaultMongoValueObject> docs = col.find(Filters.eq("objectId", objectId));
 		if (docs.iterator().hasNext()) {
 			return Optional.of(docs.first());

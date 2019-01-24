@@ -15,9 +15,8 @@ import com.mongodb.client.model.Filters;
 import com.projectbarbel.histo.BarbelHistoFactory;
 import com.projectbarbel.histo.BarbelHistoFactory.FactoryType;
 import com.projectbarbel.histo.BarbelHistoOptions;
+import com.projectbarbel.histo.BarbelTestHelper;
 import com.projectbarbel.histo.dao.DocumentDao;
-
-import io.github.benas.randombeans.api.EnhancedRandom;
 
 public class MongoDocumentDaoImpl_Create_IntegrationTest {
 
@@ -38,7 +37,7 @@ public class MongoDocumentDaoImpl_Create_IntegrationTest {
 
     @Test
     public void testCreateDocument_and_reset() {
-        DefaultMongoValueObject object = EnhancedRandom.random(DefaultMongoValueObject.class);
+        DefaultMongoValueObject object = BarbelTestHelper.random(DefaultMongoValueObject.class);
         dao.createDocument(object);
         DefaultMongoValueObject doc = dao.readDocument(object.getVersionId()).get();
         assertNotNull(doc);
@@ -49,7 +48,7 @@ public class MongoDocumentDaoImpl_Create_IntegrationTest {
 
     @Test(expected=MongoWriteException.class)
     public void testCreateDocument_and_CreateAgain_shouldThrowexception() {
-        DefaultMongoValueObject object = EnhancedRandom.random(DefaultMongoValueObject.class);
+        DefaultMongoValueObject object = BarbelTestHelper.random(DefaultMongoValueObject.class);
         dao.createDocument(object);
         DefaultMongoValueObject doc = dao.readDocument(object.getVersionId()).get();
         assertNotNull(doc);
@@ -58,16 +57,16 @@ public class MongoDocumentDaoImpl_Create_IntegrationTest {
     
     @Test
     public void testCreateDocument_findOne_byEffectiveFrom() {
-        DefaultMongoValueObject object = EnhancedRandom.random(DefaultMongoValueObject.class);
+        DefaultMongoValueObject object = BarbelTestHelper.random(DefaultMongoValueObject.class);
         dao.createDocument(object);
         DefaultMongoValueObject readObj = col.find(Filters.eq("bitemporalStamp.effectiveFrom.seconds",
-                object.getBitemporalStamp().getEffectiveFrom().getEpochSecond())).first();
+                object.getBitemporalStamp().getEffectiveTime().from.getEpochSecond())).first();
         assertEquals(object, readObj);
     }
 
     @Test
     public void testCreateDocument_findNone_byEffectiveFrom() {
-        DefaultMongoValueObject object = EnhancedRandom.random(DefaultMongoValueObject.class);
+        DefaultMongoValueObject object = BarbelTestHelper.random(DefaultMongoValueObject.class);
         dao.createDocument(object);
         // try find one where stored effective date is equal to specified value, when
         // specified value is non equal
@@ -77,8 +76,8 @@ public class MongoDocumentDaoImpl_Create_IntegrationTest {
 
     @Test
     public void testCreateDocument_findOne_byEffectiveFrom_GreaterEquals_EffectiveDate_Equal() {
-        DefaultMongoValueObject object = EnhancedRandom.random(DefaultMongoValueObject.class);
-        long epocheseconds = object.getBitemporalStamp().getEffectiveFrom().getEpochSecond();
+        DefaultMongoValueObject object = BarbelTestHelper.random(DefaultMongoValueObject.class);
+        long epocheseconds = object.getBitemporalStamp().getEffectiveTime().from.getEpochSecond();
         dao.createDocument(object);
         // try find one where stored effective date is greater/equals to specified
         // value, when specified value is equal
@@ -89,8 +88,8 @@ public class MongoDocumentDaoImpl_Create_IntegrationTest {
 
     @Test
     public void testCreateDocument_findNone_byEffectiveFrom_GreaterEquals_EffectiveDate_Greater() {
-        DefaultMongoValueObject object = EnhancedRandom.random(DefaultMongoValueObject.class);
-        long epocheseconds = object.getBitemporalStamp().getEffectiveFrom().getEpochSecond() + 2L;
+        DefaultMongoValueObject object = BarbelTestHelper.random(DefaultMongoValueObject.class);
+        long epocheseconds = object.getBitemporalStamp().getEffectiveTime().from.getEpochSecond() + 2L;
         dao.createDocument(object);
         // try find one where stored effective date is greater/equals to specified
         // value, when specified value is higher
@@ -101,8 +100,8 @@ public class MongoDocumentDaoImpl_Create_IntegrationTest {
 
     @Test
     public void testCreateDocument_findOne_byEffectiveFrom_GreaterEquals_EffectiveDate_Lower() {
-        DefaultMongoValueObject object = EnhancedRandom.random(DefaultMongoValueObject.class);
-        long epocheseconds = object.getBitemporalStamp().getEffectiveFrom().getEpochSecond() - 2L;
+        DefaultMongoValueObject object = BarbelTestHelper.random(DefaultMongoValueObject.class);
+        long epocheseconds = object.getBitemporalStamp().getEffectiveTime().from.getEpochSecond() - 2L;
         dao.createDocument(object);
         // try find one where stored effective date is greater/equals to specified
         // value, when specified value is lower
@@ -113,8 +112,8 @@ public class MongoDocumentDaoImpl_Create_IntegrationTest {
 
     @Test
     public void testCreateDocument_findOne_byEffectiveFrom_LowerEquals_EffectiveDate_Greater() {
-        DefaultMongoValueObject object = EnhancedRandom.random(DefaultMongoValueObject.class);
-        long epocheseconds = object.getBitemporalStamp().getEffectiveFrom().getEpochSecond() + 2L;
+        DefaultMongoValueObject object = BarbelTestHelper.random(DefaultMongoValueObject.class);
+        long epocheseconds = object.getBitemporalStamp().getEffectiveTime().from.getEpochSecond() + 2L;
         dao.createDocument(object);
         // try find one where stored effective date is lower/equals to specified value,
         // when specified value is higher
@@ -125,8 +124,8 @@ public class MongoDocumentDaoImpl_Create_IntegrationTest {
 
     @Test
     public void testCreateDocument_findOne_byEffectiveFrom_LowerEquals_EffectiveDate_Equals() {
-        DefaultMongoValueObject object = EnhancedRandom.random(DefaultMongoValueObject.class);
-        long epocheseconds = object.getBitemporalStamp().getEffectiveFrom().getEpochSecond();
+        DefaultMongoValueObject object = BarbelTestHelper.random(DefaultMongoValueObject.class);
+        long epocheseconds = object.getBitemporalStamp().getEffectiveTime().from.getEpochSecond();
         dao.createDocument(object);
         // try find one where stored effective date is lower/equals to specified value,
         // when specified value is equal

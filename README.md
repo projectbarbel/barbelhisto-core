@@ -25,12 +25,15 @@ This library enables you to store your data in a format that enables you to answ
 
 - bi-temporal data storage for No SQL and SQL data stores
 - small easy-to-use API (as simple as bi-temporal data storage can get)
+- works out of the box with default implementation and configuration
 - manage different time zones of client and server
 - build-in database support for different data stores
 - provides basic functionality, extendible for individual needs
 - remember every change to the data, nothing is ever going to be deleted
 - build-in thread safety by minimizing mutability
 - implemented in plain Java with no dependencies
+- highly configurable to adopt to specific needs
+- pretty print function to learn about bitemporal data storage
 
 # Build-in backends
 

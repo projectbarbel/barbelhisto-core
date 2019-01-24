@@ -13,8 +13,7 @@ import org.junit.Test;
 import com.projectbarbel.histo.BarbelHistoFactory;
 import com.projectbarbel.histo.BarbelHistoFactory.FactoryType;
 import com.projectbarbel.histo.BarbelHistoOptions;
-
-import io.github.benas.randombeans.api.EnhancedRandom;
+import com.projectbarbel.histo.BarbelTestHelper;
 
 public class MongoDocumentDaoImpl_Delete_IntegrationTest {
 
@@ -38,7 +37,7 @@ public class MongoDocumentDaoImpl_Delete_IntegrationTest {
 
 	@Test
 	public void testDeleteDocument() {
-		DefaultMongoValueObject object = EnhancedRandom.random(DefaultMongoValueObject.class);
+		DefaultMongoValueObject object = BarbelTestHelper.random(DefaultMongoValueObject.class);
 		Optional<ObjectId> oid = dao.createDocument(object);
 		DefaultMongoValueObject doc = dao.readDocument(oid.get()).orElse(null);
 		assertNotNull(doc);

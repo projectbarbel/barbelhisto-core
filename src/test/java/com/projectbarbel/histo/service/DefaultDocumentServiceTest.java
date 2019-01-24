@@ -12,10 +12,9 @@ import org.junit.Test;
 import com.projectbarbel.histo.BarbelHistoFactory;
 import com.projectbarbel.histo.BarbelHistoFactory.FactoryType;
 import com.projectbarbel.histo.BarbelHistoOptions;
+import com.projectbarbel.histo.BarbelTestHelper;
 import com.projectbarbel.histo.dao.DefaultDocumentDao;
 import com.projectbarbel.histo.model.DefaultValueObject;
-
-import io.github.benas.randombeans.api.EnhancedRandom;
 
 public class DefaultDocumentServiceTest {
 
@@ -42,14 +41,14 @@ public class DefaultDocumentServiceTest {
 
     @Test
     public void testCreateInitialDocument() {
-        DefaultValueObject object = EnhancedRandom.random(DefaultValueObject.class);
+        DefaultValueObject object = BarbelTestHelper.random(DefaultValueObject.class);
         Optional<String> oid = service.save(object);
         assertTrue(oid.isPresent());
     }
 
     @Test
     public void testCreateSecondVersion() {
-        DefaultValueObject object = EnhancedRandom.random(DefaultValueObject.class);
+        DefaultValueObject object = BarbelTestHelper.random(DefaultValueObject.class);
         Optional<String> oid = service.save(object);
         assertTrue(oid.isPresent());
         fail("fehlen diverse tests");

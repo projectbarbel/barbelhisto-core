@@ -7,9 +7,13 @@ import javax.annotation.Generated;
 
 public class DefaultValueObject implements Bitemporal<String> {
 
-    private final String versionId;
-    private final BitemporalStamp bitemporalStamp;
-    private final String data;
+    private String versionId;
+    private BitemporalStamp bitemporalStamp;
+    private String data;
+
+    public DefaultValueObject() {
+        super();
+    }
 
     @Generated("SparkTools")
     private DefaultValueObject(Builder builder) {

@@ -14,8 +14,7 @@ import org.junit.Test;
 import com.projectbarbel.histo.BarbelHistoFactory;
 import com.projectbarbel.histo.BarbelHistoFactory.FactoryType;
 import com.projectbarbel.histo.BarbelHistoOptions;
-
-import io.github.benas.randombeans.api.EnhancedRandom;
+import com.projectbarbel.histo.BarbelTestHelper;
 
 public class MongoDocumentDaoImpl_Update_IntegrationTest {
 
@@ -39,7 +38,7 @@ public class MongoDocumentDaoImpl_Update_IntegrationTest {
 
 	@Test
 	public void testUpdateDocument_updateData() {
-	    DefaultMongoValueObject object = EnhancedRandom.random(DefaultMongoValueObject.class);
+	    DefaultMongoValueObject object = BarbelTestHelper.random(DefaultMongoValueObject.class);
 		Optional<ObjectId> oid = dao.createDocument(object);
 		DefaultMongoValueObject doc = dao.readDocument(oid.get()).get();
 		DefaultMongoValueObject changedObj = new DefaultMongoValueObject(object.getVersionId(), object.getBitemporalStamp(), "new data");
@@ -52,7 +51,7 @@ public class MongoDocumentDaoImpl_Update_IntegrationTest {
 
 	@Test
 	public void testUpdateDocument_noUpdates() {
-	    DefaultMongoValueObject object = EnhancedRandom.random(DefaultMongoValueObject.class);
+	    DefaultMongoValueObject object = BarbelTestHelper.random(DefaultMongoValueObject.class);
 	    Optional<ObjectId> oid = dao.createDocument(object);
 		Optional<ObjectId> updatedOid = dao.updateDocument(oid.orElse(new ObjectId()), object);
 		DefaultMongoValueObject updatedDoc = dao.readDocument(updatedOid.orElse(new ObjectId())).get();

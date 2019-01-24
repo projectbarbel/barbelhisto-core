@@ -1,17 +1,14 @@
 package com.projectbarbel.histo.model;
 
-import static com.projectbarbel.histo.BarbelHistoHelper.effectiveDateToEffectiveUTCInstant;
-import static com.projectbarbel.histo.BarbelHistoHelper.transactionTimeToTransactionInstant;
-
-import java.time.Clock;
+import java.io.Serializable;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import javax.annotation.Generated;
 
-import com.projectbarbel.histo.model.Bitemporal.EffectivePeriod;
+import com.projectbarbel.histo.BarbelHistoFactory;
+import com.projectbarbel.histo.BarbelHistoFactory.FactoryType;
 
 /**
  * All instants representing utc time stamps.
@@ -23,239 +20,144 @@ public final class BitemporalStamp {
 
     public final static Instant NOT_INACTIVATED = Instant.ofEpochMilli(Long.MAX_VALUE);
     public final static String NOBODY = "NOBODY";
-    
-    public static class RecordPeriod {
-        public Instant createdAt;
-        public Instant inactivatedAt;
-        public BitemporalObjectState state;
-        public String inactivatedBy = NOBODY;
-        public static RecordPeriod valid() {
-            RecordPeriod rp = new RecordPeriod();
-            return rp.createdAt(Instant.now(Clock.systemUTC())).activate();
-        }
-        private RecordPeriod createdAt(Instant createdAt) {
-            this.createdAt = createdAt;
-            return this;
-        }
-        public RecordPeriod inactivate(String inactivatedBy) {
-            this.inactivatedAt = Instant.now(Clock.systemUTC());
-            this.state = BitemporalObjectState.INACTIVE;
-            this.inactivatedBy  = inactivatedBy;
-            return this;
-        }
-        public RecordPeriod activate() {
-            this.state = BitemporalObjectState.ACTIVE;
-            this.inactivatedAt = NOT_INACTIVATED;
-            return this;
-        }
-    }
 
+    protected final Serializable versionId;
     protected final String documentId;
-	protected final Instant effectiveFrom;
-	protected final Instant effectiveUntil;
-	protected final Instant createdAt;
-	protected final String createdBy;
-	protected final Instant inactivatedAt;
-	protected final BitemporalObjectState status;
-	protected final String inactivatedBy;
-	protected final String activity;
+    protected final String activity;
+    protected final EffectivePeriod effectiveTime;
+    protected final RecordPeriod recordTime;
+    protected final static Supplier<Serializable> idSupplier = BarbelHistoFactory.createProduct(FactoryType.IDSUPPLIER);
 
-    public static BitemporalStamp instance(String documentId, LocalDate effectiveFrom,
-            LocalDate effectiveUntil, String activity, String user, BitemporalObjectState state, ZonedDateTime inactivatedAt, String inactivatedBy) {
-        return BitemporalStamp.builder().withActivity(activity).withCreatedAt(Instant.now(Clock.systemUTC()))
-                .withCreatedBy(user).withDocumentId(documentId)
-                .withEffectiveFrom(effectiveDateToEffectiveUTCInstant(effectiveFrom))
-                .withEffectiveUntil(effectiveDateToEffectiveUTCInstant(effectiveUntil))
-                .withInactivatedAt(transactionTimeToTransactionInstant(inactivatedAt)).withInactivatedBy(inactivatedBy)
-                .withStatus(state).build();
-    }
-
-    public static BitemporalStamp instance(String activity, String user, String documentId, EffectivePeriod effectivePeriod, RecordPeriod recordPeriod) {
-        return BitemporalStamp.builder().withActivity(activity).withCreatedAt(Instant.now(Clock.systemUTC()))
-                .withCreatedBy(user).withDocumentId(documentId)
-                .withEffectiveFrom(effectiveDateToEffectiveUTCInstant(effectivePeriod.from))
-                .withEffectiveUntil(effectiveDateToEffectiveUTCInstant(effectivePeriod.until))
-                .withInactivatedAt(recordPeriod.inactivatedAt).withInactivatedBy(recordPeriod.inactivatedBy)
-                .withStatus(recordPeriod.state).build();
+    @Generated("SparkTools")
+    private BitemporalStamp(Builder builder) {
+        this.versionId = Objects.requireNonNull(builder.versionId);
+        this.documentId = Objects.requireNonNull(builder.documentId);
+        this.activity = Objects.requireNonNull(builder.activity);
+        this.effectiveTime = Objects.requireNonNull(builder.effectiveTime);
+        this.recordTime = Objects.requireNonNull(builder.recordTime);
     }
     
-    public BitemporalStamp(BitemporalStamp template) {
-        this(template.getDocumentId(), template.getEffectiveFrom(), template.getEffectiveUntil(),
-                template.getCreatedAt(), template.getCreatedBy(), template.getInactivatedAt(), template.getStatus(),
-                template.getInactivatedBy(), template.getActivity());
+    public static BitemporalStamp create(String activity, String documentId, EffectivePeriod effectivePeriod,
+            RecordPeriod recordPeriod) {
+        return BitemporalStamp.builder().withVersionId(Objects.requireNonNull(idSupplier.get())).withActivity(Objects.requireNonNull(activity)).withDocumentId(Objects.requireNonNull(documentId))
+                .withEffectiveTime(Objects.requireNonNull(effectivePeriod)).withRecordTime(Objects.requireNonNull(recordPeriod)).build();
     }
 
-	@Generated("SparkTools")
-	private BitemporalStamp(Builder builder) {
-		this.documentId = Objects.requireNonNull(builder.documentId);
-		this.effectiveFrom = Objects.requireNonNull(builder.effectiveFrom);
-		this.effectiveUntil = Objects.requireNonNull(builder.effectiveUntil);
-		this.createdAt = Objects.requireNonNull(builder.createdAt);
-		this.createdBy = Objects.requireNonNull(builder.createdBy);
-		this.inactivatedAt = Objects.requireNonNull(builder.inactivatedAt);
-		this.status = Objects.requireNonNull(builder.status);
-		this.inactivatedBy = Objects.requireNonNull(builder.inactivatedBy);
-		this.activity = Objects.requireNonNull(builder.activity);
-	}
+    public BitemporalStamp(BitemporalStamp template) {
+        this(template.getDocumentId(), template.getActivity(), template.getEffectiveTime(), template.getRecordTime());
+    }
 
-	private BitemporalStamp(String documentId, Instant effectiveFrom, Instant effectiveUntil, Instant createdAt,
-			String createdBy, Instant inactivatedAt, BitemporalObjectState status, String inactivatedBy, String activity) {
-		super();
-		this.documentId = Objects.requireNonNull(documentId, "documentId");
-		this.effectiveFrom = Objects.requireNonNull(effectiveFrom, "effectiveFrom");
-		this.effectiveUntil = Objects.requireNonNull(effectiveUntil, "effectiveUntil");
-		this.createdAt = Objects.requireNonNull(createdAt, "createdAt");
-		this.createdBy = Objects.requireNonNull(createdBy, "createdBy");
-		this.inactivatedAt = Objects.requireNonNull(inactivatedAt, "inactivatedAt");
-		this.status = Objects.requireNonNull(status, "status");
-		this.inactivatedBy = Objects.requireNonNull(inactivatedBy, "inactivatedBy");
-		this.activity = Objects.requireNonNull(activity, "activity");
-	}
+    public BitemporalStamp(String documentId, String activity, EffectivePeriod effectiveTime, RecordPeriod recordTime) {
+        super();
+        this.versionId = Objects.requireNonNull(idSupplier.get());
+        this.documentId = Objects.requireNonNull(documentId);
+        this.activity = Objects.requireNonNull(activity);
+        this.effectiveTime = Objects.requireNonNull(effectiveTime);
+        this.recordTime = Objects.requireNonNull(recordTime);
+    }
 
-	public String getDocumentId() {
-		return documentId;
-	}
+    public Object getVersionId() {
+        return versionId;
+    }
 
-	public Instant getEffectiveFrom() {
-		return effectiveFrom;
-	}
+    public EffectivePeriod getEffectiveTime() {
+        return effectiveTime;
+    }
 
-	public Instant getEffectiveUntil() {
-		return effectiveUntil;
-	}
+    public RecordPeriod getRecordTime() {
+        return recordTime;
+    }
 
-	public Instant getCreatedAt() {
-		return createdAt;
-	}
+    public String getDocumentId() {
+        return documentId;
+    }
 
-	public String getCreatedBy() {
-		return createdBy;
-	}
+    public String getActivity() {
+        return activity;
+    }
 
-	public Instant getInactivatedAt() {
-		return inactivatedAt;
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof BitemporalStamp)) {
+            return false;
+        }
+        BitemporalStamp abstractValueObject = (BitemporalStamp) o;
+        return Objects.equals(documentId, abstractValueObject.getDocumentId())
+                && Objects.equals(effectiveTime, abstractValueObject.getEffectiveTime())
+                && Objects.equals(recordTime, abstractValueObject.getRecordTime())
+                && Objects.equals(activity, abstractValueObject.getActivity());
+    }
 
-	public BitemporalObjectState getStatus() {
-		return status;
-	}
+    @Override
+    public int hashCode() {
+        return Objects.hash(documentId, effectiveTime, recordTime, activity);
+    }
 
-	public String getInactivatedBy() {
-		return inactivatedBy;
-	}
+    @Override
+    public String toString() {
+        return "BitemporalStamp [documentId=" + documentId + ", activity=" + activity + ", effectiveTime="
+                + effectiveTime + ", recordTime=" + recordTime + "]";
+    }
 
-	public String getActivity() {
-		return activity;
-	}
+    public BitemporalStamp inactivatedCopy(String inactivatedBy) {
+        return create(documentId, activity, 
+                EffectivePeriod.create().from(effectiveTime.from).until(effectiveTime.until),
+                RecordPeriod.create(recordTime.createdBy, recordTime.createdAt).inactivate(inactivatedBy));
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (o == this)
-			return true;
-		if (!(o instanceof BitemporalStamp)) {
-			return false;
-		}
-		BitemporalStamp abstractValueObject = (BitemporalStamp) o;
-		return Objects.equals(documentId, abstractValueObject.getDocumentId())
-				&& Objects.equals(effectiveFrom, abstractValueObject.getEffectiveFrom())
-				&& Objects.equals(effectiveUntil, abstractValueObject.getEffectiveUntil())
-				&& Objects.equals(createdAt, abstractValueObject.getCreatedAt())
-				&& Objects.equals(createdBy, abstractValueObject.getCreatedBy())
-				&& Objects.equals(inactivatedAt, abstractValueObject.getInactivatedAt())
-				&& Objects.equals(status, abstractValueObject.getStatus())
-				&& Objects.equals(inactivatedBy, abstractValueObject.getInactivatedBy())
-				&& Objects.equals(activity, abstractValueObject.getActivity());
-	}
+    /**
+     * Creates builder to build {@link BitemporalStamp}.
+     * @return created builder
+     */
+    @Generated("SparkTools")
+    public static Builder builder() {
+        return new Builder();
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(documentId, effectiveFrom, effectiveUntil, createdAt, createdBy, inactivatedAt, status,
-				inactivatedBy, activity);
-	}
+    /**
+     * Builder to build {@link BitemporalStamp}.
+     */
+    @Generated("SparkTools")
+    public static final class Builder {
+        private Serializable versionId;
+        private String documentId;
+        private String activity;
+        private EffectivePeriod effectiveTime;
+        private RecordPeriod recordTime;
 
-	@Override
-	public String toString() {
-		return "BitemporalStamp [documentId=" + documentId + ", effectiveFrom=" + effectiveFrom + ", effectiveUntil="
-				+ effectiveUntil + ", createdAt=" + createdAt + ", createdBy=" + createdBy + ", inactivatedAt="
-				+ inactivatedAt + ", status=" + status + ", inactivatedBy=" + inactivatedBy + ", activity=" + activity
-				+ "]";
-	}
+        private Builder() {
+        }
 
-	/**
-	 * Creates builder to build {@link BitemporalStamp}.
-	 * @return created builder
-	 */
-	@Generated("SparkTools")
-	public static Builder builder() {
-		return new Builder();
-	}
+        public Builder withVersionId(Serializable versionId) {
+            this.versionId = versionId;
+            return this;
+        }
 
-	/**
-	 * Builder to build {@link BitemporalStamp}.
-	 */
-	@Generated("SparkTools")
-	public static final class Builder {
-		private String documentId;
-		private Instant effectiveFrom;
-		private Instant effectiveUntil;
-		private Instant createdAt;
-		private String createdBy;
-		private Instant inactivatedAt;
-		private BitemporalObjectState status;
-		private String inactivatedBy;
-		private String activity;
+        public Builder withDocumentId(String documentId) {
+            this.documentId = documentId;
+            return this;
+        }
 
-		private Builder() {
-		}
+        public Builder withActivity(String activity) {
+            this.activity = activity;
+            return this;
+        }
 
-		public Builder withDocumentId(String documentId) {
-			this.documentId = documentId;
-			return this;
-		}
+        public Builder withEffectiveTime(EffectivePeriod effectiveTime) {
+            this.effectiveTime = effectiveTime;
+            return this;
+        }
 
-		public Builder withEffectiveFrom(Instant effectiveFrom) {
-			this.effectiveFrom = effectiveFrom;
-			return this;
-		}
+        public Builder withRecordTime(RecordPeriod recordTime) {
+            this.recordTime = recordTime;
+            return this;
+        }
 
-		public Builder withEffectiveUntil(Instant effectiveUntil) {
-			this.effectiveUntil = effectiveUntil;
-			return this;
-		}
-
-		public Builder withCreatedAt(Instant createdAt) {
-			this.createdAt = createdAt;
-			return this;
-		}
-
-		public Builder withCreatedBy(String createdBy) {
-			this.createdBy = createdBy;
-			return this;
-		}
-
-		public Builder withInactivatedAt(Instant inactivatedAt) {
-			this.inactivatedAt = inactivatedAt;
-			return this;
-		}
-
-		public Builder withStatus(BitemporalObjectState status) {
-			this.status = status;
-			return this;
-		}
-
-		public Builder withInactivatedBy(String inactivatedBy) {
-			this.inactivatedBy = inactivatedBy;
-			return this;
-		}
-
-		public Builder withActivity(String activity) {
-			this.activity = activity;
-			return this;
-		}
-
-		public BitemporalStamp build() {
-			return new BitemporalStamp(this);
-		}
-	}
+        public BitemporalStamp build() {
+            return new BitemporalStamp(this);
+        }
+    }
 
 }

@@ -12,9 +12,8 @@ import org.junit.Test;
 import com.projectbarbel.histo.BarbelHistoFactory;
 import com.projectbarbel.histo.BarbelHistoFactory.FactoryType;
 import com.projectbarbel.histo.BarbelHistoOptions;
+import com.projectbarbel.histo.BarbelTestHelper;
 import com.projectbarbel.histo.dao.DocumentDao;
-
-import io.github.benas.randombeans.api.EnhancedRandom;
 
 public class MongoDocumentDaoImpl_Reset_IntegrationTest {
 
@@ -38,7 +37,7 @@ public class MongoDocumentDaoImpl_Reset_IntegrationTest {
 
 	@Test(expected=NoSuchElementException.class)
 	public void testCreateDocument_andReset() {
-		DefaultMongoValueObject object = EnhancedRandom.random(DefaultMongoValueObject.class);
+		DefaultMongoValueObject object = BarbelTestHelper.random(DefaultMongoValueObject.class);
 		dao.createDocument(object);
 		DefaultMongoValueObject doc = dao.readDocument(object.getVersionId()).get();
 		assertNotNull(doc);
