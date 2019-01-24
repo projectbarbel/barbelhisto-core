@@ -13,6 +13,7 @@ import com.projectbarbel.histo.BarbelHistoFactory.FactoryType;
 import com.projectbarbel.histo.dao.DocumentDao;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.DefaultValueObject;
+import com.projectbarbel.histo.service.DocumentService;
 import com.projectbarbel.histo.service.DocumentService.DocumentServiceProxy;
 
 public class BarbelHistoFactoryTest {
@@ -115,7 +116,19 @@ public class BarbelHistoFactoryTest {
 
     @Test
     public void testCreateProductFactoryType() throws Exception {
-        BiFunction<Bitemporal<?>, LocalDate, Bitemporal<?>> supplier = BarbelHistoFactory.createProduct(FactoryType.POJOCOPIER);
-        assertNotNull(supplier);
+        BiFunction<Bitemporal<?>, LocalDate, Bitemporal<?>> copier = BarbelHistoFactory.createProduct(FactoryType.POJOCOPIER);
+        assertNotNull(copier);
+    }
+
+    @Test
+    public void testCreateProductFactoryType_ServiceSupplier() throws Exception {
+        DocumentService<Bitemporal<?>, ?> service = BarbelHistoFactory.createProduct(FactoryType.SERVICE);
+        assertNotNull(service);
+    }
+
+    @Test
+    public void testCreateProductFactoryType_IDSupplier() throws Exception {
+        Supplier<String> idSupplier = BarbelHistoFactory.createProduct(FactoryType.IDSUPPLIER);
+        assertNotNull(idSupplier);
     }
 }

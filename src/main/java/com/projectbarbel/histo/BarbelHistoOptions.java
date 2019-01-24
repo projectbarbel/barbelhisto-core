@@ -10,7 +10,7 @@ public class BarbelHistoOptions {
             .withDaoSupplierClassName("com.projectbarbel.histo.dao.DefaultDocumentDao$DefaultDaoSupplier")
             .withServiceSupplierClassName(
                     "com.projectbarbel.histo.service.DefaultDocumentService$DefaultDocumentServiceSupplier")
-            .withIdSupplierClassName("com.projectbarbel.histo.model.DefaultIDGeneratorSupplier")
+            .withIdSupplierClassName("com.projectbarbel.histo.model.DefaultIDGenerator$DefaultIDGeneratorSupplier")
             .withPojoCopierSupplierClassName("com.projectbarbel.histo.model.DefaultPojoCopier$DefaultPojoCopierSupplier")
             .build();
     /**
