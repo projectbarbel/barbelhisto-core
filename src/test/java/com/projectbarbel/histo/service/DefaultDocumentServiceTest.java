@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.projectbarbel.histo.BarbelHistoFactory;
-import com.projectbarbel.histo.BarbelHistoFactory.FactoryType;
+import com.projectbarbel.histo.BarbelHistoFactory.HistoType;
 import com.projectbarbel.histo.BarbelHistoOptions;
 import com.projectbarbel.histo.BarbelTestHelper;
 import com.projectbarbel.histo.dao.DefaultDocumentDao;
@@ -20,16 +20,17 @@ public class DefaultDocumentServiceTest {
 
     private DocumentService<DefaultValueObject, String> service;
     private DefaultDocumentDao dao;
-    private static BarbelHistoOptions opts = BarbelHistoOptions.builder()
-            .withDaoSupplierClassName("com.projectbarbel.histo.dao.DefaultDocumentDao$DefaultDaoSupplier")
-            .withServiceSupplierClassName(
-                    "com.projectbarbel.histo.service.DefaultDocumentService$DefaultDocumentServiceSupplier")
-            .build();
 
     @Before
     public void setUp() {
-        service = BarbelHistoFactory.createProduct(FactoryType.SERVICE, opts);
-        dao = BarbelHistoFactory.createProduct(FactoryType.DAO, opts);
+        BarbelHistoOptions.ACTIVE_CONFIG = BarbelHistoOptions.builder().withDefaultValues()
+                .withDaoClassName("com.projectbarbel.histo.dao.DefaultDocumentDao")
+                .withServiceClassName(
+                        "com.projectbarbel.histo.service.DefaultDocumentService")
+                .build();
+        BarbelHistoFactory.initialize();
+        service = BarbelHistoFactory.instanceOf(HistoType.SERVICE, new Object[] {BarbelHistoFactory.instanceOf(HistoType.DAO)});
+        dao = BarbelHistoFactory.instanceOf(HistoType.DAO);
         dao.reset();
     }
 

@@ -10,7 +10,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.projectbarbel.histo.BarbelHistoFactory;
-import com.projectbarbel.histo.BarbelHistoFactory.FactoryType;
+import com.projectbarbel.histo.BarbelHistoFactory.HistoType;
 import com.projectbarbel.histo.BarbelHistoOptions;
 import com.projectbarbel.histo.BarbelTestHelper;
 import com.projectbarbel.histo.dao.DocumentDao;
@@ -19,11 +19,11 @@ public class MongoDocumentDaoImpl_Reset_IntegrationTest {
 
 	private static DocumentDao<DefaultMongoValueObject, ObjectId> dao;
 
-	@BeforeClass
-	public static void beforeClass() {
-	    BarbelHistoOptions opts = BarbelHistoOptions.builder().withDaoSupplierClassName("com.projectbarbel.histo.dao.mongo.FlapDoodleEmbeddedMongoClientDaoSupplier").withServiceSupplierClassName("").build();
-	    dao = BarbelHistoFactory.createProduct(FactoryType.DAO, opts);
-	}
+    @BeforeClass
+    public static void beforeClass() {
+        BarbelHistoOptions.ACTIVE_CONFIG = BarbelHistoOptions.builder().withDefaultValues().withDaoClassName("com.projectbarbel.histo.dao.mongo.MongoDocumentDaoImpl").build();
+        dao = BarbelHistoFactory.instanceOf(HistoType.DAO, new Object[] {FlapDoodleEmbeddedMongoClientDaoSupplier.MONGOCLIENT.getMongo(), "test", "testCol"});
+    }
 
 	@Before
 	public void setUp() {

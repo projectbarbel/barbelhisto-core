@@ -56,6 +56,10 @@ public class EffectivePeriod {
         return this;
     }
 
+    public boolean isInfinite() {
+       return getEffectiveFromInstant().equals(INFINITE);
+    }
+    
     public EffectivePeriod fromNow() {
         this.from = BarbelHistoHelper.effectiveDateToEffectiveUTCInstant(LocalDate.now());
         return this;

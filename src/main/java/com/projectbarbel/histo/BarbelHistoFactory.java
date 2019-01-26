@@ -1,94 +1,93 @@
 package com.projectbarbel.histo;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.reflect.ConstructorUtils;
 
-public final class BarbelHistoFactory<T> {
+public final class BarbelHistoFactory {
 
-    private static Map<String, Supplier<?>> suppliers = new HashMap<String, Supplier<?>>();
-
-    public enum FactoryType {
-
-        DAO((options) -> supplierBySupplierClassName(options.getDaoSupplierClassName())),
-        SERVICE((options) -> supplierBySupplierClassName(options.getServiceSupplierClassName())),
-        POJOCOPIER((options) -> supplierBySupplierClassName(options.getPojoCopierSupplierClassName())),
-        IDSUPPLIER((options) -> supplierBySupplierClassName(options.getIdSupplierClassName()));
-        
-
-        private final Function<BarbelHistoOptions, Supplier<?>> composer;
-
-        FactoryType(Function<BarbelHistoOptions, Supplier<?>> composer) {
-            this.composer = composer;
-        }
-
-        private Supplier<?> getSupplier(BarbelHistoOptions options) {
-            return this.composer.apply(options);
-        }
+    private static Map<String, Object> beans = new ConcurrentHashMap<String, Object>();
+    private static Map<String, BiFunction<BarbelHistoOptions, Object[], Object>> factories = new ConcurrentHashMap<>();
+    static {
+        initialize();
+    }
+    
+    public enum HistoType {
+        DAO, SERVICE, COPIER, IDGENERATOR, UPDATER;
     }
 
+    public static synchronized void initialize() {
+        factories.clear();
+        beans.clear();
+        factories.computeIfAbsent(HistoType.DAO.name(), (k) -> (options, args) -> instantiate(options.getDaoClassName(), args));
+        factories.computeIfAbsent(HistoType.SERVICE.name(), (k) -> (options, args) -> instantiate(options.getServiceClassName(), args));
+        factories.computeIfAbsent(HistoType.COPIER.name(), (k) -> (options, args) -> instantiate(options.getPojoCopierClassName(), args));
+        factories.computeIfAbsent(HistoType.IDGENERATOR.name(), (k) -> 
+                (options, args) -> instantiate(options.getIdGeneratorClassName(), args));
+        factories.computeIfAbsent(HistoType.UPDATER.name(), (k) -> (options, args) -> instantiate(options.getUpdaterClassName(), args));
+    }
+    
     @SuppressWarnings("unchecked")
-    public static <T> Supplier<T> createFactory(FactoryType type, BarbelHistoOptions options) {
-        Validate.noNullElements(Arrays.asList(type, options));
-        options.validate();
-        return (Supplier<T>) type.getSupplier(options);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> Supplier<T> createFactory(String type, BarbelHistoOptions options) {
-        Validate.noNullElements(Arrays.asList(type, options));
-        options.validate();
-        return (Supplier<T>) FactoryType.valueOf(type.trim().toUpperCase()).getSupplier(options);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <O> Supplier<O> createFactory(FactoryType type) {
-        Validate.notNull(type);
-        return (Supplier<O>) type.getSupplier(BarbelHistoOptions.ACTIVE_CONFIG);
-    }
-
-    public static Supplier<?> createFactory(String type) {
-        Validate.notNull(type);
-        return FactoryType.valueOf(type.trim().toUpperCase()).getSupplier(BarbelHistoOptions.ACTIVE_CONFIG);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <O extends Supplier<O>> O supplierBySupplierClassName(String supplierClassName) {
-        Validate.noNullElements(Arrays.asList(supplierClassName));
-            return (O) suppliers.computeIfAbsent(supplierClassName, BarbelHistoFactory::instantiate);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <O extends Supplier<O>> O instantiate(String classname) {
+    protected static <O> O instantiate(String classname, Object... constructorArgs) {
+        Validate.notEmpty(classname, "classname must not be empty");
         try {
-            return (O)Class.forName(classname).newInstance();
+            return (O)ConstructorUtils.invokeConstructor(Class.forName(classname), constructorArgs);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("The class " + classname + " cannot be found.", e);
-        } catch (ClassCastException e) {
-            throw new RuntimeException(
-                    "The class " + classname + " must be of type java.util.function.Supplier!", e);
         } catch (InstantiationException e) {
             throw new RuntimeException("The class " + classname
                     + " could not be instintiated. Check that it has a public default constructor without any arguments.",
                     e);
         } catch (IllegalAccessException e) {
+            throw new RuntimeException("The class " + classname + " could not be instintiated. Check access rights.",
+                    e);
+        } catch (NoSuchMethodException e) {
             throw new RuntimeException(
-                    "The class " + classname + " could not be instintiated. Check access rights.", e);
+                    "The class " + classname + " could not be instintiated. Cannot find constructor method with arg(s): "
+                            + Arrays.stream(constructorArgs).map((arg)-> arg.getClass().getName()).collect(Collectors.joining(", ")),
+                    e);
+        } catch (SecurityException e) {
+            throw new RuntimeException("The class " + classname + " could not be instintiated. Security error. "
+                    + constructorArgs.toString(), e);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException(
+                    "The class " + classname + " could not be instintiated. Passed illegal arguments to constructor. "
+                            + Arrays.stream(constructorArgs).map((arg)-> arg.getClass().getName()).collect(Collectors.joining(", ")),
+                    e);
+        } catch (InvocationTargetException e) {
+            throw new RuntimeException(
+                    "The class " + classname + " could not be instintiated. An exception was thrown in target class. "
+                            + Arrays.stream(constructorArgs).map((arg)-> arg.getClass().getName()).collect(Collectors.joining(", ")),
+                    e);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T createProduct(FactoryType dao) {
-        return (T) createFactory(dao).get();
+    public static <T> T instanceOf(HistoType type) {
+        return (T)instanceOf(type, new Object[0]);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T createProduct(FactoryType dao, BarbelHistoOptions options) {
-        return (T) createFactory(dao, options).get();
+    public static <T> T instanceOf(HistoType type, Object... constructorArgs) {
+        Validate.noNullElements(Arrays.asList(type, BarbelHistoOptions.ACTIVE_CONFIG));
+        return (T)beans.computeIfAbsent(type.name(), (k) -> factories.get(type.name()).apply(BarbelHistoOptions.ACTIVE_CONFIG, constructorArgs));
     }
 
+    @SuppressWarnings("unchecked")
+    public static <T> T instanceOf(String customHistoType) {
+        return (T)instanceOf(customHistoType, new Object[0]);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T instanceOf(String customHistoType, Object... constructorArgs) {
+        Validate.noNullElements(Arrays.asList(customHistoType, constructorArgs, BarbelHistoOptions.ACTIVE_CONFIG));
+        return (T)beans.computeIfAbsent(customHistoType, (k) -> factories.get(customHistoType).apply(BarbelHistoOptions.ACTIVE_CONFIG, constructorArgs));
+    }
+    
 }

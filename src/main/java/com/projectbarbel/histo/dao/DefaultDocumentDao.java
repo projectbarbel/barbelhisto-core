@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
 
 import org.apache.commons.lang3.Validate;
 
@@ -12,15 +11,6 @@ import com.projectbarbel.histo.model.DefaultValueObject;
 
 public class DefaultDocumentDao implements DocumentDao<DefaultValueObject, String> {
 
-    public static class DefaultDaoSupplier implements Supplier<DefaultDocumentDao> {
-
-        @Override
-        public DefaultDocumentDao get() {
-            return new DefaultDocumentDao();
-        }
-        
-    }
-    
     private Map<String, DefaultValueObject> store = new ConcurrentHashMap<>();
 
     @Override

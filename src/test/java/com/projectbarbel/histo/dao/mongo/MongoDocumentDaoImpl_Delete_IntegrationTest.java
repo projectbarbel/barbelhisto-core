@@ -11,7 +11,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.projectbarbel.histo.BarbelHistoFactory;
-import com.projectbarbel.histo.BarbelHistoFactory.FactoryType;
+import com.projectbarbel.histo.BarbelHistoFactory.HistoType;
 import com.projectbarbel.histo.BarbelHistoOptions;
 import com.projectbarbel.histo.BarbelTestHelper;
 
@@ -21,8 +21,8 @@ public class MongoDocumentDaoImpl_Delete_IntegrationTest {
     
     @BeforeClass
     public static void beforeClass() {
-        BarbelHistoOptions opts = BarbelHistoOptions.builder().withDaoSupplierClassName("com.projectbarbel.histo.dao.mongo.FlapDoodleEmbeddedMongoClientDaoSupplier").withServiceSupplierClassName("").build();
-        dao = BarbelHistoFactory.createProduct(FactoryType.DAO, opts);
+        BarbelHistoOptions.ACTIVE_CONFIG = BarbelHistoOptions.builder().withDaoClassName("com.projectbarbel.histo.dao.mongo.FlapDoodleEmbeddedMongoClientDaoSupplier").build();
+        dao = BarbelHistoFactory.instanceOf(HistoType.DAO);
     }
 
     @Before

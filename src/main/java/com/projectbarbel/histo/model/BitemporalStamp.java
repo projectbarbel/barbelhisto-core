@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 import javax.annotation.Generated;
 
 import com.projectbarbel.histo.BarbelHistoFactory;
-import com.projectbarbel.histo.BarbelHistoFactory.FactoryType;
+import com.projectbarbel.histo.BarbelHistoFactory.HistoType;
 
 /**
  * All instants representing utc time stamps.
@@ -26,7 +26,7 @@ public final class BitemporalStamp {
     protected final String activity;
     protected final EffectivePeriod effectiveTime;
     protected final RecordPeriod recordTime;
-    protected final static Supplier<Serializable> idSupplier = BarbelHistoFactory.createProduct(FactoryType.IDSUPPLIER);
+    protected final static Supplier<Serializable> idSupplier = BarbelHistoFactory.instanceOf(HistoType.IDGENERATOR);
 
     @Generated("SparkTools")
     private BitemporalStamp(Builder builder) {
@@ -76,6 +76,16 @@ public final class BitemporalStamp {
         return activity;
     }
 
+    public BitemporalStamp inactivatedCopy(String inactivatedBy) {
+        return create(documentId, activity, 
+                EffectivePeriod.create().from(effectiveTime.from).until(effectiveTime.until),
+                RecordPeriod.create(recordTime.createdBy, recordTime.createdAt).inactivate(inactivatedBy));
+    }
+
+    public boolean isActive () {
+        return recordTime.state.equals(BitemporalObjectState.ACTIVE);
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (o == this)
@@ -99,12 +109,6 @@ public final class BitemporalStamp {
     public String toString() {
         return "BitemporalStamp [documentId=" + documentId + ", activity=" + activity + ", effectiveTime="
                 + effectiveTime + ", recordTime=" + recordTime + "]";
-    }
-
-    public BitemporalStamp inactivatedCopy(String inactivatedBy) {
-        return create(documentId, activity, 
-                EffectivePeriod.create().from(effectiveTime.from).until(effectiveTime.until),
-                RecordPeriod.create(recordTime.createdBy, recordTime.createdAt).inactivate(inactivatedBy));
     }
 
     /**

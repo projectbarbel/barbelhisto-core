@@ -1,22 +1,21 @@
 package com.projectbarbel.histo;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 
 public class BarbelHistoOptionsTest {
 
     @Test
-    public void testValidate_DefaultConfig_shouldBeValid() {
-        BarbelHistoOptions.ACTIVE_CONFIG.validate();
+    public void testAllSet() throws Exception {
+        assertTrue(BarbelHistoOptions.builder().withDefaultValues().build().allSet());
     }
 
-    @Test(expected=IllegalStateException.class)
-    public void testValidate_missingDaoClassName() {
-        BarbelHistoOptions.builder().withDaoSupplierClassName("").build().validate();
+    @Test
+    public void testAllSet_oneNull() throws Exception {
+        assertFalse(BarbelHistoOptions.builder().withDefaultValues().withDaoClassName(null).build().allSet());
     }
     
-    @Test(expected=IllegalStateException.class)
-    public void testValidate_missingServiceClassName() {
-        BarbelHistoOptions.builder().withServiceSupplierClassName("").build().validate();
-    }
     
 }

@@ -2,17 +2,8 @@ package com.projectbarbel.histo.model;
 
 import java.lang.reflect.Field;
 import java.util.function.BiFunction;
-import java.util.function.Supplier;
 
 public class DefaultPojoCopier implements BiFunction<Bitemporal<?>, BitemporalStamp, Bitemporal<?>>{
-
-    public static class DefaultPojoCopierSupplier implements Supplier<DefaultPojoCopier>{
-
-        @Override
-        public DefaultPojoCopier get() {
-            return new DefaultPojoCopier();
-        }
-    }
 
     @SuppressWarnings("unchecked")
     public <O extends Bitemporal<?>> O flatCopyWithNewStamp(Bitemporal<?> from, BitemporalStamp stamp) {

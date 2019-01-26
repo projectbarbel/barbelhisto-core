@@ -1,134 +1,134 @@
 package com.projectbarbel.histo;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import java.time.LocalDate;
-import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
+import org.junit.Before;
 import org.junit.Test;
 
-import com.projectbarbel.histo.BarbelHistoFactory.FactoryType;
+import com.projectbarbel.histo.BarbelHistoFactory.HistoType;
 import com.projectbarbel.histo.dao.DocumentDao;
-import com.projectbarbel.histo.model.Bitemporal;
+import com.projectbarbel.histo.model.DefaultIDGenerator;
+import com.projectbarbel.histo.model.DefaultPojoCopier;
 import com.projectbarbel.histo.model.DefaultValueObject;
+import com.projectbarbel.histo.service.DefaultDocumentService;
 import com.projectbarbel.histo.service.DocumentService;
 import com.projectbarbel.histo.service.DocumentService.DocumentServiceProxy;
 
 public class BarbelHistoFactoryTest {
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testCreateFactoryFactoryType_wrongType() {
-        BarbelHistoFactory.createFactory("");
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void testCreateDaoFactory_withConfig_wrongName() {
-        BarbelHistoFactory.createFactory(FactoryType.DAO,
-                BarbelHistoOptions.builder().withDaoSupplierClassName("bla").build());
-    }
-
-    @Test()
-    public void testCreateDaoFactory_withConfig_serviceClass() {
-        Supplier<?> supplier = BarbelHistoFactory.createFactory(FactoryType.DAO, BarbelHistoOptions.builder()
-                .withDaoSupplierClassName("com.projectbarbel.histo.service.DocumentService$DocumentServiceProxy")
-                .withServiceSupplierClassName("").build());
-        assertTrue(supplier instanceof DocumentServiceProxy);
-    }
-
-    @Test()
-    public void testCreateDaoFactory_withConfig_serviceClass_stringFactoryName() {
-        Supplier<?> supplier = BarbelHistoFactory.createFactory("DAO", BarbelHistoOptions.builder()
-                .withDaoSupplierClassName("com.projectbarbel.histo.service.DocumentService$DocumentServiceProxy")
-                .withServiceSupplierClassName("").build());
-        assertTrue(supplier instanceof DocumentServiceProxy);
+    @Before
+    public void setUp() {
+        BarbelHistoOptions.ACTIVE_CONFIG = BarbelHistoOptions.DEFAULT_CONFIG;
+        BarbelHistoFactory.initialize();
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCreateDaoFactory_withConfig_ConfigIsNull() {
-        BarbelHistoFactory.createFactory("DAO", null);
+    public void testInstanceOfFactoryFactoryType_nullType() {
+        HistoType type = null;
+        BarbelHistoFactory.instanceOf(type);
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testCreateDaoFactory_withConfig_StringFactoryType_ConfigValueIsNull() {
-        BarbelHistoFactory.createFactory("DAO", BarbelHistoOptions.builder().withDaoSupplierClassName(null).build());
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void testCreateDaoFactory_withConfig_EnumFactoryType_ConfigValueIsNull() {
-        BarbelHistoFactory.createFactory(FactoryType.DAO,
-                BarbelHistoOptions.builder().withDaoSupplierClassName(null).build());
+    @Test(expected = PassedException.class)
+    public void testInstanceOfDaoFactory_withConfig_wrongName() {
+        try {
+            BarbelHistoFactory.instanceOf(HistoType.DAO,
+                    BarbelHistoOptions.builder().withDaoClassName("bla").withIdGeneratorClassName("")
+                            .withPojoCopierClassName("").withServiceClassName("").withUpdaterClassName("").build());
+        } catch (RuntimeException e) {
+            BarbelTestHelper.passed();
+        }
+        fail();
     }
 
     @Test()
-    public void testCreateFactoryFactoryType_DefaultDaoFactory() {
-        Supplier<?> factory = BarbelHistoFactory.createFactory(FactoryType.DAO);
+    public void testInstanceOfDaoFactory_withCustomConfig_serviceClass() {
+        BarbelHistoOptions.ACTIVE_CONFIG = BarbelHistoOptions.builder()
+                .withDaoClassName("com.projectbarbel.histo.service.DocumentService$DocumentServiceProxy")
+                .withIdGeneratorClassName("").withPojoCopierClassName("").withServiceClassName("")
+                .withUpdaterClassName("").build();
+        Object bean = BarbelHistoFactory.instanceOf(HistoType.DAO);
+        assertTrue(bean instanceof DocumentServiceProxy);
+    }
+
+    @Test()
+    public void testInstanceOfDaoFactory_withConfig_serviceClass_stringFactoryName() {
+        BarbelHistoOptions.ACTIVE_CONFIG = BarbelHistoOptions.builder()
+                .withDaoClassName("com.projectbarbel.histo.service.DocumentService$DocumentServiceProxy")
+                .withIdGeneratorClassName("").withPojoCopierClassName("").withServiceClassName("")
+                .withUpdaterClassName("").build();
+        Object bean = BarbelHistoFactory.instanceOf("DAO");
+        assertTrue(bean instanceof DocumentServiceProxy);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInstanceOfDaoFactory_withConfig_ConfigIsNull() {
+        BarbelHistoFactory.instanceOf("DAO", (Object[])null);
+    }
+
+    @Test()
+    public void testInstanceOfFactoryFactoryType_DefaultDaoFactory() {
+        Object factory = BarbelHistoFactory.instanceOf(HistoType.DAO);
         assertNotNull(factory);
     }
 
     @Test()
-    public void testCreateFactoryFactoryType_DefaultDaoProduct() {
-        DocumentDao<DefaultValueObject, String> dao = BarbelHistoFactory.createProduct(FactoryType.DAO);
+    public void testInstanceOfFactoryFactoryType_DefaultDaoProduct() {
+        DocumentDao<DefaultValueObject, String> dao = BarbelHistoFactory.instanceOf(HistoType.DAO);
         assertNotNull(dao);
     }
 
     @Test
-    public void testCreateFactoryFactoryType_DefaultIDSupplier() throws Exception {
-        Supplier<String> supplier = BarbelHistoFactory.createProduct(FactoryType.IDSUPPLIER);
-        assertNotNull(supplier);
+    public void testInstanceOfFactoryFactoryType_DefaultIDGeneratror() throws Exception {
+        DefaultIDGenerator generator = BarbelHistoFactory.instanceOf(HistoType.IDGENERATOR);
+        assertNotNull(generator);
     }
 
     @Test()
-    public void testCreateFactoryFactoryTypeWithOptions_DefaultDaoProduct() {
-        DocumentDao<DefaultValueObject, String> dao = BarbelHistoFactory.createProduct(FactoryType.DAO,
-                BarbelHistoOptions.ACTIVE_CONFIG);
-        assertNotNull(dao);
+    public void testInstanceOfFactoryFactoryType_DefaultServiceFactory() {
+        DefaultDocumentService service = BarbelHistoFactory.instanceOf(HistoType.SERVICE, new Object[] {BarbelHistoFactory.instanceOf(HistoType.DAO)});
+        assertNotNull(service);
     }
 
     @Test()
-    public void testCreateFactoryFactoryType_DefaultServiceFactory() {
-        Supplier<?> factory = BarbelHistoFactory.createFactory(FactoryType.SERVICE);
-        assertNotNull(factory);
-    }
-
-    @Test()
-    public void testCreateFactoryFactoryType_DefaultServiceFactory_callTwice_ShouldBeSameFactory() {
-        Supplier<?> factory1 = BarbelHistoFactory.createFactory(FactoryType.SERVICE);
-        Supplier<?> factory2 = BarbelHistoFactory.createFactory(FactoryType.SERVICE);
-        assertTrue(factory1 == factory2);
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void testInstanceByClassName_UnknownClass() {
-        BarbelHistoFactory.supplierBySupplierClassName("some.senseless.classpath.NonExistingClass");
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void testInstanceByClassName_GenerateString() {
-        BarbelHistoFactory.supplierBySupplierClassName("java.jang.String");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testInstanceByClassName_NullValuePassed() {
-        BarbelHistoFactory.supplierBySupplierClassName(null);
+    @SuppressWarnings("rawtypes")
+    public void testInstanceOfFactoryFactoryType_DefaultServiceFactory_callTwice_ShouldBeSameFactory() {
+        DocumentService service1 = BarbelHistoFactory.instanceOf(HistoType.SERVICE, new Object[] {BarbelHistoFactory.instanceOf(HistoType.DAO)});
+        DocumentService service2 = BarbelHistoFactory.instanceOf(HistoType.SERVICE, new Object[] {BarbelHistoFactory.instanceOf(HistoType.DAO)});
+        assertTrue(service1 == service2);
     }
 
     @Test
-    public void testCreateProductFactoryType() throws Exception {
-        BiFunction<Bitemporal<?>, LocalDate, Bitemporal<?>> copier = BarbelHistoFactory.createProduct(FactoryType.POJOCOPIER);
+    public void testInstanceOfFactoryType() throws Exception {
+        DefaultPojoCopier copier = BarbelHistoFactory.instanceOf(HistoType.COPIER);
         assertNotNull(copier);
     }
 
     @Test
-    public void testCreateProductFactoryType_ServiceSupplier() throws Exception {
-        DocumentService<Bitemporal<?>, ?> service = BarbelHistoFactory.createProduct(FactoryType.SERVICE);
-        assertNotNull(service);
+    public void testInstanceOfFactoryType_IDSupplier() throws Exception {
+        Supplier<String> idSupplier = BarbelHistoFactory.instanceOf(HistoType.IDGENERATOR);
+        assertNotNull(idSupplier);
     }
 
     @Test
-    public void testCreateProductFactoryType_IDSupplier() throws Exception {
-        Supplier<String> idSupplier = BarbelHistoFactory.createProduct(FactoryType.IDSUPPLIER);
-        assertNotNull(idSupplier);
+    public void testInstantiate_withArgs() throws Exception {
+        Integer four = BarbelHistoFactory.instantiate("java.lang.Integer", "4");
+        assertEquals(new Integer(4), four);
     }
+
+    @Test
+    public void testInstantiate() throws Exception {
+        String string = BarbelHistoFactory.instantiate("java.lang.String");
+        assertEquals(new String(), string);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testInstantiate_withUnknownType() throws Exception {
+        throw new RuntimeException("not yet implemented");
+    }
+
 }

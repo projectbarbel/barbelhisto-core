@@ -1,54 +1,49 @@
 package com.projectbarbel.histo;
 
-import javax.annotation.Generated;
+import java.lang.reflect.Field;
 
-import org.apache.commons.lang3.Validate;
+import javax.annotation.Generated;
 
 public class BarbelHistoOptions {
 
-    private final static BarbelHistoOptions DEFAULT_CONFIG = builder()
-            .withDaoSupplierClassName("com.projectbarbel.histo.dao.DefaultDocumentDao$DefaultDaoSupplier")
-            .withServiceSupplierClassName(
-                    "com.projectbarbel.histo.service.DefaultDocumentService$DefaultDocumentServiceSupplier")
-            .withIdSupplierClassName("com.projectbarbel.histo.model.DefaultIDGenerator$DefaultIDGeneratorSupplier")
-            .withPojoCopierSupplierClassName("com.projectbarbel.histo.model.DefaultPojoCopier$DefaultPojoCopierSupplier")
-            .build();
+    public final static BarbelHistoOptions DEFAULT_CONFIG = builder().withDefaultValues().build();
     /**
      * Config used when no config is passed to a method or object, i.e. global default config
      */
     public static BarbelHistoOptions ACTIVE_CONFIG = DEFAULT_CONFIG;
-    private final String daoSupplierClassName;
-    private final String serviceSupplierClassName;
-    private final String idSupplierClassName;
-    private final String pojoCopierSupplierClassName;
+    private final String daoClassName;
+    private final String serviceClassName;
+    private final String idGeneratorClassName;
+    private final String pojoCopierClassName;
+    private final String updaterClassName;
 
     @Generated("SparkTools")
     private BarbelHistoOptions(Builder builder) {
-        this.daoSupplierClassName = builder.daoSupplierClassName;
-        this.serviceSupplierClassName = builder.serviceSupplierClassName;
-        this.idSupplierClassName = builder.idSupplierClassName;
-        this.pojoCopierSupplierClassName = builder.pojoCopierSupplierClassName;
+        this.daoClassName = builder.daoClassName;
+        this.serviceClassName = builder.serviceClassName;
+        this.idGeneratorClassName = builder.idGeneratorClassName;
+        this.pojoCopierClassName = builder.pojoCopierClassName;
+        this.updaterClassName = builder.updaterClassName;
     }
 
-    public String getPojoCopierSupplierClassName() {
-        return pojoCopierSupplierClassName;
+    public String getDaoClassName() {
+        return daoClassName;
     }
 
-    public String getIdSupplierClassName() {
-        return idSupplierClassName;
-    }
-    
-    public String getDaoSupplierClassName() {
-        return daoSupplierClassName;
+    public String getServiceClassName() {
+        return serviceClassName;
     }
 
-    public String getServiceSupplierClassName() {
-        return serviceSupplierClassName;
+    public String getIdGeneratorClassName() {
+        return idGeneratorClassName;
     }
 
-    public void validate() {
-        Validate.validState(daoSupplierClassName != null, "daoClassName must not be null");
-        Validate.validState(serviceSupplierClassName != null, "serviceClassName must not be null");
+    public String getPojoCopierClassName() {
+        return pojoCopierClassName;
+    }
+
+    public String getUpdaterClassName() {
+        return updaterClassName;
     }
 
     /**
@@ -65,37 +60,59 @@ public class BarbelHistoOptions {
      */
     @Generated("SparkTools")
     public static final class Builder {
-        private String daoSupplierClassName;
-        private String serviceSupplierClassName;
-        private String idSupplierClassName;
-        private String pojoCopierSupplierClassName;
+        private String daoClassName;
+        private String serviceClassName;
+        private String idGeneratorClassName;
+        private String pojoCopierClassName;
+        private String updaterClassName;
 
         private Builder() {
         }
-
-        public Builder withDaoSupplierClassName(String daoSupplierClassName) {
-            this.daoSupplierClassName = daoSupplierClassName;
+        
+        public Builder withDefaultValues() {
+            daoClassName = "com.projectbarbel.histo.dao.DefaultDocumentDao";
+            serviceClassName = "com.projectbarbel.histo.service.DefaultDocumentService";
+            idGeneratorClassName = "com.projectbarbel.histo.model.DefaultIDGenerator";
+            pojoCopierClassName = "com.projectbarbel.histo.model.DefaultPojoCopier";
+            updaterClassName = "com.projectbarbel.histo.model.VersionUpdate";
+            return this;
+        }
+        
+        public Builder withDaoClassName(String daoClassName) {
+            this.daoClassName = daoClassName;
             return this;
         }
 
-        public Builder withServiceSupplierClassName(String serviceSupplierClassName) {
-            this.serviceSupplierClassName = serviceSupplierClassName;
+        public Builder withServiceClassName(String serviceClassName) {
+            this.serviceClassName = serviceClassName;
             return this;
         }
 
-        public Builder withIdSupplierClassName(String idSupplierClassName) {
-            this.idSupplierClassName = idSupplierClassName;
+        public Builder withIdGeneratorClassName(String idGeneratorClassName) {
+            this.idGeneratorClassName = idGeneratorClassName;
             return this;
         }
 
-        public Builder withPojoCopierSupplierClassName(String pojoCopierSupplierClassName) {
-            this.pojoCopierSupplierClassName = pojoCopierSupplierClassName;
+        public Builder withPojoCopierClassName(String pojoCopierClassName) {
+            this.pojoCopierClassName = pojoCopierClassName;
+            return this;
+        }
+
+        public Builder withUpdaterClassName(String updaterClassName) {
+            this.updaterClassName = updaterClassName;
             return this;
         }
 
         public BarbelHistoOptions build() {
             return new BarbelHistoOptions(this);
         }
+    }
+    
+    public boolean allSet() throws IllegalAccessException {
+        for (Field f : getClass().getDeclaredFields())
+            if (f.get(this) == null)
+                return false;
+        return true;            
     }
 
 }

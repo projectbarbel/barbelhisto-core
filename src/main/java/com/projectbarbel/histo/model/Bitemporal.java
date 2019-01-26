@@ -42,7 +42,11 @@ public interface Bitemporal<O> {
     }
 
     default LocalDate getEffectiveUntil() {
-        return getBitemporalStamp().getEffectiveTime().getEffectiveFromLocalDate();
+        return getBitemporalStamp().getEffectiveTime().getEffectiveUntilLocalDate();
+    }
+    
+    default boolean isEffectiveInfinitely() {
+        return getEffectiveUntilInstant().equals(EffectivePeriod.INFINITE);
     }
 
 }
