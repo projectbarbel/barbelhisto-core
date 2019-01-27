@@ -59,7 +59,12 @@ public class VersionUpdate {
                 RecordPeriod.create(createdBy));
         newPrecedingVersion = copyFunction.apply(oldVersion, newPrecedingStamp);
         newSubsequentVersion = copyFunction.apply(oldVersion, newSubsequentStamp);
+        oldVersion.inactivate();
         return this;
+    }
+    
+    public Bitemporal<?> inactivatedVersion() {
+        return oldVersion;
     }
     
     public Bitemporal<?> precedingVersion() {

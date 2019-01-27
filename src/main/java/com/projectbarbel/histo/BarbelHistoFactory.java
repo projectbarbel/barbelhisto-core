@@ -13,7 +13,7 @@ import org.apache.commons.lang3.reflect.ConstructorUtils;
 public final class BarbelHistoFactory {
 
     public enum DefaultHistoType implements HistoType {
-        DAO, SERVICE, COPIER, IDGENERATOR, UPDATER;
+        DAO, SERVICE, COPIER, IDGENERATOR, UPDATER, UPDATEPOLICY;
     }
     
     public interface HistoType {String name();};
@@ -48,6 +48,8 @@ public final class BarbelHistoFactory {
                 (k) -> (options, args) -> BarbelHistoFactory.instantiate(options.getPojoCopierClassName(), args));
         factories.computeIfAbsent(DefaultHistoType.IDGENERATOR.name(),
                 (k) -> (options, args) -> BarbelHistoFactory.instantiate(options.getIdGeneratorClassName(), args));
+        factories.computeIfAbsent(DefaultHistoType.UPDATEPOLICY.name(),
+                (k) -> (options, args) -> BarbelHistoFactory.instantiate(options.getUpdatePolicyClassName(), args));
         factories.computeIfAbsent(DefaultHistoType.UPDATER.name(),
                 (k) -> (options, args) -> BarbelHistoFactory.instantiate(options.getUpdaterClassName(), args));
         return factories;

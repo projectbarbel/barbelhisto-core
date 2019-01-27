@@ -9,12 +9,12 @@ public class BarbelHistoOptionsTest {
 
     @Test
     public void testAllSet() throws Exception {
-        assertTrue(BarbelHistoOptions.builder().withDefaultValues().build().allSet());
+        assertTrue(BarbelHistoOptions.builderWithDefaultValues().build().allSet());
     }
 
     @Test
     public void testAllSet_oneNull() throws Exception {
-        assertFalse(BarbelHistoOptions.builder().withDefaultValues().withDaoClassName(null).build().allSet());
+        assertFalse(BarbelHistoOptions.builderWithDefaultValues().withDaoClassName(null).build().allSet());
     }
     
     

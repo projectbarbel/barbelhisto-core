@@ -13,6 +13,7 @@ import java.time.LocalDate;
 public interface Bitemporal<O> {
 
     BitemporalStamp getBitemporalStamp();
+    void setBitemporalStamp(BitemporalStamp stamp);
 
     /**
      * The unique ID of the value object version (not the documentId). Must be
@@ -47,6 +48,10 @@ public interface Bitemporal<O> {
     
     default boolean isEffectiveInfinitely() {
         return getEffectiveUntilInstant().equals(EffectivePeriod.INFINITE);
+    }
+
+    default void inactivate() {
+       setBitemporalStamp(getBitemporalStamp().inactivatedCopy(getDocumentId()));
     }
 
 }

@@ -11,14 +11,7 @@ public class BarbelHistoOptions {
     private final String idGeneratorClassName;
     private final String pojoCopierClassName;
     private final String updaterClassName;
-
-    public final static BarbelHistoOptions withDaoClassName(String customDaoClassName) {
-        return builder().withDefaultValues().withDaoClassName(customDaoClassName).build();
-    }
-
-    public static BarbelHistoOptions withDefaultValues() {
-        return builder().withDefaultValues().build();
-    }
+    private final String updatePolicyClassName;
 
     @Generated("SparkTools")
     private BarbelHistoOptions(Builder builder) {
@@ -27,6 +20,19 @@ public class BarbelHistoOptions {
         this.idGeneratorClassName = builder.idGeneratorClassName;
         this.pojoCopierClassName = builder.pojoCopierClassName;
         this.updaterClassName = builder.updaterClassName;
+        this.updatePolicyClassName = builder.updatePolicyClassName;
+    }
+
+    public final static BarbelHistoOptions withDaoClassName(String customDaoClassName) {
+        return builderWithDefaultValues().withDaoClassName(customDaoClassName).build();
+    }
+
+    public static BarbelHistoOptions withDefaultValues() {
+        return builderWithDefaultValues().build();
+    }
+
+    public String getUpdatePolicyClassName() {
+        return updatePolicyClassName;
     }
 
     public String getDaoClassName() {
@@ -49,9 +55,26 @@ public class BarbelHistoOptions {
         return updaterClassName;
     }
 
+    public static Builder builderWithDefaultValues() {
+        Builder builder = new Builder();
+        builder.daoClassName = "com.projectbarbel.histo.persistence.dao.DefaultDocumentDao";
+        builder.serviceClassName = "com.projectbarbel.histo.persistence.service.DefaultDocumentService";
+        builder.idGeneratorClassName = "com.projectbarbel.histo.model.DefaultIDGenerator";
+        builder.pojoCopierClassName = "com.projectbarbel.histo.model.DefaultPojoCopier";
+        builder.updaterClassName = "com.projectbarbel.histo.model.VersionUpdate";
+        builder.updatePolicyClassName = "com.projectbarbel.histo.model.KeepSubsequentUpdatePolicy";
+        return builder;
+    }
+
+    public boolean allSet() throws IllegalAccessException {
+        for (Field f : getClass().getDeclaredFields())
+            if (f.get(this) == null)
+                return false;
+        return true;
+    }
+
     /**
      * Creates builder to build {@link BarbelHistoOptions}.
-     * 
      * @return created builder
      */
     @Generated("SparkTools")
@@ -69,17 +92,9 @@ public class BarbelHistoOptions {
         private String idGeneratorClassName;
         private String pojoCopierClassName;
         private String updaterClassName;
+        private String updatePolicyClassName;
 
         private Builder() {
-        }
-
-        public Builder withDefaultValues() {
-            daoClassName = "com.projectbarbel.histo.persistence.dao.DefaultDocumentDao";
-            serviceClassName = "com.projectbarbel.histo.persistence.service.DefaultDocumentService";
-            idGeneratorClassName = "com.projectbarbel.histo.model.DefaultIDGenerator";
-            pojoCopierClassName = "com.projectbarbel.histo.model.DefaultPojoCopier";
-            updaterClassName = "com.projectbarbel.histo.model.VersionUpdate";
-            return this;
         }
 
         public Builder withDaoClassName(String daoClassName) {
@@ -107,16 +122,14 @@ public class BarbelHistoOptions {
             return this;
         }
 
+        public Builder withUpdatePolicyClassName(String updatePolicyClassName) {
+            this.updatePolicyClassName = updatePolicyClassName;
+            return this;
+        }
+
         public BarbelHistoOptions build() {
             return new BarbelHistoOptions(this);
         }
-    }
-
-    public boolean allSet() throws IllegalAccessException {
-        for (Field f : getClass().getDeclaredFields())
-            if (f.get(this) == null)
-                return false;
-        return true;
     }
 
 }

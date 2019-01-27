@@ -13,6 +13,7 @@ import com.projectbarbel.histo.BarbelHistoFactory.DefaultHistoType;
 import com.projectbarbel.histo.model.DefaultIDGenerator;
 import com.projectbarbel.histo.model.DefaultPojoCopier;
 import com.projectbarbel.histo.model.DefaultValueObject;
+import com.projectbarbel.histo.model.KeepSubsequentUpdatePolicy;
 import com.projectbarbel.histo.model.VersionUpdate;
 import com.projectbarbel.histo.persistence.dao.DefaultDocumentDao;
 import com.projectbarbel.histo.persistence.service.DefaultDocumentService;
@@ -47,14 +48,14 @@ public class BarbelHistoFactoryTest {
     @Test
     public void testCreate_withBarbelHistoOptions() throws Exception {
         BarbelHistoFactory factory = BarbelHistoFactory
-                .create(BarbelHistoOptions.builder().withDefaultValues().withDaoClassName("blabla").build());
+                .create(BarbelHistoOptions.builderWithDefaultValues().withDaoClassName("blabla").build());
         assertEquals(factory.options().getDaoClassName(), "blabla");
     }
 
     @Test
     public void testCreate_withBarbelHistoOptionsAndFactories() throws Exception {
         BarbelHistoFactory factory = BarbelHistoFactory.create(
-                BarbelHistoOptions.builder().withDefaultValues().withDaoClassName("blabla").build(),
+                BarbelHistoOptions.builderWithDefaultValues().withDaoClassName("blabla").build(),
                 Collections.emptyMap());
         assertTrue(factory.factories().size() == 0);
     }
@@ -88,6 +89,12 @@ public class BarbelHistoFactoryTest {
         assertNotNull(bean);
     }
 
+    @Test
+    public void testInstanceOfHistoType_UpdatePolicy() throws Exception {
+        KeepSubsequentUpdatePolicy bean = factory.instanceOf(DefaultHistoType.UPDATEPOLICY);
+        assertNotNull(bean);
+    }
+    
     @Test(expected = RuntimeException.class)
     public void testInstanceOfHistoType_Service() throws Exception {
         DefaultDocumentService bean = factory.instanceOf(DefaultHistoType.SERVICE);

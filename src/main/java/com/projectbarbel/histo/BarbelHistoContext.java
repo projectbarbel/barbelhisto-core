@@ -19,7 +19,7 @@ public class BarbelHistoContext {
     }
 
     public static BarbelHistoContext createDefault() {
-        BarbelHistoOptions options = BarbelHistoOptions.builder().withDefaultValues().build();
+        BarbelHistoOptions options = BarbelHistoOptions.builderWithDefaultValues().build();
         BarbelHistoFactory factory = BarbelHistoFactory.create(options);
         return new BarbelHistoContext(options, factory);
     }

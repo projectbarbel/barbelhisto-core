@@ -120,4 +120,9 @@ public class DefaultValueObject implements Bitemporal<String> {
         }
     }
 
+    @Override
+    public void setBitemporalStamp(BitemporalStamp stamp) {
+        this.bitemporalStamp = stamp;
+    }
+
 }

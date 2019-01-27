@@ -28,6 +28,11 @@ public class DefaultPojoCopierTest {
         public BitemporalStamp getBitemporalStamp() {
             return stamp;
         }
+
+        @Override
+        public void setBitemporalStamp(BitemporalStamp stamp) {
+            this.stamp = stamp;
+        }
         
     }
     
