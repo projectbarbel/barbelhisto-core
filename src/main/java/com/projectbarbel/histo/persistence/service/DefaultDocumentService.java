@@ -1,10 +1,10 @@
-package com.projectbarbel.histo.service;
+package com.projectbarbel.histo.persistence.service;
 
 import java.util.Optional;
 
-import com.projectbarbel.histo.dao.DefaultDocumentDao;
-import com.projectbarbel.histo.dao.DocumentDao;
 import com.projectbarbel.histo.model.DefaultValueObject;
+import com.projectbarbel.histo.persistence.dao.DefaultDocumentDao;
+import com.projectbarbel.histo.persistence.dao.DocumentDao;
 
 public class DefaultDocumentService implements DocumentService<DefaultValueObject, String> {
 

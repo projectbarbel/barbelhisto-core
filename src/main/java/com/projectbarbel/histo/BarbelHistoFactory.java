@@ -10,8 +10,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.reflect.ConstructorUtils;
 
-import com.projectbarbel.histo.model.HistoContextAware;
-
 public final class BarbelHistoFactory {
 
     public enum DefaultHistoType implements HistoType {
@@ -103,19 +101,11 @@ public final class BarbelHistoFactory {
         Validate.noNullElements(Arrays.asList(customHistoType, constructorArgs, options));
         T bean = (T) beans.computeIfAbsent(customHistoType,
                 (k) -> factories.get(customHistoType).apply(options, constructorArgs));
-        makeContextAware(bean);
         return bean;
     }
     
     public <T> T instanceOf(HistoType type, Object... constructorArgs) {
         return instanceOf(type.name(), constructorArgs);
-    }
-
-    private void makeContextAware(Object bean) {
-        if (bean instanceof HistoContextAware) {
-            ((HistoContextAware) bean)
-                    .withContext(BarbelHistoContext.of(options(), this));
-        }
     }
 
     @SuppressWarnings("unchecked")

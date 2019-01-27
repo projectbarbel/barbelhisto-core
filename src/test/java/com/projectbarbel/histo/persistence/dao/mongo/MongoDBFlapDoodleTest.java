@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.dao.mongo;
+package com.projectbarbel.histo.persistence.dao.mongo;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;

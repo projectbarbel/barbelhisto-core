@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.dao;
+package com.projectbarbel.histo.persistence.dao;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import com.projectbarbel.histo.model.DefaultValueObject;
+import com.projectbarbel.histo.persistence.dao.DocumentDao;
 
 public class DocumentDaoTest {
 

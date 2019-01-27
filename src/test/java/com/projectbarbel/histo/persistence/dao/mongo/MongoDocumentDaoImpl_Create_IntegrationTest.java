@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.dao.mongo;
+package com.projectbarbel.histo.persistence.dao.mongo;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -14,9 +14,11 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelHistoFactory.DefaultHistoType;
+import com.projectbarbel.histo.persistence.dao.DocumentDao;
+import com.projectbarbel.histo.persistence.dao.mongo.DefaultMongoValueObject;
+import com.projectbarbel.histo.persistence.dao.mongo.MongoDocumentDaoImpl;
 import com.projectbarbel.histo.BarbelHistoOptions;
 import com.projectbarbel.histo.BarbelTestHelper;
-import com.projectbarbel.histo.dao.DocumentDao;
 
 public class MongoDocumentDaoImpl_Create_IntegrationTest {
 
@@ -25,7 +27,7 @@ public class MongoDocumentDaoImpl_Create_IntegrationTest {
 
     @BeforeClass
     public static void beforeClass() {
-        BarbelHistoOptions opts = BarbelHistoOptions.withDaoClassName("com.projectbarbel.histo.dao.mongo.MongoDocumentDaoImpl");
+        BarbelHistoOptions opts = BarbelHistoOptions.withDaoClassName("com.projectbarbel.histo.persistence.dao.mongo.MongoDocumentDaoImpl");
         BarbelHistoContext ctx = BarbelHistoContext.of(opts);
         dao = ctx.factory().instanceOf(DefaultHistoType.DAO, new Object[] {FlapDoodleEmbeddedMongoClientDaoSupplier.MONGOCLIENT.getMongo(), "test", "testCol"});
     }

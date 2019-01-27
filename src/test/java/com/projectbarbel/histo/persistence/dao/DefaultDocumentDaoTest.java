@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.dao;
+package com.projectbarbel.histo.persistence.dao;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -14,6 +14,7 @@ import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelHistoFactory.DefaultHistoType;
 import com.projectbarbel.histo.BarbelTestHelper;
 import com.projectbarbel.histo.model.DefaultValueObject;
+import com.projectbarbel.histo.persistence.dao.DefaultDocumentDao;
 
 public class DefaultDocumentDaoTest {
 

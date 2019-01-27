@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.service;
+package com.projectbarbel.histo.persistence.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -12,8 +12,9 @@ import org.junit.Test;
 import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelHistoFactory.DefaultHistoType;
 import com.projectbarbel.histo.BarbelTestHelper;
-import com.projectbarbel.histo.dao.DefaultDocumentDao;
 import com.projectbarbel.histo.model.DefaultValueObject;
+import com.projectbarbel.histo.persistence.dao.DefaultDocumentDao;
+import com.projectbarbel.histo.persistence.service.DocumentService;
 
 public class DefaultDocumentServiceTest {
 

@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.dao.mongo;
+package com.projectbarbel.histo.persistence.dao.mongo;
 
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
@@ -15,7 +15,10 @@ import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
-import com.projectbarbel.histo.dao.DocumentDao;
+import com.projectbarbel.histo.persistence.dao.DocumentDao;
+import com.projectbarbel.histo.persistence.dao.mongo.BitemporalCodec;
+import com.projectbarbel.histo.persistence.dao.mongo.DefaultMongoValueObject;
+import com.projectbarbel.histo.persistence.dao.mongo.MongoDocumentDaoImpl;
 
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodProcess;

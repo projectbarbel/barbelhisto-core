@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.dao.mongo;
+package com.projectbarbel.histo.persistence.dao.mongo;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -27,6 +27,7 @@ import org.mockito.ArgumentCaptor;
 
 import com.projectbarbel.histo.BarbelTestHelper;
 import com.projectbarbel.histo.model.BitemporalStamp;
+import com.projectbarbel.histo.persistence.dao.mongo.BitemporalCodec;
 
 public class BitemporalCodecTest {
 

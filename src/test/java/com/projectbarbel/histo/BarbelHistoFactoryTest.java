@@ -10,12 +10,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.projectbarbel.histo.BarbelHistoFactory.DefaultHistoType;
-import com.projectbarbel.histo.dao.DefaultDocumentDao;
 import com.projectbarbel.histo.model.DefaultIDGenerator;
 import com.projectbarbel.histo.model.DefaultPojoCopier;
 import com.projectbarbel.histo.model.DefaultValueObject;
 import com.projectbarbel.histo.model.VersionUpdate;
-import com.projectbarbel.histo.service.DefaultDocumentService;
+import com.projectbarbel.histo.persistence.dao.DefaultDocumentDao;
+import com.projectbarbel.histo.persistence.service.DefaultDocumentService;
 
 public class BarbelHistoFactoryTest {
 

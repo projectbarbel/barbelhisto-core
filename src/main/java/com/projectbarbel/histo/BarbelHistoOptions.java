@@ -74,8 +74,8 @@ public class BarbelHistoOptions {
         }
 
         public Builder withDefaultValues() {
-            daoClassName = "com.projectbarbel.histo.dao.DefaultDocumentDao";
-            serviceClassName = "com.projectbarbel.histo.service.DefaultDocumentService";
+            daoClassName = "com.projectbarbel.histo.persistence.dao.DefaultDocumentDao";
+            serviceClassName = "com.projectbarbel.histo.persistence.service.DefaultDocumentService";
             idGeneratorClassName = "com.projectbarbel.histo.model.DefaultIDGenerator";
             pojoCopierClassName = "com.projectbarbel.histo.model.DefaultPojoCopier";
             updaterClassName = "com.projectbarbel.histo.model.VersionUpdate";

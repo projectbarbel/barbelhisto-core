@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.dao.mongo;
+package com.projectbarbel.histo.persistence.dao.mongo;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -11,6 +11,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.CreateCollectionOptions;
 import com.mongodb.client.model.Filters;
 import com.projectbarbel.histo.BarbelTestHelper;
+import com.projectbarbel.histo.persistence.dao.mongo.DefaultMongoValueObject;
 
 public class MongoPojoIntegrationTests {
 

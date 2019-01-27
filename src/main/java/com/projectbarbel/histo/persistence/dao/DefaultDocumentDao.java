@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.dao;
+package com.projectbarbel.histo.persistence.dao;
 
 import java.util.List;
 import java.util.Map;

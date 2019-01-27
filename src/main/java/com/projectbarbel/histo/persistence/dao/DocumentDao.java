@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.dao;
+package com.projectbarbel.histo.persistence.dao;
 
 import java.lang.reflect.Proxy;
 import java.util.List;
