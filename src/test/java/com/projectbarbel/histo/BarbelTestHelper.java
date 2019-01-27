@@ -13,15 +13,18 @@ import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 import com.projectbarbel.histo.model.BitemporalStamp;
+import com.projectbarbel.histo.model.DefaultIDGenerator;
 import com.projectbarbel.histo.model.DefaultValueObject;
 import com.projectbarbel.histo.model.EffectivePeriod;
 import com.projectbarbel.histo.model.RecordPeriod;
 
 import io.github.benas.randombeans.EnhancedRandomBuilder;
+import io.github.benas.randombeans.FieldDefinition;
 import io.github.benas.randombeans.api.EnhancedRandom;
 
 public class BarbelTestHelper {
 
+    @SuppressWarnings("rawtypes")
     public static <T> T random(Class<T> clazz, String... excludedFields) {
         return EnhancedRandomBuilder.aNewEnhancedRandomBuilder().randomize(Serializable.class, new Supplier<String>() {
 
@@ -48,6 +51,12 @@ public class BarbelTestHelper {
             public RecordPeriod get() {
                 return RecordPeriod.create(EnhancedRandom.random(String.class), randomInstant(2000, 2020));
             }
+        }).randomize(new FieldDefinition<BitemporalStamp, Supplier>("idSupplier", Supplier.class, BitemporalStamp.class),new Supplier<DefaultIDGenerator>() {
+
+            @Override
+            public DefaultIDGenerator get() {
+                return new DefaultIDGenerator();
+            }
         }).build().nextObject(clazz, excludedFields);
     }
 
@@ -61,7 +70,7 @@ public class BarbelTestHelper {
 
     private static BitemporalStamp createPeriod(String docId, List<LocalDate> effectiveDates, int listPointer) {
         return BitemporalStamp
-                .create("SYSTEM_PROCESS", docId,
+                .of("SYSTEM_PROCESS", docId,
                         effectiveDates.size() - 1 == listPointer
                                 ? EffectivePeriod.create().from(effectiveDates.get(listPointer)).toInfinite()
                                 : EffectivePeriod.create().from(effectiveDates.get(listPointer))

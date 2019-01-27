@@ -6,16 +6,19 @@ import javax.annotation.Generated;
 
 public class BarbelHistoOptions {
 
-    public final static BarbelHistoOptions DEFAULT_CONFIG = builder().withDefaultValues().build();
-    /**
-     * Config used when no config is passed to a method or object, i.e. global default config
-     */
-    public static BarbelHistoOptions ACTIVE_CONFIG = DEFAULT_CONFIG;
     private final String daoClassName;
     private final String serviceClassName;
     private final String idGeneratorClassName;
     private final String pojoCopierClassName;
     private final String updaterClassName;
+
+    public final static BarbelHistoOptions withDaoClassName(String customDaoClassName) {
+        return builder().withDefaultValues().withDaoClassName(customDaoClassName).build();
+    }
+
+    public static BarbelHistoOptions withDefaultValues() {
+        return builder().withDefaultValues().build();
+    }
 
     @Generated("SparkTools")
     private BarbelHistoOptions(Builder builder) {
@@ -48,6 +51,7 @@ public class BarbelHistoOptions {
 
     /**
      * Creates builder to build {@link BarbelHistoOptions}.
+     * 
      * @return created builder
      */
     @Generated("SparkTools")
@@ -68,7 +72,7 @@ public class BarbelHistoOptions {
 
         private Builder() {
         }
-        
+
         public Builder withDefaultValues() {
             daoClassName = "com.projectbarbel.histo.dao.DefaultDocumentDao";
             serviceClassName = "com.projectbarbel.histo.service.DefaultDocumentService";
@@ -77,7 +81,7 @@ public class BarbelHistoOptions {
             updaterClassName = "com.projectbarbel.histo.model.VersionUpdate";
             return this;
         }
-        
+
         public Builder withDaoClassName(String daoClassName) {
             this.daoClassName = daoClassName;
             return this;
@@ -107,12 +111,12 @@ public class BarbelHistoOptions {
             return new BarbelHistoOptions(this);
         }
     }
-    
+
     public boolean allSet() throws IllegalAccessException {
         for (Field f : getClass().getDeclaredFields())
             if (f.get(this) == null)
                 return false;
-        return true;            
+        return true;
     }
 
 }

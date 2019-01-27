@@ -10,9 +10,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.projectbarbel.histo.BarbelHistoFactory;
-import com.projectbarbel.histo.BarbelHistoFactory.HistoType;
-import com.projectbarbel.histo.BarbelHistoOptions;
+import com.projectbarbel.histo.BarbelHistoContext;
+import com.projectbarbel.histo.BarbelHistoFactory.DefaultHistoType;
 import com.projectbarbel.histo.BarbelTestHelper;
 import com.projectbarbel.histo.model.DefaultValueObject;
 
@@ -22,9 +21,7 @@ public class DefaultDocumentDaoTest {
     
     @BeforeClass
     public static void beforeClass() {
-        BarbelHistoFactory.initialize();
-        BarbelHistoOptions.ACTIVE_CONFIG = BarbelHistoOptions.DEFAULT_CONFIG;
-        dao = BarbelHistoFactory.instanceOf(HistoType.DAO);
+        dao = BarbelHistoContext.createDefault().factory().instanceOf(DefaultHistoType.DAO);
     }
 
     @Before

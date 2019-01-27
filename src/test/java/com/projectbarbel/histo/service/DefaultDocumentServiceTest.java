@@ -9,9 +9,8 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.projectbarbel.histo.BarbelHistoFactory;
-import com.projectbarbel.histo.BarbelHistoFactory.HistoType;
-import com.projectbarbel.histo.BarbelHistoOptions;
+import com.projectbarbel.histo.BarbelHistoContext;
+import com.projectbarbel.histo.BarbelHistoFactory.DefaultHistoType;
 import com.projectbarbel.histo.BarbelTestHelper;
 import com.projectbarbel.histo.dao.DefaultDocumentDao;
 import com.projectbarbel.histo.model.DefaultValueObject;
@@ -23,14 +22,8 @@ public class DefaultDocumentServiceTest {
 
     @Before
     public void setUp() {
-        BarbelHistoOptions.ACTIVE_CONFIG = BarbelHistoOptions.builder().withDefaultValues()
-                .withDaoClassName("com.projectbarbel.histo.dao.DefaultDocumentDao")
-                .withServiceClassName(
-                        "com.projectbarbel.histo.service.DefaultDocumentService")
-                .build();
-        BarbelHistoFactory.initialize();
-        service = BarbelHistoFactory.instanceOf(HistoType.SERVICE, new Object[] {BarbelHistoFactory.instanceOf(HistoType.DAO)});
-        dao = BarbelHistoFactory.instanceOf(HistoType.DAO);
+        dao = BarbelHistoContext.createDefault().factory().instanceOf(DefaultHistoType.DAO);
+        service = BarbelHistoContext.createDefault().factory().instanceOf(DefaultHistoType.SERVICE, dao);
         dao.reset();
     }
 

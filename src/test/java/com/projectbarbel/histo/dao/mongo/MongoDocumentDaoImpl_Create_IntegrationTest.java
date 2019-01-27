@@ -12,8 +12,8 @@ import org.junit.Test;
 import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
-import com.projectbarbel.histo.BarbelHistoFactory;
-import com.projectbarbel.histo.BarbelHistoFactory.HistoType;
+import com.projectbarbel.histo.BarbelHistoContext;
+import com.projectbarbel.histo.BarbelHistoFactory.DefaultHistoType;
 import com.projectbarbel.histo.BarbelHistoOptions;
 import com.projectbarbel.histo.BarbelTestHelper;
 import com.projectbarbel.histo.dao.DocumentDao;
@@ -25,8 +25,9 @@ public class MongoDocumentDaoImpl_Create_IntegrationTest {
 
     @BeforeClass
     public static void beforeClass() {
-        BarbelHistoOptions.ACTIVE_CONFIG = BarbelHistoOptions.builder().withDefaultValues().withDaoClassName("com.projectbarbel.histo.dao.mongo.MongoDocumentDaoImpl").build();
-        dao = BarbelHistoFactory.instanceOf(HistoType.DAO, new Object[] {FlapDoodleEmbeddedMongoClientDaoSupplier.MONGOCLIENT.getMongo(), "test", "testCol"});
+        BarbelHistoOptions opts = BarbelHistoOptions.withDaoClassName("com.projectbarbel.histo.dao.mongo.MongoDocumentDaoImpl");
+        BarbelHistoContext ctx = BarbelHistoContext.of(opts);
+        dao = ctx.factory().instanceOf(DefaultHistoType.DAO, new Object[] {FlapDoodleEmbeddedMongoClientDaoSupplier.MONGOCLIENT.getMongo(), "test", "testCol"});
     }
 
     @Before
