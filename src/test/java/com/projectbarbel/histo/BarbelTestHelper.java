@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.DefaultIDGenerator;
-import com.projectbarbel.histo.model.DefaultValueObject;
+import com.projectbarbel.histo.model.DefaultDocument;
 import com.projectbarbel.histo.model.EffectivePeriod;
 import com.projectbarbel.histo.model.RecordPeriod;
 
@@ -78,11 +78,11 @@ public class BarbelTestHelper {
                         RecordPeriod.create("SYSTEM_USER"));
     }
 
-    public static List<DefaultValueObject> generateJournalOfDefaultValueObjects(String docId,
+    public static List<DefaultDocument> generateJournalOfDefaultValueObjects(String docId,
             List<LocalDate> effectiveDates) {
-        List<DefaultValueObject> journal = new ArrayList<DefaultValueObject>();
+        List<DefaultDocument> journal = new ArrayList<DefaultDocument>();
         for (int i = 0; i < effectiveDates.size(); i++) {
-            journal.add(DefaultValueObject.builder().withBitemporalStamp(createPeriod(docId, effectiveDates, i))
+            journal.add(DefaultDocument.builder().withBitemporalStamp(createPeriod(docId, effectiveDates, i))
                     .withData(EnhancedRandom.random(String.class)).withVersionId(UUID.randomUUID().toString()).build());
         }
         return journal;

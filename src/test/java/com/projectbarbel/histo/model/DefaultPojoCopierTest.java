@@ -38,17 +38,17 @@ public class DefaultPojoCopierTest {
     
     @Test
     public void testFlatCopyWithNewStamp() throws Exception {
-        DefaultValueObject object = BarbelTestHelper.random(DefaultValueObject.class);
-        DefaultValueObject copied = new DefaultPojoCopier().flatCopyWithNewStamp(object, BarbelTestHelper.random(BitemporalStamp.class));
+        DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
+        DefaultDocument copied = new DefaultPojoCopier().flatCopyWithNewStamp(object, BarbelTestHelper.random(BitemporalStamp.class));
         assertNotNull(copied);
     }
 
     @Test
     public void testFlatCopyWithNewStampOnlyStampChanged() throws Exception {
-        DefaultValueObject object = BarbelTestHelper.random(DefaultValueObject.class);
+        DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
         BitemporalStamp newstamp = BarbelTestHelper.random(BitemporalStamp.class);
         BitemporalStamp oldstamp = object.getBitemporalStamp();
-        DefaultValueObject copied = new DefaultPojoCopier().flatCopyWithNewStamp(object, newstamp);
+        DefaultDocument copied = new DefaultPojoCopier().flatCopyWithNewStamp(object, newstamp);
         assertEquals(object.getData(), copied.getData());
         assertNotEquals(object.getBitemporalStamp(), copied.getBitemporalStamp());
         assertEquals(object.getBitemporalStamp(), oldstamp);
@@ -74,8 +74,8 @@ public class DefaultPojoCopierTest {
     
     @Test
     public void testFlatCopyWithNewStampNotEqual() throws Exception {
-        DefaultValueObject object = BarbelTestHelper.random(DefaultValueObject.class);
-        DefaultValueObject copied = new DefaultPojoCopier().flatCopyWithNewStamp(object, BarbelTestHelper.random(BitemporalStamp.class));
+        DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
+        DefaultDocument copied = new DefaultPojoCopier().flatCopyWithNewStamp(object, BarbelTestHelper.random(BitemporalStamp.class));
         assertNotEquals(copied, object);
     }
 
