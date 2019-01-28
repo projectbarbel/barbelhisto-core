@@ -1,48 +1,48 @@
 package com.projectbarbel.histo.api;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import com.projectbarbel.histo.functions.KeepSubsequentUpdateStrategy;
 import com.projectbarbel.histo.model.Bitemporal;
 
-public class DocumentJournal<T extends Bitemporal<O>, O> {
+public class DocumentJournal<T extends Bitemporal<?>> {
 
-    private Map<O, Bitemporal<O>> journal;
+    private final List<T> journal = new ArrayList<T>();
     private static final Logger logger = Logger.getLogger(DocumentJournal.class.getName());
-    private Function<DocumentJournal<?,?>,DocumentJournal<?,?>> updateStrategy;
+    @SuppressWarnings("unused")
+    private final Function<DocumentJournal<?>,DocumentJournal<?>> journalUpdateStrategy = new KeepSubsequentUpdateStrategy();
 
-    private DocumentJournal(Map<O, Bitemporal<O>> journal) {
+    private DocumentJournal(List<T> documentList) {
         super();
-        this.journal = journal;
+        documentList.stream().forEach(journal::add);
     }
 
     public int size() {
         return journal.size();
     }
 
-    public List<? extends Bitemporal<O>> list() {
-        return journal.values().stream().collect(Collectors.toList());
+    public List<? extends Bitemporal<?>> list() {
+        return journal.stream().collect(Collectors.toCollection(ArrayList::new));
     }
 
-    public Map<O, Bitemporal<O>> map() {
-        return journal;
+    @SuppressWarnings("unchecked")
+    public static <T extends DocumentJournal<O>, O extends Bitemporal<?>> T create(List<O> listOfBitemporal) {
+        return (T)new DocumentJournal<O>(listOfBitemporal);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static <T extends DocumentJournal<O>, O extends Bitemporal<?>> T create(Bitemporal<?> newDocument) {
+        return (T)new DocumentJournal<Bitemporal<?>>(Collections.singletonList(newDocument));
     }
 
-    public static <O> DocumentJournal<Bitemporal<O>, O> create(List<? extends Bitemporal<O>> listOfBitemporal) {
-        return new DocumentJournal<Bitemporal<O>, O>(listOfBitemporal.stream().collect(
-                Collectors.toMap(Bitemporal::getVersionId, Function.identity())));
-    }
-
-    public DocumentJournal<T, O> sortByEffectiveDate() {
-        journal = journal.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue(
-                        (v1, v2) -> v1.getEffectiveFromInstant().compareTo(v2.getEffectiveFromInstant())))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+    public DocumentJournal<T> sortAscendingByEffectiveDate() {
+        Collections.sort(journal, (e1,e2)->e1.getEffectiveFrom().isBefore(e2.getEffectiveFrom())?-1:1);
         return this;
     }
 

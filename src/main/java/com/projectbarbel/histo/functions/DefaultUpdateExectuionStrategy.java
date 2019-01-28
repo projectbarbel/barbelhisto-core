@@ -9,7 +9,7 @@ import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.EffectivePeriod;
 import com.projectbarbel.histo.model.RecordPeriod;
 
-public class DefaultUpdateExectionStrategy implements Function<UpdateExecutionContext, VersionUpdateResult> {
+public class DefaultUpdateExectuionStrategy implements Function<UpdateExecutionContext, VersionUpdateResult> {
 
     @Override
     public VersionUpdateResult apply(UpdateExecutionContext executionContext) {

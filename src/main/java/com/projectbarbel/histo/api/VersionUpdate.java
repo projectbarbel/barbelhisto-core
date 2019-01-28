@@ -6,7 +6,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 import com.projectbarbel.histo.functions.DefaultPojoCopier;
-import com.projectbarbel.histo.functions.DefaultUpdateExectionStrategy;
+import com.projectbarbel.histo.functions.DefaultUpdateExectuionStrategy;
 import com.projectbarbel.histo.functions.ValidateEffectiveDate;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
@@ -48,7 +48,7 @@ public class VersionUpdate {
     public static class VersionUpdateExecutionBuilder {
         private final VersionUpdate update;
         private BiPredicate<Bitemporal<?>, LocalDate> effectiveDateValidationFuction = new ValidateEffectiveDate();
-        private Function<UpdateExecutionContext, VersionUpdateResult> updateExecutionFunction = new DefaultUpdateExectionStrategy();
+        private Function<UpdateExecutionContext, VersionUpdateResult> updateExecutionFunction = new DefaultUpdateExectuionStrategy();
 
         private VersionUpdateExecutionBuilder(Bitemporal<?> oldVersion) {
             update = new VersionUpdate(oldVersion);
@@ -125,8 +125,8 @@ public class VersionUpdate {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends VersionUpdateExecutionBuilder> T of(Bitemporal<?> oldVersion) {
-        return (T) new VersionUpdateExecutionBuilder(oldVersion);
+    public static <T extends VersionUpdateExecutionBuilder> T of(Bitemporal<?> document) {
+        return (T) new VersionUpdateExecutionBuilder(document);
     }
 
     private VersionUpdate(Bitemporal<?> bitemporal) {

@@ -8,8 +8,6 @@ import org.junit.Test;
 
 import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelHistoFactory.DefaultHistoType;
-import com.projectbarbel.histo.persistence.impl.mongo.DefaultMongoValueObject;
-import com.projectbarbel.histo.persistence.impl.mongo.MongoDocumentDaoImpl;
 import com.projectbarbel.histo.BarbelHistoOptions;
 import com.projectbarbel.histo.BarbelTestHelper;
 

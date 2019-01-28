@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import com.projectbarbel.histo.model.DefaultDocument;
-import com.projectbarbel.histo.persistence.api.DocumentDao;
 
 public class DocumentDaoTest {
 

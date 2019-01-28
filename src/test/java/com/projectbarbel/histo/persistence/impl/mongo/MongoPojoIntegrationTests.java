@@ -11,7 +11,6 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.CreateCollectionOptions;
 import com.mongodb.client.model.Filters;
 import com.projectbarbel.histo.BarbelTestHelper;
-import com.projectbarbel.histo.persistence.impl.mongo.DefaultMongoValueObject;
 
 public class MongoPojoIntegrationTests {
 

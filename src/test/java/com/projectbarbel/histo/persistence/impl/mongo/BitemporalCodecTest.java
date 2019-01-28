@@ -27,7 +27,6 @@ import org.mockito.ArgumentCaptor;
 
 import com.projectbarbel.histo.BarbelTestHelper;
 import com.projectbarbel.histo.model.BitemporalStamp;
-import com.projectbarbel.histo.persistence.impl.mongo.BitemporalCodec;
 
 public class BitemporalCodecTest {
 

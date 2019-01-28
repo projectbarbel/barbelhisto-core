@@ -14,7 +14,6 @@ import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelHistoFactory.DefaultHistoType;
 import com.projectbarbel.histo.BarbelTestHelper;
 import com.projectbarbel.histo.model.DefaultDocument;
-import com.projectbarbel.histo.persistence.impl.DefaultDocumentDao;
 
 public class DefaultDocumentDaoTest {
 

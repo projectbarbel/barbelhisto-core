@@ -16,9 +16,6 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.projectbarbel.histo.persistence.api.DocumentDao;
-import com.projectbarbel.histo.persistence.impl.mongo.BitemporalCodec;
-import com.projectbarbel.histo.persistence.impl.mongo.DefaultMongoValueObject;
-import com.projectbarbel.histo.persistence.impl.mongo.MongoDocumentDaoImpl;
 
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodProcess;
