@@ -12,8 +12,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
+import com.projectbarbel.histo.functions.DefaultIDGenerator;
 import com.projectbarbel.histo.model.BitemporalStamp;
-import com.projectbarbel.histo.model.DefaultIDGenerator;
 import com.projectbarbel.histo.model.DefaultDocument;
 import com.projectbarbel.histo.model.EffectivePeriod;
 import com.projectbarbel.histo.model.RecordPeriod;

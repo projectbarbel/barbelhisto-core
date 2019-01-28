@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.model;
+package com.projectbarbel.histo.functions;
 
 import java.util.UUID;
 import java.util.function.Supplier;

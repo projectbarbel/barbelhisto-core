@@ -7,6 +7,8 @@ import java.util.function.Supplier;
 
 import javax.annotation.Generated;
 
+import com.projectbarbel.histo.functions.DefaultIDGenerator;
+
 /**
  * All instants representing utc time stamps.
  * 

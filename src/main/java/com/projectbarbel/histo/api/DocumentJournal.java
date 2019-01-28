@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.model;
+package com.projectbarbel.histo.api;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -7,6 +7,8 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import com.projectbarbel.histo.model.Bitemporal;
 
 public class DocumentJournal<T extends Bitemporal<O>, O> {
 

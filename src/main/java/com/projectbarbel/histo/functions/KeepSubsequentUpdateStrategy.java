@@ -1,6 +1,9 @@
-package com.projectbarbel.histo.model;
+package com.projectbarbel.histo.functions;
 
 import java.util.function.Function;
+
+import com.projectbarbel.histo.api.DocumentJournal;
+import com.projectbarbel.histo.model.Bitemporal;
 
 public class KeepSubsequentUpdateStrategy implements Function<DocumentJournal<Bitemporal<?>, ?>, DocumentJournal<Bitemporal<?>, ?>> {
 

@@ -1,7 +1,7 @@
 package com.projectbarbel.histo.persistence.api;
 
+import com.projectbarbel.histo.api.DocumentJournal;
 import com.projectbarbel.histo.model.Bitemporal;
-import com.projectbarbel.histo.model.DocumentJournal;
 
 public interface PersistenceService<T extends Bitemporal<O>, O> {
 

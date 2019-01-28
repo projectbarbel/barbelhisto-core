@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.model;
+package com.projectbarbel.histo.api;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -11,6 +11,8 @@ import java.util.Collections;
 import org.junit.Test;
 
 import com.projectbarbel.histo.BarbelTestHelper;
+import com.projectbarbel.histo.model.Bitemporal;
+import com.projectbarbel.histo.api.DocumentJournal;
 
 public class DocumentJournalTest {
 

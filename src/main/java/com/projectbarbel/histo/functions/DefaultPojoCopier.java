@@ -1,7 +1,10 @@
-package com.projectbarbel.histo.model;
+package com.projectbarbel.histo.functions;
 
 import java.lang.reflect.Field;
 import java.util.function.BiFunction;
+
+import com.projectbarbel.histo.model.Bitemporal;
+import com.projectbarbel.histo.model.BitemporalStamp;
 
 public class DefaultPojoCopier implements BiFunction<Bitemporal<?>, BitemporalStamp, Bitemporal<?>>{
 

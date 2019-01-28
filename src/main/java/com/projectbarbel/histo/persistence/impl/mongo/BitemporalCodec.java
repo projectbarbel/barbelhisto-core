@@ -19,9 +19,9 @@ import org.bson.codecs.EncoderContext;
 
 import com.projectbarbel.histo.model.BitemporalObjectState;
 import com.projectbarbel.histo.model.BitemporalStamp;
+import com.projectbarbel.histo.model.BitemporalStamp.Builder;
 import com.projectbarbel.histo.model.EffectivePeriod;
 import com.projectbarbel.histo.model.RecordPeriod;
-import com.projectbarbel.histo.model.BitemporalStamp.Builder;
 
 public class BitemporalCodec implements Codec<BitemporalStamp> {
 

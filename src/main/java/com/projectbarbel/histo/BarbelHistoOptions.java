@@ -10,7 +10,6 @@ public class BarbelHistoOptions {
     private final String serviceClassName;
     private final String idGeneratorClassName;
     private final String pojoCopierClassName;
-    private final String updaterClassName;
     private final String periodicUpdateStrategyClassName;
 
     @Generated("SparkTools")
@@ -19,7 +18,6 @@ public class BarbelHistoOptions {
         this.serviceClassName = builder.serviceClassName;
         this.idGeneratorClassName = builder.idGeneratorClassName;
         this.pojoCopierClassName = builder.pojoCopierClassName;
-        this.updaterClassName = builder.updaterClassName;
         this.periodicUpdateStrategyClassName = builder.periodicUpdateStrategyClassName;
     }
 
@@ -51,18 +49,13 @@ public class BarbelHistoOptions {
         return pojoCopierClassName;
     }
 
-    public String getUpdaterClassName() {
-        return updaterClassName;
-    }
-
     public static Builder builderWithDefaultValues() {
         Builder builder = new Builder();
         builder.daoClassName = "com.projectbarbel.histo.persistence.impl.DefaultDocumentDao";
         builder.serviceClassName = "com.projectbarbel.histo.persistence.impl.DefaultDocumentService";
-        builder.idGeneratorClassName = "com.projectbarbel.histo.model.DefaultIDGenerator";
-        builder.pojoCopierClassName = "com.projectbarbel.histo.model.DefaultPojoCopier";
-        builder.updaterClassName = "com.projectbarbel.histo.model.VersionUpdate";
-        builder.periodicUpdateStrategyClassName = "com.projectbarbel.histo.model.KeepSubsequentUpdateStrategy";
+        builder.idGeneratorClassName = "com.projectbarbel.histo.functions.DefaultIDGenerator";
+        builder.pojoCopierClassName = "com.projectbarbel.histo.functions.DefaultPojoCopier";
+        builder.periodicUpdateStrategyClassName = "com.projectbarbel.histo.functions.KeepSubsequentUpdateStrategy";
         return builder;
     }
 
@@ -91,7 +84,6 @@ public class BarbelHistoOptions {
         private String serviceClassName;
         private String idGeneratorClassName;
         private String pojoCopierClassName;
-        private String updaterClassName;
         private String periodicUpdateStrategyClassName;
 
         private Builder() {
@@ -114,11 +106,6 @@ public class BarbelHistoOptions {
 
         public Builder withPojoCopierClassName(String pojoCopierClassName) {
             this.pojoCopierClassName = pojoCopierClassName;
-            return this;
-        }
-
-        public Builder withUpdaterClassName(String updaterClassName) {
-            this.updaterClassName = updaterClassName;
             return this;
         }
 

@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.model;
+package com.projectbarbel.histo.functions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -10,6 +10,10 @@ import java.io.Serializable;
 import org.junit.Test;
 
 import com.projectbarbel.histo.BarbelTestHelper;
+import com.projectbarbel.histo.model.Bitemporal;
+import com.projectbarbel.histo.model.BitemporalStamp;
+import com.projectbarbel.histo.model.DefaultDocument;
+import com.projectbarbel.histo.functions.DefaultPojoCopier;
 
 public class DefaultPojoCopierTest {
 

@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.model;
+package com.projectbarbel.histo.api;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -10,54 +10,62 @@ import java.time.LocalDate;
 import org.junit.Test;
 
 import com.projectbarbel.histo.BarbelTestHelper;
+import com.projectbarbel.histo.api.VersionUpdate.VersionUpdateResult;
+import com.projectbarbel.histo.model.BitemporalStamp;
+import com.projectbarbel.histo.model.DefaultDocument;
+import com.projectbarbel.histo.model.EffectivePeriod;
+import com.projectbarbel.histo.model.RecordPeriod;
 
 public class VersionUpdateTest {
 
     @Test
     public void testOf() throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
-        VersionUpdate update = VersionUpdate.of(object, new DefaultPojoCopier()).effectiveFrom(object.getEffectiveFrom().plusDays(1)).execute();
-        assertNotNull(update);
-        assertNotNull(update.precedingVersion());
-        assertNotNull(update.subsequentVersion());
+        VersionUpdateResult result = VersionUpdate.of(object).execute();
+        assertNotNull(result);
+        assertNotNull(result.newPrecedingVersion());
+        assertNotNull(result.newSubsequentVersion());
+        assertNotNull(result.oldVersion());
+        assertEquals(result.oldVersion(),object);
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void testOf_effectiveDateOfNewVersionMustBeWithinBoundaries_onOriginEffectiveUntil() throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
-        VersionUpdate.of(object, new DefaultPojoCopier()).effectiveFrom(object.getEffectiveUntil()).execute();
+        VersionUpdate.of(object).effectiveFrom(object.getEffectiveUntil()).execute();
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void testOf_effectiveDateOfNewVersionMustBeWithinBoundaries_onOriginEffectiveUntil_effectiveUntilIsInfinite() throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
-        VersionUpdate.of(object, new DefaultPojoCopier()).effectiveFrom(LocalDate.MAX).execute();
+        VersionUpdate.of(object).effectiveFrom(LocalDate.MAX).execute();
     }
 
     @Test
     public void testOf_effectiveDateOfNewVersionMustBeWithinBoundaries_onOriginEffectiveFrom() throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
-        VersionUpdate.of(object, new DefaultPojoCopier()).effectiveFrom(object.getEffectiveFrom()).execute();
+        VersionUpdate.of(object).effectiveFrom(object.getEffectiveFrom()).execute();
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void testOf_effectiveDateOfNewVersionMustBeWithinBoundaries_toHigh() throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
-        VersionUpdate.of(object, new DefaultPojoCopier()).effectiveFrom(object.getEffectiveUntil().plusDays(1)).execute();
+        VersionUpdate.of(object).effectiveFrom(object.getEffectiveUntil().plusDays(1)).execute();
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void testOf_effectiveDateOfNewVersionMustBeWithinBoundaries_toLow() throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
-        VersionUpdate.of(object, new DefaultPojoCopier()).effectiveFrom(object.getEffectiveFrom().minusDays(1)).execute();
+        VersionUpdate.of(object).effectiveFrom(object.getEffectiveFrom().minusDays(1)).execute();
     }
 
     @Test
     public void testOf_bothNewVersionsMustBeActive() throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
-        VersionUpdate update = VersionUpdate.of(object, new DefaultPojoCopier()).effectiveFrom(validNewEffectiveDate(object)).execute();
-        assertTrue(update.precedingVersion().getBitemporalStamp().isActive());
-        assertTrue(update.subsequentVersion().getBitemporalStamp().isActive());
+        VersionUpdateResult update = VersionUpdate.of(object).effectiveFrom(validNewEffectiveDate(object)).execute();
+        assertTrue(update.newPrecedingVersion().getBitemporalStamp().isActive());
+        assertTrue(update.newSubsequentVersion().getBitemporalStamp().isActive());
+        assertFalse(update.oldVersion().getBitemporalStamp().isActive());
     }
 
     private LocalDate validNewEffectiveDate(DefaultDocument object) {
@@ -68,34 +76,36 @@ public class VersionUpdateTest {
     public void testOf_correctEffectiveFromDates() throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
         LocalDate newEffectDate = validNewEffectiveDate(object);
-        VersionUpdate update = VersionUpdate.of(object, new DefaultPojoCopier()).effectiveFrom(newEffectDate).execute();
-        assertEquals(update.precedingVersion().getEffectiveFrom(), object.getEffectiveFrom());
-        assertEquals(update.subsequentVersion().getEffectiveFrom(), newEffectDate);
+        VersionUpdateResult update = VersionUpdate.of(object).effectiveFrom(newEffectDate).execute();
+        assertEquals(update.newPrecedingVersion().getEffectiveFrom(), object.getEffectiveFrom());
+        assertEquals(update.newSubsequentVersion().getEffectiveFrom(), newEffectDate);
+        assertEquals(update.oldVersion().getEffectiveFrom(), object.getEffectiveFrom());
     }
 
     @Test
     public void testOf_correctEffectiveUntilDates() throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
         LocalDate newEffectDate = validNewEffectiveDate(object);
-        VersionUpdate update = VersionUpdate.of(object, new DefaultPojoCopier()).effectiveFrom(newEffectDate).execute();
-        assertEquals(update.precedingVersion().getEffectiveUntil(), newEffectDate);
-        assertEquals(update.subsequentVersion().getEffectiveUntil(), object.getEffectiveUntil());
+        VersionUpdateResult update = VersionUpdate.of(object).effectiveFrom(newEffectDate).execute();
+        assertEquals(update.newPrecedingVersion().getEffectiveUntil(), newEffectDate);
+        assertEquals(update.newSubsequentVersion().getEffectiveUntil(), object.getEffectiveUntil());
+        assertEquals(update.oldVersion().getEffectiveUntil(), object.getEffectiveUntil());
     }
 
     @Test
     public void testOf_newEffectivePeriods_nextToEachOther() throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
         LocalDate newEffectDate = validNewEffectiveDate(object);
-        VersionUpdate update = VersionUpdate.of(object, new DefaultPojoCopier()).effectiveFrom(newEffectDate).execute();
-        assertEquals(update.precedingVersion().getEffectiveUntil(), update.subsequentVersion().getEffectiveFrom());
+        VersionUpdateResult update = VersionUpdate.of(object).effectiveFrom(newEffectDate).execute();
+        assertEquals(update.newPrecedingVersion().getEffectiveUntil(), update.newSubsequentVersion().getEffectiveFrom());
     }
 
     @Test
     public void testOf_newEffectivePeriods_nextToEachOther_FiniteOrigin() throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
         LocalDate newEffectDate = validNewEffectiveDate(object);
-        VersionUpdate update = VersionUpdate.of(object, new DefaultPojoCopier()).effectiveFrom(newEffectDate).execute();
-        assertEquals(update.subsequentVersion().getEffectiveUntil(), object.getEffectiveUntil());
+        VersionUpdateResult update = VersionUpdate.of(object).effectiveFrom(newEffectDate).execute();
+        assertEquals(update.newSubsequentVersion().getEffectiveUntil(), object.getEffectiveUntil());
     }
 
     @Test
@@ -105,12 +115,12 @@ public class VersionUpdateTest {
                         "someId", EffectivePeriod.create().fromNow().toInfinite(), RecordPeriod.create("JUNITTest")))
                 .build();
         LocalDate newEffectDate = validNewEffectiveDate(object);
-        VersionUpdate update = VersionUpdate.of(object, new DefaultPojoCopier()).effectiveFrom(newEffectDate).execute();
+        VersionUpdateResult update = VersionUpdate.of(object).effectiveFrom(newEffectDate).execute();
         assertEquals(object.getEffectiveUntilInstant(), EffectivePeriod.INFINITE);
         assertTrue(object.isEffectiveInfinitely());
-        assertFalse(update.precedingVersion().isEffectiveInfinitely());
-        assertTrue(update.subsequentVersion().isEffectiveInfinitely());
-        assertEquals(update.subsequentVersion().getEffectiveUntil(), object.getEffectiveUntil());
+        assertFalse(update.newPrecedingVersion().isEffectiveInfinitely());
+        assertTrue(update.newSubsequentVersion().isEffectiveInfinitely());
+        assertEquals(update.newSubsequentVersion().getEffectiveUntil(), object.getEffectiveUntil());
     }
 
 }

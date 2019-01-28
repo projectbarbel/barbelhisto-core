@@ -50,8 +50,6 @@ public final class BarbelHistoFactory {
                 (k) -> (options, args) -> BarbelHistoFactory.instantiate(options.getIdGeneratorClassName(), args));
         factories.computeIfAbsent(DefaultHistoType.UPDATEPOLICY.name(),
                 (k) -> (options, args) -> BarbelHistoFactory.instantiate(options.getUpdatePolicyClassName(), args));
-        factories.computeIfAbsent(DefaultHistoType.UPDATER.name(),
-                (k) -> (options, args) -> BarbelHistoFactory.instantiate(options.getUpdaterClassName(), args));
         return factories;
     }
 
