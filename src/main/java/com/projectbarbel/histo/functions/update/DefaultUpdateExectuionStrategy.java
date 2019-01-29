@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.functions;
+package com.projectbarbel.histo.functions.update;
 
 import java.util.function.Function;
 

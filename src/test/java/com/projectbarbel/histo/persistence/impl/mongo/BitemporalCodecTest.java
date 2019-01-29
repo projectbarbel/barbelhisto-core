@@ -56,9 +56,9 @@ public class BitemporalCodecTest {
         ArgumentCaptor<String> documentCapture = ArgumentCaptor.forClass(String.class);
         verify(writer, times(5)).writeString(documentCapture.capture(),documentCapture.capture());
         assertEquals(documentCapture.getAllValues().get(1), stamp.getDocumentId());
-        assertEquals(documentCapture.getAllValues().get(3), stamp.getRecordTime().createdBy);
-        assertEquals(documentCapture.getAllValues().get(5), stamp.getRecordTime().state.name());
-        assertEquals(documentCapture.getAllValues().get(7), stamp.getRecordTime().inactivatedBy);
+        assertEquals(documentCapture.getAllValues().get(3), stamp.getRecordTime().getCreatedBy());
+        assertEquals(documentCapture.getAllValues().get(5), stamp.getRecordTime().getState().name());
+        assertEquals(documentCapture.getAllValues().get(7), stamp.getRecordTime().getInactivatedBy());
         assertEquals(documentCapture.getAllValues().get(9), stamp.getActivity());
     }
 

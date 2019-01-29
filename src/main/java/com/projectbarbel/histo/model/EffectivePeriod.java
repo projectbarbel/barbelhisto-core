@@ -2,6 +2,7 @@ package com.projectbarbel.histo.model;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Objects;
 
 import com.projectbarbel.histo.BarbelHistoHelper;
@@ -9,9 +10,10 @@ import com.projectbarbel.histo.BarbelHistoHelper;
 public class EffectivePeriod {
     public final static Instant INFINITE = Instant.ofEpochMilli(Long.MAX_VALUE);
     public final static Instant BIGBANG = Instant.ofEpochMilli(Long.MIN_VALUE);
-    public Instant from = BIGBANG;
-    public Instant until = INFINITE;
-
+    private Instant from = BIGBANG; // UTC
+    private Instant until = INFINITE; // UTC
+    private Systemclock clock = new Systemclock(ZoneId.of("Z"));
+    
     private EffectivePeriod() {
         super();
     }
@@ -61,7 +63,7 @@ public class EffectivePeriod {
     }
     
     public EffectivePeriod fromNow() {
-        this.from = BarbelHistoHelper.effectiveDateToEffectiveUTCInstant(LocalDate.now());
+        this.from = BarbelHistoHelper.effectiveDateToEffectiveUTCInstant(clock.now().toLocalDate());
         return this;
     }
     

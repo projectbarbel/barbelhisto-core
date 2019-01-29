@@ -40,9 +40,9 @@ public class MongoDBFlapDoodleTest {
 		MongoDatabase db = _mongo.getMongo().getDatabase("test");
 		db.createCollection("testCol", new CreateCollectionOptions().capped(false));
 		MongoCollection<Document> col = db.getCollection("testCol");
-		Document document = new Document("name", "Test");
+		Document document = new Document("name", "BlockTest");
 		col.insertOne(document);
-		Document readDoc = col.find(Filters.eq("name", "Test")).first();
+		Document readDoc = col.find(Filters.eq("name", "BlockTest")).first();
 		assertNotNull(readDoc);
 	}
 
@@ -51,9 +51,9 @@ public class MongoDBFlapDoodleTest {
 		MongoDatabase db = _mongo.getMongo().getDatabase("test");
 		db.createCollection("testCol", new CreateCollectionOptions().capped(false));
 		MongoCollection<Document> col = db.getCollection("testCol");
-		Document document = new Document("name", "Test");
+		Document document = new Document("name", "BlockTest");
 		col.insertOne(document);
-		col.updateOne(Filters.eq("name", "Test"),
+		col.updateOne(Filters.eq("name", "BlockTest"),
 				Updates.combine(Updates.set("name", "Updated"), Updates.currentDate("lastModified")));
 		Document readDoc = col.find(Filters.eq("name", "Updated")).first();
 		assertTrue(col.countDocuments() == 1);
@@ -65,10 +65,10 @@ public class MongoDBFlapDoodleTest {
 		MongoDatabase db = _mongo.getMongo().getDatabase("test");
 		db.createCollection("testCol", new CreateCollectionOptions().capped(false));
 		MongoCollection<Document> col = db.getCollection("testCol");
-		Document document = new Document("name", "Test");
+		Document document = new Document("name", "BlockTest");
 		col.insertOne(document);
 		assertTrue(col.countDocuments() == 1);
-		col.deleteOne(Filters.eq("name", "Test"));
+		col.deleteOne(Filters.eq("name", "BlockTest"));
 		assertTrue(col.countDocuments() == 0);
 	}
 

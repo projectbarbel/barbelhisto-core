@@ -9,11 +9,11 @@ public class RecordPeriod {
     public final static Instant NOT_INACTIVATED = Instant.ofEpochMilli(Long.MAX_VALUE);
     public final static String NOBODY = "NOBODY";
 
-    public Instant createdAt = Clock.systemUTC().instant();
-    public String createdBy = "SYSTEM";
-    public Instant inactivatedAt = NOT_INACTIVATED;
-    public String inactivatedBy = NOBODY;
-    public BitemporalObjectState state = BitemporalObjectState.ACTIVE;
+    private Instant createdAt = Clock.systemUTC().instant(); // UTC
+    private String createdBy = "SYSTEM";
+    private Instant inactivatedAt = NOT_INACTIVATED; // UTC
+    private String inactivatedBy = NOBODY;
+    private BitemporalObjectState state = BitemporalObjectState.ACTIVE;
 
     private RecordPeriod() {
         super();
@@ -94,6 +94,26 @@ public class RecordPeriod {
     @Override
     public int hashCode() {
         return Objects.hash(createdAt, createdBy, inactivatedAt, inactivatedBy, state);
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public BitemporalObjectState getState() {
+        return state;
+    }
+
+    public Instant getInactivatedAt() {
+        return inactivatedAt;
+    }
+
+    public String getInactivatedBy() {
+        return inactivatedBy;
     }
 
 }

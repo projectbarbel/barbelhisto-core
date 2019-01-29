@@ -12,8 +12,8 @@ import org.junit.Test;
 import com.projectbarbel.histo.BarbelHistoFactory.DefaultHistoType;
 import com.projectbarbel.histo.api.VersionUpdate;
 import com.projectbarbel.histo.functions.DefaultIDGenerator;
-import com.projectbarbel.histo.functions.DefaultPojoCopier;
-import com.projectbarbel.histo.functions.KeepSubsequentUpdateStrategy;
+import com.projectbarbel.histo.functions.journal.KeepSubsequentUpdateStrategy;
+import com.projectbarbel.histo.functions.update.DefaultPojoCopier;
 import com.projectbarbel.histo.persistence.impl.DefaultDocumentDao;
 import com.projectbarbel.histo.persistence.impl.DefaultDocumentService;
 

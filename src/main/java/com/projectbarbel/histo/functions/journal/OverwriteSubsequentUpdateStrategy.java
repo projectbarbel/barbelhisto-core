@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.functions;
+package com.projectbarbel.histo.functions.journal;
 
 import java.util.function.Function;
 

@@ -17,7 +17,7 @@ import com.projectbarbel.histo.BarbelTestHelper;
 public class DefaultDocumentTest {
 
 	/**
-	 * Test if hashCode returns the correct values. If {@link DefaultDocument} is changed internally
+	 * BlockTest if hashCode returns the correct values. If {@link DefaultDocument} is changed internally
 	 * and the hashCode Method is not adopted correspondingly, then this test will fail.
 	 */
 	@Test

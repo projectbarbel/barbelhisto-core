@@ -5,9 +5,9 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
-import com.projectbarbel.histo.functions.DefaultPojoCopier;
-import com.projectbarbel.histo.functions.DefaultUpdateExectuionStrategy;
-import com.projectbarbel.histo.functions.ValidateEffectiveDate;
+import com.projectbarbel.histo.functions.update.DefaultPojoCopier;
+import com.projectbarbel.histo.functions.update.DefaultUpdateExectuionStrategy;
+import com.projectbarbel.histo.functions.update.ValidateEffectiveDate;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
 

@@ -41,16 +41,16 @@ public class BitemporalCodec implements Codec<BitemporalStamp> {
         writer.writeInt32("nanos", value.getEffectiveTime().getEffectiveUntilInstant().getNano());
         writer.writeEndDocument();
         writer.writeStartDocument("createdAt");
-        writer.writeInt64("seconds", value.getRecordTime().createdAt.getEpochSecond());
-        writer.writeInt32("nanos", value.getRecordTime().createdAt.getNano());
+        writer.writeInt64("seconds", value.getRecordTime().getCreatedAt().getEpochSecond());
+        writer.writeInt32("nanos", value.getRecordTime().getCreatedAt().getNano());
         writer.writeEndDocument();
-        writer.writeString("createdBy", value.getRecordTime().createdBy);
+        writer.writeString("createdBy", value.getRecordTime().getCreatedBy());
         writer.writeStartDocument("inactivatedAt");
-        writer.writeInt64("seconds", value.getRecordTime().inactivatedAt.getEpochSecond());
-        writer.writeInt32("nanos", value.getRecordTime().inactivatedAt.getNano());
+        writer.writeInt64("seconds", value.getRecordTime().getInactivatedAt().getEpochSecond());
+        writer.writeInt32("nanos", value.getRecordTime().getInactivatedAt().getNano());
         writer.writeEndDocument();
-        writer.writeString("status", value.getRecordTime().state.name());
-        writer.writeString("inactivatedBy", value.getRecordTime().inactivatedBy);
+        writer.writeString("status", value.getRecordTime().getState().name());
+        writer.writeString("inactivatedBy", value.getRecordTime().getInactivatedBy());
         writer.writeString("activity", value.getActivity());
         writer.writeEndDocument();
     }
