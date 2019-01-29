@@ -9,6 +9,8 @@ The library implements Martin Fowlers Temporal Pattern that can be found here: h
 
 # Who needs barbelhisto?
 
+<script src="https://gist.github.com/nisrulz/11c0d63428b108f10c83.js"></script>
+
 When you use barbelhisto to store and read data you can find answers to these questions:
 
 - What changes to domain objects were stored the last two weeks?
