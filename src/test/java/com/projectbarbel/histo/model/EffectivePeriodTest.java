@@ -1,6 +1,5 @@
 package com.projectbarbel.histo.model;
 
-import java.time.Instant;
 import java.time.LocalDate;
 
 import org.junit.Test;
@@ -9,8 +8,8 @@ public class EffectivePeriodTest {
 
     @Test(expected=NullPointerException.class)
         public void testGetEffectiveFromInstant() throws Exception {
-            Instant instant = null;
-            EffectivePeriod.create().from(instant);
+            LocalDate date = null;
+            EffectivePeriod.create().from(date);
         }
 
     @Test(expected=NullPointerException.class)
@@ -27,7 +26,7 @@ public class EffectivePeriodTest {
 
     @Test(expected=NullPointerException.class)
         public void testGetEffectiveUntilInstant() throws Exception {
-            Instant date = null;
+            LocalDate date = null;
             EffectivePeriod.create().until(date);
         }
 

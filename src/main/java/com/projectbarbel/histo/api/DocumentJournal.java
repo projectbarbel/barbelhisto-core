@@ -1,7 +1,6 @@
 package com.projectbarbel.histo.api;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -28,7 +27,7 @@ public class DocumentJournal<T extends Bitemporal<?>> {
     private final BiFunction<DocumentJournal<?>, VersionUpdate, DocumentJournal<?>> journalUpdateStrategy = new KeepSubsequentUpdateStrategy();
     private BiFunction<DocumentJournal<T>, LocalDate, Optional<T>> effectiveReaderFunction = new ReaderFunctionGetEffectiveByDate<T>();
     private BiFunction<DocumentJournal<T>, LocalDate, List<T>> effectiveAfterFunction = new ReaderFunctionGetEffectiveAfter<T>();
-    private Systemclock clock = new Systemclock(ZoneId.of("Z"));
+    private Systemclock clock = new Systemclock();
 
     private DocumentJournal(List<T> documentList) {
         super();

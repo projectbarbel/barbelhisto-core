@@ -4,7 +4,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +23,7 @@ public class DocumentJournalTest {
         assertTrue(journal.size() == 2);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testCreate_withList_Empty() throws Exception {
         List<DefaultDocument> list = Collections.emptyList();
         DocumentJournal.create(list);
@@ -54,14 +53,11 @@ public class DocumentJournalTest {
         DocumentJournal<DefaultDocument> journal = DocumentJournal
                 .create(BarbelTestHelper.generateJournalOfDefaultValueObjects("#12345",
                         Arrays.asList(LocalDate.of(2019, 4, 1), LocalDate.of(2019, 8, 1), LocalDate.of(2019, 1, 1))));
-        assertFalse(journal.sortAscendingByEffectiveDate().list().get(1).getEffectiveFromInstant()
-                .isAfter(journal.list().get(2).getEffectiveFromInstant()));
-        assertTrue(journal.list().get(0).getEffectiveFromInstant()
-                .equals(LocalDate.of(2019, 1, 1).atStartOfDay().toInstant(ZoneOffset.UTC)));
-        assertTrue(journal.list().get(1).getEffectiveFromInstant()
-                .equals(LocalDate.of(2019, 4, 1).atStartOfDay().toInstant(ZoneOffset.UTC)));
-        assertTrue(journal.list().get(2).getEffectiveFromInstant()
-                .equals(LocalDate.of(2019, 8, 1).atStartOfDay().toInstant(ZoneOffset.UTC)));
+        assertFalse(journal.sortAscendingByEffectiveDate().list().get(1).getEffectiveFrom()
+                .isAfter(journal.list().get(2).getEffectiveFrom()));
+        assertTrue(journal.list().get(0).getEffectiveFrom().equals(LocalDate.of(2019, 1, 1)));
+        assertTrue(journal.list().get(1).getEffectiveFrom().equals(LocalDate.of(2019, 4, 1)));
+        assertTrue(journal.list().get(2).getEffectiveFrom().equals(LocalDate.of(2019, 8, 1)));
     }
 
     @Test

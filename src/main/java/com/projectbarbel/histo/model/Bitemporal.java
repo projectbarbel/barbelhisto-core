@@ -1,6 +1,5 @@
 package com.projectbarbel.histo.model;
 
-import java.time.Instant;
 import java.time.LocalDate;
 
 /**
@@ -30,24 +29,16 @@ public interface Bitemporal<O> {
         return getBitemporalStamp().getDocumentId();
     }
 
-    default Instant getEffectiveFromInstant() {
-        return getBitemporalStamp().getEffectiveTime().getEffectiveFromInstant();
-    }
-
     default LocalDate getEffectiveFrom() {
-        return getBitemporalStamp().getEffectiveTime().getEffectiveFromLocalDate();
-    }
-
-    default Instant getEffectiveUntilInstant() {
-        return getBitemporalStamp().getEffectiveTime().getEffectiveUntilInstant();
+        return getBitemporalStamp().getEffectiveTime().getFrom();
     }
 
     default LocalDate getEffectiveUntil() {
-        return getBitemporalStamp().getEffectiveTime().getEffectiveUntilLocalDate();
+        return getBitemporalStamp().getEffectiveTime().getUntil();
     }
     
     default boolean isEffectiveInfinitely() {
-        return getEffectiveUntilInstant().equals(EffectivePeriod.INFINITE);
+        return getEffectiveUntil().equals(EffectivePeriod.INFINITE);
     }
 
     default void inactivate() {

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +50,7 @@ public class BarbelTestHelper {
 
             @Override
             public RecordPeriod get() {
-                return RecordPeriod.create(EnhancedRandom.random(String.class), randomInstant(2000, 2020));
+                return RecordPeriod.create(EnhancedRandom.random(String.class), LocalDateTime.ofInstant(randomInstant(2000, 2020),ZoneId.systemDefault()));
             }
         }).randomize(new FieldDefinition<BitemporalStamp, Supplier>("idSupplier", Supplier.class, BitemporalStamp.class),new Supplier<DefaultIDGenerator>() {
 

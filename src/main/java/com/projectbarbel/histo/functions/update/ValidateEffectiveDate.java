@@ -5,7 +5,6 @@ import java.util.function.BiPredicate;
 
 import org.apache.commons.lang3.Validate;
 
-import com.projectbarbel.histo.BarbelHistoHelper;
 import com.projectbarbel.histo.model.Bitemporal;
 
 public class ValidateEffectiveDate implements BiPredicate<Bitemporal<?>, LocalDate> {
@@ -16,9 +15,9 @@ public class ValidateEffectiveDate implements BiPredicate<Bitemporal<?>, LocalDa
                 "effective date must be before current versions effective until");
         Validate.isTrue(newEffectiveFrom.isBefore(LocalDate.MAX),
                 "effective date cannot be infinite");
-        Validate.inclusiveBetween(currentVersion.getEffectiveFromInstant().toEpochMilli(),
-                currentVersion.getEffectiveUntilInstant().toEpochMilli(),
-                BarbelHistoHelper.effectiveDateToEffectiveUTCInstant(newEffectiveFrom).toEpochMilli(),
+        Validate.inclusiveBetween(currentVersion.getEffectiveFrom().toEpochDay(),
+                currentVersion.getEffectiveUntil().toEpochDay(),
+                newEffectiveFrom.toEpochDay(),
                 "effective date of new version must be withing effective period of current version");
         return true;
     }

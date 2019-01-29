@@ -6,28 +6,22 @@ import java.time.ZoneId;
 
 public class Systemclock {
 
-    private Clock clock;
-    private ZoneId zone;
+    private Clock clock = Clock.systemDefaultZone();
 
-    public Systemclock(ZoneId zone) {
-        this.clock = Clock.system(zone);
-        this.zone = zone;
+    public Systemclock() {
     }
     public LocalDateTime now() {
-        return LocalDateTime.now(getClock());
+        return LocalDateTime.now(clock);
     }
 
     public void useFixedClockAt(LocalDateTime date) {
-        clock = Clock.fixed(date.atZone(zone).toInstant(), zone);
+        clock = Clock.fixed(date.atZone(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault());
     }
 
     public void useSystemDefaultZoneClock() {
-        clock = Clock.system(ZoneId.of(zone.getId()));
+        clock = Clock.systemDefaultZone();
     }
 
-    private Clock getClock() {
-        return clock;
-    }
 }
 
 

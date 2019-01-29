@@ -1,17 +1,19 @@
 package com.projectbarbel.histo.model;
 
-import java.time.Clock;
-import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Objects;
 
 public class RecordPeriod {
 
-    public final static Instant NOT_INACTIVATED = Instant.ofEpochMilli(Long.MAX_VALUE);
+    public final static LocalDateTime NOT_INACTIVATED = LocalDateTime.of(2199,12,31,23,59);
     public final static String NOBODY = "NOBODY";
 
-    private Instant createdAt = Clock.systemUTC().instant(); // UTC
+    private Systemclock clock = new Systemclock();
+    private ZoneId zone = ZoneId.systemDefault();
+    private LocalDateTime createdAt = clock.now();
     private String createdBy = "SYSTEM";
-    private Instant inactivatedAt = NOT_INACTIVATED; // UTC
+    private LocalDateTime inactivatedAt = NOT_INACTIVATED; 
     private String inactivatedBy = NOBODY;
     private BitemporalObjectState state = BitemporalObjectState.ACTIVE;
 
@@ -19,14 +21,11 @@ public class RecordPeriod {
         super();
     }
 
-    /**
-     * Creates an active record time instance with given values.
-     * 
-     * @param createdBy
-     * @param createdAt
-     * @return record period
-     */
-    public static RecordPeriod create(String createdBy, Instant createdAt, Instant inactivatedAt, String inactivatedBy, BitemporalObjectState state) {
+    public ZoneId getZone() {
+        return zone;
+    }
+    
+    public static RecordPeriod create(String createdBy, LocalDateTime createdAt, LocalDateTime inactivatedAt, String inactivatedBy, BitemporalObjectState state) {
         RecordPeriod rp = new RecordPeriod();
         rp.createdBy = Objects.requireNonNull(createdBy);
         rp.createdAt = Objects.requireNonNull(createdAt);
@@ -35,7 +34,7 @@ public class RecordPeriod {
         rp.state = state;
         return rp;
     }
-    
+
     /**
      * Creates an active record time instance with given values.
      * 
@@ -43,7 +42,7 @@ public class RecordPeriod {
      * @param createdAt
      * @return record period
      */
-    public static RecordPeriod create(String createdBy, Instant createdAt) {
+    public static RecordPeriod create(String createdBy, LocalDateTime createdAt) {
         RecordPeriod rp = new RecordPeriod();
         rp.createdBy = Objects.requireNonNull(createdBy);
         rp.createdAt = Objects.requireNonNull(createdAt);
@@ -70,7 +69,7 @@ public class RecordPeriod {
      * @return record period
      */
     public RecordPeriod inactivate(String inactivatedBy) {
-        this.inactivatedAt = Instant.now(Clock.systemUTC());
+        this.inactivatedAt = clock.now();
         this.state = BitemporalObjectState.INACTIVE;
         this.inactivatedBy = Objects.requireNonNull(inactivatedBy);
         return this;
@@ -95,12 +94,19 @@ public class RecordPeriod {
     public int hashCode() {
         return Objects.hash(createdAt, createdBy, inactivatedAt, inactivatedBy, state);
     }
+    
+    @Override
+    public String toString() {
+        return "RecordPeriod [clock=" + clock + ", zone=" + zone + ", createdAt=" + createdAt + ", createdBy="
+                + createdBy + ", inactivatedAt=" + inactivatedAt + ", inactivatedBy=" + inactivatedBy + ", state="
+                + state + "]";
+    }
 
     public String getCreatedBy() {
         return createdBy;
     }
 
-    public Instant getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
@@ -108,7 +114,7 @@ public class RecordPeriod {
         return state;
     }
 
-    public Instant getInactivatedAt() {
+    public LocalDateTime getInactivatedAt() {
         return inactivatedAt;
     }
 

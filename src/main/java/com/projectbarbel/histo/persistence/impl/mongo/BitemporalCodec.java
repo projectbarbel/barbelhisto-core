@@ -9,6 +9,9 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 
 import org.bson.BsonBinary;
 import org.bson.BsonReader;
@@ -32,23 +35,11 @@ public class BitemporalCodec implements Codec<BitemporalStamp> {
         BsonBinary binary = new BsonBinary(toByteArray(value.getVersionId()));
         writer.writeBinaryData("versionId", binary);
         writer.writeString("documentId", value.getDocumentId());
-        writer.writeStartDocument("effectiveFrom");
-        writer.writeInt64("seconds", value.getEffectiveTime().getEffectiveFromInstant().getEpochSecond());
-        writer.writeInt32("nanos", value.getEffectiveTime().getEffectiveFromInstant().getNano());
-        writer.writeEndDocument();
-        writer.writeStartDocument("effectiveUntil");
-        writer.writeInt64("seconds", value.getEffectiveTime().getEffectiveUntilInstant().getEpochSecond());
-        writer.writeInt32("nanos", value.getEffectiveTime().getEffectiveUntilInstant().getNano());
-        writer.writeEndDocument();
-        writer.writeStartDocument("createdAt");
-        writer.writeInt64("seconds", value.getRecordTime().getCreatedAt().getEpochSecond());
-        writer.writeInt32("nanos", value.getRecordTime().getCreatedAt().getNano());
-        writer.writeEndDocument();
+        writer.writeDateTime("from", Date.from(value.getEffectiveTime().getFrom().atStartOfDay(ZoneId.of("Z")).toInstant()).getTime());
+        writer.writeDateTime("until", Date.from(value.getEffectiveTime().getUntil().atStartOfDay(ZoneId.of("Z")).toInstant()).getTime());
+        writer.writeBinaryData("createdAt", new BsonBinary(toByteArray(value.getRecordTime().getCreatedAt())));
         writer.writeString("createdBy", value.getRecordTime().getCreatedBy());
-        writer.writeStartDocument("inactivatedAt");
-        writer.writeInt64("seconds", value.getRecordTime().getInactivatedAt().getEpochSecond());
-        writer.writeInt32("nanos", value.getRecordTime().getInactivatedAt().getNano());
-        writer.writeEndDocument();
+        writer.writeBinaryData("inactivatedAt", new BsonBinary(toByteArray(value.getRecordTime().getInactivatedAt())));
         writer.writeString("status", value.getRecordTime().getState().name());
         writer.writeString("inactivatedBy", value.getRecordTime().getInactivatedBy());
         writer.writeString("activity", value.getActivity());
@@ -67,26 +58,17 @@ public class BitemporalCodec implements Codec<BitemporalStamp> {
         reader.readStartDocument();
         builder.withVersionId(fromByteArray(reader.readBinaryData("versionId").getData()));
         builder.withDocumentId(reader.readString("documentId"));
-        builder.withEffectiveTime(EffectivePeriod.create().from(readInstant(reader, builder, "effectiveFrom"))
-                .until(readInstant(reader, builder, "effectiveUntil")));
-        Instant createdAt = readInstant(reader, builder, "createdAt");
+        builder.withEffectiveTime(EffectivePeriod.create().from(Instant.ofEpochMilli(reader.readDateTime("from")).atZone(ZoneId.of("Z")).toLocalDate())
+                .until(Instant.ofEpochMilli(reader.readDateTime("until")).atZone(ZoneId.of("Z")).toLocalDate()));
+        LocalDateTime createdAt = (LocalDateTime)fromByteArray(reader.readBinaryData("createdAt").getData());
         String createdBy = reader.readString("createdBy");
-        Instant inactivatedAt = readInstant(reader, builder, "inactivatedAt");
+        LocalDateTime inactivatedAt = (LocalDateTime)fromByteArray(reader.readBinaryData("inactivatedAt").getData());
         BitemporalObjectState state = BitemporalObjectState.valueOf(reader.readString("status"));
         String inactivatedBy = reader.readString("inactivatedBy");
         builder.withRecordTime(RecordPeriod.create(createdBy, createdAt, inactivatedAt, inactivatedBy, state));
         builder.withActivity(reader.readString("activity"));
         reader.readEndDocument();
         return builder.build();
-    }
-
-    private Instant readInstant(BsonReader reader, final Builder builder, String name) {
-        reader.readName(name);
-        reader.readStartDocument();
-        long seconds = reader.readInt64("seconds");
-        int nano = reader.readInt32("nanos");
-        reader.readEndDocument();
-        return Instant.ofEpochSecond(seconds, nano);
     }
 
     private byte[] toByteArray(Object object) {

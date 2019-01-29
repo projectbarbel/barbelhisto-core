@@ -65,7 +65,7 @@ public final class BitemporalStamp {
 
     public BitemporalStamp inactivatedCopy(String inactivatedBy) {
         return of(documentId, activity, 
-                EffectivePeriod.create().from(effectiveTime.getEffectiveFromLocalDate()).until(effectiveTime.getEffectiveUntilLocalDate()),
+                EffectivePeriod.create().from(effectiveTime.getFrom()).until(effectiveTime.getUntil()),
                 RecordPeriod.create(recordTime.getCreatedBy(), recordTime.getCreatedAt()).inactivate(inactivatedBy));
     }
 

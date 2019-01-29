@@ -1,18 +1,14 @@
 package com.projectbarbel.histo.model;
 
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Objects;
 
-import com.projectbarbel.histo.BarbelHistoHelper;
-
 public class EffectivePeriod {
-    public final static Instant INFINITE = Instant.ofEpochMilli(Long.MAX_VALUE);
-    public final static Instant BIGBANG = Instant.ofEpochMilli(Long.MIN_VALUE);
-    private Instant from = BIGBANG; // UTC
-    private Instant until = INFINITE; // UTC
-    private Systemclock clock = new Systemclock(ZoneId.of("Z"));
+    public final static LocalDate INFINITE = LocalDate.MAX;
+    public final static LocalDate BIGBANG = LocalDate.MIN;
+    private LocalDate from = BIGBANG;
+    private LocalDate until = INFINITE;
+    private Systemclock clock = new Systemclock();
     
     private EffectivePeriod() {
         super();
@@ -34,55 +30,37 @@ public class EffectivePeriod {
      * @return adopted effective period
      */
     public EffectivePeriod from(LocalDate from) {
-        this.from = BarbelHistoHelper.effectiveDateToEffectiveUTCInstant(Objects.requireNonNull(from));
-        return this;
-    }
-
-    public EffectivePeriod from(Instant from) {
         this.from = Objects.requireNonNull(from);
         return this;
     }
-    
-    public EffectivePeriod until(LocalDate until) {
-        this.until = BarbelHistoHelper.effectiveDateToEffectiveUTCInstant(Objects.requireNonNull(until));
-        return this;
-    }
 
-    public EffectivePeriod until(Instant until) {
+    public EffectivePeriod until(LocalDate until) {
         this.until = Objects.requireNonNull(until);
         return this;
     }
-    
+
     public EffectivePeriod toInfinite() {
         this.until = INFINITE;
         return this;
     }
 
     public boolean isInfinite() {
-       return getEffectiveFromInstant().equals(INFINITE);
+       return from.equals(INFINITE);
     }
     
     public EffectivePeriod fromNow() {
-        this.from = BarbelHistoHelper.effectiveDateToEffectiveUTCInstant(clock.now().toLocalDate());
+        this.from = clock.now().toLocalDate();
         return this;
     }
     
-    public LocalDate getEffectiveFromLocalDate() {
-        return BarbelHistoHelper.effectiveInstantToEffectiveDate(Objects.requireNonNull(from));
-    }
-    
-    public LocalDate getEffectiveUntilLocalDate() {
-        return BarbelHistoHelper.effectiveInstantToEffectiveDate(Objects.requireNonNull(until));
-    }
-    
-    public Instant getEffectiveFromInstant() {
+    public LocalDate getFrom() {
         return from;
     }
-    
-    public Instant getEffectiveUntilInstant() {
+
+    public LocalDate getUntil() {
         return until;
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (o == this)
@@ -100,5 +78,9 @@ public class EffectivePeriod {
         return Objects.hash(from, until);
     }
 
+    @Override
+    public String toString() {
+        return "EffectivePeriod [from=" + from + ", until=" + until + ", clock=" + clock + "]";
+    }
 
 }

@@ -10,7 +10,6 @@ import java.io.Serializable;
 import org.junit.Test;
 
 import com.projectbarbel.histo.BarbelTestHelper;
-import com.projectbarbel.histo.functions.update.DefaultPojoCopier;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.DefaultDocument;

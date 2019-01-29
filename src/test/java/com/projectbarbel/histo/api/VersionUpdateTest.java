@@ -116,7 +116,7 @@ public class VersionUpdateTest {
                 .build();
         LocalDate newEffectDate = validNewEffectiveDate(object);
         VersionUpdateResult update = VersionUpdate.of(object).effectiveFrom(newEffectDate).execute();
-        assertEquals(object.getEffectiveUntilInstant(), EffectivePeriod.INFINITE);
+        assertEquals(object.getEffectiveUntil(), EffectivePeriod.INFINITE);
         assertTrue(object.isEffectiveInfinitely());
         assertFalse(update.newPrecedingVersion().isEffectiveInfinitely());
         assertTrue(update.newSubsequentVersion().isEffectiveInfinitely());

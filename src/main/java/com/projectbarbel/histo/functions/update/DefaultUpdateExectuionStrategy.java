@@ -15,11 +15,11 @@ public class DefaultUpdateExectuionStrategy implements Function<UpdateExecutionC
     public VersionUpdateResult apply(UpdateExecutionContext executionContext) {
         BitemporalStamp newPrecedingStamp = BitemporalStamp.of(
                 executionContext.activity(), executionContext.oldVersion().getDocumentId(), EffectivePeriod.create()
-                        .from(executionContext.oldVersion().getEffectiveFromInstant()).until(executionContext.newEffectiveFrom()),
+                        .from(executionContext.oldVersion().getEffectiveFrom()).until(executionContext.newEffectiveFrom()),
                 RecordPeriod.create(executionContext.createdBy()));
         BitemporalStamp newSubsequentStamp = BitemporalStamp.of(
                 executionContext.activity(), executionContext.oldVersion().getDocumentId(), EffectivePeriod.create()
-                        .from(executionContext.newEffectiveFrom()).until(executionContext.oldVersion().getEffectiveUntilInstant()),
+                        .from(executionContext.newEffectiveFrom()).until(executionContext.oldVersion().getEffectiveUntil()),
                 RecordPeriod.create(executionContext.createdBy()));
         Bitemporal<?> newPrecedingVersion = executionContext.copyFunction().apply(executionContext.oldVersion(), newPrecedingStamp);
         Bitemporal<?> newSubsequentVersion = executionContext.copyFunction().apply(executionContext.oldVersion(), newSubsequentStamp);
