@@ -1,5 +1,6 @@
 package com.projectbarbel.histo.functions.journal;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
@@ -16,7 +17,7 @@ import com.projectbarbel.histo.api.VersionUpdate.VersionUpdateResult;
 import com.projectbarbel.histo.model.DefaultDocument;
 import com.projectbarbel.histo.model.Systemclock;
 
-public class KeepSubsequentUpdateStrategyTest {
+public class InactivateSubsequentUpdateStrategyTest {
 
     private DocumentJournal<DefaultDocument> journal;
     private Systemclock clock = new Systemclock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 10, 0));
@@ -27,42 +28,42 @@ public class KeepSubsequentUpdateStrategyTest {
     }
     
     @Test
-    public void testApply_KeepSubsequent() throws Exception {
-        VersionUpdate<DefaultDocument> update = VersionUpdate.of(journal.list().get(3)).prepare().effectiveFrom(clock.now().toLocalDate()).setProperty("data", "some new data").get();
+    public void testApply_InactivateSubsequent() throws Exception {
+        VersionUpdate<DefaultDocument> update = VersionUpdate.of(journal.list().get(3)).prepare().effectiveFrom(clock.now().toLocalDate()).effectiveUntilInfinite().setProperty("data", "some new data").get();
         assertTrue(journal.read().activeVersions().size()==4);
         VersionUpdateResult<DefaultDocument> result = update.execute();
-        KeepSubsequentUpdateStrategy<DefaultDocument> updateFunction = new KeepSubsequentUpdateStrategy<DefaultDocument>();
+        InactivateSubsequentUpdateStrategy<DefaultDocument> updateFunction = new InactivateSubsequentUpdateStrategy<DefaultDocument>();
         DocumentJournal<DefaultDocument> updatedJournal = updateFunction.apply(journal, update);
         assertTrue(result.newSubsequentVersion().getData().equals("some new data"));
         assertTrue(result.newPrecedingVersion().getData().equals(journal.list().get(3).getData()));
-        assertTrue(updatedJournal.read().activeVersions().size()==5);
-        assertTrue(updatedJournal.read().inactiveVersions().size()==1);
-    }
-
-    @Test
-    public void testApply_KeepSubsequent_subsequentPeriodsExist_andShouldNotBeInactivated() throws Exception {
-        VersionUpdate<DefaultDocument> update = VersionUpdate.of(journal.list().get(2)).prepare().effectiveFrom(LocalDate.of(2018, 7, 1)).setProperty("data", "some new data").get();
-        assertTrue(journal.read().activeVersions().size()==4);
-        VersionUpdateResult<DefaultDocument> result = update.execute();
-        KeepSubsequentUpdateStrategy<DefaultDocument> updateFunction = new KeepSubsequentUpdateStrategy<DefaultDocument>();
-        DocumentJournal<DefaultDocument> updatedJournal = updateFunction.apply(journal, update);
-        assertTrue(result.newSubsequentVersion().getData().equals("some new data"));
-        assertTrue(result.newPrecedingVersion().getData().equals(journal.list().get(2).getData()));
-        assertTrue(updatedJournal.read().activeVersions().size()==5);
-        assertTrue(updatedJournal.read().inactiveVersions().size()==1);
+        assertEquals(5,updatedJournal.read().activeVersions().size());
+        assertEquals(1, updatedJournal.read().inactiveVersions().size());
     }
     
     @Test
-    public void testApply_KeepSubsequent_multiplieSubsequentPeriodsExist_andShouldNotBeInactivated() throws Exception {
-        VersionUpdate<DefaultDocument> update = VersionUpdate.of(journal.list().get(0)).prepare().effectiveFrom(LocalDate.of(2016, 7, 1)).setProperty("data", "some new data").get();
+    public void testApply_InactivateSubsequent_subsequentPeriodsExist_andShouldBeInactivated() throws Exception {
+        VersionUpdate<DefaultDocument> update = VersionUpdate.of(journal.list().get(2)).prepare().effectiveFrom(LocalDate.of(2018, 7, 1)).effectiveUntilInfinite().setProperty("data", "some new data").get();
         assertTrue(journal.read().activeVersions().size()==4);
         VersionUpdateResult<DefaultDocument> result = update.execute();
-        KeepSubsequentUpdateStrategy<DefaultDocument> updateFunction = new KeepSubsequentUpdateStrategy<DefaultDocument>();
+        InactivateSubsequentUpdateStrategy<DefaultDocument> updateFunction = new InactivateSubsequentUpdateStrategy<DefaultDocument>();
+        DocumentJournal<DefaultDocument> updatedJournal = updateFunction.apply(journal, update);
+        assertTrue(result.newSubsequentVersion().getData().equals("some new data"));
+        assertTrue(result.newPrecedingVersion().getData().equals(journal.list().get(2).getData()));
+        assertEquals(4,updatedJournal.read().activeVersions().size());
+        assertEquals(2, updatedJournal.read().inactiveVersions().size());
+    }
+    
+    @Test
+    public void testApply_InactivateSubsequent_multipleSubsequentPeriodsExist_andShouldBeInactivated() throws Exception {
+        VersionUpdate<DefaultDocument> update = VersionUpdate.of(journal.list().get(0)).prepare().effectiveFrom(LocalDate.of(2016, 7, 1)).effectiveUntilInfinite().setProperty("data", "some new data").get();
+        assertTrue(journal.read().activeVersions().size()==4);
+        VersionUpdateResult<DefaultDocument> result = update.execute();
+        InactivateSubsequentUpdateStrategy<DefaultDocument> updateFunction = new InactivateSubsequentUpdateStrategy<DefaultDocument>();
         DocumentJournal<DefaultDocument> updatedJournal = updateFunction.apply(journal, update);
         assertTrue(result.newSubsequentVersion().getData().equals("some new data"));
         assertTrue(result.newPrecedingVersion().getData().equals(journal.list().get(0).getData()));
-        assertTrue(updatedJournal.read().activeVersions().size()==5);
-        assertTrue(updatedJournal.read().inactiveVersions().size()==1);
+        assertEquals(2,updatedJournal.read().activeVersions().size());
+        assertEquals(4, updatedJournal.read().inactiveVersions().size());
     }
-        
+
 }

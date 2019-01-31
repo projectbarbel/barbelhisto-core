@@ -186,5 +186,5 @@ public class VersionUpdateTest {
             super.setBitemporalStamp(document.getBitemporalStamp());
         }
     }
-    
+
 }

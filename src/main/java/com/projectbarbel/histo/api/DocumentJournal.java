@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
 
-import com.projectbarbel.histo.functions.journal.KeepSubsequentUpdateStrategy;
 import com.projectbarbel.histo.functions.journal.ReaderFunctionGetEffectiveAfter;
 import com.projectbarbel.histo.functions.journal.ReaderFunctionGetEffectiveByDate;
 import com.projectbarbel.histo.model.Bitemporal;
@@ -23,7 +22,6 @@ public class DocumentJournal<T extends Bitemporal<?>> {
 
     private final List<T> journal = new ArrayList<T>();
     private static final Logger logger = Logger.getLogger(DocumentJournal.class.getName());
-    private final BiFunction<DocumentJournal<T>, VersionUpdate<T>, DocumentJournal<T>> journalUpdateStrategy = new KeepSubsequentUpdateStrategy<T>();
     private BiFunction<DocumentJournal<T>, LocalDate, Optional<T>> effectiveReaderFunction = new ReaderFunctionGetEffectiveByDate<T>();
     private BiFunction<DocumentJournal<T>, LocalDate, List<T>> effectiveAfterFunction = new ReaderFunctionGetEffectiveAfter<T>();
     private Systemclock clock = new Systemclock();
@@ -82,9 +80,8 @@ public class DocumentJournal<T extends Bitemporal<?>> {
         }
         
         public DocumentJournal<T> processVersionUpdate(VersionUpdate<T> update) {
-            return journal.journalUpdateStrategy.apply(journal, update);
+            return update.updateStrategy.apply(journal, update);
         }
-        
     }
     
     public static class JournalReader<T extends Bitemporal<?>> {
@@ -151,8 +148,16 @@ public class DocumentJournal<T extends Bitemporal<?>> {
 
     }
 
-    public void add(T version) {
-        journal.add(version);
+    public void add(VersionUpdate<T> update) {
+        Validate.notNull(update, "update passed must not be null");
+        Validate.validState(update.done(), "this update has not been executed - execute before adding the update to journal");
+        Validate.validState(journal.contains(update.result().oldVersion()), "the old version of that update passed is unknown in this journal - please only add valid update whose origin are objects from this journal");
+        Validate.validState(!journal.contains(update.result().newPrecedingVersion()), "the new generated preceeding version by this update was already added to the journal");
+        Validate.validState(!journal.contains(update.result().newSubsequentVersion()), "the new generated subsequent version by this update was already added to the journal");
+        if (journal.contains(update.result().oldVersion())) {
+            journal.add(update.result().newPrecedingVersion());
+            journal.add(update.result().newSubsequentVersion());
+        }
     }
 
 }

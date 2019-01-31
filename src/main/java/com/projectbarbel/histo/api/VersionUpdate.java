@@ -12,13 +12,16 @@ import java.util.function.Function;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.Validate;
 
+import com.projectbarbel.histo.functions.journal.InactivateSubsequentUpdateStrategy;
+import com.projectbarbel.histo.functions.journal.KeepSubsequentUpdateStrategy;
 import com.projectbarbel.histo.functions.update.DefaultPojoCopier;
 import com.projectbarbel.histo.functions.update.DefaultUpdateExectuionStrategy;
 import com.projectbarbel.histo.functions.update.ValidateEffectiveDate;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
+import com.projectbarbel.histo.model.EffectivePeriod;
 
-public class VersionUpdate<T extends Bitemporal<?>> {
+public final class VersionUpdate<T extends Bitemporal<?>> {
 
     public enum UpdateState {
         PREPARATION(() -> {}, () -> Validate.validState(false, "this method is not allowed in state PTREPARATION")), 
@@ -45,6 +48,7 @@ public class VersionUpdate<T extends Bitemporal<?>> {
     private T newPrecedingVersion;
     private T newSubsequentVersion;
     private LocalDate newEffectiveDate;
+    private LocalDate newEffectiveUntil;
     private String activity = "SYSTEM_ACTIVITY";
     private String createdBy = "SYSTEM";
     private BiFunction<T, BitemporalStamp, T> copyFunction = new DefaultPojoCopier<T>();
@@ -52,6 +56,7 @@ public class VersionUpdate<T extends Bitemporal<?>> {
     private Function<UpdateExecutionContext<T>, VersionUpdateResult<T>> updateExecutionFunction = new DefaultUpdateExectuionStrategy<T>();
     private final Map<String, Object> propertyUpdates = new HashMap<>();
     private VersionUpdateResult<T> result;
+    public BiFunction<DocumentJournal<T>, VersionUpdate<T>, DocumentJournal<T>> updateStrategy = new KeepSubsequentUpdateStrategy<T>();
 
     public VersionUpdateResult<T> result() {
         return state.get(result);
@@ -101,6 +106,12 @@ public class VersionUpdate<T extends Bitemporal<?>> {
             return this;
         }
 
+        public VersionUpdateExecutionBuilder<T> effectiveUntilInfinite() {
+            update.newEffectiveUntil = update.state.set(EffectivePeriod.INFINITE);
+            update.updateStrategy  = new InactivateSubsequentUpdateStrategy<T>();
+            return this;
+        }
+        
         public VersionUpdateExecutionBuilder<T> activity(String activity) {
             update.activity = update.state.set(activity);
             return this;
@@ -204,10 +215,16 @@ public class VersionUpdate<T extends Bitemporal<?>> {
         oldVersion = Objects.requireNonNull(bitemporal, "bitemporal object must not be null");
         newEffectiveDate = Objects.requireNonNull(bitemporal.getEffectiveFrom(),
                 "the bitemporal passed must not contain null value on effective from");
+        newEffectiveUntil = Objects.requireNonNull(bitemporal.getEffectiveUntil(),
+                "the bitemporal passed must not contain null value on effective until");
     }
 
     public LocalDate effectiveFrom() {
         return newEffectiveDate;
+    }
+
+    public LocalDate newEffectiveUntil() {
+        return newEffectiveUntil;
     }
 
 }

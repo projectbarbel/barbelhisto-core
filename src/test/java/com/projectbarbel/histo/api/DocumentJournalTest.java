@@ -60,9 +60,4 @@ public class DocumentJournalTest {
         assertTrue(journal.list().get(2).getEffectiveFrom().equals(LocalDate.of(2019, 8, 1)));
     }
 
-    @Test
-    public void testMap() throws Exception {
-
-    }
-
 }
