@@ -13,9 +13,9 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelHistoFactory.DefaultHistoType;
+import com.projectbarbel.histo.persistence.impl.DocumentDao;
 import com.projectbarbel.histo.BarbelHistoOptions;
 import com.projectbarbel.histo.BarbelTestHelper;
-import com.projectbarbel.histo.persistence.api.DocumentDao;
 
 public class MongoDocumentDaoImpl_Create_IntegrationTest {
 

@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.persistence.api;
+package com.projectbarbel.histo.persistence.impl;
 
 import java.lang.reflect.Proxy;
 import java.util.Optional;

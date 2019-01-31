@@ -8,7 +8,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.Validate;
 
 import com.projectbarbel.histo.model.DefaultDocument;
-import com.projectbarbel.histo.persistence.api.DocumentDao;
 
 public class DefaultDocumentDao implements DocumentDao<DefaultDocument, String> {
 

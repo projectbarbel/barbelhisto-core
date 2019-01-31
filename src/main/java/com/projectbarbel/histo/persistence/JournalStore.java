@@ -1,11 +1,11 @@
-package com.projectbarbel.histo.persistence.api;
+package com.projectbarbel.histo.persistence;
 
 import com.projectbarbel.histo.api.DocumentJournal;
 import com.projectbarbel.histo.model.Bitemporal;
 
-public interface PersistenceService<T extends Bitemporal<?>> {
+public interface JournalStore<T extends Bitemporal<?>> {
 
     DocumentJournal<T> loadJournal(String documentId);
-    long updateJournal(DocumentJournal<T> journal);
+    long persistJournal(DocumentJournal<T> journal);
     
 }

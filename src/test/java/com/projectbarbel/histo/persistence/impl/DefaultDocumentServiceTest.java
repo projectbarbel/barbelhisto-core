@@ -8,7 +8,6 @@ import org.junit.Test;
 import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelHistoFactory.DefaultHistoType;
 import com.projectbarbel.histo.model.DefaultDocument;
-import com.projectbarbel.histo.persistence.api.DocumentService;
 
 public class DefaultDocumentServiceTest {
 

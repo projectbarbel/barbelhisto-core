@@ -11,9 +11,9 @@ import org.junit.Test;
 
 import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelHistoFactory.DefaultHistoType;
+import com.projectbarbel.histo.persistence.impl.DocumentDao;
 import com.projectbarbel.histo.BarbelHistoOptions;
 import com.projectbarbel.histo.BarbelTestHelper;
-import com.projectbarbel.histo.persistence.api.DocumentDao;
 
 public class MongoDocumentDaoImpl_Reset_IntegrationTest {
 

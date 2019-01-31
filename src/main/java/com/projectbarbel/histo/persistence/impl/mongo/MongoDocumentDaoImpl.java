@@ -13,7 +13,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.CreateCollectionOptions;
 import com.mongodb.client.model.Filters;
 import com.projectbarbel.histo.model.DefaultDocument;
-import com.projectbarbel.histo.persistence.api.DocumentDao;
+import com.projectbarbel.histo.persistence.impl.DocumentDao;
 
 public class MongoDocumentDaoImpl implements DocumentDao<DefaultMongoValueObject, ObjectId> {
 
