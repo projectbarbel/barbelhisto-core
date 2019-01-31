@@ -17,7 +17,6 @@ public class ReaderFunctionGetEffectiveAfter<T extends Bitemporal<?>>
     public List<T> apply(DocumentJournal<T> journal, LocalDate day) {
         Validate.notNull(journal, "null value for journal not welcome here");
         JournalPredicates predicates = new JournalPredicates(day);
-        @SuppressWarnings("unchecked")
         List<T> documents = (List<T>) journal.list();
         return documents.stream().filter(predicates::isActive).filter(predicates::effectiveAfter)
                 .collect(Collectors.toList());

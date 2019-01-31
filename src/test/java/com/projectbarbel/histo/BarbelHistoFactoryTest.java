@@ -14,6 +14,7 @@ import com.projectbarbel.histo.api.VersionUpdate;
 import com.projectbarbel.histo.functions.DefaultIDGenerator;
 import com.projectbarbel.histo.functions.journal.KeepSubsequentUpdateStrategy;
 import com.projectbarbel.histo.functions.update.DefaultPojoCopier;
+import com.projectbarbel.histo.model.DefaultDocument;
 import com.projectbarbel.histo.persistence.impl.DefaultDocumentDao;
 import com.projectbarbel.histo.persistence.impl.DefaultDocumentService;
 
@@ -72,13 +73,13 @@ public class BarbelHistoFactoryTest {
 
     @Test(expected = RuntimeException.class)
     public void testInstanceOfHistoType_DefaultUpdater() throws Exception {
-        VersionUpdate bean = factory.instanceOf(DefaultHistoType.UPDATER);
+        VersionUpdate<DefaultDocument> bean = factory.instanceOf(DefaultHistoType.UPDATER);
         assertNotNull(bean);
     }
 
     @Test
     public void testInstanceOfHistoType_DefaultCopier() throws Exception {
-        DefaultPojoCopier bean = factory.instanceOf(DefaultHistoType.COPIER);
+        DefaultPojoCopier<DefaultDocument> bean = factory.instanceOf(DefaultHistoType.COPIER);
         assertNotNull(bean);
     }
 
@@ -90,7 +91,7 @@ public class BarbelHistoFactoryTest {
 
     @Test
     public void testInstanceOfHistoType_UpdatePolicy() throws Exception {
-        KeepSubsequentUpdateStrategy bean = factory.instanceOf(DefaultHistoType.UPDATEPOLICY);
+        KeepSubsequentUpdateStrategy<DefaultDocument> bean = factory.instanceOf(DefaultHistoType.UPDATEPOLICY);
         assertNotNull(bean);
     }
     

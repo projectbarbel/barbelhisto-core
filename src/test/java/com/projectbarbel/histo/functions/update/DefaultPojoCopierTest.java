@@ -42,7 +42,7 @@ public class DefaultPojoCopierTest {
     @Test
     public void testFlatCopyWithNewStamp() throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
-        DefaultDocument copied = new DefaultPojoCopier().flatCopyWithNewStamp(object, BarbelTestHelper.random(BitemporalStamp.class));
+        DefaultDocument copied = new DefaultPojoCopier<DefaultDocument>().flatCopyWithNewStamp(object, BarbelTestHelper.random(BitemporalStamp.class));
         assertNotNull(copied);
     }
 
@@ -51,7 +51,7 @@ public class DefaultPojoCopierTest {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
         BitemporalStamp newstamp = BarbelTestHelper.random(BitemporalStamp.class);
         BitemporalStamp oldstamp = object.getBitemporalStamp();
-        DefaultDocument copied = new DefaultPojoCopier().flatCopyWithNewStamp(object, newstamp);
+        DefaultDocument copied = new DefaultPojoCopier<DefaultDocument>().flatCopyWithNewStamp(object, newstamp);
         assertEquals(object.getData(), copied.getData());
         assertNotEquals(object.getBitemporalStamp(), copied.getBitemporalStamp());
         assertEquals(object.getBitemporalStamp(), oldstamp);
@@ -63,7 +63,7 @@ public class DefaultPojoCopierTest {
         APojo object = BarbelTestHelper.random(APojo.class);
         BitemporalStamp newstamp = BarbelTestHelper.random(BitemporalStamp.class);
         BitemporalStamp oldstamp = object.getBitemporalStamp();
-        APojo copied = new DefaultPojoCopier().flatCopyWithNewStamp(object, newstamp);
+        APojo copied = new DefaultPojoCopier<DefaultDocument>().flatCopyWithNewStamp(object, newstamp);
         assertEquals(object.clazz, copied.clazz);
         assertEquals(object.count, copied.count);
         assertEquals(object.intGr, copied.intGr);
@@ -78,7 +78,7 @@ public class DefaultPojoCopierTest {
     @Test
     public void testFlatCopyWithNewStampNotEqual() throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
-        DefaultDocument copied = new DefaultPojoCopier().flatCopyWithNewStamp(object, BarbelTestHelper.random(BitemporalStamp.class));
+        DefaultDocument copied = new DefaultPojoCopier<DefaultDocument>().flatCopyWithNewStamp(object, BarbelTestHelper.random(BitemporalStamp.class));
         assertNotEquals(copied, object);
     }
 

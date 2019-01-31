@@ -14,12 +14,14 @@ public class Systemclock {
         return LocalDateTime.now(clock);
     }
 
-    public void useFixedClockAt(LocalDateTime date) {
+    public Systemclock useFixedClockAt(LocalDateTime date) {
         clock = Clock.fixed(date.atZone(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault());
+        return this;
     }
 
-    public void useSystemDefaultZoneClock() {
+    public Systemclock useSystemDefaultZoneClock() {
         clock = Clock.systemDefaultZone();
+        return this;
     }
 
 }

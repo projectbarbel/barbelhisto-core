@@ -1,6 +1,9 @@
 package com.projectbarbel.histo.functions.update;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.function.Function;
+
+import org.apache.commons.beanutils.PropertyUtils;
 
 import com.projectbarbel.histo.api.VersionUpdate.UpdateExecutionContext;
 import com.projectbarbel.histo.api.VersionUpdate.VersionUpdateResult;
@@ -9,10 +12,10 @@ import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.EffectivePeriod;
 import com.projectbarbel.histo.model.RecordPeriod;
 
-public class DefaultUpdateExectuionStrategy implements Function<UpdateExecutionContext, VersionUpdateResult> {
+public class DefaultUpdateExectuionStrategy<T extends Bitemporal<?>> implements Function<UpdateExecutionContext<T>, VersionUpdateResult<T>> {
 
     @Override
-    public VersionUpdateResult apply(UpdateExecutionContext executionContext) {
+    public VersionUpdateResult<T> apply(UpdateExecutionContext<T> executionContext) {
         BitemporalStamp newPrecedingStamp = BitemporalStamp.of(
                 executionContext.activity(), executionContext.oldVersion().getDocumentId(), EffectivePeriod.create()
                         .from(executionContext.oldVersion().getEffectiveFrom()).until(executionContext.newEffectiveFrom()),
@@ -21,10 +24,18 @@ public class DefaultUpdateExectuionStrategy implements Function<UpdateExecutionC
                 executionContext.activity(), executionContext.oldVersion().getDocumentId(), EffectivePeriod.create()
                         .from(executionContext.newEffectiveFrom()).until(executionContext.oldVersion().getEffectiveUntil()),
                 RecordPeriod.create(executionContext.createdBy()));
-        Bitemporal<?> newPrecedingVersion = executionContext.copyFunction().apply(executionContext.oldVersion(), newPrecedingStamp);
-        Bitemporal<?> newSubsequentVersion = executionContext.copyFunction().apply(executionContext.oldVersion(), newSubsequentStamp);
-        executionContext.oldVersion().inactivate();
+        T newPrecedingVersion = executionContext.copyFunction().apply(executionContext.oldVersion(), newPrecedingStamp);
+        T newSubsequentVersion = executionContext.copyFunction().apply(executionContext.oldVersion(), newSubsequentStamp);
+        executionContext.propertyUpdates().keySet().stream().forEach((k)->setNestedProperty(newSubsequentVersion, k, executionContext.propertyUpdates().get(k)));
         return executionContext.createExecutionResult(newPrecedingVersion, newSubsequentVersion);
+    }
+    
+    public void setNestedProperty(Object bean, String fieldname, Object value) {
+        try {
+            PropertyUtils.setNestedProperty(bean, fieldname, value);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new IllegalArgumentException("the property with the name " + fieldname + " in bean of type " + bean.getClass().getName() + " cannot be written", e);
+        }
     }
 
 }

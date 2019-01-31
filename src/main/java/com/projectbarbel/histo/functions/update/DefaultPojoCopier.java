@@ -6,10 +6,15 @@ import java.util.function.BiFunction;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
 
-public class DefaultPojoCopier implements BiFunction<Bitemporal<?>, BitemporalStamp, Bitemporal<?>>{
+public class DefaultPojoCopier<T extends Bitemporal<?>> implements BiFunction<T, BitemporalStamp, T>{
 
-    @SuppressWarnings("unchecked")
-    public <O extends Bitemporal<?>> O flatCopyWithNewStamp(Bitemporal<?> from, BitemporalStamp stamp) {
+    @Override
+    public T apply(T objectFrom, BitemporalStamp newStamp) {
+        return flatCopyWithNewStamp(objectFrom, newStamp);
+    }
+    
+   @SuppressWarnings("unchecked")
+    public <O extends Bitemporal<?>> O flatCopyWithNewStamp(O from, BitemporalStamp stamp) {
         Class<?> clazz = from.getClass();
         Field[] fields = clazz.getDeclaredFields();
         Object to = null;
@@ -38,11 +43,6 @@ public class DefaultPojoCopier implements BiFunction<Bitemporal<?>, BitemporalSt
             throw new RuntimeException("Cannot find field in class " + clazz.getName() + " to create new Version!", e);
         }
         return (O) to;
-    }
-
-    @Override
-    public Bitemporal<?> apply(Bitemporal<?> objectFrom, BitemporalStamp newStamp) {
-        return flatCopyWithNewStamp(objectFrom, newStamp);
     }
 
 }

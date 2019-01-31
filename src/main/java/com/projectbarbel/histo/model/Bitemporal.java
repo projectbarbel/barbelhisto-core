@@ -44,5 +44,9 @@ public interface Bitemporal<O> {
     default void inactivate() {
        setBitemporalStamp(getBitemporalStamp().inactivatedCopy(getDocumentId()));
     }
+    
+    default boolean isActive() {
+        return getBitemporalStamp().isActive();
+    }
 
 }

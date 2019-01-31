@@ -11,6 +11,10 @@ public class DefaultDocument implements Bitemporal<String> {
     private BitemporalStamp bitemporalStamp;
     private String data;
 
+    public void setData(String data) {
+        this.data = data;
+    }
+
     public DefaultDocument() {
         super();
     }

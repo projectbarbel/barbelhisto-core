@@ -1,9 +1,16 @@
 package com.projectbarbel.histo.api;
 
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
+
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.lang3.Validate;
 
 import com.projectbarbel.histo.functions.update.DefaultPojoCopier;
 import com.projectbarbel.histo.functions.update.DefaultUpdateExectuionStrategy;
@@ -11,98 +18,152 @@ import com.projectbarbel.histo.functions.update.ValidateEffectiveDate;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
 
-public class VersionUpdate {
+public class VersionUpdate<T extends Bitemporal<?>> {
 
-    private final Bitemporal<?> oldVersion;
-    private Bitemporal<?> newPrecedingVersion;
-    private Bitemporal<?> newSubsequentVersion;
+    public enum UpdateState {
+        PREPARATION(() -> {}, () -> Validate.validState(false, "this method is not allowed in state PTREPARATION")), 
+        EXECUTED(() -> Validate.validState(false, "this method is not allowed in state EXECUTED"), () -> {});
+        private Runnable setter;
+        private Runnable getter;
+
+        private UpdateState(Runnable setter, Runnable getter) {
+            this.setter = setter;
+            this.getter = getter;
+        }
+
+        public <T> T set(T value) {
+            setter.run();
+            return value;
+        }
+
+        public <T> T get(T value) {
+            getter.run();
+            return value;
+        }
+    }
+    private final T oldVersion;
+    private T newPrecedingVersion;
+    private T newSubsequentVersion;
     private LocalDate newEffectiveDate;
     private String activity = "SYSTEM_ACTIVITY";
     private String createdBy = "SYSTEM";
-    private BiFunction<Bitemporal<?>, BitemporalStamp, Bitemporal<?>> copyFunction = new DefaultPojoCopier();
+    private BiFunction<T, BitemporalStamp, T> copyFunction = new DefaultPojoCopier<T>();
+    private UpdateState state = UpdateState.PREPARATION;
+    private Function<UpdateExecutionContext<T>, VersionUpdateResult<T>> updateExecutionFunction = new DefaultUpdateExectuionStrategy<T>();
+    private final Map<String, Object> propertyUpdates = new HashMap<>();
+    private VersionUpdateResult<T> result;
 
-    public static class VersionUpdateResult {
+    public VersionUpdateResult<T> result() {
+        return state.get(result);
+    }
 
-        private VersionUpdate update;
-        
-        private VersionUpdateResult(VersionUpdate update, Bitemporal<?> newPrecedingVersion, Bitemporal<?> subSequentVersion) {
+    public boolean done() {
+        return state.equals(UpdateState.EXECUTED);
+    }
+
+    public static class VersionUpdateResult<T extends Bitemporal<?>> {
+
+        private VersionUpdate<T> update;
+
+        private VersionUpdateResult(VersionUpdate<T> update, T newPrecedingVersion, T subSequentVersion) {
             update.newPrecedingVersion = newPrecedingVersion;
             update.newSubsequentVersion = subSequentVersion;
             this.update = update;
         }
 
-        public Bitemporal<?> oldVersion() {
+        public T oldVersion() {
             return update.oldVersion;
         }
 
-        public Bitemporal<?> newPrecedingVersion() {
+        public T newPrecedingVersion() {
             return update.newPrecedingVersion;
         }
 
-        public Bitemporal<?> newSubsequentVersion() {
+        public T newSubsequentVersion() {
             return update.newSubsequentVersion;
         }
-        
+
     }
 
-    public static class VersionUpdateExecutionBuilder {
-        private final VersionUpdate update;
+    public static class VersionUpdateExecutionBuilder<T extends Bitemporal<?>> {
+        private final VersionUpdate<T> update;
         private BiPredicate<Bitemporal<?>, LocalDate> effectiveDateValidationFuction = new ValidateEffectiveDate();
-        private Function<UpdateExecutionContext, VersionUpdateResult> updateExecutionFunction = new DefaultUpdateExectuionStrategy();
 
-        private VersionUpdateExecutionBuilder(Bitemporal<?> oldVersion) {
-            update = new VersionUpdate(oldVersion);
-        }
-
-        public VersionUpdateExecutionBuilder effectiveFrom(LocalDate newEffectiveFrom) {
-            if (!effectiveDateValidationFuction.test(update.oldVersion, newEffectiveFrom))
-                throw new IllegalArgumentException("new effective date is not valid: " + newEffectiveFrom
-                        + " - old version: " + update.oldVersion.toString());
-            update.newEffectiveDate = newEffectiveFrom;
-            return this;
-        }
-
-        public VersionUpdateExecutionBuilder activity(String activity) {
-            update.activity = activity;
-            return this;
-        }
-
-        public VersionUpdateExecutionBuilder createdBy(String createdBy) {
-            update.createdBy = createdBy;
-            return this;
-        }
-
-        public VersionUpdateExecutionBuilder customCopyFunction(
-                BiFunction<Bitemporal<?>, BitemporalStamp, Bitemporal<?>> copyFunction) {
-            update.copyFunction = copyFunction;
-            return this;
-        }
-
-        public VersionUpdateExecutionBuilder customEffectiveDateValidationFunction(
-                BiPredicate<Bitemporal<?>, LocalDate> function) {
-            effectiveDateValidationFuction = function;
-            return this;
-        }
-
-        public VersionUpdateResult execute() {
-            return updateExecutionFunction.apply(new UpdateExecutionContext(update));
-        }
-
-    }
-
-    public static class UpdateExecutionContext {
-        private VersionUpdate update;
-
-        private UpdateExecutionContext(VersionUpdate update) {
-            super();
+        private VersionUpdateExecutionBuilder(VersionUpdate<T> update) {
             this.update = update;
         }
 
-        public Bitemporal<?> oldVersion() {
+        public VersionUpdateExecutionBuilder<T> effectiveFrom(LocalDate newEffectiveFrom) {
+            if (!effectiveDateValidationFuction.test(update.oldVersion, newEffectiveFrom))
+                throw new IllegalArgumentException("new effective date is not valid: " + newEffectiveFrom
+                        + " - old version: " + update.oldVersion.toString());
+            update.newEffectiveDate = update.state.set(newEffectiveFrom);
+            return this;
+        }
+
+        public VersionUpdateExecutionBuilder<T> activity(String activity) {
+            update.activity = update.state.set(activity);
+            return this;
+        }
+
+        public VersionUpdateExecutionBuilder<T> createdBy(String createdBy) {
+            update.createdBy = update.state.set(createdBy);
+            return this;
+        }
+
+        public VersionUpdateExecutionBuilder<T> customCopyFunction(BiFunction<T, BitemporalStamp, T> copyFunction) {
+            update.copyFunction = update.state.set(copyFunction);
+            return this;
+        }
+
+        public VersionUpdateExecutionBuilder<T> customEffectiveDateValidationFunction(
+                BiPredicate<Bitemporal<?>, LocalDate> function) {
+            effectiveDateValidationFuction = update.state.set(function);
+            return this;
+        }
+
+        public VersionUpdateResult<T> execute() {
+            return update.execute();
+        }
+
+        public VersionUpdateExecutionBuilder<T> setProperty(String fieldname, Object value) {
+            try {
+                T dummyCopy = update.state
+                        .set(update.copyFunction.apply(update.oldVersion, update.oldVersion.getBitemporalStamp()));
+                PropertyUtils.setNestedProperty(dummyCopy, fieldname, value);
+                update.propertyUpdates.put(fieldname, value);
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                throw new IllegalArgumentException("the property " + fieldname + " cannot be written on bean "
+                        + update.oldVersion.getClass().getName(), e);
+            }
+            return this;
+        }
+
+        public VersionUpdate<T> get() {
+            return update;
+        }
+
+    }
+
+    public static class UpdateExecutionContext<T extends Bitemporal<?>> {
+        private VersionUpdate<T> update;
+        private Map<String, Object> propertyUpdates;
+
+        public Map<String, Object> propertyUpdates() {
+            return propertyUpdates;
+        }
+
+        private UpdateExecutionContext(VersionUpdate<T> update, Map<String, Object> propertyUpdates) {
+            super();
+            this.update = update;
+            this.propertyUpdates = propertyUpdates;
+        }
+
+        public T oldVersion() {
             return update.oldVersion;
         }
 
-        public BiFunction<Bitemporal<?>, BitemporalStamp, Bitemporal<?>> copyFunction() {
+        public BiFunction<T, BitemporalStamp, T> copyFunction() {
             return update.copyFunction;
         }
 
@@ -117,21 +178,36 @@ public class VersionUpdate {
         public String createdBy() {
             return update.createdBy;
         }
-        
-        public VersionUpdateResult createExecutionResult(Bitemporal<?> newPrecedingVersion, Bitemporal<?> newSubsequentVersion) {
-            return new VersionUpdateResult(update, newPrecedingVersion, newSubsequentVersion);
+
+        public VersionUpdateResult<T> createExecutionResult(T newPrecedingVersion, T newSubsequentVersion) {
+            return new VersionUpdateResult<T>(update, newPrecedingVersion, newSubsequentVersion);
         }
-        
+
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T extends VersionUpdateExecutionBuilder> T of(Bitemporal<?> document) {
-        return (T) new VersionUpdateExecutionBuilder(document);
+    public VersionUpdateExecutionBuilder<T> prepare() {
+        return new VersionUpdateExecutionBuilder<T>(this);
     }
 
-    private VersionUpdate(Bitemporal<?> bitemporal) {
-        oldVersion = bitemporal;
-        newEffectiveDate = bitemporal.getEffectiveFrom();
+    public VersionUpdateResult<T> execute() {
+        result = state
+                .set(updateExecutionFunction.apply(new UpdateExecutionContext<T>(this, propertyUpdates)));
+        state = UpdateState.EXECUTED;
+        return result;
+    }
+
+    public static <T extends Bitemporal<?>> VersionUpdate<T> of(T document) {
+        return new VersionUpdate<T>(document);
+    }
+
+    private VersionUpdate(T bitemporal) {
+        oldVersion = Objects.requireNonNull(bitemporal, "bitemporal object must not be null");
+        newEffectiveDate = Objects.requireNonNull(bitemporal.getEffectiveFrom(),
+                "the bitemporal passed must not contain null value on effective from");
+    }
+
+    public LocalDate effectiveFrom() {
+        return newEffectiveDate;
     }
 
 }

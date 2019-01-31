@@ -23,8 +23,7 @@ public class DocumentJournal<T extends Bitemporal<?>> {
 
     private final List<T> journal = new ArrayList<T>();
     private static final Logger logger = Logger.getLogger(DocumentJournal.class.getName());
-    @SuppressWarnings("unused")
-    private final BiFunction<DocumentJournal<?>, VersionUpdate, DocumentJournal<?>> journalUpdateStrategy = new KeepSubsequentUpdateStrategy();
+    private final BiFunction<DocumentJournal<T>, VersionUpdate<T>, DocumentJournal<T>> journalUpdateStrategy = new KeepSubsequentUpdateStrategy<T>();
     private BiFunction<DocumentJournal<T>, LocalDate, Optional<T>> effectiveReaderFunction = new ReaderFunctionGetEffectiveByDate<T>();
     private BiFunction<DocumentJournal<T>, LocalDate, List<T>> effectiveAfterFunction = new ReaderFunctionGetEffectiveAfter<T>();
     private Systemclock clock = new Systemclock();
@@ -38,7 +37,7 @@ public class DocumentJournal<T extends Bitemporal<?>> {
         return journal.size();
     }
 
-    public List<? extends Bitemporal<?>> list() {
+    public List<T> list() {
         return journal.stream().collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -46,11 +45,11 @@ public class DocumentJournal<T extends Bitemporal<?>> {
         this.clock = clock;
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T extends DocumentJournal<O>, O extends Bitemporal<?>> T create(List<O> listOfBitemporalDocuments) {
+    public static <T extends Bitemporal<?>> DocumentJournal<T> create(List<T> listOfBitemporalDocuments) {
         Validate.notNull(listOfBitemporalDocuments, "new document list must not be null when creating new journal");
         Validate.isTrue(listOfBitemporalDocuments.size() > 0, "list of documents must not be empty");
-        return (T) new DocumentJournal<O>(listOfBitemporalDocuments);
+        DocumentJournal<T> newjournal = (DocumentJournal<T>)new DocumentJournal<T>(listOfBitemporalDocuments);
+        return newjournal;
     }
 
     @SuppressWarnings("unchecked")
@@ -71,7 +70,23 @@ public class DocumentJournal<T extends Bitemporal<?>> {
     public JournalReader<T> read() {
         return new JournalReader<T>(this, clock );
     }
+    
+    public JournalUpdater<T> update() {
+        return new JournalUpdater<T>(this);
+    }
 
+    public static class JournalUpdater<T extends Bitemporal<?>> {
+        private DocumentJournal<T> journal;
+        private JournalUpdater(DocumentJournal<T> journal) {
+            this.journal = journal;
+        }
+        
+        public DocumentJournal<T> processVersionUpdate(VersionUpdate<T> update) {
+            return journal.journalUpdateStrategy.apply(journal, update);
+        }
+        
+    }
+    
     public static class JournalReader<T extends Bitemporal<?>> {
         private DocumentJournal<T> journal;
         private Systemclock clock;
@@ -88,6 +103,14 @@ public class DocumentJournal<T extends Bitemporal<?>> {
         public RecordtimeReader<T> recordTime() {
             return new RecordtimeReader<T>(journal);
         }
+
+        public List<T> activeVersions() {
+            return journal.list().stream().filter((d)->d.isActive()).collect(Collectors.toList());
+        }
+        
+        public List<T> inactiveVersions() {
+            return journal.list().stream().filter((d)->!d.isActive()).collect(Collectors.toList());
+        }
     }
 
     public static class EffectiveReader<T extends Bitemporal<?>> {
@@ -100,6 +123,9 @@ public class DocumentJournal<T extends Bitemporal<?>> {
             this.clock = clock;
         }
 
+        public List<T> activeVersions() {
+            return journal.list().stream().filter((d)->d.isActive()).collect(Collectors.toList());
+        }
         public Optional<T> effectiveNow() {
             return journal.effectiveReaderFunction.apply(journal, clock.now().toLocalDate());
         }
@@ -116,12 +142,17 @@ public class DocumentJournal<T extends Bitemporal<?>> {
 
     public static class RecordtimeReader<T extends Bitemporal<?>> {
 
+        @SuppressWarnings("unused")
         private DocumentJournal<T> journal;
 
         public RecordtimeReader(DocumentJournal<T> journal) {
             this.journal = journal;
         }
 
+    }
+
+    public void add(T version) {
+        journal.add(version);
     }
 
 }
