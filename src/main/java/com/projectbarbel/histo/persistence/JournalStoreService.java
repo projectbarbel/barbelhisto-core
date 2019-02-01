@@ -10,10 +10,12 @@ import com.projectbarbel.histo.persistence.api.JournalStoreProvider;
 public class JournalStoreService<T extends Bitemporal<?>> {
     
     private static JournalStoreService<?> service = new JournalStoreService<Bitemporal<?>>();
+    @SuppressWarnings("rawtypes")
     private ServiceLoader<JournalStoreProvider> loader;
-    private JournalStoreProvider provider;
+    private JournalStoreProvider<T> provider;
     private Gson gson = new Gson();
  
+    @SuppressWarnings("unchecked")
     private JournalStoreService() {
         loader = ServiceLoader.load(JournalStoreProvider.class);
         provider = loader.iterator().next();
