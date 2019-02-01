@@ -1,10 +1,10 @@
 package com.projectbarbel.histo.persistence.spi;
 
-import com.projectbarbel.histo.api.DocumentJournal;
+import com.projectbarbel.histo.persistence.api.DocumentJournal;
 
 public interface JournalStoreProvider {
 
-    DocumentJournal<?> loadJournal(String documentId);
-    long persistJournal(DocumentJournal<?> journal);
+    DocumentJournal loadJournal(String documentId);
+    long persistJournal(DocumentJournal journal);
 
 }
