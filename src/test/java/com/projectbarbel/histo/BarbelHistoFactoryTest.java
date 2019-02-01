@@ -15,8 +15,6 @@ import com.projectbarbel.histo.functions.DefaultIDGenerator;
 import com.projectbarbel.histo.functions.journal.KeepSubsequentUpdateStrategy;
 import com.projectbarbel.histo.functions.update.DefaultPojoCopier;
 import com.projectbarbel.histo.model.DefaultDocument;
-import com.projectbarbel.histo.persistence.impl.DefaultDocumentDao;
-import com.projectbarbel.histo.persistence.impl.DefaultDocumentService;
 
 public class BarbelHistoFactoryTest {
 
@@ -65,12 +63,6 @@ public class BarbelHistoFactoryTest {
         assertTrue(BarbelHistoFactory.withDefaultValues().factories().size() > 0);
     }
 
-    @Test
-    public void testInstanceOfHistoType_DefaultDao() throws Exception {
-        DefaultDocumentDao dao = factory.instanceOf(DefaultHistoType.DAO);
-        assertNotNull(dao);
-    }
-
     @Test(expected = RuntimeException.class)
     public void testInstanceOfHistoType_DefaultUpdater() throws Exception {
         VersionUpdate<DefaultDocument> bean = factory.instanceOf(DefaultHistoType.UPDATER);
@@ -95,16 +87,4 @@ public class BarbelHistoFactoryTest {
         assertNotNull(bean);
     }
     
-    @Test(expected = RuntimeException.class)
-    public void testInstanceOfHistoType_Service() throws Exception {
-        DefaultDocumentService bean = factory.instanceOf(DefaultHistoType.SERVICE);
-        assertNotNull(bean);
-    }
-
-    @Test
-    public void testInstanceOfHistoTypeObjectArray_Service() throws Exception {
-        DefaultDocumentService bean = factory.instanceOf(DefaultHistoType.SERVICE, new DefaultDocumentDao());
-        assertNotNull(bean);
-    }
-
 }
