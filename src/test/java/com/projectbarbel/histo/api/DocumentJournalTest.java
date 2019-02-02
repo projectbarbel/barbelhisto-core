@@ -56,6 +56,15 @@ public class DocumentJournalTest {
         DocumentJournal<DefaultDocument> journal = DocumentJournal
                 .create(DefaultDocument.builder().withBitemporalStamp(stamp).withData("some initial data").build());
         assertTrue(journal.size() == 1);
+        assertTrue(journal.list().get(0).getBitemporalStamp() != null);
+    }
+
+    @Test
+    public void testCreate_withInitialDocument_withoutStamp() throws Exception {
+        DocumentJournal<DefaultDocument> journal = DocumentJournal
+                .create(DefaultDocument.builder().withData("some initial data").build());
+        assertTrue(journal.size() == 1);
+        assertTrue(journal.list().get(0).getBitemporalStamp() != null);
     }
 
     @Test(expected = NullPointerException.class)
@@ -78,9 +87,8 @@ public class DocumentJournalTest {
 
     @Test
     public void testPrettyPrint() throws Exception {
-        BitemporalStamp stamp = BitemporalStamp.initial();
         DocumentJournal<DefaultDocument> journal = DocumentJournal
-                .create(DefaultDocument.builder().withBitemporalStamp(stamp).withData("some initial data").build());
+                .create(DefaultDocument.builder().withData("some initial data").build());
         assertNotNull(journal.prettyPrint());
     }
 

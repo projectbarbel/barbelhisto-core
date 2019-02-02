@@ -16,6 +16,7 @@ import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.functions.journal.ReaderFunctionGetEffectiveAfter;
 import com.projectbarbel.histo.functions.journal.ReaderFunctionGetEffectiveByDate;
 import com.projectbarbel.histo.model.Bitemporal;
+import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.Systemclock;
 
 public class DocumentJournal<T extends Bitemporal<?>> {
@@ -54,6 +55,9 @@ public class DocumentJournal<T extends Bitemporal<?>> {
     @SuppressWarnings("unchecked")
     public static <T extends DocumentJournal<O>, O extends Bitemporal<?>> T create(Bitemporal<?> newDocument) {
         Validate.notNull(newDocument, "new document must not be null when creating new journal");
+        Optional.ofNullable(newDocument).filter((d) -> d.getBitemporalStamp() == null)
+                .ifPresent((d) -> d.setBitemporalStamp(BitemporalStamp::initial));
+        Validate.validState(newDocument.getBitemporalStamp()!=null, "failed to initialize stamp");
         return (T) new DocumentJournal<Bitemporal<?>>(Collections.singletonList(newDocument));
     }
 

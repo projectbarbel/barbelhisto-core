@@ -3,6 +3,7 @@ package com.projectbarbel.histo.model;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.function.Supplier;
 
 import com.projectbarbel.histo.BarbelHistoContext;
 
@@ -19,6 +20,10 @@ public interface Bitemporal<O> {
 
     void setBitemporalStamp(BitemporalStamp stamp);
 
+    default void setBitemporalStamp(Supplier<BitemporalStamp> stampSupplier) {
+        setBitemporalStamp(stampSupplier.get());
+    }
+    
     /**
      * The unique ID of the value object version (not the documentId). Must be
      * uniquie within the document collection/table.
