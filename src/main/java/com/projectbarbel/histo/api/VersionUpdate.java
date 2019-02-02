@@ -12,6 +12,7 @@ import java.util.function.Function;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.Validate;
 
+import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.functions.journal.InactivateSubsequentUpdateStrategy;
 import com.projectbarbel.histo.functions.journal.KeepSubsequentUpdateStrategy;
 import com.projectbarbel.histo.functions.update.DefaultPojoCopier;
@@ -19,7 +20,6 @@ import com.projectbarbel.histo.functions.update.DefaultUpdateExectuionStrategy;
 import com.projectbarbel.histo.functions.update.ValidateEffectiveDate;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
-import com.projectbarbel.histo.model.EffectivePeriod;
 
 public final class VersionUpdate<T extends Bitemporal<?>> {
 
@@ -107,7 +107,7 @@ public final class VersionUpdate<T extends Bitemporal<?>> {
         }
 
         public VersionUpdateExecutionBuilder<T> effectiveUntilInfinite() {
-            update.newEffectiveUntil = update.state.set(EffectivePeriod.INFINITE);
+            update.newEffectiveUntil = update.state.set(BarbelHistoContext.CONTEXT.infiniteDate());
             update.updateStrategy  = new InactivateSubsequentUpdateStrategy<T>();
             return this;
         }

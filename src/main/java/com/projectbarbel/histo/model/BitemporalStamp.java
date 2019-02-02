@@ -1,13 +1,9 @@
 package com.projectbarbel.histo.model;
 
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.Objects;
-import java.util.function.Supplier;
 
-import javax.annotation.Generated;
-
-import com.projectbarbel.histo.functions.DefaultIDGenerator;
+import com.projectbarbel.histo.BarbelHistoContext;
 
 /**
  * All instants representing utc time stamps.
@@ -17,30 +13,34 @@ import com.projectbarbel.histo.functions.DefaultIDGenerator;
  */
 public final class BitemporalStamp {
 
-    public final static Instant NOT_INACTIVATED = Instant.ofEpochMilli(Long.MAX_VALUE);
-    public final static String NOBODY = "NOBODY";
-
     protected final Serializable versionId;
     protected final String documentId;
     protected final String activity;
     protected final EffectivePeriod effectiveTime;
     protected final RecordPeriod recordTime;
-    protected final Supplier<Serializable> idSupplier;
 
-    @Generated("SparkTools")
     private BitemporalStamp(Builder builder) {
-        this.versionId = builder.versionId;
-        this.documentId = builder.documentId;
-        this.activity = builder.activity;
-        this.effectiveTime = builder.effectiveTime;
-        this.recordTime = builder.recordTime;
-        this.idSupplier = builder.idSupplier;
+        this.versionId = builder.versionId != null ? builder.versionId
+                : BarbelHistoContext.CONTEXT.versionIdGenerator().get();
+        this.documentId = Objects.requireNonNull(builder.documentId);
+        this.activity = builder.activity != null ? builder.activity : BarbelHistoContext.CONTEXT.defaultActivity();
+        this.effectiveTime = Objects.requireNonNull(builder.effectiveTime);
+        this.recordTime = Objects.requireNonNull(builder.recordTime);
     }
 
-    public static BitemporalStamp of(String activity, String documentId, EffectivePeriod effectivePeriod,
-            RecordPeriod recordPeriod) {
-        return BitemporalStamp.builder().withVersionId(DefaultIDGenerator.generateId()).withActivity(Objects.requireNonNull(activity)).withDocumentId(Objects.requireNonNull(documentId))
-                .withEffectiveTime(Objects.requireNonNull(effectivePeriod)).withRecordTime(Objects.requireNonNull(recordPeriod)).build();
+    public static BitemporalStamp initial() {
+        return builder().withActivity(BarbelHistoContext.CONTEXT.defaultActivity())
+                .withDocumentId(BarbelHistoContext.CONTEXT.documentIdGenerator().get())
+                .withVersionId(BarbelHistoContext.CONTEXT.versionIdGenerator().get())
+                .withEffectiveTime(EffectivePeriod.builder().build()).withRecordTime(RecordPeriod.builder().build())
+                .build();
+    }
+
+    public static BitemporalStamp of(String activity, String documentId, EffectivePeriod effectiveTime,
+            RecordPeriod recordTime) {
+        return builder().withActivity(activity).withDocumentId(documentId).withEffectiveTime(effectiveTime)
+                .withRecordTime(recordTime).withVersionId(BarbelHistoContext.CONTEXT.versionIdGenerator().get())
+                .build();
     }
 
     public Object getVersionId() {
@@ -64,15 +64,14 @@ public final class BitemporalStamp {
     }
 
     public BitemporalStamp inactivatedCopy(String inactivatedBy) {
-        return of(documentId, activity, 
-                EffectivePeriod.create().from(effectiveTime.getFrom()).until(effectiveTime.getUntil()),
-                RecordPeriod.create(recordTime.getCreatedBy(), recordTime.getCreatedAt()).inactivate(inactivatedBy));
+        return builder().withActivity(activity).withDocumentId(documentId).withEffectiveTime(effectiveTime)
+                .withRecordTime(recordTime.inactivate(inactivatedBy)).withVersionId(versionId).build();
     }
 
-    public boolean isActive () {
+    public boolean isActive() {
         return recordTime.getState().equals(BitemporalObjectState.ACTIVE);
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (o == this)
@@ -98,26 +97,16 @@ public final class BitemporalStamp {
                 + effectiveTime + ", recordTime=" + recordTime + "]";
     }
 
-    /**
-     * Creates builder to build {@link BitemporalStamp}.
-     * @return created builder
-     */
-    @Generated("SparkTools")
     public static Builder builder() {
         return new Builder();
     }
 
-    /**
-     * Builder to build {@link BitemporalStamp}.
-     */
-    @Generated("SparkTools")
     public static final class Builder {
         private Serializable versionId;
         private String documentId;
         private String activity;
         private EffectivePeriod effectiveTime;
         private RecordPeriod recordTime;
-        private Supplier<Serializable> idSupplier;
 
         private Builder() {
         }
@@ -144,11 +133,6 @@ public final class BitemporalStamp {
 
         public Builder withRecordTime(RecordPeriod recordTime) {
             this.recordTime = recordTime;
-            return this;
-        }
-
-        public Builder withIdSupplier(Supplier<Serializable> idSupplier) {
-            this.idSupplier = idSupplier;
             return this;
         }
 

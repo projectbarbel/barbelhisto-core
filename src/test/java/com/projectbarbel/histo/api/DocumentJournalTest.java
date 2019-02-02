@@ -11,6 +11,7 @@ import java.util.List;
 import org.junit.Test;
 
 import com.projectbarbel.histo.BarbelTestHelper;
+import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.DefaultDocument;
 
 public class DocumentJournalTest {
@@ -42,6 +43,14 @@ public class DocumentJournalTest {
         assertTrue(journal.size() == 1);
     }
 
+    @Test
+    public void testCreate_withInitialDocument() throws Exception {
+        BitemporalStamp stamp = BitemporalStamp.initial();
+        DocumentJournal<DefaultDocument> journal = DocumentJournal
+                .create(BarbelTestHelper.random(DefaultDocument.class));
+        assertTrue(journal.size() == 1);
+    }
+    
     @Test(expected = NullPointerException.class)
     public void testCreate_withDocument_null() throws Exception {
         DefaultDocument dflt = null;

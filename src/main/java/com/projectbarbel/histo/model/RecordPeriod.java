@@ -2,63 +2,38 @@ package com.projectbarbel.histo.model;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Objects;
+
+import com.projectbarbel.histo.BarbelHistoContext;
 
 public class RecordPeriod {
 
-    public final static LocalDateTime NOT_INACTIVATED = LocalDateTime.of(2199,12,31,23,59);
-    public final static String NOBODY = "NOBODY";
+    private final static ZonedDateTime NOT_INACTIVATED = ZonedDateTime.of(LocalDateTime.of(2199, 12, 31, 23, 59),
+            ZoneId.of("Z"));
+    private final static String NOBODY = "NOBODY";
 
-    private Systemclock clock = new Systemclock();
-    private ZoneId zone = ZoneId.systemDefault();
-    private LocalDateTime createdAt = clock.now();
-    private String createdBy = "SYSTEM";
-    private LocalDateTime inactivatedAt = NOT_INACTIVATED; 
-    private String inactivatedBy = NOBODY;
-    private BitemporalObjectState state = BitemporalObjectState.ACTIVE;
+    private final ZonedDateTime createdAt;
+    private final String createdBy;
+    private ZonedDateTime inactivatedAt;
+    private String inactivatedBy;
+    private BitemporalObjectState state;
 
-    private RecordPeriod() {
-        super();
+    private RecordPeriod(Builder builder) {
+        this.createdAt = builder.createdAt != null ? builder.createdAt : BarbelHistoContext.CONTEXT.clock().now();
+        this.createdBy = builder.createdBy != null ? builder.createdBy : BarbelHistoContext.CONTEXT.defaultCreatedBy();
+        this.inactivatedAt = builder.inactivatedAt != null ? builder.inactivatedAt : NOT_INACTIVATED;
+        this.inactivatedBy = builder.inactivatedBy != null ? builder.inactivatedBy : NOBODY;
+        this.state = compileState();
     }
 
-    public ZoneId getZone() {
-        return zone;
-    }
-    
-    public static RecordPeriod create(String createdBy, LocalDateTime createdAt, LocalDateTime inactivatedAt, String inactivatedBy, BitemporalObjectState state) {
-        RecordPeriod rp = new RecordPeriod();
-        rp.createdBy = Objects.requireNonNull(createdBy);
-        rp.createdAt = Objects.requireNonNull(createdAt);
-        rp.inactivatedAt = Objects.requireNonNull(inactivatedAt);
-        rp.inactivatedBy = Objects.requireNonNull(inactivatedBy);
-        rp.state = state;
-        return rp;
-    }
-
-    /**
-     * Creates an active record time instance with given values.
-     * 
-     * @param createdBy
-     * @param createdAt
-     * @return record period
-     */
-    public static RecordPeriod create(String createdBy, LocalDateTime createdAt) {
-        RecordPeriod rp = new RecordPeriod();
-        rp.createdBy = Objects.requireNonNull(createdBy);
-        rp.createdAt = Objects.requireNonNull(createdAt);
-        return rp;
-    }
-
-    /**
-     * Creates an active record time instance with given value and createdAt now.
-     * 
-     * @param createdBy
-     * @return record period
-     */
-    public static RecordPeriod create(String createdBy) {
-        RecordPeriod rp = new RecordPeriod();
-        rp.createdBy = Objects.requireNonNull(createdBy);
-        return rp;
+    private BitemporalObjectState compileState() {
+        if (inactivatedAt.equals(NOT_INACTIVATED) && inactivatedBy.equals(NOBODY))
+            return BitemporalObjectState.ACTIVE;
+        else if(!inactivatedAt.equals(NOT_INACTIVATED) && !inactivatedBy.equals(NOBODY))
+            return BitemporalObjectState.INACTIVE;
+        else
+            throw new IllegalStateException("cannot compile state: " + toString());
     }
 
     /**
@@ -69,12 +44,12 @@ public class RecordPeriod {
      * @return record period
      */
     public RecordPeriod inactivate(String inactivatedBy) {
-        this.inactivatedAt = clock.now();
+        this.inactivatedAt = BarbelHistoContext.CONTEXT.clock().now();
         this.state = BitemporalObjectState.INACTIVE;
         this.inactivatedBy = Objects.requireNonNull(inactivatedBy);
         return this;
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (o == this)
@@ -94,19 +69,18 @@ public class RecordPeriod {
     public int hashCode() {
         return Objects.hash(createdAt, createdBy, inactivatedAt, inactivatedBy, state);
     }
-    
+
     @Override
     public String toString() {
-        return "RecordPeriod [clock=" + clock + ", zone=" + zone + ", createdAt=" + createdAt + ", createdBy="
-                + createdBy + ", inactivatedAt=" + inactivatedAt + ", inactivatedBy=" + inactivatedBy + ", state="
-                + state + "]";
+        return "RecordPeriod [createdAt=" + createdAt + ", createdBy=" + createdBy + ", inactivatedAt=" + inactivatedAt
+                + ", inactivatedBy=" + inactivatedBy + ", state=" + state + "]";
     }
 
     public String getCreatedBy() {
         return createdBy;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
@@ -114,12 +88,50 @@ public class RecordPeriod {
         return state;
     }
 
-    public LocalDateTime getInactivatedAt() {
+    public ZonedDateTime getInactivatedAt() {
         return inactivatedAt;
     }
 
     public String getInactivatedBy() {
         return inactivatedBy;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static final class Builder {
+        private ZonedDateTime createdAt;
+        private String createdBy;
+        private ZonedDateTime inactivatedAt;
+        private String inactivatedBy;
+
+        private Builder() {
+        }
+
+        public Builder createdAt(ZonedDateTime createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
+
+        public Builder createdBy(String createdBy) {
+            this.createdBy = createdBy;
+            return this;
+        }
+
+        public Builder inactivatedAt(ZonedDateTime inactivatedAt) {
+            this.inactivatedAt = inactivatedAt;
+            return this;
+        }
+
+        public Builder inactivatedBy(String inactivatedBy) {
+            this.inactivatedBy = inactivatedBy;
+            return this;
+        }
+
+        public RecordPeriod build() {
+            return new RecordPeriod(this);
+        }
     }
 
 }

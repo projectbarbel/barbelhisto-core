@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,21 +43,24 @@ public class BarbelTestHelper {
             @Override
             public EffectivePeriod get() {
                 LocalDate effectiveFrom = randomLocalDate(2000, 2020);
-                return EffectivePeriod.create().from(effectiveFrom).until(randomLocalDate(effectiveFrom.plusDays(1), 2020));
+                return EffectivePeriod.builder().from(effectiveFrom)
+                        .until(randomLocalDate(effectiveFrom.plusDays(1), 2020)).build();
             }
         }).randomize(RecordPeriod.class, new Supplier<RecordPeriod>() {
 
             @Override
             public RecordPeriod get() {
-                return RecordPeriod.create(EnhancedRandom.random(String.class), LocalDateTime.ofInstant(randomInstant(2000, 2020),ZoneId.systemDefault()));
+                return RecordPeriod.builder().build();
             }
-        }).randomize(new FieldDefinition<BitemporalStamp, Supplier>("idSupplier", Supplier.class, BitemporalStamp.class),new Supplier<DefaultIDGenerator>() {
+        }).randomize(
+                new FieldDefinition<BitemporalStamp, Supplier>("idSupplier", Supplier.class, BitemporalStamp.class),
+                new Supplier<DefaultIDGenerator>() {
 
-            @Override
-            public DefaultIDGenerator get() {
-                return new DefaultIDGenerator();
-            }
-        }).build().nextObject(clazz, excludedFields);
+                    @Override
+                    public DefaultIDGenerator get() {
+                        return new DefaultIDGenerator();
+                    }
+                }).build().nextObject(clazz, excludedFields);
     }
 
     public static List<BitemporalStamp> generateListOfBitemporals(String docId, List<LocalDate> effectiveDates) {
@@ -70,13 +72,12 @@ public class BarbelTestHelper {
     }
 
     private static BitemporalStamp createPeriod(String docId, List<LocalDate> effectiveDates, int listPointer) {
-        return BitemporalStamp
-                .of("SYSTEM_PROCESS", docId,
-                        effectiveDates.size() - 1 == listPointer
-                                ? EffectivePeriod.create().from(effectiveDates.get(listPointer)).toInfinite()
-                                : EffectivePeriod.create().from(effectiveDates.get(listPointer))
-                                        .until(effectiveDates.get(listPointer + 1)),
-                        RecordPeriod.create("SYSTEM_USER"));
+        return BitemporalStamp.builder().withDocumentId(docId)
+                .withEffectiveTime(effectiveDates.size() - 1 == listPointer
+                        ? EffectivePeriod.builder().from(effectiveDates.get(listPointer)).toInfinite().build()
+                        : EffectivePeriod.builder().from(effectiveDates.get(listPointer))
+                                .until(effectiveDates.get(listPointer + 1)).build())
+                .withRecordTime(RecordPeriod.builder().build()).build();
     }
 
     public static List<DefaultDocument> generateJournalOfDefaultValueObjects(String docId,
@@ -102,14 +103,14 @@ public class BarbelTestHelper {
         long randomDay = ThreadLocalRandom.current().nextLong(minDay, maxDay);
         return LocalDate.ofEpochDay(randomDay);
     }
-    
+
     public static LocalDate randomLocalDate(LocalDate low, LocalDate high) {
         long minDay = low.toEpochDay();
         long maxDay = high.toEpochDay();
         long randomDay = ThreadLocalRandom.current().nextLong(minDay, maxDay);
         return LocalDate.ofEpochDay(randomDay);
     }
-    
+
     public static Instant randomInstant(int startYear, int endYear) {
         ThreadLocalRandom random = ThreadLocalRandom.current();
         BiFunction<Integer, Integer, Integer> rdm = random::nextInt;

@@ -12,29 +12,35 @@ import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.EffectivePeriod;
 import com.projectbarbel.histo.model.RecordPeriod;
 
-public class DefaultUpdateExectuionStrategy<T extends Bitemporal<?>> implements Function<UpdateExecutionContext<T>, VersionUpdateResult<T>> {
+public class DefaultUpdateExectuionStrategy<T extends Bitemporal<?>>
+        implements Function<UpdateExecutionContext<T>, VersionUpdateResult<T>> {
 
     @Override
     public VersionUpdateResult<T> apply(UpdateExecutionContext<T> executionContext) {
-        BitemporalStamp newPrecedingStamp = BitemporalStamp.of(
-                executionContext.activity(), executionContext.oldVersion().getDocumentId(), EffectivePeriod.create()
-                        .from(executionContext.oldVersion().getEffectiveFrom()).until(executionContext.newEffectiveFrom()),
-                RecordPeriod.create(executionContext.createdBy()));
-        BitemporalStamp newSubsequentStamp = BitemporalStamp.of(
-                executionContext.activity(), executionContext.oldVersion().getDocumentId(), EffectivePeriod.create()
-                        .from(executionContext.newEffectiveFrom()).until(executionContext.oldVersion().getEffectiveUntil()),
-                RecordPeriod.create(executionContext.createdBy()));
+        BitemporalStamp newPrecedingStamp = BitemporalStamp.builder().withActivity(executionContext.activity())
+                .withDocumentId(executionContext.oldVersion().getDocumentId())
+                .withEffectiveTime(EffectivePeriod.builder().from(executionContext.oldVersion().getEffectiveFrom())
+                        .until(executionContext.newEffectiveFrom()).build())
+                .withRecordTime(RecordPeriod.builder().createdBy(executionContext.createdBy()).build()).build();
+        BitemporalStamp newSubsequentStamp = BitemporalStamp.builder().withActivity(executionContext.activity())
+                .withDocumentId(executionContext.oldVersion().getDocumentId())
+                .withEffectiveTime(EffectivePeriod.builder().from(executionContext.newEffectiveFrom())
+                        .until(executionContext.oldVersion().getEffectiveUntil()).build())
+                .withRecordTime(RecordPeriod.builder().createdBy(executionContext.createdBy()).build()).build();
         T newPrecedingVersion = executionContext.copyFunction().apply(executionContext.oldVersion(), newPrecedingStamp);
-        T newSubsequentVersion = executionContext.copyFunction().apply(executionContext.oldVersion(), newSubsequentStamp);
-        executionContext.propertyUpdates().keySet().stream().forEach((k)->setNestedProperty(newSubsequentVersion, k, executionContext.propertyUpdates().get(k)));
+        T newSubsequentVersion = executionContext.copyFunction().apply(executionContext.oldVersion(),
+                newSubsequentStamp);
+        executionContext.propertyUpdates().keySet().stream()
+                .forEach((k) -> setNestedProperty(newSubsequentVersion, k, executionContext.propertyUpdates().get(k)));
         return executionContext.createExecutionResult(newPrecedingVersion, newSubsequentVersion);
     }
-    
+
     public void setNestedProperty(Object bean, String fieldname, Object value) {
         try {
             PropertyUtils.setNestedProperty(bean, fieldname, value);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new IllegalArgumentException("the property with the name " + fieldname + " in bean of type " + bean.getClass().getName() + " cannot be written", e);
+            throw new IllegalArgumentException("the property with the name " + fieldname + " in bean of type "
+                    + bean.getClass().getName() + " cannot be written", e);
         }
     }
 

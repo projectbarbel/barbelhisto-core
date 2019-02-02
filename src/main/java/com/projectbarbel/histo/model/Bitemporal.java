@@ -2,6 +2,8 @@ package com.projectbarbel.histo.model;
 
 import java.time.LocalDate;
 
+import com.projectbarbel.histo.BarbelHistoContext;
+
 /**
  * Value Objects in the application must implement this interface.
  * 
@@ -30,15 +32,15 @@ public interface Bitemporal<O> {
     }
 
     default LocalDate getEffectiveFrom() {
-        return getBitemporalStamp().getEffectiveTime().getFrom();
+        return getBitemporalStamp().getEffectiveTime().from();
     }
 
     default LocalDate getEffectiveUntil() {
-        return getBitemporalStamp().getEffectiveTime().getUntil();
+        return getBitemporalStamp().getEffectiveTime().until();
     }
     
     default boolean isEffectiveInfinitely() {
-        return getEffectiveUntil().equals(EffectivePeriod.INFINITE);
+        return getEffectiveUntil().equals(BarbelHistoContext.CONTEXT.infiniteDate());
     }
 
     default void inactivate() {

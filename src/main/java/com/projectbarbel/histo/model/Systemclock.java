@@ -3,6 +3,7 @@ package com.projectbarbel.histo.model;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 public class Systemclock {
 
@@ -10,8 +11,8 @@ public class Systemclock {
 
     public Systemclock() {
     }
-    public LocalDateTime now() {
-        return LocalDateTime.now(clock);
+    public ZonedDateTime now() {
+        return ZonedDateTime.now(clock);
     }
 
     public Systemclock useFixedClockAt(LocalDateTime date) {

@@ -3,61 +3,28 @@ package com.projectbarbel.histo.model;
 import java.time.LocalDate;
 import java.util.Objects;
 
+import javax.annotation.Generated;
+
+import com.projectbarbel.histo.BarbelHistoContext;
+
 public class EffectivePeriod {
-    public final static LocalDate INFINITE = LocalDate.MAX;
-    public final static LocalDate BIGBANG = LocalDate.MIN;
-    private LocalDate from = BIGBANG;
-    private LocalDate until = INFINITE;
-    private Systemclock clock = new Systemclock();
+    private final LocalDate until;
+    private final LocalDate from;
+
+    private EffectivePeriod(Builder builder) {
+        this.until = builder.until != null ? builder.until : BarbelHistoContext.CONTEXT.infiniteDate();
+        this.from = builder.from != null ? builder.from : BarbelHistoContext.CONTEXT.clock().now().toLocalDate();
+    }
     
-    private EffectivePeriod() {
-        super();
-    }
-
-    /**
-     * The default {@link EffectivePeriod} is always effective.
-     * 
-     * @return default effective period
-     */
-    public static EffectivePeriod create() {
-        return new EffectivePeriod();
-    }
-
-    /**
-     * Set effective from date. Effective period ist effective from the given value {@link LocalDate}.
-     * 
-     * @param from effective date
-     * @return adopted effective period
-     */
-    public EffectivePeriod from(LocalDate from) {
-        this.from = Objects.requireNonNull(from);
-        return this;
-    }
-
-    public EffectivePeriod until(LocalDate until) {
-        this.until = Objects.requireNonNull(until);
-        return this;
-    }
-
-    public EffectivePeriod toInfinite() {
-        this.until = INFINITE;
-        return this;
-    }
-
     public boolean isInfinite() {
-       return from.equals(INFINITE);
+       return from.equals(BarbelHistoContext.CONTEXT.infiniteDate());
     }
     
-    public EffectivePeriod fromNow() {
-        this.from = clock.now().toLocalDate();
-        return this;
-    }
-    
-    public LocalDate getFrom() {
+    public LocalDate from() {
         return from;
     }
 
-    public LocalDate getUntil() {
+    public LocalDate until() {
         return until;
     }
 
@@ -80,7 +47,48 @@ public class EffectivePeriod {
 
     @Override
     public String toString() {
-        return "EffectivePeriod [from=" + from + ", until=" + until + ", clock=" + clock + "]";
+        return "EffectivePeriod [from=" + from + ", until=" + until + "]";
+    }
+
+    /**
+     * Creates builder to build {@link EffectivePeriod}.
+     * @return created builder
+     */
+    @Generated("SparkTools")
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static final class Builder {
+        private LocalDate until;
+        private LocalDate from;
+
+        private Builder() {
+        }
+
+        public Builder until(LocalDate until) {
+            this.until = until;
+            return this;
+        }
+
+        public Builder toInfinite() {
+            this.until = BarbelHistoContext.CONTEXT.infiniteDate();
+            return this;
+        }
+        
+        public Builder from(LocalDate from) {
+            this.from = from;
+            return this;
+        }
+
+        public Builder fromNow() {
+            this.from = BarbelHistoContext.CONTEXT.clock().now().toLocalDate();
+            return this;
+        }
+        
+        public EffectivePeriod build() {
+            return new EffectivePeriod(this);
+        }
     }
 
 }
