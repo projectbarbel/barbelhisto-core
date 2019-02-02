@@ -107,7 +107,7 @@ public final class VersionUpdate<T extends Bitemporal<?>> {
         }
 
         public VersionUpdateExecutionBuilder<T> effectiveUntilInfinite() {
-            update.newEffectiveUntil = update.state.set(BarbelHistoContext.CONTEXT.infiniteDate());
+            update.newEffectiveUntil = update.state.set(BarbelHistoContext.instance().infiniteDate());
             update.updateStrategy  = new InactivateSubsequentUpdateStrategy<T>();
             return this;
         }

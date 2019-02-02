@@ -21,17 +21,17 @@ public final class BitemporalStamp {
 
     private BitemporalStamp(Builder builder) {
         this.versionId = builder.versionId != null ? builder.versionId
-                : BarbelHistoContext.CONTEXT.versionIdGenerator().get();
+                : BarbelHistoContext.instance().versionIdGenerator().get();
         this.documentId = Objects.requireNonNull(builder.documentId);
-        this.activity = builder.activity != null ? builder.activity : BarbelHistoContext.CONTEXT.defaultActivity();
+        this.activity = builder.activity != null ? builder.activity : BarbelHistoContext.instance().defaultActivity();
         this.effectiveTime = Objects.requireNonNull(builder.effectiveTime);
         this.recordTime = Objects.requireNonNull(builder.recordTime);
     }
 
     public static BitemporalStamp initial() {
-        return builder().withActivity(BarbelHistoContext.CONTEXT.defaultActivity())
-                .withDocumentId(BarbelHistoContext.CONTEXT.documentIdGenerator().get())
-                .withVersionId(BarbelHistoContext.CONTEXT.versionIdGenerator().get())
+        return builder().withActivity(BarbelHistoContext.instance().defaultActivity())
+                .withDocumentId(BarbelHistoContext.instance().documentIdGenerator().get())
+                .withVersionId(BarbelHistoContext.instance().versionIdGenerator().get())
                 .withEffectiveTime(EffectivePeriod.builder().build()).withRecordTime(RecordPeriod.builder().build())
                 .build();
     }
@@ -39,7 +39,7 @@ public final class BitemporalStamp {
     public static BitemporalStamp of(String activity, String documentId, EffectivePeriod effectiveTime,
             RecordPeriod recordTime) {
         return builder().withActivity(activity).withDocumentId(documentId).withEffectiveTime(effectiveTime)
-                .withRecordTime(recordTime).withVersionId(BarbelHistoContext.CONTEXT.versionIdGenerator().get())
+                .withRecordTime(recordTime).withVersionId(BarbelHistoContext.instance().versionIdGenerator().get())
                 .build();
     }
 

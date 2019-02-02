@@ -11,17 +11,17 @@ public class BarbelHistoContextTest {
 
     @Test
     public void testGetProperty() throws Exception {
-        assertEquals("SYSTEM", BarbelHistoContext.CONTEXT.defaultCreatedBy());
+        assertEquals("SYSTEM", BarbelHistoContext.instance().defaultCreatedBy());
     }
 
     @Test
     public void testVersionIdGenerator() throws Exception {
-        assertTrue(BarbelHistoContext.CONTEXT.versionIdGenerator() != null);
+        assertTrue(BarbelHistoContext.instance().versionIdGenerator() != null);
     }
 
     @Test
     public void testDocumentIdGenerator() throws Exception {
-        assertTrue(BarbelHistoContext.CONTEXT.documentIdGenerator() instanceof DefaultIDGenerator);
+        assertTrue(BarbelHistoContext.instance().documentIdGenerator() instanceof DefaultIDGenerator);
     }
 
 }

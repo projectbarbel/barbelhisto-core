@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
+import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.functions.journal.ReaderFunctionGetEffectiveAfter;
 import com.projectbarbel.histo.functions.journal.ReaderFunctionGetEffectiveByDate;
 import com.projectbarbel.histo.model.Bitemporal;
@@ -22,7 +23,6 @@ public class DocumentJournal<T extends Bitemporal<?>> {
     private final List<T> journal = new ArrayList<T>();
     private BiFunction<DocumentJournal<T>, LocalDate, Optional<T>> effectiveReaderFunction = new ReaderFunctionGetEffectiveByDate<T>();
     private BiFunction<DocumentJournal<T>, LocalDate, List<T>> effectiveAfterFunction = new ReaderFunctionGetEffectiveAfter<T>();
-    private Systemclock clock = new Systemclock();
 
     @Override
     public String toString() {
@@ -40,10 +40,6 @@ public class DocumentJournal<T extends Bitemporal<?>> {
 
     public List<T> list() {
         return journal.stream().collect(Collectors.toCollection(ArrayList::new));
-    }
-
-    public void setClock(Systemclock clock) {
-        this.clock = clock;
     }
 
     public static <T extends Bitemporal<?>> DocumentJournal<T> create(List<T> listOfBitemporalDocuments) {
@@ -81,7 +77,7 @@ public class DocumentJournal<T extends Bitemporal<?>> {
     // @formatter:on
 
     public JournalReader<T> read() {
-        return new JournalReader<T>(this, clock);
+        return new JournalReader<T>(this, BarbelHistoContext.instance().clock());
     }
 
     public JournalUpdater<T> update() {

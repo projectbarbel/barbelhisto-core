@@ -11,28 +11,27 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelTestHelper;
 import com.projectbarbel.histo.api.DocumentJournal;
 import com.projectbarbel.histo.model.DefaultDocument;
-import com.projectbarbel.histo.model.Systemclock;
 
 public class ReaderFunctionGetEffectiveAfterTest {
 
     private DocumentJournal<DefaultDocument> journal;
     private ReaderFunctionGetEffectiveAfter<DefaultDocument> function;
-    private Systemclock clock = new Systemclock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 8, 0, 0));
 
     @Before
     public void setUp() {
         journal = DocumentJournal.create(BarbelTestHelper.generateJournalOfDefaultValueObjects("docid1",
                 Arrays.asList(LocalDate.of(2010, 12, 1), LocalDate.of(2017, 12, 1), LocalDate.of(2020, 1, 1))));
-        journal.setClock(clock);
+        BarbelHistoContext.instance().clock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 8, 0, 0));
         function = new ReaderFunctionGetEffectiveAfter<DefaultDocument>();
     }
 
     @Test
     public void testApply_threeRecord_onePeriodAfterCurrent() throws Exception {
-        List<DefaultDocument> documents = function.apply(journal, clock.now().toLocalDate());
+        List<DefaultDocument> documents = function.apply(journal, BarbelHistoContext.instance().clock().now().toLocalDate());
         assertTrue(documents.size() == 1);
         assertEquals(documents.get(0).getEffectiveFrom(), LocalDate.of(2020, 1, 1));
     }

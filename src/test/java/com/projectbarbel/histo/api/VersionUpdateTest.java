@@ -138,7 +138,7 @@ public class VersionUpdateTest {
         LocalDate newEffectDate = validNewEffectiveDate(object);
         VersionUpdateResult<DefaultDocument> update = VersionUpdate.of(object).prepare().effectiveFrom(newEffectDate)
                 .execute();
-        assertEquals(object.getEffectiveUntil(), BarbelHistoContext.CONTEXT.infiniteDate());
+        assertEquals(object.getEffectiveUntil(), BarbelHistoContext.instance().infiniteDate());
         assertTrue(object.isEffectiveInfinitely());
         assertFalse(update.newPrecedingVersion().isEffectiveInfinitely());
         assertTrue(update.newSubsequentVersion().isEffectiveInfinitely());

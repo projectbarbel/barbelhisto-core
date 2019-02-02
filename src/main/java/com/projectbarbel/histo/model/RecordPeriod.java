@@ -20,8 +20,8 @@ public class RecordPeriod {
     private BitemporalObjectState state;
 
     private RecordPeriod(Builder builder) {
-        this.createdAt = builder.createdAt != null ? builder.createdAt : BarbelHistoContext.CONTEXT.clock().now();
-        this.createdBy = builder.createdBy != null ? builder.createdBy : BarbelHistoContext.CONTEXT.defaultCreatedBy();
+        this.createdAt = builder.createdAt != null ? builder.createdAt : BarbelHistoContext.instance().clock().now();
+        this.createdBy = builder.createdBy != null ? builder.createdBy : BarbelHistoContext.instance().defaultCreatedBy();
         this.inactivatedAt = builder.inactivatedAt != null ? builder.inactivatedAt : NOT_INACTIVATED;
         this.inactivatedBy = builder.inactivatedBy != null ? builder.inactivatedBy : NOBODY;
         this.state = compileState();
@@ -44,7 +44,7 @@ public class RecordPeriod {
      * @return record period
      */
     public RecordPeriod inactivate(String inactivatedBy) {
-        this.inactivatedAt = BarbelHistoContext.CONTEXT.clock().now();
+        this.inactivatedAt = BarbelHistoContext.instance().clock().now();
         this.state = BitemporalObjectState.INACTIVE;
         this.inactivatedBy = Objects.requireNonNull(inactivatedBy);
         return this;
