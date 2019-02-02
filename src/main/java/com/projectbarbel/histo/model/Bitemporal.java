@@ -1,6 +1,8 @@
 package com.projectbarbel.histo.model;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import com.projectbarbel.histo.BarbelHistoContext;
 
@@ -14,6 +16,7 @@ import com.projectbarbel.histo.BarbelHistoContext;
 public interface Bitemporal<O> {
 
     BitemporalStamp getBitemporalStamp();
+
     void setBitemporalStamp(BitemporalStamp stamp);
 
     /**
@@ -24,7 +27,7 @@ public interface Bitemporal<O> {
      */
     @SuppressWarnings("unchecked")
     default O getVersionId() {
-        return (O)getBitemporalStamp().getVersionId();
+        return (O) getBitemporalStamp().getVersionId();
     }
 
     default String getDocumentId() {
@@ -38,17 +41,45 @@ public interface Bitemporal<O> {
     default LocalDate getEffectiveUntil() {
         return getBitemporalStamp().getEffectiveTime().until();
     }
-    
+
     default boolean isEffectiveInfinitely() {
         return getEffectiveUntil().equals(BarbelHistoContext.CONTEXT.infiniteDate());
     }
 
     default void inactivate() {
-       setBitemporalStamp(getBitemporalStamp().inactivatedCopy(getDocumentId()));
+        setBitemporalStamp(getBitemporalStamp().inactivatedCopy(getDocumentId()));
     }
-    
+
     default boolean isActive() {
         return getBitemporalStamp().isActive();
+    }
+
+    default BitemporalObjectState getState() {
+        return getBitemporalStamp().getRecordTime().getState();
+    }
+
+    default String getCreatedBy() {
+        return getBitemporalStamp().getRecordTime().getCreatedBy();
+    }
+
+    default ZonedDateTime getCreatedAt() {
+        return getBitemporalStamp().getRecordTime().getCreatedAt();
+    }
+
+    default ZonedDateTime getInactivatedAt() {
+        return getBitemporalStamp().getRecordTime().getInactivatedAt();
+    }
+
+    default String prettyPrint() {
+        return String.format("|%1$-40s|%2$-15tF|%3$-16tF|%4$-8s|%5$-21s|%6$-23s|%7$-21s|%8$-23s|", getVersionId(),
+                getEffectiveFrom(), getEffectiveUntil(), getState().name(),
+                getCreatedBy().substring(0, Math.min(getCreatedBy().length(), 20)),
+                DateTimeFormatter.ofPattern("dd/MM/yyyy - hh:mm:ss").format(getCreatedAt()),
+                getInactivatedBy().substring(0, Math.min(getCreatedBy().length(), 20)), getInactivatedAt());
+    }
+
+    default String getInactivatedBy() {
+        return getBitemporalStamp().getRecordTime().getInactivatedBy();
     }
 
 }

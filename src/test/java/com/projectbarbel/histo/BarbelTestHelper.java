@@ -85,7 +85,7 @@ public class BarbelTestHelper {
         List<DefaultDocument> journal = new ArrayList<DefaultDocument>();
         for (int i = 0; i < effectiveDates.size(); i++) {
             journal.add(DefaultDocument.builder().withBitemporalStamp(createPeriod(docId, effectiveDates, i))
-                    .withData(EnhancedRandom.random(String.class)).withVersionId(UUID.randomUUID().toString()).build());
+                    .withData(EnhancedRandom.random(String.class)).build());
         }
         return journal;
     }

@@ -7,10 +7,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
 import com.projectbarbel.histo.functions.journal.ReaderFunctionGetEffectiveAfter;
@@ -21,10 +20,14 @@ import com.projectbarbel.histo.model.Systemclock;
 public class DocumentJournal<T extends Bitemporal<?>> {
 
     private final List<T> journal = new ArrayList<T>();
-    private static final Logger logger = Logger.getLogger(DocumentJournal.class.getName());
     private BiFunction<DocumentJournal<T>, LocalDate, Optional<T>> effectiveReaderFunction = new ReaderFunctionGetEffectiveByDate<T>();
     private BiFunction<DocumentJournal<T>, LocalDate, List<T>> effectiveAfterFunction = new ReaderFunctionGetEffectiveAfter<T>();
     private Systemclock clock = new Systemclock();
+
+    @Override
+    public String toString() {
+        return "DocumentJournal [journal=" + journal + "]";
+    }
 
     private DocumentJournal(List<T> documentList) {
         super();
@@ -46,7 +49,9 @@ public class DocumentJournal<T extends Bitemporal<?>> {
     public static <T extends Bitemporal<?>> DocumentJournal<T> create(List<T> listOfBitemporalDocuments) {
         Validate.notNull(listOfBitemporalDocuments, "new document list must not be null when creating new journal");
         Validate.isTrue(listOfBitemporalDocuments.size() > 0, "list of documents must not be empty");
-        DocumentJournal<T> newjournal = (DocumentJournal<T>)new DocumentJournal<T>(listOfBitemporalDocuments);
+        Validate.isTrue(listOfBitemporalDocuments.stream().map(Bitemporal::getDocumentId).collect(Collectors.toSet())
+                .size() == 1, "the list passed must only contain bitemporal objects for the same document id");
+        DocumentJournal<T> newjournal = (DocumentJournal<T>) new DocumentJournal<T>(listOfBitemporalDocuments);
         return newjournal;
     }
 
@@ -61,29 +66,40 @@ public class DocumentJournal<T extends Bitemporal<?>> {
         return this;
     }
 
-    public void prettyPrint() {
-        logger.log(Level.INFO, this.toString());
+    // @formatter:off
+    public String prettyPrint() {
+        return "\n" + "Document-ID: " + (journal.size() > 0 ? journal.get(0).getDocumentId() : "<empty jounral>")
+                + "\n\n"
+                + String.format("|%-40s|%-15s|%-16s|%-8s|%-21s|%-23s|%-21s|%-23s|", "Version-ID", "Effective-From",
+                        "Effective-Until", "State", "Created-By", "Created-At", "Inactivated-By", "Inactivated-At")
+                + "\n|" + StringUtils.leftPad("|", 41, "-") + StringUtils.leftPad("|", 16, "-")
+                + StringUtils.leftPad("|", 17, "-") + StringUtils.leftPad("|", 9, "-")
+                + StringUtils.leftPad("|", 22, "-") + StringUtils.leftPad("|", 24, "-")
+                + StringUtils.leftPad("|", 22, "-") + StringUtils.leftPad("|", 24, "-") + "\n"
+                + journal.stream().map(Bitemporal::prettyPrint).collect(Collectors.joining("\n"));
     }
+    // @formatter:on
 
     public JournalReader<T> read() {
-        return new JournalReader<T>(this, clock );
+        return new JournalReader<T>(this, clock);
     }
-    
+
     public JournalUpdater<T> update() {
         return new JournalUpdater<T>(this);
     }
 
     public static class JournalUpdater<T extends Bitemporal<?>> {
         private DocumentJournal<T> journal;
+
         private JournalUpdater(DocumentJournal<T> journal) {
             this.journal = journal;
         }
-        
+
         public DocumentJournal<T> processVersionUpdate(VersionUpdate<T> update) {
             return update.updateStrategy.apply(journal, update);
         }
     }
-    
+
     public static class JournalReader<T extends Bitemporal<?>> {
         private DocumentJournal<T> journal;
         private Systemclock clock;
@@ -102,11 +118,11 @@ public class DocumentJournal<T extends Bitemporal<?>> {
         }
 
         public List<T> activeVersions() {
-            return journal.list().stream().filter((d)->d.isActive()).collect(Collectors.toList());
+            return journal.list().stream().filter((d) -> d.isActive()).collect(Collectors.toList());
         }
-        
+
         public List<T> inactiveVersions() {
-            return journal.list().stream().filter((d)->!d.isActive()).collect(Collectors.toList());
+            return journal.list().stream().filter((d) -> !d.isActive()).collect(Collectors.toList());
         }
     }
 
@@ -121,8 +137,9 @@ public class DocumentJournal<T extends Bitemporal<?>> {
         }
 
         public List<T> activeVersions() {
-            return journal.list().stream().filter((d)->d.isActive()).collect(Collectors.toList());
+            return journal.list().stream().filter((d) -> d.isActive()).collect(Collectors.toList());
         }
+
         public Optional<T> effectiveNow() {
             return journal.effectiveReaderFunction.apply(journal, clock.now().toLocalDate());
         }
@@ -150,10 +167,14 @@ public class DocumentJournal<T extends Bitemporal<?>> {
 
     public void add(VersionUpdate<T> update) {
         Validate.notNull(update, "update passed must not be null");
-        Validate.validState(update.done(), "this update has not been executed - execute before adding the update to journal");
-        Validate.validState(journal.contains(update.result().oldVersion()), "the old version of that update passed is unknown in this journal - please only add valid update whose origin are objects from this journal");
-        Validate.validState(!journal.contains(update.result().newPrecedingVersion()), "the new generated preceeding version by this update was already added to the journal");
-        Validate.validState(!journal.contains(update.result().newSubsequentVersion()), "the new generated subsequent version by this update was already added to the journal");
+        Validate.validState(update.done(),
+                "this update has not been executed - execute before adding the update to journal");
+        Validate.validState(journal.contains(update.result().oldVersion()),
+                "the old version of that update passed is unknown in this journal - please only add valid update whose origin are objects from this journal");
+        Validate.validState(!journal.contains(update.result().newPrecedingVersion()),
+                "the new generated preceeding version by this update was already added to the journal");
+        Validate.validState(!journal.contains(update.result().newSubsequentVersion()),
+                "the new generated subsequent version by this update was already added to the journal");
         if (journal.contains(update.result().oldVersion())) {
             journal.add(update.result().newPrecedingVersion());
             journal.add(update.result().newSubsequentVersion());

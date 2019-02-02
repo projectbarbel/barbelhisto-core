@@ -131,7 +131,7 @@ public class VersionUpdateTest {
 
     @Test
     public void testOf_newEffectivePeriods_nextToEachOther_InfiniteOrigin() throws Exception {
-        DefaultDocument object = DefaultDocument.builder().withVersionId("bla").withData("data")
+        DefaultDocument object = DefaultDocument.builder().withData("data")
                 .withBitemporalStamp(BitemporalStamp.of("JUNITTest", "someId",
                         EffectivePeriod.builder().fromNow().toInfinite().build(), RecordPeriod.builder().build()))
                 .build();
@@ -147,7 +147,7 @@ public class VersionUpdateTest {
 
     @Test
     public void testSetProperty() throws Exception {
-        DefaultDocument object = DefaultDocument.builder().withVersionId("bla").withData("data")
+        DefaultDocument object = DefaultDocument.builder().withData("data")
                 .withBitemporalStamp(BitemporalStamp.of("JUNITTest", "someId",
                         EffectivePeriod.builder().fromNow().toInfinite().build(), RecordPeriod.builder().build()))
                 .build();
@@ -168,7 +168,7 @@ public class VersionUpdateTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testSetProperty_illegalArgument_fieldnameUnknown() throws Exception {
-        DefaultDocument object = DefaultDocument.builder().withVersionId("bla").withData("data")
+        DefaultDocument object = DefaultDocument.builder().withData("data")
                 .withBitemporalStamp(BitemporalStamp.of("JUNITTest", "someId",
                         EffectivePeriod.builder().fromNow().toInfinite().build(), RecordPeriod.builder().build()))
                 .build();

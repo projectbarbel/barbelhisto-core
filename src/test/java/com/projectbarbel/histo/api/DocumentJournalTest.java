@@ -1,6 +1,7 @@
 package com.projectbarbel.histo.api;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
@@ -22,6 +23,12 @@ public class DocumentJournalTest {
                 .create(BarbelTestHelper.generateJournalOfDefaultValueObjects("#12345",
                         Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 4, 1))));
         assertTrue(journal.size() == 2);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreate_withList_differentDocumentIds() throws Exception {
+        DocumentJournal.create(Arrays.asList(BarbelTestHelper.random(DefaultDocument.class),
+                BarbelTestHelper.random(DefaultDocument.class)));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -47,10 +54,10 @@ public class DocumentJournalTest {
     public void testCreate_withInitialDocument() throws Exception {
         BitemporalStamp stamp = BitemporalStamp.initial();
         DocumentJournal<DefaultDocument> journal = DocumentJournal
-                .create(BarbelTestHelper.random(DefaultDocument.class));
+                .create(DefaultDocument.builder().withBitemporalStamp(stamp).withData("some initial data").build());
         assertTrue(journal.size() == 1);
     }
-    
+
     @Test(expected = NullPointerException.class)
     public void testCreate_withDocument_null() throws Exception {
         DefaultDocument dflt = null;
@@ -67,6 +74,14 @@ public class DocumentJournalTest {
         assertTrue(journal.list().get(0).getEffectiveFrom().equals(LocalDate.of(2019, 1, 1)));
         assertTrue(journal.list().get(1).getEffectiveFrom().equals(LocalDate.of(2019, 4, 1)));
         assertTrue(journal.list().get(2).getEffectiveFrom().equals(LocalDate.of(2019, 8, 1)));
+    }
+
+    @Test
+    public void testPrettyPrint() throws Exception {
+        BitemporalStamp stamp = BitemporalStamp.initial();
+        DocumentJournal<DefaultDocument> journal = DocumentJournal
+                .create(DefaultDocument.builder().withBitemporalStamp(stamp).withData("some initial data").build());
+        assertNotNull(journal.prettyPrint());
     }
 
 }

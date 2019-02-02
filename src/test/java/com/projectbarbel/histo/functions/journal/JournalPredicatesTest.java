@@ -53,31 +53,31 @@ public class JournalPredicatesTest {
 
     @Test
     public void testEffectiveAfter_isAfter_dueDateBeforeEffectivePeriod() throws Exception {
-        DefaultDocument doc = DefaultDocument.builder().withData("bla").withVersionId("id").withBitemporalStamp(BitemporalStamp.of("test", "docid", EffectivePeriod.builder().from(LocalDate.now().plusDays(1)).toInfinite().build(), RecordPeriod.builder().build())).build();
+        DefaultDocument doc = DefaultDocument.builder().withData("bla").withBitemporalStamp(BitemporalStamp.of("test", "docid", EffectivePeriod.builder().from(LocalDate.now().plusDays(1)).toInfinite().build(), RecordPeriod.builder().build())).build();
         assertTrue(new JournalPredicates(LocalDate.now()).effectiveAfter(doc));
     }
 
     @Test
     public void testEffectiveAfter_isAfter_dueDateOnEffectiveFrom() throws Exception {
-        DefaultDocument doc = DefaultDocument.builder().withData("bla").withVersionId("id").withBitemporalStamp(BitemporalStamp.of("test", "docid", EffectivePeriod.builder().from(LocalDate.now()).toInfinite().build(), RecordPeriod.builder().build())).build();
+        DefaultDocument doc = DefaultDocument.builder().withData("bla").withBitemporalStamp(BitemporalStamp.of("test", "docid", EffectivePeriod.builder().from(LocalDate.now()).toInfinite().build(), RecordPeriod.builder().build())).build();
         assertTrue(new JournalPredicates(LocalDate.now()).effectiveAfter(doc));
     }
 
     @Test
     public void testEffectiveAfter_notAfter_dueDateInEffectivePeriod() throws Exception {
-        DefaultDocument doc = DefaultDocument.builder().withData("bla").withVersionId("id").withBitemporalStamp(BitemporalStamp.of("test", "docid", EffectivePeriod.builder().from(LocalDate.now().minusDays(1)).toInfinite().build(), RecordPeriod.builder().build())).build();
+        DefaultDocument doc = DefaultDocument.builder().withData("bla").withBitemporalStamp(BitemporalStamp.of("test", "docid", EffectivePeriod.builder().from(LocalDate.now().minusDays(1)).toInfinite().build(), RecordPeriod.builder().build())).build();
         assertFalse(new JournalPredicates(LocalDate.now()).effectiveAfter(doc));
     }
 
     @Test
     public void testEffectiveAfter_notAfter_dueDateAfterEffectivePeriod() throws Exception {
-        DefaultDocument doc = DefaultDocument.builder().withData("bla").withVersionId("id").withBitemporalStamp(BitemporalStamp.of("test", "docid", EffectivePeriod.builder().from(LocalDate.now().minusDays(10)).until(LocalDate.now().minusDays(1)).build(), RecordPeriod.builder().build())).build();
+        DefaultDocument doc = DefaultDocument.builder().withData("bla").withBitemporalStamp(BitemporalStamp.of("test", "docid", EffectivePeriod.builder().from(LocalDate.now().minusDays(10)).until(LocalDate.now().minusDays(1)).build(), RecordPeriod.builder().build())).build();
         assertFalse(new JournalPredicates(LocalDate.now()).effectiveAfter(doc));
     }
 
     @Test
     public void testEffectiveAfter_notAfter_dueDateOnEffectiveUntil() throws Exception {
-        DefaultDocument doc = DefaultDocument.builder().withData("bla").withVersionId("id").withBitemporalStamp(BitemporalStamp.of("test", "docid", EffectivePeriod.builder().from(LocalDate.now().minusDays(10)).until(LocalDate.now()).build(), RecordPeriod.builder().build())).build();
+        DefaultDocument doc = DefaultDocument.builder().withData("bla").withBitemporalStamp(BitemporalStamp.of("test", "docid", EffectivePeriod.builder().from(LocalDate.now().minusDays(10)).until(LocalDate.now()).build(), RecordPeriod.builder().build())).build();
         assertFalse(new JournalPredicates(LocalDate.now()).effectiveAfter(doc));
     }
 
