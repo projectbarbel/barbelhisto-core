@@ -32,9 +32,9 @@ public final class BarbelHistoContext {
 
     private BarbelHistoContext(Builder builder) {
         this.properties = builder.properties;
-        this.versionIdGenerator = builder.versionIdGenerator;
-        this.documentIdGenerator = builder.documentIdGenerator;
-        this.clock = builder.clock;
+        this.versionIdGenerator = builder.versionIdGenerator != null ? builder.versionIdGenerator : instantiate(properties.getProperty(VERSIONID_GENERATOR_CLASS), new Object[] {});;
+        this.documentIdGenerator = builder.documentIdGenerator != null ? builder.documentIdGenerator : instantiate(properties.getProperty(DOCID_GENERATOR_CLASS), new Object[] {});;
+        this.clock = builder.clock != null ? builder.clock : new Systemclock();
     }
     
     public LocalDate infiniteDate() {
@@ -132,9 +132,6 @@ public final class BarbelHistoContext {
 
         public Builder withProperties(Properties properties) {
             this.properties = properties;
-            this.versionIdGenerator = instantiate(properties.getProperty(VERSIONID_GENERATOR_CLASS), new Object[] {});
-            this.documentIdGenerator = instantiate(properties.getProperty(DOCID_GENERATOR_CLASS), new Object[] {});
-            this.clock = new Systemclock();
             return this;
         }
 
