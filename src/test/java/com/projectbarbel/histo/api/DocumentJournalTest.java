@@ -102,8 +102,13 @@ public class DocumentJournalTest {
         DocumentJournal<DefaultDocument> journal = DocumentJournal.create(doc);
         VersionUpdateResult<DefaultDocument> update = VersionUpdate.of(doc).prepare()
                 .from(BarbelHistoContext.instance().clock().now().plusDays(1).toLocalDate()).execute();
-        journal.add(update::newPrecedingVersion);
+        journal.update(update);
         System.out.println(journal.prettyPrint());
+    }
+
+    @Test
+    public void testUpdate() throws Exception {
+        throw new RuntimeException("not yet implemented");
     }
 
 }

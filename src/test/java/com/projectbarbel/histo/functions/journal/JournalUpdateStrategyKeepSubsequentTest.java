@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,11 +33,11 @@ public class JournalUpdateStrategyKeepSubsequentTest {
         assertTrue(journal.read().activeVersions().size()==4);
         VersionUpdateResult<DefaultDocument> result = update.execute();
         JournalUpdateStrategyKeepSubsequent<DefaultDocument> updateFunction = new JournalUpdateStrategyKeepSubsequent<DefaultDocument>();
-        DocumentJournal<DefaultDocument> updatedJournal = updateFunction.apply(journal, update.result());
+        List<DefaultDocument> updateVersion = updateFunction.apply(journal, update.result());
         assertTrue(result.newSubsequentVersion().getData().equals("some new data"));
         assertTrue(result.newPrecedingVersion().getData().equals(journal.list().get(3).getData()));
-        assertTrue(updatedJournal.read().activeVersions().size()==5);
-        assertTrue(updatedJournal.read().inactiveVersions().size()==1);
+        assertTrue(updateVersion.size()==2);
+        assertTrue(journal.read().inactiveVersions().size()==1);
     }
 
     @Test
@@ -45,11 +46,11 @@ public class JournalUpdateStrategyKeepSubsequentTest {
         assertTrue(journal.read().activeVersions().size()==4);
         VersionUpdateResult<DefaultDocument> result = update.execute();
         JournalUpdateStrategyKeepSubsequent<DefaultDocument> updateFunction = new JournalUpdateStrategyKeepSubsequent<DefaultDocument>();
-        DocumentJournal<DefaultDocument> updatedJournal = updateFunction.apply(journal, update.result());
+        List<DefaultDocument> updateVersion = updateFunction.apply(journal, update.result());
         assertTrue(result.newSubsequentVersion().getData().equals("some new data"));
         assertTrue(result.newPrecedingVersion().getData().equals(journal.list().get(2).getData()));
-        assertTrue(updatedJournal.read().activeVersions().size()==5);
-        assertTrue(updatedJournal.read().inactiveVersions().size()==1);
+        assertTrue(updateVersion.size()==2);
+        assertTrue(journal.read().inactiveVersions().size()==1);
     }
     
     @Test
@@ -58,11 +59,11 @@ public class JournalUpdateStrategyKeepSubsequentTest {
         assertTrue(journal.read().activeVersions().size()==4);
         VersionUpdateResult<DefaultDocument> result = update.execute();
         JournalUpdateStrategyKeepSubsequent<DefaultDocument> updateFunction = new JournalUpdateStrategyKeepSubsequent<DefaultDocument>();
-        DocumentJournal<DefaultDocument> updatedJournal = updateFunction.apply(journal, update.result());
+        List<DefaultDocument> updateVersion = updateFunction.apply(journal, update.result());
         assertTrue(result.newSubsequentVersion().getData().equals("some new data"));
         assertTrue(result.newPrecedingVersion().getData().equals(journal.list().get(0).getData()));
-        assertTrue(updatedJournal.read().activeVersions().size()==5);
-        assertTrue(updatedJournal.read().inactiveVersions().size()==1);
+        assertTrue(updateVersion.size()==2);
+        assertTrue(journal.read().inactiveVersions().size()==1);
     }
         
 }

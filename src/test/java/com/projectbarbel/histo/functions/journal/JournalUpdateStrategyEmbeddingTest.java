@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -30,10 +31,11 @@ public class JournalUpdateStrategyEmbeddingTest {
     public void testApply_lastIntervall() throws Exception {
         VersionUpdate<DefaultDocument> update = VersionUpdate.of(journal.list().get(3)).prepare().from(clock.now().toLocalDate()).untilInfinite().setProperty("data", "some new data").get();
         VersionUpdateResult<DefaultDocument> result = update.execute();
-        DocumentJournal<DefaultDocument> newJournal = new JournalUpdateStrategyEmbedding<DefaultDocument>().apply(journal, result);
-        assertTrue(newJournal.read().activeVersions().size()==5);
-        assertTrue(newJournal.read().inactiveVersions().size()==1);        
-        System.out.println(newJournal.prettyPrint());
+        List<DefaultDocument> list = new JournalUpdateStrategyEmbedding<DefaultDocument>().apply(journal, result);
+        assertTrue(list.size()==2);
+        assertTrue(journal.read().activeVersions().size()==3);
+        assertTrue(journal.read().inactiveVersions().size()==1);        
+        System.out.println(journal.prettyPrint());
     }
 
 }

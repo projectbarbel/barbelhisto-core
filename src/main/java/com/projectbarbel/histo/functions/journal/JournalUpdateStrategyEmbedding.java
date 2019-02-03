@@ -1,5 +1,6 @@
 package com.projectbarbel.histo.functions.journal;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -10,25 +11,26 @@ import com.projectbarbel.histo.api.VersionUpdate.VersionUpdateResult;
 import com.projectbarbel.histo.model.Bitemporal;
 
 public class JournalUpdateStrategyEmbedding<T extends Bitemporal<?>>
-        implements BiFunction<DocumentJournal<T>, VersionUpdateResult<T>, DocumentJournal<T>> {
+        implements BiFunction<DocumentJournal<T>, VersionUpdateResult<T>, List<T>> {
 
     @Override
-    public DocumentJournal<T> apply(DocumentJournal<T> journal, final VersionUpdateResult<T> update) {
+    public List<T> apply(DocumentJournal<T> journal, final VersionUpdateResult<T> update) {
+        List<T> newVersions = new ArrayList<>();
         Optional<T> interruptedFromVersion = journal.read().effectiveTime().effectiveAt(update.effectiveFrom());
         Optional<T> interruptedUntilVersion = journal.read().effectiveTime().effectiveAt(update.effectiveUntil());
         if (interruptedUntilVersion.isPresent()) {
             VersionUpdateResult<T> result = VersionUpdate.of(interruptedUntilVersion.get()).prepare()
                     .from(update.effectiveUntil()).until(interruptedUntilVersion.get().getEffectiveUntil()).execute();
             interruptedUntilVersion.get().inactivate();
-            journal.add(result::newSubsequentVersion);
+            newVersions.add(result.newSubsequentVersion());
         }
         List<T> betweenVersions = journal.read().effectiveTime()
                 .effectiveBetween(update.newSubsequentVersion().getBitemporalStamp().getEffectiveTime());
         betweenVersions.stream().forEach(Bitemporal::inactivate);
         interruptedFromVersion.ifPresent(Bitemporal::inactivate);
-        journal.add(update::newPrecedingVersion);
-        journal.add(update::newSubsequentVersion);
-        return journal;
+        newVersions.add(update.newPrecedingVersion());
+        newVersions.add(update.newSubsequentVersion());
+        return newVersions;
     }
 
 }

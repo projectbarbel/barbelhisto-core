@@ -13,7 +13,6 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.Validate;
 
 import com.projectbarbel.histo.BarbelHistoContext;
-import com.projectbarbel.histo.functions.journal.JournalUpdateStrategyKeepSubsequent;
 import com.projectbarbel.histo.functions.update.DefaultPojoCopier;
 import com.projectbarbel.histo.functions.update.DefaultUpdateExectuionStrategy;
 import com.projectbarbel.histo.functions.update.ValidateEffectiveDate;
@@ -25,24 +24,25 @@ public final class VersionUpdate<T extends Bitemporal<?>> {
     public enum UpdateState {
         PREPARATION(() -> {}, () -> Validate.validState(false, "this method is not allowed in state PTREPARATION")), 
         EXECUTED(() -> Validate.validState(false, "this method is not allowed in state EXECUTED"), () -> {});
-        private Runnable setter;
-        private Runnable getter;
+        private Runnable inputSetter;
+        private Runnable outputGetter;
 
-        private UpdateState(Runnable setter, Runnable getter) {
-            this.setter = setter;
-            this.getter = getter;
+        private UpdateState(Runnable inputSetter, Runnable outputGetter) {
+            this.inputSetter = inputSetter;
+            this.outputGetter = outputGetter;
         }
 
         public <T> T set(T value) {
-            setter.run();
+            inputSetter.run();
             return value;
         }
 
         public <T> T get(T value) {
-            getter.run();
+            outputGetter.run();
             return value;
         }
     }
+    
     private final T oldVersion;
     private T newPrecedingVersion;
     private T newSubsequentVersion;
@@ -55,7 +55,6 @@ public final class VersionUpdate<T extends Bitemporal<?>> {
     private Function<UpdateExecutionContext<T>, VersionUpdateResult<T>> updateExecutionFunction = new DefaultUpdateExectuionStrategy<T>();
     private final Map<String, Object> propertyUpdates = new HashMap<>();
     private VersionUpdateResult<T> result;
-    public BiFunction<DocumentJournal<T>, VersionUpdateResult<T>, DocumentJournal<T>> updateStrategy = new JournalUpdateStrategyKeepSubsequent<T>();
 
     public VersionUpdateResult<T> result() {
         return state.get(result);
@@ -231,11 +230,11 @@ public final class VersionUpdate<T extends Bitemporal<?>> {
     }
 
     public LocalDate newEffectiveUntil() {
-        return newEffectiveUntil;
+        return state.get(newEffectiveUntil);
     }
 
     public LocalDate newEffectiveFrom() {
-        return newEffectiveDate;
+        return state.get(newEffectiveDate);
     }
     
 }
