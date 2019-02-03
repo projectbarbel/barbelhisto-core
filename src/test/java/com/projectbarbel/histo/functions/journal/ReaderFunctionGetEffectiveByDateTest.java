@@ -26,13 +26,13 @@ public class ReaderFunctionGetEffectiveByDateTest {
     public void setUp() {
         journal = DocumentJournal.create(BarbelTestHelper.generateJournalOfDefaultValueObjects("docid1",
                 Arrays.asList(LocalDate.of(2010, 12, 1), LocalDate.of(2017, 12, 1), LocalDate.of(2020, 1, 1))));
-        BarbelHistoContext.instance().clock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 8, 0, 0));
+        BarbelHistoContext.getClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 8, 0, 0));
         function = new ReaderFunctionGetEffectiveByDate<DefaultDocument>();
     }
 
     @Test
     public void testApply() throws Exception {
-        Optional<DefaultDocument> document = function.apply(journal, BarbelHistoContext.instance().clock().now().toLocalDate());
+        Optional<DefaultDocument> document = function.apply(journal, BarbelHistoContext.getClock().now().toLocalDate());
         assertTrue(document.isPresent());
         assertEquals(document.get().getEffectiveFrom(), LocalDate.of(2017, 12, 1));
     }

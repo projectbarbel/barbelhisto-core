@@ -9,14 +9,14 @@ public class DefaultIDGeneratorTest {
 
     @Test
     public void testGet() throws Exception {
-        String id = new DefaultIDGenerator().get();
+        String id = (String)new DefaultIDGenerator().get();
         assertNotNull(id);
     }
 
     @Test
     public void testGetTwoDifferent() throws Exception {
-        String id1 = new DefaultIDGenerator().get();
-        String id2 = new DefaultIDGenerator().get();
+        String id1 = (String)new DefaultIDGenerator().get();
+        String id2 = (String)new DefaultIDGenerator().get();
         assertNotEquals(id1, id2);
     }
 

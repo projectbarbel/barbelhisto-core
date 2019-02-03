@@ -12,12 +12,12 @@ public class EffectivePeriod {
     private final LocalDate from;
 
     private EffectivePeriod(Builder builder) {
-        this.until = builder.until != null ? builder.until : BarbelHistoContext.instance().infiniteDate();
-        this.from = builder.from != null ? builder.from : BarbelHistoContext.instance().clock().now().toLocalDate();
+        this.until = builder.until != null ? builder.until : BarbelHistoContext.getInfiniteDate();
+        this.from = builder.from != null ? builder.from : BarbelHistoContext.getClock().now().toLocalDate();
     }
     
     public boolean isInfinite() {
-       return from.equals(BarbelHistoContext.instance().infiniteDate());
+       return from.equals(BarbelHistoContext.getInfiniteDate());
     }
     
     public LocalDate from() {
@@ -72,7 +72,7 @@ public class EffectivePeriod {
         }
 
         public Builder toInfinite() {
-            this.until = BarbelHistoContext.instance().infiniteDate();
+            this.until = BarbelHistoContext.getInfiniteDate();
             return this;
         }
         
@@ -82,7 +82,7 @@ public class EffectivePeriod {
         }
 
         public Builder fromNow() {
-            this.from = BarbelHistoContext.instance().clock().now().toLocalDate();
+            this.from = BarbelHistoContext.getClock().now().toLocalDate();
             return this;
         }
         

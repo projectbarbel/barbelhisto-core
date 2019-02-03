@@ -30,7 +30,7 @@ public class JournalUpdateStrategyInactivateSubsequentTest {
     
     @Test
     public void testApply_InactivateSubsequent() throws Exception {
-        VersionUpdate<DefaultDocument> update = VersionUpdate.of(journal.list().get(3)).prepare().from(clock.now().toLocalDate()).untilInfinite().setProperty("data", "some new data").get();
+        VersionUpdate<DefaultDocument> update = VersionUpdate.of(journal.list().get(3)).prepare().effectiveFrom(clock.now().toLocalDate()).untilInfinite().setProperty("data", "some new data").get();
         assertTrue(journal.read().activeVersions().size()==4);
         VersionUpdateResult<DefaultDocument> result = update.execute();
         JournalUpdateStrategyInactivateSubsequent<DefaultDocument> updateFunction = new JournalUpdateStrategyInactivateSubsequent<DefaultDocument>();
@@ -43,7 +43,7 @@ public class JournalUpdateStrategyInactivateSubsequentTest {
     
     @Test
     public void testApply_InactivateSubsequent_subsequentPeriodsExist_andShouldBeInactivated() throws Exception {
-        VersionUpdate<DefaultDocument> update = VersionUpdate.of(journal.list().get(2)).prepare().from(LocalDate.of(2018, 7, 1)).untilInfinite().setProperty("data", "some new data").get();
+        VersionUpdate<DefaultDocument> update = VersionUpdate.of(journal.list().get(2)).prepare().effectiveFrom(LocalDate.of(2018, 7, 1)).untilInfinite().setProperty("data", "some new data").get();
         assertTrue(journal.read().activeVersions().size()==4);
         VersionUpdateResult<DefaultDocument> result = update.execute();
         JournalUpdateStrategyInactivateSubsequent<DefaultDocument> updateFunction = new JournalUpdateStrategyInactivateSubsequent<DefaultDocument>();
@@ -56,7 +56,7 @@ public class JournalUpdateStrategyInactivateSubsequentTest {
     
     @Test
     public void testApply_InactivateSubsequent_multipleSubsequentPeriodsExist_andShouldBeInactivated() throws Exception {
-        VersionUpdate<DefaultDocument> update = VersionUpdate.of(journal.list().get(0)).prepare().from(LocalDate.of(2016, 7, 1)).untilInfinite().setProperty("data", "some new data").get();
+        VersionUpdate<DefaultDocument> update = VersionUpdate.of(journal.list().get(0)).prepare().effectiveFrom(LocalDate.of(2016, 7, 1)).untilInfinite().setProperty("data", "some new data").get();
         assertTrue(journal.read().activeVersions().size()==4);
         VersionUpdateResult<DefaultDocument> result = update.execute();
         JournalUpdateStrategyInactivateSubsequent<DefaultDocument> updateFunction = new JournalUpdateStrategyInactivateSubsequent<DefaultDocument>();

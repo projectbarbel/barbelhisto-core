@@ -53,14 +53,22 @@ public class BarbelTestHelper {
                 return RecordPeriod.builder().build();
             }
         }).randomize(
-                new FieldDefinition<BitemporalStamp, Supplier>("idSupplier", Supplier.class, BitemporalStamp.class),
+                new FieldDefinition<BitemporalStamp, Supplier>("versionIdGenerator", Supplier.class, BitemporalStamp.class),
                 new Supplier<DefaultIDGenerator>() {
 
                     @Override
                     public DefaultIDGenerator get() {
                         return new DefaultIDGenerator();
                     }
-                }).build().nextObject(clazz, excludedFields);
+                }).randomize(
+                        new FieldDefinition<BitemporalStamp, Supplier>("documentIdGenerator", Supplier.class, BitemporalStamp.class),
+                        new Supplier<DefaultIDGenerator>() {
+
+                            @Override
+                            public DefaultIDGenerator get() {
+                                return new DefaultIDGenerator();
+                            }
+                        }).build().nextObject(clazz, excludedFields);
     }
 
     public static List<BitemporalStamp> generateListOfBitemporals(String docId, List<LocalDate> effectiveDates) {

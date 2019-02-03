@@ -96,18 +96,18 @@ public class DocumentJournalTest {
     }
 
     @Test
-    public void testInsert() throws Exception {
-        BarbelHistoContext.instance().clock().useFixedClockAt(LocalDateTime.of(2019, 2, 1, 8, 0));
+    public void testUpdate() throws Exception {
+        BarbelHistoContext.getClock().useFixedClockAt(LocalDateTime.of(2019, 2, 1, 8, 0));
         DefaultDocument doc = DefaultDocument.builder().withData("some data").build();
         DocumentJournal<DefaultDocument> journal = DocumentJournal.create(doc);
         VersionUpdateResult<DefaultDocument> update = VersionUpdate.of(doc).prepare()
-                .from(BarbelHistoContext.instance().clock().now().plusDays(1).toLocalDate()).execute();
+                .effectiveFrom(BarbelHistoContext.getClock().now().plusDays(1).toLocalDate()).execute();
         journal.update(update);
         System.out.println(journal.prettyPrint());
     }
 
     @Test
-    public void testUpdate() throws Exception {
+    public void testUpdate_further() throws Exception {
         throw new RuntimeException("not yet implemented");
     }
 

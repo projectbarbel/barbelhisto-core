@@ -29,7 +29,7 @@ public class JournalUpdateStrategyEmbeddingTest {
     
     @Test
     public void testApply_lastIntervall() throws Exception {
-        VersionUpdate<DefaultDocument> update = VersionUpdate.of(journal.list().get(3)).prepare().from(clock.now().toLocalDate()).untilInfinite().setProperty("data", "some new data").get();
+        VersionUpdate<DefaultDocument> update = VersionUpdate.of(journal.list().get(3)).prepare().effectiveFrom(clock.now().toLocalDate()).untilInfinite().setProperty("data", "some new data").get();
         VersionUpdateResult<DefaultDocument> result = update.execute();
         List<DefaultDocument> list = new JournalUpdateStrategyEmbedding<DefaultDocument>().apply(journal, result);
         assertTrue(list.size()==2);

@@ -31,35 +31,9 @@ public class DocumentJournal<T extends Bitemporal<?>> {
     private BiFunction<DocumentJournal<T>, EffectivePeriod, List<T>> effectiveBetweenFunction = new ReaderFunctionGetEffectiveBetween<T>();
     private BiFunction<DocumentJournal<T>, VersionUpdateResult<T>, List<T>> updateFunction = new JournalUpdateStrategyEmbedding<T>();
 
-    public void update(VersionUpdateResult<T> update) {
-        Validate.notNull(update, "update passed must not be null");
-        Validate.validState(journal.contains(update.oldVersion()),
-                "the old version of that update passed is unknown in this journal - please only add valid update whose origin are objects from this journal");
-        Validate.validState(!journal.contains(update.newPrecedingVersion()),
-                "the new generated preceeding version by this update was already added to the journal");
-        Validate.validState(!journal.contains(update.newSubsequentVersion()),
-                "the new generated subsequent version by this update was already added to the journal");
-        if (journal.contains(update.oldVersion())) {
-            journal.addAll(updateFunction.apply(this, update));
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "DocumentJournal [journal=" + journal + "]";
-    }
-
     private DocumentJournal(List<T> documentList) {
         super();
         documentList.stream().forEach(journal::add);
-    }
-
-    public int size() {
-        return journal.size();
-    }
-
-    public List<T> list() {
-        return journal.stream().collect(Collectors.toCollection(ArrayList::new));
     }
 
     public static <T extends Bitemporal<?>> DocumentJournal<T> create(List<T> listOfBitemporalDocuments) {
@@ -78,6 +52,32 @@ public class DocumentJournal<T extends Bitemporal<?>> {
                 .ifPresent((d) -> d.setBitemporalStamp(BitemporalStamp::initial));
         Validate.validState(newDocument.getBitemporalStamp() != null, "failed to initialize stamp");
         return (T) new DocumentJournal<Bitemporal<?>>(Collections.singletonList(newDocument));
+    }
+
+    public void update(VersionUpdateResult<T> update) {
+        Validate.notNull(update, "update passed must not be null");
+        Validate.validState(journal.contains(update.oldVersion()),
+                "the old version of that update passed is unknown in this journal - please only add valid update whose origin are objects from this journal");
+        Validate.validState(!journal.contains(update.newPrecedingVersion()),
+                "the new generated preceeding version by this update was already added to the journal");
+        Validate.validState(!journal.contains(update.newSubsequentVersion()),
+                "the new generated subsequent version by this update was already added to the journal");
+        if (journal.contains(update.oldVersion())) {
+            journal.addAll(updateFunction.apply(this, update));
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "DocumentJournal [journal=" + journal + "]";
+    }
+
+    public int size() {
+        return journal.size();
+    }
+
+    public List<T> list() {
+        return journal.stream().collect(Collectors.toCollection(ArrayList::new));
     }
 
     public DocumentJournal<T> sortAscendingByEffectiveDate() {
@@ -100,7 +100,7 @@ public class DocumentJournal<T extends Bitemporal<?>> {
     // @formatter:on
 
     public JournalReader<T> read() {
-        return new JournalReader<T>(this, BarbelHistoContext.instance().clock());
+        return new JournalReader<T>(this, BarbelHistoContext.getClock());
     }
 
     public static class JournalReader<T extends Bitemporal<?>> {

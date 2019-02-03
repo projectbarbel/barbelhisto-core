@@ -48,7 +48,7 @@ public interface Bitemporal<O> {
     }
 
     default boolean isEffectiveInfinitely() {
-        return getEffectiveUntil().equals(BarbelHistoContext.instance().infiniteDate());
+        return getEffectiveUntil().equals(BarbelHistoContext.getInfiniteDate());
     }
 
     default void inactivate() {

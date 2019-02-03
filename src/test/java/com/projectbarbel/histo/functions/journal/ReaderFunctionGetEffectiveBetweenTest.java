@@ -26,7 +26,7 @@ public class ReaderFunctionGetEffectiveBetweenTest {
     public void setUp() {
         journal = DocumentJournal.create(BarbelTestHelper.generateJournalOfDefaultValueObjects("docid1",
                 Arrays.asList(LocalDate.of(2010, 12, 1), LocalDate.of(2017, 12, 1), LocalDate.of(2020, 1, 1))));
-        BarbelHistoContext.instance().clock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 8, 0, 0));
+        BarbelHistoContext.getClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 8, 0, 0));
         function = new ReaderFunctionGetEffectiveBetween<DefaultDocument>();
     }
 
@@ -41,7 +41,7 @@ public class ReaderFunctionGetEffectiveBetweenTest {
     @Test
     public void testApply_threeRecord_allBetween() throws Exception {
         List<DefaultDocument> documents = function.apply(journal,
-                EffectivePeriod.builder().from(LocalDate.of(2010, 11, 1)).until(BarbelHistoContext.instance().infiniteDate()).build());
+                EffectivePeriod.builder().from(LocalDate.of(2010, 11, 1)).until(BarbelHistoContext.getInfiniteDate()).build());
         assertTrue(documents.size() == 3);
     }
     

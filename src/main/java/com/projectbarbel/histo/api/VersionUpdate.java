@@ -56,11 +56,34 @@ public final class VersionUpdate<T extends Bitemporal<?>> {
     private final Map<String, Object> propertyUpdates = new HashMap<>();
     private VersionUpdateResult<T> result;
 
+    private VersionUpdate(T bitemporal) {
+        oldVersion = Objects.requireNonNull(bitemporal, "bitemporal object must not be null");
+        newEffectiveDate = Objects.requireNonNull(bitemporal.getEffectiveFrom(),
+                "the bitemporal passed must not contain null value on effective from");
+        newEffectiveUntil = Objects.requireNonNull(bitemporal.getEffectiveUntil(),
+                "the bitemporal passed must not contain null value on effective until");
+    }
+
+    public static <T extends Bitemporal<?>> VersionUpdate<T> of(T document) {
+        return new VersionUpdate<T>(document);
+    }
+
+    public VersionUpdateExecutionBuilder<T> prepare() {
+        return new VersionUpdateExecutionBuilder<T>(this);
+    }
+
+    public VersionUpdateResult<T> execute() {
+        result = state
+                .set(updateExecutionFunction.apply(new UpdateExecutionContext<T>(this, propertyUpdates)));
+        state = UpdateState.EXECUTED;
+        return result;
+    }
+
     public VersionUpdateResult<T> result() {
         return state.get(result);
     }
 
-    public boolean done() {
+    public boolean isDone() {
         return state.equals(UpdateState.EXECUTED);
     }
 
@@ -87,11 +110,11 @@ public final class VersionUpdate<T extends Bitemporal<?>> {
         }
         
         public LocalDate effectiveFrom() {
-            return update.newEffectiveFrom();
+            return update.newEffectiveDate;
         }
 
         public LocalDate effectiveUntil() {
-            return update.newEffectiveUntil();
+            return update.newEffectiveUntil;
         }
 
     }
@@ -104,7 +127,7 @@ public final class VersionUpdate<T extends Bitemporal<?>> {
             this.update = update;
         }
 
-        public VersionUpdateExecutionBuilder<T> from(LocalDate newEffectiveFrom) {
+        public VersionUpdateExecutionBuilder<T> effectiveFrom(LocalDate newEffectiveFrom) {
             if (!effectiveDateValidationFuction.test(update.oldVersion, newEffectiveFrom))
                 throw new IllegalArgumentException("new effective date is not valid: " + newEffectiveFrom
                         + " - old version: " + update.oldVersion.toString());
@@ -113,7 +136,7 @@ public final class VersionUpdate<T extends Bitemporal<?>> {
         }
 
         public VersionUpdateExecutionBuilder<T> untilInfinite() {
-            update.newEffectiveUntil = update.state.set(BarbelHistoContext.instance().infiniteDate());
+            update.newEffectiveUntil = update.state.set(BarbelHistoContext.getInfiniteDate());
             return this;
         }
         
@@ -129,17 +152,6 @@ public final class VersionUpdate<T extends Bitemporal<?>> {
 
         public VersionUpdateExecutionBuilder<T> createdBy(String createdBy) {
             update.createdBy = update.state.set(createdBy);
-            return this;
-        }
-
-        public VersionUpdateExecutionBuilder<T> customCopyFunction(BiFunction<T, BitemporalStamp, T> copyFunction) {
-            update.copyFunction = update.state.set(copyFunction);
-            return this;
-        }
-
-        public VersionUpdateExecutionBuilder<T> customEffectiveDateValidationFunction(
-                BiPredicate<Bitemporal<?>, LocalDate> function) {
-            effectiveDateValidationFuction = update.state.set(function);
             return this;
         }
 
@@ -206,35 +218,4 @@ public final class VersionUpdate<T extends Bitemporal<?>> {
 
     }
 
-    public VersionUpdateExecutionBuilder<T> prepare() {
-        return new VersionUpdateExecutionBuilder<T>(this);
-    }
-
-    public VersionUpdateResult<T> execute() {
-        result = state
-                .set(updateExecutionFunction.apply(new UpdateExecutionContext<T>(this, propertyUpdates)));
-        state = UpdateState.EXECUTED;
-        return result;
-    }
-
-    public static <T extends Bitemporal<?>> VersionUpdate<T> of(T document) {
-        return new VersionUpdate<T>(document);
-    }
-
-    private VersionUpdate(T bitemporal) {
-        oldVersion = Objects.requireNonNull(bitemporal, "bitemporal object must not be null");
-        newEffectiveDate = Objects.requireNonNull(bitemporal.getEffectiveFrom(),
-                "the bitemporal passed must not contain null value on effective from");
-        newEffectiveUntil = Objects.requireNonNull(bitemporal.getEffectiveUntil(),
-                "the bitemporal passed must not contain null value on effective until");
-    }
-
-    public LocalDate newEffectiveUntil() {
-        return state.get(newEffectiveUntil);
-    }
-
-    public LocalDate newEffectiveFrom() {
-        return state.get(newEffectiveDate);
-    }
-    
 }

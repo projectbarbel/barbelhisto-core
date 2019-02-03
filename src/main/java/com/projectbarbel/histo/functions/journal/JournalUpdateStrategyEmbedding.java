@@ -20,7 +20,7 @@ public class JournalUpdateStrategyEmbedding<T extends Bitemporal<?>>
         Optional<T> interruptedUntilVersion = journal.read().effectiveTime().effectiveAt(update.effectiveUntil());
         if (interruptedUntilVersion.isPresent()) {
             VersionUpdateResult<T> result = VersionUpdate.of(interruptedUntilVersion.get()).prepare()
-                    .from(update.effectiveUntil()).until(interruptedUntilVersion.get().getEffectiveUntil()).execute();
+                    .effectiveFrom(update.effectiveUntil()).until(interruptedUntilVersion.get().getEffectiveUntil()).execute();
             interruptedUntilVersion.get().inactivate();
             newVersions.add(result.newSubsequentVersion());
         }

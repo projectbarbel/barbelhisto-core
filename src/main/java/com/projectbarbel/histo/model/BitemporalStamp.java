@@ -2,6 +2,7 @@ package com.projectbarbel.histo.model;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import com.projectbarbel.histo.BarbelHistoContext;
 
@@ -18,20 +19,26 @@ public final class BitemporalStamp {
     protected final String activity;
     protected final EffectivePeriod effectiveTime;
     protected final RecordPeriod recordTime;
+    protected final Supplier<Serializable> versionIdGenerator;
+    protected final Supplier<Serializable> documentIdGenerator;
 
     private BitemporalStamp(Builder builder) {
-        this.versionId = builder.versionId != null ? builder.versionId
-                : BarbelHistoContext.instance().versionIdGenerator().get();
-        this.documentId = Objects.requireNonNull(builder.documentId);
-        this.activity = builder.activity != null ? builder.activity : BarbelHistoContext.instance().defaultActivity();
+        this.versionIdGenerator = builder.versionIdGenerator != null ? builder.versionIdGenerator
+                : BarbelHistoContext.getDefaultVersionIDGenerator();
+        this.documentIdGenerator = builder.documentIdGenerator != null ? builder.documentIdGenerator
+                : BarbelHistoContext.getDefaultDocumentIDGenerator();
+        ;
+        this.versionId = builder.versionId != null ? builder.versionId : versionIdGenerator.get();
+        this.documentId = builder.documentId != null ? builder.documentId : (String) documentIdGenerator.get();
+        this.activity = builder.activity != null ? builder.activity : BarbelHistoContext.getDefaultActivity();
         this.effectiveTime = Objects.requireNonNull(builder.effectiveTime);
         this.recordTime = Objects.requireNonNull(builder.recordTime);
     }
 
     public static BitemporalStamp initial() {
-        return builder().withActivity(BarbelHistoContext.instance().defaultActivity())
-                .withDocumentId(BarbelHistoContext.instance().documentIdGenerator().get())
-                .withVersionId(BarbelHistoContext.instance().versionIdGenerator().get())
+        return builder().withActivity(BarbelHistoContext.getDefaultActivity())
+                .withDocumentId((String) BarbelHistoContext.getDefaultDocumentIDGenerator().get())
+                .withVersionId(BarbelHistoContext.getDefaultVersionIDGenerator().get())
                 .withEffectiveTime(EffectivePeriod.builder().build()).withRecordTime(RecordPeriod.builder().build())
                 .build();
     }
@@ -39,7 +46,7 @@ public final class BitemporalStamp {
     public static BitemporalStamp of(String activity, String documentId, EffectivePeriod effectiveTime,
             RecordPeriod recordTime) {
         return builder().withActivity(activity).withDocumentId(documentId).withEffectiveTime(effectiveTime)
-                .withRecordTime(recordTime).withVersionId(BarbelHistoContext.instance().versionIdGenerator().get())
+                .withRecordTime(recordTime).withVersionId(BarbelHistoContext.getDefaultVersionIDGenerator().get())
                 .build();
     }
 
@@ -97,16 +104,26 @@ public final class BitemporalStamp {
                 + effectiveTime + ", recordTime=" + recordTime + "]";
     }
 
+    /**
+     * Creates builder to build {@link BitemporalStamp}.
+     * 
+     * @return created builder
+     */
     public static Builder builder() {
         return new Builder();
     }
 
+    /**
+     * Builder to build {@link BitemporalStamp}.
+     */
     public static final class Builder {
         private Serializable versionId;
         private String documentId;
         private String activity;
         private EffectivePeriod effectiveTime;
         private RecordPeriod recordTime;
+        private Supplier<Serializable> versionIdGenerator;
+        private Supplier<Serializable> documentIdGenerator;
 
         private Builder() {
         }
@@ -133,6 +150,16 @@ public final class BitemporalStamp {
 
         public Builder withRecordTime(RecordPeriod recordTime) {
             this.recordTime = recordTime;
+            return this;
+        }
+
+        public Builder withVersionIdGenerator(Supplier<Serializable> versionIdGenerator) {
+            this.versionIdGenerator = versionIdGenerator;
+            return this;
+        }
+
+        public Builder withDocumentIdGenerator(Supplier<Serializable> documentIdGenerator) {
+            this.documentIdGenerator = documentIdGenerator;
             return this;
         }
 

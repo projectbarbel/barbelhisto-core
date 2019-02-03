@@ -67,8 +67,7 @@ public class DefaultDocument implements Bitemporal<String> {
 
     @Override
     public String toString() {
-        return "DefaultDocument [bitemporalStamp=" + bitemporalStamp + ", data=" + data
-                + "]";
+        return "DefaultDocument [bitemporalStamp=" + bitemporalStamp + ", data=" + data + "]";
     }
 
     @Override
@@ -78,6 +77,7 @@ public class DefaultDocument implements Bitemporal<String> {
 
     /**
      * Creates builder to build {@link DefaultDocument}.
+     * 
      * @return created builder
      */
     @Generated("SparkTools")

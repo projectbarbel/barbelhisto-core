@@ -14,14 +14,14 @@ public class EffectivePeriodTest {
     public void testGetEffectiveFromInstant() throws Exception {
         LocalDate date = null;
         EffectivePeriod ep = EffectivePeriod.builder().from(date).build();
-        assertEquals(BarbelHistoContext.instance().clock().now().toLocalDate(), ep.from());
+        assertEquals(BarbelHistoContext.getClock().now().toLocalDate(), ep.from());
     }
 
     @Test
     public void testGetEffectiveUntilInstant() throws Exception {
         LocalDate date = null;
         EffectivePeriod ep = EffectivePeriod.builder().until(date).build();
-        assertEquals(BarbelHistoContext.instance().infiniteDate(), ep.until());
+        assertEquals(BarbelHistoContext.getInfiniteDate(), ep.until());
     }
 
 }

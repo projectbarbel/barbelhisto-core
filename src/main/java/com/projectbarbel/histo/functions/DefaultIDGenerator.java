@@ -1,16 +1,17 @@
 package com.projectbarbel.histo.functions;
 
+import java.io.Serializable;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public class DefaultIDGenerator implements Supplier<String> {
+public class DefaultIDGenerator implements Supplier<Serializable> {
 
-    public static String generateId() {
+    public static Serializable generateId() {
         return new DefaultIDGenerator().get();
     }
     
     @Override
-    public String get() {
+    public Serializable get() {
         return UUID.randomUUID().toString();
     }
     
