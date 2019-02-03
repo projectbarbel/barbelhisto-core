@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -14,9 +15,11 @@ import org.apache.commons.lang3.Validate;
 
 import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.functions.journal.ReaderFunctionGetEffectiveAfter;
+import com.projectbarbel.histo.functions.journal.ReaderFunctionGetEffectiveBetween;
 import com.projectbarbel.histo.functions.journal.ReaderFunctionGetEffectiveByDate;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
+import com.projectbarbel.histo.model.EffectivePeriod;
 import com.projectbarbel.histo.model.Systemclock;
 
 public class DocumentJournal<T extends Bitemporal<?>> {
@@ -24,7 +27,8 @@ public class DocumentJournal<T extends Bitemporal<?>> {
     private final List<T> journal = new ArrayList<T>();
     private BiFunction<DocumentJournal<T>, LocalDate, Optional<T>> effectiveReaderFunction = new ReaderFunctionGetEffectiveByDate<T>();
     private BiFunction<DocumentJournal<T>, LocalDate, List<T>> effectiveAfterFunction = new ReaderFunctionGetEffectiveAfter<T>();
-
+    public BiFunction<DocumentJournal<T>, EffectivePeriod, List<T>> effectiveBetweenFunction = new ReaderFunctionGetEffectiveBetween<T>();
+    
     @Override
     public String toString() {
         return "DocumentJournal [journal=" + journal + "]";
@@ -37,6 +41,10 @@ public class DocumentJournal<T extends Bitemporal<?>> {
 
     public int size() {
         return journal.size();
+    }
+    
+    public void add(Supplier<T> supplier) {
+        journal.add(supplier.get());
     }
 
     public List<T> list() {
@@ -82,22 +90,6 @@ public class DocumentJournal<T extends Bitemporal<?>> {
 
     public JournalReader<T> read() {
         return new JournalReader<T>(this, BarbelHistoContext.instance().clock());
-    }
-
-    public JournalUpdater<T> update() {
-        return new JournalUpdater<T>(this);
-    }
-
-    public static class JournalUpdater<T extends Bitemporal<?>> {
-        private DocumentJournal<T> journal;
-
-        private JournalUpdater(DocumentJournal<T> journal) {
-            this.journal = journal;
-        }
-
-        public DocumentJournal<T> processVersionUpdate(VersionUpdate<T> update) {
-            return update.updateStrategy.apply(journal, update);
-        }
     }
 
     public static class JournalReader<T extends Bitemporal<?>> {
@@ -152,6 +144,10 @@ public class DocumentJournal<T extends Bitemporal<?>> {
             return journal.effectiveAfterFunction.apply(journal, day);
         }
 
+        public List<T> effectiveBetween(EffectivePeriod effectiveTime) {
+            return journal.effectiveBetweenFunction.apply(journal, effectiveTime);
+        }
+
     }
 
     public static class RecordtimeReader<T extends Bitemporal<?>> {
@@ -164,21 +160,5 @@ public class DocumentJournal<T extends Bitemporal<?>> {
         }
 
     }
-
-    public void add(VersionUpdate<T> update) {
-        Validate.notNull(update, "update passed must not be null");
-        Validate.validState(update.done(),
-                "this update has not been executed - execute before adding the update to journal");
-        Validate.validState(journal.contains(update.result().oldVersion()),
-                "the old version of that update passed is unknown in this journal - please only add valid update whose origin are objects from this journal");
-        Validate.validState(!journal.contains(update.result().newPrecedingVersion()),
-                "the new generated preceeding version by this update was already added to the journal");
-        Validate.validState(!journal.contains(update.result().newSubsequentVersion()),
-                "the new generated subsequent version by this update was already added to the journal");
-        if (journal.contains(update.result().oldVersion())) {
-            journal.add(update.result().newPrecedingVersion());
-            journal.add(update.result().newSubsequentVersion());
-        }
-    }
-
+    
 }

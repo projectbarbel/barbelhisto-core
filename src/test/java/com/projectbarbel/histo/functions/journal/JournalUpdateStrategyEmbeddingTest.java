@@ -1,0 +1,39 @@
+package com.projectbarbel.histo.functions.journal;
+
+import static org.junit.Assert.assertTrue;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import com.projectbarbel.histo.BarbelTestHelper;
+import com.projectbarbel.histo.api.DocumentJournal;
+import com.projectbarbel.histo.api.VersionUpdate;
+import com.projectbarbel.histo.api.VersionUpdate.VersionUpdateResult;
+import com.projectbarbel.histo.model.DefaultDocument;
+import com.projectbarbel.histo.model.Systemclock;
+
+public class JournalUpdateStrategyEmbeddingTest {
+
+    private DocumentJournal<DefaultDocument> journal;
+    private Systemclock clock = new Systemclock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 10, 0));
+
+    @Before
+    public void setUp() {
+        journal = DocumentJournal.create(BarbelTestHelper.generateJournalOfDefaultValueObjects("someId", Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))));
+    }
+    
+    @Test
+    public void testApply_lastIntervall() throws Exception {
+        VersionUpdate<DefaultDocument> update = VersionUpdate.of(journal.list().get(3)).prepare().from(clock.now().toLocalDate()).untilInfinite().setProperty("data", "some new data").get();
+        VersionUpdateResult<DefaultDocument> result = update.execute();
+        DocumentJournal<DefaultDocument> newJournal = new JournalUpdateStrategyEmbedding<DefaultDocument>().apply(journal, result);
+        assertTrue(newJournal.read().activeVersions().size()==5);
+        assertTrue(newJournal.read().inactiveVersions().size()==1);        
+        System.out.println(newJournal.prettyPrint());
+    }
+
+}

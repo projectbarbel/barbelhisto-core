@@ -13,8 +13,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.Validate;
 
 import com.projectbarbel.histo.BarbelHistoContext;
-import com.projectbarbel.histo.functions.journal.InactivateSubsequentUpdateStrategy;
-import com.projectbarbel.histo.functions.journal.KeepSubsequentUpdateStrategy;
+import com.projectbarbel.histo.functions.journal.JournalUpdateStrategyKeepSubsequent;
 import com.projectbarbel.histo.functions.update.DefaultPojoCopier;
 import com.projectbarbel.histo.functions.update.DefaultUpdateExectuionStrategy;
 import com.projectbarbel.histo.functions.update.ValidateEffectiveDate;
@@ -56,7 +55,7 @@ public final class VersionUpdate<T extends Bitemporal<?>> {
     private Function<UpdateExecutionContext<T>, VersionUpdateResult<T>> updateExecutionFunction = new DefaultUpdateExectuionStrategy<T>();
     private final Map<String, Object> propertyUpdates = new HashMap<>();
     private VersionUpdateResult<T> result;
-    public BiFunction<DocumentJournal<T>, VersionUpdate<T>, DocumentJournal<T>> updateStrategy = new KeepSubsequentUpdateStrategy<T>();
+    public BiFunction<DocumentJournal<T>, VersionUpdateResult<T>, DocumentJournal<T>> updateStrategy = new JournalUpdateStrategyKeepSubsequent<T>();
 
     public VersionUpdateResult<T> result() {
         return state.get(result);
@@ -87,6 +86,14 @@ public final class VersionUpdate<T extends Bitemporal<?>> {
         public T newSubsequentVersion() {
             return update.newSubsequentVersion;
         }
+        
+        public LocalDate effectiveFrom() {
+            return update.newEffectiveFrom();
+        }
+
+        public LocalDate effectiveUntil() {
+            return update.newEffectiveUntil();
+        }
 
     }
 
@@ -98,7 +105,7 @@ public final class VersionUpdate<T extends Bitemporal<?>> {
             this.update = update;
         }
 
-        public VersionUpdateExecutionBuilder<T> effectiveFrom(LocalDate newEffectiveFrom) {
+        public VersionUpdateExecutionBuilder<T> from(LocalDate newEffectiveFrom) {
             if (!effectiveDateValidationFuction.test(update.oldVersion, newEffectiveFrom))
                 throw new IllegalArgumentException("new effective date is not valid: " + newEffectiveFrom
                         + " - old version: " + update.oldVersion.toString());
@@ -106,9 +113,13 @@ public final class VersionUpdate<T extends Bitemporal<?>> {
             return this;
         }
 
-        public VersionUpdateExecutionBuilder<T> effectiveUntilInfinite() {
+        public VersionUpdateExecutionBuilder<T> untilInfinite() {
             update.newEffectiveUntil = update.state.set(BarbelHistoContext.instance().infiniteDate());
-            update.updateStrategy  = new InactivateSubsequentUpdateStrategy<T>();
+            return this;
+        }
+        
+        public VersionUpdateExecutionBuilder<T> until(LocalDate newEffectiveUntil) {
+            update.newEffectiveUntil = update.state.set(newEffectiveUntil);
             return this;
         }
         
@@ -219,12 +230,12 @@ public final class VersionUpdate<T extends Bitemporal<?>> {
                 "the bitemporal passed must not contain null value on effective until");
     }
 
-    public LocalDate effectiveFrom() {
-        return newEffectiveDate;
-    }
-
     public LocalDate newEffectiveUntil() {
         return newEffectiveUntil;
     }
 
+    public LocalDate newEffectiveFrom() {
+        return newEffectiveDate;
+    }
+    
 }

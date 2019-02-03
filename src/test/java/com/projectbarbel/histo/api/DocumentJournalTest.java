@@ -5,13 +5,16 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
 
+import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelTestHelper;
+import com.projectbarbel.histo.api.VersionUpdate.VersionUpdateResult;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.DefaultDocument;
 
@@ -90,6 +93,17 @@ public class DocumentJournalTest {
         DocumentJournal<DefaultDocument> journal = DocumentJournal
                 .create(DefaultDocument.builder().withData("some initial data").build());
         assertNotNull(journal.prettyPrint());
+    }
+
+    @Test
+    public void testInsert() throws Exception {
+        BarbelHistoContext.instance().clock().useFixedClockAt(LocalDateTime.of(2019, 2, 1, 8, 0));
+        DefaultDocument doc = DefaultDocument.builder().withData("some data").build();
+        DocumentJournal<DefaultDocument> journal = DocumentJournal.create(doc);
+        VersionUpdateResult<DefaultDocument> update = VersionUpdate.of(doc).prepare()
+                .from(BarbelHistoContext.instance().clock().now().plusDays(1).toLocalDate()).execute();
+        journal.add(update::newPrecedingVersion);
+        System.out.println(journal.prettyPrint());
     }
 
 }

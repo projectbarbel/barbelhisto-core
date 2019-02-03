@@ -7,16 +7,16 @@ import org.junit.Test;
 public class BitemporalStampTest {
 
     @Test
-    public void testOf() throws Exception {
-        BitemporalStamp bs = BitemporalStamp.of("test", "test", EffectivePeriod.builder().build(), RecordPeriod.builder().build());
-        assertNotNull(bs);
-    }
+        public void testCopy() throws Exception {
+            BitemporalStamp bs = BitemporalStamp.of("test", "test", EffectivePeriod.builder().build(), RecordPeriod.builder().build());
+            assertNotNull(bs);
+        }
 
     @Test
-    public void testOf_versionIdSet() throws Exception {
-        BitemporalStamp bs = BitemporalStamp.of("test", "test", EffectivePeriod.builder().build(), RecordPeriod.builder().build());
-        assertNotNull(bs.getVersionId());
-    }
+        public void testCopy_versionIdSet() throws Exception {
+            BitemporalStamp bs = BitemporalStamp.of("test", "test", EffectivePeriod.builder().build(), RecordPeriod.builder().build());
+            assertNotNull(bs.getVersionId());
+        }
 
     
 }
