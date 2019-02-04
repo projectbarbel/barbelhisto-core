@@ -17,6 +17,7 @@ import com.googlecode.cqengine.attribute.Attribute;
 import com.googlecode.cqengine.resultset.ResultSet;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalObjectState;
+import com.projectbarbel.histo.model.EffectivePeriod;
 
 public class BitemporalCollectionPreparedStatements {
 
@@ -35,9 +36,9 @@ public class BitemporalCollectionPreparedStatements {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends Bitemporal<?>> ResultSet<T> getActiveVersionsEffectiveBetween_ByFromAndUntilDate_orderByEffectiveFrom(IndexedCollection<T> documents, LocalDate from, LocalDate until) {
-        return documents.retrieve(and(greaterThanOrEqualTo((Attribute<T, ChronoLocalDate>) Bitemporal.EFFECTIVE_FROM, from),
-                                      lessThanOrEqualTo((Attribute<T, ChronoLocalDate>) Bitemporal.EFFECTIVE_UNTIL, until),
+    public static <T extends Bitemporal<?>> ResultSet<T> getActiveVersionsEffectiveBetween_ByFromAndUntilDate_orderByEffectiveFrom(IndexedCollection<T> documents, EffectivePeriod period) {
+        return documents.retrieve(and(greaterThanOrEqualTo((Attribute<T, ChronoLocalDate>) Bitemporal.EFFECTIVE_FROM, period.from()),
+                                      lessThanOrEqualTo((Attribute<T, ChronoLocalDate>) Bitemporal.EFFECTIVE_UNTIL, period.until()),
                                       equal((Attribute<T, BitemporalObjectState>) Bitemporal.STATE, BitemporalObjectState.ACTIVE)),
                                   queryOptions(orderBy(ascending(Bitemporal.EFFECTIVE_FROM))));
     }

@@ -18,12 +18,11 @@ import org.apache.commons.lang3.Validate;
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.attribute.Attribute;
+import com.googlecode.cqengine.resultset.ResultSet;
 import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.api.VersionUpdate.VersionUpdateResult;
+import com.projectbarbel.histo.functions.journal.BitemporalCollectionPreparedStatements;
 import com.projectbarbel.histo.functions.journal.JournalUpdateStrategyEmbedding;
-import com.projectbarbel.histo.functions.journal.ReaderFunctionGetEffectiveAfter;
-import com.projectbarbel.histo.functions.journal.ReaderFunctionGetEffectiveBetween;
-import com.projectbarbel.histo.functions.journal.ReaderFunctionGetEffectiveByDate;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.EffectivePeriod;
 import com.projectbarbel.histo.model.Systemclock;
@@ -31,9 +30,9 @@ import com.projectbarbel.histo.model.Systemclock;
 public class DocumentJournal<T extends Bitemporal<?>> {
 
     private IndexedCollection<T> journal;
-    private BiFunction<IndexedCollection<T>, LocalDate, Optional<T>> effectiveReaderFunction = new ReaderFunctionGetEffectiveByDate<T>();
-    private BiFunction<IndexedCollection<T>, LocalDate, IndexedCollection<T>> effectiveAfterFunction = new ReaderFunctionGetEffectiveAfter<T>();
-    private BiFunction<IndexedCollection<T>, EffectivePeriod, IndexedCollection<T>> effectiveBetweenFunction = new ReaderFunctionGetEffectiveBetween<T>();
+    private BiFunction<IndexedCollection<T>, LocalDate, ResultSet<T>> effectiveReaderFunction = BitemporalCollectionPreparedStatements::getActiveVersionEffectiveOn_ByDate;
+    private BiFunction<IndexedCollection<T>, LocalDate, ResultSet<T>> effectiveAfterFunction = BitemporalCollectionPreparedStatements::getActiveVersionsEffectiveAfter_ByDate_orderByEffectiveFrom;
+    private BiFunction<IndexedCollection<T>, EffectivePeriod, ResultSet<T>> effectiveBetweenFunction = BitemporalCollectionPreparedStatements::getActiveVersionsEffectiveBetween_ByFromAndUntilDate_orderByEffectiveFrom;
     private BiFunction<DocumentJournal<T>, VersionUpdateResult<T>, List<T>> updateFunction = new JournalUpdateStrategyEmbedding<T>();
     private Object id;
 
@@ -154,19 +153,24 @@ public class DocumentJournal<T extends Bitemporal<?>> {
         }
 
         public Optional<T> effectiveNow() {
-            return journal.effectiveReaderFunction.apply(journal.collection(), clock.now().toLocalDate());
+            ResultSet<T> result = journal.effectiveReaderFunction.apply(journal.collection(),
+                    clock.now().toLocalDate());
+            return result.iterator().hasNext() ? Optional.of(result.iterator().next()) : Optional.empty();
         }
 
         public Optional<T> effectiveAt(LocalDate day) {
-            return journal.effectiveReaderFunction.apply(journal.collection(), day);
+            ResultSet<T> result = journal.effectiveReaderFunction.apply(journal.collection(), day);
+            return result.iterator().hasNext() ? Optional.of(result.iterator().next()) : Optional.empty();
         }
 
         public IndexedCollection<T> effectiveAfter(LocalDate day) {
-            return journal.effectiveAfterFunction.apply(journal.collection(), day);
+            return journal.effectiveAfterFunction.apply(journal.collection(), day).stream()
+                    .collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
         }
 
         public IndexedCollection<T> effectiveBetween(EffectivePeriod effectiveTime) {
-            return journal.effectiveBetweenFunction.apply(journal.collection(), effectiveTime);
+            return journal.effectiveBetweenFunction.apply(journal.collection(), effectiveTime).stream()
+                    .collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
         }
 
     }
