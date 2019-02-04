@@ -1,5 +1,9 @@
 package com.projectbarbel.histo.model;
 
+import com.googlecode.cqengine.attribute.Attribute;
+import com.googlecode.cqengine.attribute.SimpleAttribute;
+import com.googlecode.cqengine.query.option.QueryOptions;
+
 public class BitemporalVersion implements Bitemporal<BitemporalVersion> {
 
     private BitemporalStamp stamp;
@@ -13,7 +17,7 @@ public class BitemporalVersion implements Bitemporal<BitemporalVersion> {
 
     @Override
     public BitemporalStamp getBitemporalStamp() {
-        return null;
+        return stamp;
     }
     
     @Override
@@ -37,4 +41,8 @@ public class BitemporalVersion implements Bitemporal<BitemporalVersion> {
         this.object = object;
     }
 
+    public static final Attribute<BitemporalVersion, String> DOCUMENT_ID = new SimpleAttribute<BitemporalVersion, String>("documentId") {
+        public String getValue(BitemporalVersion object, QueryOptions queryOptions) { return object.getDocumentId(); }
+    };
+    
 }

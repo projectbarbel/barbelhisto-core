@@ -6,7 +6,7 @@ public class BarbelHistoBuilderTest {
 
     @Test
     public void testBarbel() throws Exception {
-        BarbelHisto barbel = BarbelHistoBuilder.barbel().build();
+        BarbelHistoBuilder.barbel().build();
     }
 
 }

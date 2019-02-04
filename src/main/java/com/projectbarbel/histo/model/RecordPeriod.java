@@ -21,7 +21,7 @@ public class RecordPeriod {
 
     private RecordPeriod(Builder builder) {
         this.createdAt = builder.createdAt != null ? builder.createdAt : BarbelHistoContext.getClock().now();
-        this.createdBy = builder.createdBy != null ? builder.createdBy : BarbelHistoContext.getDefaultCreatedBy();
+        this.createdBy = builder.createdBy != null ? builder.createdBy : BarbelHistoContext.getDefaultUser();
         this.inactivatedAt = builder.inactivatedAt != null ? builder.inactivatedAt : NOT_INACTIVATED;
         this.inactivatedBy = builder.inactivatedBy != null ? builder.inactivatedBy : NOBODY;
         this.state = compileState();

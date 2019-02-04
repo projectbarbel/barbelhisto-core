@@ -42,6 +42,13 @@ public class DocumentJournal<T extends Bitemporal<?>> {
         this.id = id;
     }
 
+    /**
+     * Creates the journal using the backbone as pre-created collection. This collection may contain objects with other Ids.
+     *  
+     * @param backbone the collection containing the journal objects
+     * @param id document id of the document under barbel control
+     * @return
+     */
     public static <T extends Bitemporal<?>> DocumentJournal<T> create(IndexedCollection<T> backbone, Object id) {
         Validate.notNull(backbone, "new document list must not be null when creating new journal");
         Validate.notNull(id, "must specify document id for this collection");

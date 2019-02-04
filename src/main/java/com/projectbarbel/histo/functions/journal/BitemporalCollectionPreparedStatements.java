@@ -46,8 +46,8 @@ public class BitemporalCollectionPreparedStatements {
     @SuppressWarnings("unchecked")
     public static <T extends Bitemporal<?>> ResultSet<T> getActiveVersionEffectiveOn_ByDate(IndexedCollection<T> documents, LocalDate date) {
         ResultSet<T> set = documents.retrieve(and(lessThanOrEqualTo((Attribute<T, ChronoLocalDate>) Bitemporal.EFFECTIVE_FROM, date),
-                                               greaterThan((Attribute<T, ChronoLocalDate>) Bitemporal.EFFECTIVE_UNTIL, date),
-                                               equal((Attribute<T, BitemporalObjectState>) Bitemporal.STATE, BitemporalObjectState.ACTIVE)));
+                                                  greaterThan((Attribute<T, ChronoLocalDate>) Bitemporal.EFFECTIVE_UNTIL, date),
+                                                  equal((Attribute<T, BitemporalObjectState>) Bitemporal.STATE, BitemporalObjectState.ACTIVE)));
         return set;
     }
     // @formatter:on

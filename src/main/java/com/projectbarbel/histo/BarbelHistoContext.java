@@ -2,9 +2,11 @@ package com.projectbarbel.histo;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import com.googlecode.cqengine.IndexedCollection;
+import com.projectbarbel.histo.api.DocumentJournal;
 import com.projectbarbel.histo.functions.DefaultIDGenerator;
 import com.projectbarbel.histo.model.BitemporalVersion;
 import com.projectbarbel.histo.model.Systemclock;
@@ -35,7 +37,7 @@ public interface BarbelHistoContext {
         return new DefaultIDGenerator();
     }
 
-    static String getDefaultCreatedBy() {
+    static String getDefaultUser() {
         return SYSTEM;
     }
     
@@ -46,5 +48,9 @@ public interface BarbelHistoContext {
     IndexedCollection<BitemporalVersion> getBackbone();
 
     String getActivity();
+
+    String getUser();
+
+    Map<Object, DocumentJournal<BitemporalVersion>> getJournalStore();
 
 }
