@@ -3,7 +3,7 @@ package com.projectbarbel.histo.persistence;
 import java.util.ServiceLoader;
 
 import com.google.gson.Gson;
-import com.projectbarbel.histo.api.DocumentJournal;
+import com.projectbarbel.histo.journal.DocumentJournal;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.persistence.api.JournalStoreProvider;
 

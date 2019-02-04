@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
-import com.projectbarbel.histo.api.DocumentJournal;
+import com.projectbarbel.histo.journal.DocumentJournal;
 import com.projectbarbel.histo.model.BitemporalVersion;
 
 public class BarbelHistoBuilder implements BarbelHistoContext {

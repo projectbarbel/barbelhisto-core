@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import com.googlecode.cqengine.IndexedCollection;
-import com.projectbarbel.histo.api.DocumentJournal;
-import com.projectbarbel.histo.functions.DefaultIDGenerator;
+import com.projectbarbel.histo.journal.DocumentJournal;
+import com.projectbarbel.histo.joutnal.functions.DefaultIDGenerator;
 import com.projectbarbel.histo.model.BitemporalVersion;
 import com.projectbarbel.histo.model.Systemclock;
 

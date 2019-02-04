@@ -1,12 +1,12 @@
-package com.projectbarbel.histo.functions.update;
+package com.projectbarbel.histo.joutnal.functions;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.function.Function;
 
 import org.apache.commons.beanutils.PropertyUtils;
 
-import com.projectbarbel.histo.api.VersionUpdate.UpdateExecutionContext;
-import com.projectbarbel.histo.api.VersionUpdate.VersionUpdateResult;
+import com.projectbarbel.histo.journal.VersionUpdate.UpdateExecutionContext;
+import com.projectbarbel.histo.journal.VersionUpdate.VersionUpdateResult;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.EffectivePeriod;

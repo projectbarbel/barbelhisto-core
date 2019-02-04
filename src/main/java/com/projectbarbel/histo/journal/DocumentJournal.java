@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.api;
+package com.projectbarbel.histo.journal;
 
 import static com.googlecode.cqengine.query.QueryFactory.ascending;
 import static com.googlecode.cqengine.query.QueryFactory.equal;
@@ -20,9 +20,9 @@ import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.attribute.Attribute;
 import com.googlecode.cqengine.resultset.ResultSet;
 import com.projectbarbel.histo.BarbelHistoContext;
-import com.projectbarbel.histo.api.VersionUpdate.VersionUpdateResult;
-import com.projectbarbel.histo.functions.journal.BitemporalCollectionPreparedStatements;
-import com.projectbarbel.histo.functions.journal.JournalUpdateStrategyEmbedding;
+import com.projectbarbel.histo.journal.VersionUpdate.VersionUpdateResult;
+import com.projectbarbel.histo.joutnal.functions.BitemporalCollectionPreparedStatements;
+import com.projectbarbel.histo.joutnal.functions.JournalUpdateStrategyEmbedding;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.EffectivePeriod;
 import com.projectbarbel.histo.model.Systemclock;

@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.api;
+package com.projectbarbel.histo.journal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -11,8 +11,9 @@ import org.junit.Test;
 
 import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelTestHelper;
-import com.projectbarbel.histo.api.VersionUpdate.VersionUpdateExecutionBuilder;
-import com.projectbarbel.histo.api.VersionUpdate.VersionUpdateResult;
+import com.projectbarbel.histo.journal.VersionUpdate;
+import com.projectbarbel.histo.journal.VersionUpdate.VersionUpdateExecutionBuilder;
+import com.projectbarbel.histo.journal.VersionUpdate.VersionUpdateResult;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.DefaultDocument;
 import com.projectbarbel.histo.model.EffectivePeriod;

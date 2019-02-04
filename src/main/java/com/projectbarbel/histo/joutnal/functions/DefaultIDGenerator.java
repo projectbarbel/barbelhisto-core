@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.functions;
+package com.projectbarbel.histo.joutnal.functions;
 
 import java.io.Serializable;
 import java.util.UUID;

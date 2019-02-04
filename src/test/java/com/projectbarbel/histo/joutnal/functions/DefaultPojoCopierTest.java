@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.functions.update;
+package com.projectbarbel.histo.joutnal.functions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -10,6 +10,7 @@ import java.io.Serializable;
 import org.junit.Test;
 
 import com.projectbarbel.histo.BarbelTestHelper;
+import com.projectbarbel.histo.joutnal.functions.DefaultPojoCopier;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.DefaultDocument;

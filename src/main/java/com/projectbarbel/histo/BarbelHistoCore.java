@@ -17,7 +17,7 @@ import com.googlecode.cqengine.attribute.Attribute;
 import com.googlecode.cqengine.attribute.SimpleAttribute;
 import com.googlecode.cqengine.query.Query;
 import com.googlecode.cqengine.query.option.QueryOptions;
-import com.projectbarbel.histo.api.DocumentJournal;
+import com.projectbarbel.histo.journal.DocumentJournal;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.BitemporalVersion;
 import com.projectbarbel.histo.model.EffectivePeriod;

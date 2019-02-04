@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.api;
+package com.projectbarbel.histo.journal;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -14,7 +14,9 @@ import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
 import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelTestHelper;
-import com.projectbarbel.histo.api.VersionUpdate.VersionUpdateResult;
+import com.projectbarbel.histo.journal.DocumentJournal;
+import com.projectbarbel.histo.journal.VersionUpdate;
+import com.projectbarbel.histo.journal.VersionUpdate.VersionUpdateResult;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.DefaultDocument;
 

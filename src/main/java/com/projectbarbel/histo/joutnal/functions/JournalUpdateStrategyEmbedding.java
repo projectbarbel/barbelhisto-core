@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.functions.journal;
+package com.projectbarbel.histo.joutnal.functions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,9 +6,9 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 
 import com.googlecode.cqengine.IndexedCollection;
-import com.projectbarbel.histo.api.DocumentJournal;
-import com.projectbarbel.histo.api.VersionUpdate;
-import com.projectbarbel.histo.api.VersionUpdate.VersionUpdateResult;
+import com.projectbarbel.histo.journal.DocumentJournal;
+import com.projectbarbel.histo.journal.VersionUpdate;
+import com.projectbarbel.histo.journal.VersionUpdate.VersionUpdateResult;
 import com.projectbarbel.histo.model.Bitemporal;
 
 public class JournalUpdateStrategyEmbedding<T extends Bitemporal<?>>

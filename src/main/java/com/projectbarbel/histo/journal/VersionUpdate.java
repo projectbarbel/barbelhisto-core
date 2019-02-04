@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.api;
+package com.projectbarbel.histo.journal;
 
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
@@ -13,9 +13,9 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.Validate;
 
 import com.projectbarbel.histo.BarbelHistoContext;
-import com.projectbarbel.histo.functions.update.DefaultPojoCopier;
-import com.projectbarbel.histo.functions.update.DefaultUpdateExectuionStrategy;
-import com.projectbarbel.histo.functions.update.ValidateEffectiveDate;
+import com.projectbarbel.histo.joutnal.functions.DefaultPojoCopier;
+import com.projectbarbel.histo.joutnal.functions.DefaultUpdateExectuionStrategy;
+import com.projectbarbel.histo.joutnal.functions.ValidateEffectiveDate;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
 

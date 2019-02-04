@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.functions.update;
+package com.projectbarbel.histo.joutnal.functions;
 
 import java.lang.reflect.Field;
 import java.util.function.BiFunction;
