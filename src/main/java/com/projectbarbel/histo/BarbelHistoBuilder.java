@@ -2,22 +2,38 @@ package com.projectbarbel.histo;
 
 import java.util.function.Supplier;
 
+import com.googlecode.cqengine.ConcurrentIndexedCollection;
+import com.googlecode.cqengine.IndexedCollection;
+import com.projectbarbel.histo.model.BitemporalVersion;
+
 public class BarbelHistoBuilder implements BarbelHistoContext {
 
-    private String defaultActivity = "SYSTEMACTIVITY";
-    private String defaultCreatedBy = "SYSTEM";
-    private Supplier<?> versionIdGenerator;
-    private Supplier<String> documentIdGenerator;
+    private String defaultActivity = BarbelHistoContext.getDefaultActivity();
+    private String defaultCreatedBy = BarbelHistoContext.getDefaultCreatedBy();
+    private Supplier<?> versionIdGenerator = BarbelHistoContext.getDefaultVersionIDGenerator();
+    private Supplier<?> documentIdGenerator = BarbelHistoContext.getDefaultDocumentIDGenerator();
+    private IndexedCollection<BitemporalVersion> backbone = new ConcurrentIndexedCollection<>();
+    private String activity = BarbelHistoContext.getDefaultActivity();
 
     public static BarbelHistoBuilder barbel() {
         return new BarbelHistoBuilder();
     }
-    
+
     protected BarbelHistoBuilder() {
     }
-    
+
     public BarbelHisto build() {
         return new BarbelHistoCore(this);
+    }
+
+    @Override
+    public IndexedCollection<BitemporalVersion> getBackbone() {
+        return backbone;
+    }
+
+    public BarbelHistoBuilder withBackbone(IndexedCollection<BitemporalVersion> backbone) {
+        this.backbone = backbone;
+        return this;
     }
 
     public String getDefaultCreatedBy() {
@@ -32,8 +48,9 @@ public class BarbelHistoBuilder implements BarbelHistoContext {
         return defaultActivity;
     }
 
-    public void withDefaultActivity(String defaultActivity) {
+    public BarbelHistoBuilder withDefaultActivity(String defaultActivity) {
         this.defaultActivity = defaultActivity;
+        return this;
     }
 
     @Override
@@ -42,16 +59,28 @@ public class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     @Override
-    public Supplier<String> getDocumentIdGenerator() {
+    public Supplier<?> getDocumentIdGenerator() {
         return documentIdGenerator;
     }
 
-    public void withVersionIdGenerator(Supplier<?> versionIdGenerator) {
+    public BarbelHistoBuilder withVersionIdGenerator(Supplier<?> versionIdGenerator) {
         this.versionIdGenerator = versionIdGenerator;
+        return this;
     }
 
-    public void withDocumentIdGenerator(Supplier<String> documentIdGenerator) {
+    public BarbelHistoBuilder withDocumentIdGenerator(Supplier<String> documentIdGenerator) {
         this.documentIdGenerator = documentIdGenerator;
+        return this;
     }
 
+    @Override
+    public String getActivity() {
+        return activity;
+    }
+
+    public BarbelHistoBuilder withActivity(String activity) {
+        this.activity = activity;
+        return this;
+    }
+    
 }

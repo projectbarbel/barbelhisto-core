@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.function.Supplier;
 
+import com.googlecode.cqengine.IndexedCollection;
 import com.projectbarbel.histo.functions.DefaultIDGenerator;
+import com.projectbarbel.histo.model.BitemporalVersion;
 import com.projectbarbel.histo.model.Systemclock;
 
 public interface BarbelHistoContext {
@@ -37,8 +39,12 @@ public interface BarbelHistoContext {
         return SYSTEM;
     }
     
-    Supplier<String> getDocumentIdGenerator();
+    Supplier<?> getDocumentIdGenerator();
 
     Supplier<?> getVersionIdGenerator();
+
+    IndexedCollection<BitemporalVersion> getBackbone();
+
+    String getActivity();
 
 }

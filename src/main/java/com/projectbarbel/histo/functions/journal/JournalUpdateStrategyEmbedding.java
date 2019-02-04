@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
+import com.googlecode.cqengine.IndexedCollection;
 import com.projectbarbel.histo.api.DocumentJournal;
 import com.projectbarbel.histo.api.VersionUpdate;
 import com.projectbarbel.histo.api.VersionUpdate.VersionUpdateResult;
@@ -24,7 +25,7 @@ public class JournalUpdateStrategyEmbedding<T extends Bitemporal<?>>
             interruptedUntilVersion.get().inactivate();
             newVersions.add(result.newSubsequentVersion());
         }
-        List<T> betweenVersions = journal.read().effectiveTime()
+        IndexedCollection<T> betweenVersions = journal.read().effectiveTime()
                 .effectiveBetween(update.newSubsequentVersion().getBitemporalStamp().getEffectiveTime());
         betweenVersions.stream().forEach(Bitemporal::inactivate);
         interruptedFromVersion.ifPresent(Bitemporal::inactivate);

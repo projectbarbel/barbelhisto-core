@@ -12,6 +12,10 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
+import org.javers.common.collections.Arrays;
+
+import com.googlecode.cqengine.ConcurrentIndexedCollection;
+import com.googlecode.cqengine.IndexedCollection;
 import com.projectbarbel.histo.functions.DefaultIDGenerator;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.DefaultDocument;
@@ -88,9 +92,9 @@ public class BarbelTestHelper {
                 .withRecordTime(RecordPeriod.builder().build()).build();
     }
 
-    public static List<DefaultDocument> generateJournalOfDefaultValueObjects(String docId,
+    public static IndexedCollection<DefaultDocument> generateJournalOfDefaultValueObjects(String docId,
             List<LocalDate> effectiveDates) {
-        List<DefaultDocument> journal = new ArrayList<DefaultDocument>();
+        IndexedCollection<DefaultDocument> journal = new ConcurrentIndexedCollection<DefaultDocument>();
         for (int i = 0; i < effectiveDates.size(); i++) {
             journal.add(DefaultDocument.builder().withBitemporalStamp(createPeriod(docId, effectiveDates, i))
                     .withData(EnhancedRandom.random(String.class)).build());
@@ -98,6 +102,13 @@ public class BarbelTestHelper {
         return journal;
     }
 
+    @SuppressWarnings("unchecked")
+    public static <T> IndexedCollection<T> asIndexedCollection(T... objects){
+        ConcurrentIndexedCollection<T> collection = new ConcurrentIndexedCollection<>();
+        Arrays.asList(objects).stream().forEach(d->collection.add((T)d));
+        return collection;
+    }
+    
     public static LocalDate randomLocalDate(int startYear, int endYear) {
         long minDay = LocalDate.of(startYear, 1, 1).toEpochDay();
         long maxDay = LocalDate.of(endYear, 12, 31).toEpochDay();

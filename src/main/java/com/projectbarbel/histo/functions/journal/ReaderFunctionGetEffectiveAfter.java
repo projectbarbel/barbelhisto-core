@@ -7,19 +7,20 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
 
-import com.projectbarbel.histo.api.DocumentJournal;
+import com.googlecode.cqengine.ConcurrentIndexedCollection;
+import com.googlecode.cqengine.IndexedCollection;
 import com.projectbarbel.histo.model.Bitemporal;
 
 public class ReaderFunctionGetEffectiveAfter<T extends Bitemporal<?>>
-        implements BiFunction<DocumentJournal<T>, LocalDate, List<T>> {
+        implements BiFunction<IndexedCollection<T>, LocalDate, IndexedCollection<T>> {
 
     @Override
-    public List<T> apply(DocumentJournal<T> journal, LocalDate day) {
+    public IndexedCollection<T> apply(IndexedCollection<T> journal, LocalDate day) {
         Validate.notNull(journal, "null value for journal not welcome here");
         JournalPredicates predicates = new JournalPredicates(day);
-        List<T> documents = (List<T>) journal.list();
+        List<T> documents = (List<T>) journal.stream().collect(Collectors.toList());
         return documents.stream().filter(predicates::isActive).filter(predicates::effectiveAfter)
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
 
     }
 }

@@ -1,17 +1,17 @@
 package com.projectbarbel.histo.api;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import org.junit.Test;
 
+import com.googlecode.cqengine.ConcurrentIndexedCollection;
+import com.googlecode.cqengine.IndexedCollection;
 import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelTestHelper;
 import com.projectbarbel.histo.api.VersionUpdate.VersionUpdateResult;
@@ -24,82 +24,47 @@ public class DocumentJournalTest {
     public void testCreate_withList() {
         DocumentJournal<DefaultDocument> journal = DocumentJournal
                 .create(BarbelTestHelper.generateJournalOfDefaultValueObjects("#12345",
-                        Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 4, 1))));
-        assertTrue(journal.size() == 2);
+                        Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 4, 1))), "#12345");
+        assertEquals(2, journal.size());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testCreate_withList_differentDocumentIds() throws Exception {
-        DocumentJournal.create(Arrays.asList(BarbelTestHelper.random(DefaultDocument.class),
-                BarbelTestHelper.random(DefaultDocument.class)));
+        DocumentJournal<DefaultDocument> journal = DocumentJournal
+                .create(BarbelTestHelper.asIndexedCollection(BarbelTestHelper.random(DefaultDocument.class),
+                        BarbelTestHelper.random(DefaultDocument.class)), "arbitrary");
+        assertTrue(journal.size() == 0);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testCreate_withList_Empty() throws Exception {
-        List<DefaultDocument> list = Collections.emptyList();
-        DocumentJournal.create(list);
+        IndexedCollection<DefaultDocument> list = new ConcurrentIndexedCollection<DefaultDocument>();
+        DocumentJournal<DefaultDocument> journal = DocumentJournal.create(list, "");
+        assertNotNull(journal);
     }
 
     @Test(expected = NullPointerException.class)
     public void testCreate_withList_null() throws Exception {
-        List<DefaultDocument> list = null;
-        DocumentJournal.create(list);
-    }
-
-    @Test
-    public void testCreate_withDocument() throws Exception {
-        DocumentJournal<DefaultDocument> journal = DocumentJournal
-                .create(BarbelTestHelper.random(DefaultDocument.class));
-        assertTrue(journal.size() == 1);
-    }
-
-    @Test
-    public void testCreate_withInitialDocument() throws Exception {
-        BitemporalStamp stamp = BitemporalStamp.initial();
-        DocumentJournal<DefaultDocument> journal = DocumentJournal
-                .create(DefaultDocument.builder().withBitemporalStamp(stamp).withData("some initial data").build());
-        assertTrue(journal.size() == 1);
-        assertTrue(journal.list().get(0).getBitemporalStamp() != null);
-    }
-
-    @Test
-    public void testCreate_withInitialDocument_withoutStamp() throws Exception {
-        DocumentJournal<DefaultDocument> journal = DocumentJournal
-                .create(DefaultDocument.builder().withData("some initial data").build());
-        assertTrue(journal.size() == 1);
-        assertTrue(journal.list().get(0).getBitemporalStamp() != null);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void testCreate_withDocument_null() throws Exception {
-        DefaultDocument dflt = null;
-        DocumentJournal.create(dflt);
-    }
-
-    @Test
-    public void testSortAscendingByEffectiveDate() throws Exception {
-        DocumentJournal<DefaultDocument> journal = DocumentJournal
-                .create(BarbelTestHelper.generateJournalOfDefaultValueObjects("#12345",
-                        Arrays.asList(LocalDate.of(2019, 4, 1), LocalDate.of(2019, 8, 1), LocalDate.of(2019, 1, 1))));
-        assertFalse(journal.sortAscendingByEffectiveDate().list().get(1).getEffectiveFrom()
-                .isAfter(journal.list().get(2).getEffectiveFrom()));
-        assertTrue(journal.list().get(0).getEffectiveFrom().equals(LocalDate.of(2019, 1, 1)));
-        assertTrue(journal.list().get(1).getEffectiveFrom().equals(LocalDate.of(2019, 4, 1)));
-        assertTrue(journal.list().get(2).getEffectiveFrom().equals(LocalDate.of(2019, 8, 1)));
+        IndexedCollection<DefaultDocument> list = null;
+        DocumentJournal.create(list, "");
     }
 
     @Test
     public void testPrettyPrint() throws Exception {
         DocumentJournal<DefaultDocument> journal = DocumentJournal
-                .create(DefaultDocument.builder().withData("some initial data").build());
+                .create(BarbelTestHelper.asIndexedCollection(BarbelTestHelper.random(DefaultDocument.class),
+                        BarbelTestHelper.random(DefaultDocument.class)), "arbitrary");
         assertNotNull(journal.prettyPrint());
     }
 
     @Test
     public void testUpdate() throws Exception {
+        IndexedCollection<DefaultDocument> coll = new ConcurrentIndexedCollection<DefaultDocument>();
         BarbelHistoContext.getClock().useFixedClockAt(LocalDateTime.of(2019, 2, 1, 8, 0));
-        DefaultDocument doc = DefaultDocument.builder().withData("some data").build();
-        DocumentJournal<DefaultDocument> journal = DocumentJournal.create(doc);
+        DefaultDocument doc = DefaultDocument.builder().withData("some data")
+                .withBitemporalStamp(BitemporalStamp.initial()).build();
+        coll.add(doc);
+        DocumentJournal<DefaultDocument> journal = DocumentJournal.create(coll, doc.getDocumentId());
         VersionUpdateResult<DefaultDocument> update = VersionUpdate.of(doc).prepare()
                 .effectiveFrom(BarbelHistoContext.getClock().now().plusDays(1).toLocalDate()).execute();
         journal.update(update);
@@ -109,6 +74,14 @@ public class DocumentJournalTest {
     @Test
     public void testUpdate_further() throws Exception {
         throw new RuntimeException("not yet implemented");
+    }
+
+    @Test
+    public void testList() throws Exception {
+        DocumentJournal<DefaultDocument> journal = DocumentJournal
+                .create(BarbelTestHelper.generateJournalOfDefaultValueObjects("#12345",
+                        Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 4, 1))), "#12345");
+        assertEquals(journal.list().get(0).getEffectiveFrom(), LocalDate.of(2019, 1, 1));
     }
 
 }

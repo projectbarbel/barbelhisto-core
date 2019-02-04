@@ -5,6 +5,9 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.function.Supplier;
 
+import com.googlecode.cqengine.attribute.Attribute;
+import com.googlecode.cqengine.attribute.SimpleAttribute;
+import com.googlecode.cqengine.query.option.QueryOptions;
 import com.projectbarbel.histo.BarbelHistoContext;
 
 /**
@@ -86,5 +89,13 @@ public interface Bitemporal<O> {
     default String getInactivatedBy() {
         return getBitemporalStamp().getRecordTime().getInactivatedBy();
     }
+    
+    public static final Attribute<Bitemporal<?>, String> DOCUMENT_ID = new SimpleAttribute<Bitemporal<?>, String>("documentId") {
+        public String getValue(Bitemporal<?> object, QueryOptions queryOptions) { return object.getDocumentId(); }
+    };
+    
+    public static final Attribute<Bitemporal<?>, LocalDate> EFFECTIVE_FROM = new SimpleAttribute<Bitemporal<?>, LocalDate>("effectiveFrom") {
+        public LocalDate getValue(Bitemporal<?> object, QueryOptions queryOptions) { return object.getEffectiveFrom(); }
+    };
 
 }
