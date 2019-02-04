@@ -1,7 +1,6 @@
 package com.projectbarbel.histo.functions.journal;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -16,11 +15,10 @@ public class ReaderFunctionGetEffectiveByDate<T extends Bitemporal<?>>
         implements BiFunction<IndexedCollection<T>, LocalDate, Optional<T>> {
 
     @Override
-    public Optional<T> apply(IndexedCollection<T> journal, LocalDate day) {
-        Validate.notNull(journal, "null value for journal not welcome here");
-        List<T> documents = (List<T>) journal.stream().collect(Collectors.toList());
-        JournalPredicates predicates = new JournalPredicates(day);
-        IndexedCollection<T> currentVersions = documents.stream().filter(predicates::isActive).filter(predicates::effectiveOn)
+    public Optional<T> apply(IndexedCollection<T> documentJournal, LocalDate day) {
+        Validate.notNull(documentJournal, "null value for journal not welcome here");
+        IndexedCollection<T> currentVersions = BitemporalCollectionPreparedStatements
+                .getActiveVersionEffectiveOn_ByDate(documentJournal, day).stream()
                 .collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
         if (currentVersions.size() == 0)
             return Optional.empty();

@@ -35,7 +35,7 @@ public class ReaderFunctionGetEffectiveBetweenTest {
         IndexedCollection<DefaultDocument> documents = function.apply(journal.collection(),
                 EffectivePeriod.builder().from(LocalDate.of(2010, 12, 2)).until(LocalDate.of(2020, 1, 2)).build());
         assertTrue(documents.size() == 1);
-        assertEquals(BitemporalCollectionPreparedStatements.getByID_orderByEffectiveFrom(documents, "docid1").iterator()
+        assertEquals(BitemporalCollectionPreparedStatements.getAll_ByID_orderByEffectiveFrom(documents, "docid1").iterator()
                 .next().getEffectiveFrom(), LocalDate.of(2017, 12, 1));
     }
 

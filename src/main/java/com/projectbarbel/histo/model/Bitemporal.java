@@ -2,6 +2,7 @@ package com.projectbarbel.histo.model;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
+import java.time.chrono.ChronoLocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.function.Supplier;
 
@@ -94,8 +95,16 @@ public interface Bitemporal<O> {
         public String getValue(Bitemporal<?> object, QueryOptions queryOptions) { return object.getDocumentId(); }
     };
     
-    public static final Attribute<Bitemporal<?>, LocalDate> EFFECTIVE_FROM = new SimpleAttribute<Bitemporal<?>, LocalDate>("effectiveFrom") {
+    public static final Attribute<Bitemporal<?>, ChronoLocalDate> EFFECTIVE_FROM = new SimpleAttribute<Bitemporal<?>, ChronoLocalDate>("effectiveFrom") {
         public LocalDate getValue(Bitemporal<?> object, QueryOptions queryOptions) { return object.getEffectiveFrom(); }
     };
 
+    public static final Attribute<Bitemporal<?>, ChronoLocalDate> EFFECTIVE_UNTIL = new SimpleAttribute<Bitemporal<?>, ChronoLocalDate>("effectiveUntil") {
+        public LocalDate getValue(Bitemporal<?> object, QueryOptions queryOptions) { return object.getEffectiveUntil(); }
+    };
+    
+    public static final Attribute<Bitemporal<?>, BitemporalObjectState> STATE = new SimpleAttribute<Bitemporal<?>, BitemporalObjectState>("state") {
+        public BitemporalObjectState getValue(Bitemporal<?> object, QueryOptions queryOptions) { return object.getState(); }
+    };
+    
 }

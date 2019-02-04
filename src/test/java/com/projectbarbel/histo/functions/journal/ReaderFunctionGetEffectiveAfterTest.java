@@ -36,7 +36,7 @@ public class ReaderFunctionGetEffectiveAfterTest {
         IndexedCollection<DefaultDocument> documents = function.apply(journal.collection(),
                 BarbelHistoContext.getClock().now().toLocalDate());
         assertTrue(documents.size() == 1);
-        assertEquals(BitemporalCollectionPreparedStatements.getByID_orderByEffectiveFrom(documents, "docid1").iterator()
+        assertEquals(BitemporalCollectionPreparedStatements.getAll_ByID_orderByEffectiveFrom(documents, "docid1").iterator()
                 .next().getEffectiveFrom(), LocalDate.of(2020, 1, 1));
     }
 
@@ -44,7 +44,7 @@ public class ReaderFunctionGetEffectiveAfterTest {
     public void testApply_threeRecord_allAfter_DueDateOnBeginning() throws Exception {
         IndexedCollection<DefaultDocument> documents = function.apply(journal.collection(), LocalDate.of(2010, 12, 1));
         assertTrue(documents.size() == 3);
-        assertEquals(LocalDate.of(2010, 12, 1), BitemporalCollectionPreparedStatements.getByID_orderByEffectiveFrom(documents, "docid1").iterator()
+        assertEquals(LocalDate.of(2010, 12, 1), BitemporalCollectionPreparedStatements.getAll_ByID_orderByEffectiveFrom(documents, "docid1").iterator()
                 .next().getEffectiveFrom());
     }
 
@@ -52,7 +52,7 @@ public class ReaderFunctionGetEffectiveAfterTest {
     public void testApply_threeRecord_allAfter_DueDateBefore() throws Exception {
         IndexedCollection<DefaultDocument> documents = function.apply(journal.collection(), LocalDate.of(2010, 11, 1));
         assertTrue(documents.size() == 3);
-        assertEquals(LocalDate.of(2010, 12, 1), BitemporalCollectionPreparedStatements.getByID_orderByEffectiveFrom(documents, "docid1").iterator()
+        assertEquals(LocalDate.of(2010, 12, 1), BitemporalCollectionPreparedStatements.getAll_ByID_orderByEffectiveFrom(documents, "docid1").iterator()
                 .next().getEffectiveFrom());
     }
 
@@ -60,7 +60,7 @@ public class ReaderFunctionGetEffectiveAfterTest {
     public void testApply_threeRecord_twoAfter() throws Exception {
         IndexedCollection<DefaultDocument> documents = function.apply(journal.collection(), LocalDate.of(2011, 12, 1));
         assertTrue(documents.size() == 2);
-        assertEquals(LocalDate.of(2017, 12, 1), BitemporalCollectionPreparedStatements.getByID_orderByEffectiveFrom(documents, "docid1").iterator()
+        assertEquals(LocalDate.of(2017, 12, 1), BitemporalCollectionPreparedStatements.getAll_ByID_orderByEffectiveFrom(documents, "docid1").iterator()
                 .next().getEffectiveFrom());
     }
 

@@ -74,14 +74,18 @@ public class DocumentJournal<T extends Bitemporal<?>> {
 
     @SuppressWarnings("unchecked")
     public List<T> list() {
-        return journal.retrieve(equal((Attribute<T, String>) Bitemporal.DOCUMENT_ID, (String) id),
-                queryOptions(orderBy(ascending((Attribute<T, LocalDate>)Bitemporal.EFFECTIVE_FROM)))).stream()
-                .collect(Collectors.toCollection(ArrayList::new));
+        return journal
+                .retrieve(equal((Attribute<T, String>) Bitemporal.DOCUMENT_ID, (String) id),
+                        queryOptions(orderBy(ascending(Bitemporal.EFFECTIVE_FROM))))
+                .stream().collect(Collectors.toCollection(ArrayList::new));
     }
 
+    @SuppressWarnings("unchecked")
     public IndexedCollection<T> collection() {
-        return journal.stream().filter(d -> d.getDocumentId().equals(id))
-                .collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
+        return journal
+                .retrieve(equal((Attribute<T, String>) Bitemporal.DOCUMENT_ID, (String) id),
+                        queryOptions(orderBy(ascending(Bitemporal.EFFECTIVE_FROM))))
+                .stream().collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
     }
 
     // @formatter:off
