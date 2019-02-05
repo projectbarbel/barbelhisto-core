@@ -1,8 +1,6 @@
 language: java
 
-script: 
-- "mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -U"
-- "mvn cobertura:cobertura"
+script: "mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -U"
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
