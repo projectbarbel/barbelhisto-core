@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.joutnal.functions;
+package com.projectbarbel.histo.journal.functions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -15,7 +15,7 @@ import com.projectbarbel.histo.BarbelTestHelper;
 import com.projectbarbel.histo.journal.DocumentJournal;
 import com.projectbarbel.histo.journal.VersionUpdate;
 import com.projectbarbel.histo.journal.VersionUpdate.VersionUpdateResult;
-import com.projectbarbel.histo.joutnal.functions.JournalUpdateStrategyInactivateSubsequent;
+import com.projectbarbel.histo.journal.functions.JournalUpdateStrategyInactivateSubsequent;
 import com.projectbarbel.histo.model.DefaultDocument;
 import com.projectbarbel.histo.model.Systemclock;
 

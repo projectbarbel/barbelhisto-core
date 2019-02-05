@@ -2,48 +2,83 @@ package com.projectbarbel.histo;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.google.gson.Gson;
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
 import com.projectbarbel.histo.journal.DocumentJournal;
-import com.projectbarbel.histo.model.BitemporalVersion;
+import com.projectbarbel.histo.model.Bitemporal;
+import com.projectbarbel.histo.model.BitemporalStamp;
 
-public class BarbelHistoBuilder implements BarbelHistoContext {
+public final class BarbelHistoBuilder<T> implements BarbelHistoContext<T> {
 
+    private BiFunction<T, BitemporalStamp, T> pojoProxyingFunction = BarbelHistoContext.getDefaultProxyingFunction();
+    private Function<T, T> pojoCopyFunction = BarbelHistoContext.getDefaultCopyFunction();
     private String defaultActivity = BarbelHistoContext.getDefaultActivity();
     private Supplier<?> versionIdGenerator = BarbelHistoContext.getDefaultVersionIDGenerator();
     private Supplier<?> documentIdGenerator = BarbelHistoContext.getDefaultDocumentIDGenerator();
-    private IndexedCollection<BitemporalVersion> backbone = new ConcurrentIndexedCollection<>();
+    private IndexedCollection<T> backbone = new ConcurrentIndexedCollection<>();
     private String activity = BarbelHistoContext.getDefaultActivity();
     private String user = BarbelHistoContext.getDefaultUser();
-    private Map<Object, DocumentJournal<BitemporalVersion>> journalStore = new ConcurrentHashMap<Object, DocumentJournal<BitemporalVersion>>();
-
-    public static BarbelHistoBuilder barbel() {
-        return new BarbelHistoBuilder();
+    private Map<Object, DocumentJournal<? extends Bitemporal<?>>> journalStore = new ConcurrentHashMap<Object, DocumentJournal<?>>();
+    private Gson gson = BarbelHistoContext.getDefaultGson();
+    
+    public static <T> BarbelHistoBuilder<T> barbel() {
+        return new BarbelHistoBuilder<T>();
     }
 
     protected BarbelHistoBuilder() {
     }
 
-    public BarbelHisto build() {
-        return new BarbelHistoCore(this);
+    @SuppressWarnings("unchecked")
+    public <O> BarbelHisto<O> build() {
+        return new BarbelHistoCore<O>((BarbelHistoContext<O>)this);
     }
 
-    public Map<Object, DocumentJournal<BitemporalVersion>> getJournalStore() {
+    @Override
+    public Function<T, T> getPojoCopyFunction() {
+        return pojoCopyFunction;
+    }
+
+    public void withPojoCopyFunction(Function<T, T> pojoCopyFunction) {
+        this.pojoCopyFunction = pojoCopyFunction;
+    }
+
+    public Gson getGson() {
+        return gson;
+    }
+
+    public void withGson(Gson gson) {
+        this.gson = gson;
+    }
+
+    @Override
+    public BiFunction<T, BitemporalStamp, T> getPojoProxyingFunction() {
+        return pojoProxyingFunction;
+    }
+
+    public void withPojoProxyingFunction(BiFunction<T, BitemporalStamp, T> proxyingFunction) {
+        this.pojoProxyingFunction = proxyingFunction;
+    }
+
+    @Override
+    public Map<Object, DocumentJournal<? extends Bitemporal<?>>> getJournalStore() {
         return journalStore;
     }
 
-    public void withJournalStore(Map<Object, DocumentJournal<BitemporalVersion>> journalStore) {
+    public void withJournalStore(Map<Object, DocumentJournal<? extends Bitemporal<?>>> journalStore) {
         this.journalStore = journalStore;
     }
 
     @Override
-    public IndexedCollection<BitemporalVersion> getBackbone() {
+    public IndexedCollection<T> getBackbone() {
         return backbone;
     }
 
-    public BarbelHistoBuilder withBackbone(IndexedCollection<BitemporalVersion> backbone) {
+    public BarbelHistoContext<T> withBackbone(IndexedCollection<T> backbone) {
         this.backbone = backbone;
         return this;
     }
@@ -52,7 +87,7 @@ public class BarbelHistoBuilder implements BarbelHistoContext {
         return defaultActivity;
     }
 
-    public BarbelHistoBuilder withDefaultActivity(String defaultActivity) {
+    public BarbelHistoContext<T> withDefaultActivity(String defaultActivity) {
         this.defaultActivity = defaultActivity;
         return this;
     }
@@ -67,12 +102,12 @@ public class BarbelHistoBuilder implements BarbelHistoContext {
         return documentIdGenerator;
     }
 
-    public BarbelHistoBuilder withVersionIdGenerator(Supplier<?> versionIdGenerator) {
+    public BarbelHistoContext<T> withVersionIdGenerator(Supplier<?> versionIdGenerator) {
         this.versionIdGenerator = versionIdGenerator;
         return this;
     }
 
-    public BarbelHistoBuilder withDocumentIdGenerator(Supplier<String> documentIdGenerator) {
+    public BarbelHistoContext<T> withDocumentIdGenerator(Supplier<String> documentIdGenerator) {
         this.documentIdGenerator = documentIdGenerator;
         return this;
     }
@@ -82,7 +117,7 @@ public class BarbelHistoBuilder implements BarbelHistoContext {
         return activity;
     }
 
-    public BarbelHistoBuilder withActivity(String activity) {
+    public BarbelHistoContext<T> withActivity(String activity) {
         this.activity = activity;
         return this;
     }

@@ -120,6 +120,11 @@
 			<artifactId>barbelhisto-persistence-api</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib</artifactId>
+			<version>3.2.10</version>
+		</dependency>
 		<!-- Test Scope libraries -->
 		<dependency>
 			<groupId>org.javers</groupId>

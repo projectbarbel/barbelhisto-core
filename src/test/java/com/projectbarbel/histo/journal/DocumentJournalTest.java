@@ -64,18 +64,13 @@ public class DocumentJournalTest {
         IndexedCollection<DefaultDocument> coll = new ConcurrentIndexedCollection<DefaultDocument>();
         BarbelHistoContext.getClock().useFixedClockAt(LocalDateTime.of(2019, 2, 1, 8, 0));
         DefaultDocument doc = DefaultDocument.builder().withData("some data")
-                .withBitemporalStamp(BitemporalStamp.initial()).build();
+                .withBitemporalStamp(BitemporalStamp.defaultValues()).build();
         coll.add(doc);
         DocumentJournal<DefaultDocument> journal = DocumentJournal.create(coll, doc.getDocumentId());
         VersionUpdateResult<DefaultDocument> update = VersionUpdate.of(doc).prepare()
                 .effectiveFrom(BarbelHistoContext.getClock().now().plusDays(1).toLocalDate()).execute();
         journal.update(update);
         System.out.println(journal.prettyPrint());
-    }
-
-    @Test
-    public void testUpdate_further() throws Exception {
-        throw new RuntimeException("not yet implemented");
     }
 
     @Test

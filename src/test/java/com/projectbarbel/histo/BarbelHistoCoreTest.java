@@ -1,5 +1,6 @@
 package com.projectbarbel.histo;
 
+import static com.googlecode.cqengine.query.QueryFactory.and;
 import static org.junit.Assert.assertEquals;
 
 import java.time.LocalDate;
@@ -13,11 +14,12 @@ import io.github.benas.randombeans.api.EnhancedRandom;
 
 public class BarbelHistoCoreTest {
 
-    private BarbelHistoCore core;
+    private BarbelHistoCore<DefaultPojo> core;
     
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Before
     public void setup() {
-        core = (BarbelHistoCore) BarbelHistoBuilder.barbel().build();
+        core = (BarbelHistoCore)BarbelHistoBuilder.barbel().build();
     }
     
     @Test
@@ -30,7 +32,7 @@ public class BarbelHistoCoreTest {
     public void testRetrieve() throws Exception {
         DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
         core.save(pojo, LocalDate.now(), LocalDate.MAX);
-        assertEquals(1, core.retrieve(pojo.getDocumentId(), BarbelQueries::all).size());
+        assertEquals(1, core.retrieve(and(BarbelQueries.all(pojo.getDocumentId()), BarbelQueries.all(pojo.getDocumentId()))).size());
     }
 
 }

@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.joutnal.functions;
+package com.projectbarbel.histo.journal.functions;
 
 import java.time.LocalDate;
 import java.util.function.BiPredicate;

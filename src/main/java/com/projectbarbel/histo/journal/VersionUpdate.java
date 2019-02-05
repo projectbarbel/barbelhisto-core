@@ -13,9 +13,9 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.Validate;
 
 import com.projectbarbel.histo.BarbelHistoContext;
-import com.projectbarbel.histo.joutnal.functions.DefaultPojoCopier;
-import com.projectbarbel.histo.joutnal.functions.DefaultUpdateExectuionStrategy;
-import com.projectbarbel.histo.joutnal.functions.ValidateEffectiveDate;
+import com.projectbarbel.histo.journal.functions.DefaultPojoCopier;
+import com.projectbarbel.histo.journal.functions.DefaultUpdateExectuionStrategy;
+import com.projectbarbel.histo.journal.functions.ValidateEffectiveDate;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
 

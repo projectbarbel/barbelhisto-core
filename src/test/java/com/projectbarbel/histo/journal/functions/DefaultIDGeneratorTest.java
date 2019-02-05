@@ -1,11 +1,11 @@
-package com.projectbarbel.histo.joutnal.functions;
+package com.projectbarbel.histo.journal.functions;
 
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
-import com.projectbarbel.histo.joutnal.functions.DefaultIDGenerator;
+import com.projectbarbel.histo.journal.functions.DefaultIDGenerator;
 
 public class DefaultIDGeneratorTest {
 

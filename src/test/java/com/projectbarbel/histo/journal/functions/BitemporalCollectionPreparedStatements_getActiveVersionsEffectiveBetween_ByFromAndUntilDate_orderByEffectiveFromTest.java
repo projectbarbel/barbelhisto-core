@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.joutnal.functions;
+package com.projectbarbel.histo.journal.functions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -16,7 +16,7 @@ import com.googlecode.cqengine.resultset.ResultSet;
 import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelTestHelper;
 import com.projectbarbel.histo.journal.DocumentJournal;
-import com.projectbarbel.histo.joutnal.functions.BitemporalCollectionPreparedStatements;
+import com.projectbarbel.histo.journal.functions.BitemporalCollectionPreparedStatements;
 import com.projectbarbel.histo.model.DefaultDocument;
 import com.projectbarbel.histo.model.EffectivePeriod;
 

@@ -6,12 +6,6 @@ import java.util.function.Supplier;
 
 import com.projectbarbel.histo.BarbelHistoContext;
 
-/**
- * All instants representing utc time stamps.
- * 
- * @author niklasschlimm
- *
- */
 public final class BitemporalStamp {
 
     protected final Serializable versionId;
@@ -35,7 +29,7 @@ public final class BitemporalStamp {
         this.recordTime = Objects.requireNonNull(builder.recordTime);
     }
 
-    public static BitemporalStamp initial() {
+    public static BitemporalStamp defaultValues() {
         return builder().withActivity(BarbelHistoContext.getDefaultActivity())
                 .withDocumentId((String) BarbelHistoContext.getDefaultDocumentIDGenerator().get())
                 .withVersionId(BarbelHistoContext.getDefaultVersionIDGenerator().get())

@@ -1,9 +1,14 @@
 package com.projectbarbel.histo;
 
 import java.time.LocalDate;
+import java.util.List;
 
-public interface BarbelHisto {
+import com.googlecode.cqengine.query.Query;
+
+public interface BarbelHisto<T> {
     
-    void save(Object currentVersion, LocalDate from, LocalDate until);
+    void save(T currentVersion, LocalDate from, LocalDate until);
+
+    List<T> retrieve(Query<T> query);
 
 }
