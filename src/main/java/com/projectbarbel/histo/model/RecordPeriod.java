@@ -36,13 +36,6 @@ public class RecordPeriod {
             throw new IllegalStateException("cannot compile state: " + toString());
     }
 
-    /**
-     * Inactivates this record time instance with given value.
-     * 
-     * @param createdBy
-     * @param createdAt
-     * @return record period
-     */
     public RecordPeriod inactivate(String inactivatedBy) {
         this.inactivatedAt = BarbelHistoContext.getClock().now();
         this.state = BitemporalObjectState.INACTIVE;

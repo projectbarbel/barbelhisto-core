@@ -34,6 +34,19 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
+	<repositories>
+		<repository>
+			<id>nschlimm-projectbarbel</id>
+			<url>https://packagecloud.io/nschlimm/projectbarbel/maven2</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -116,7 +129,7 @@
 			<version>3.0.0</version>
 		</dependency>
 		<dependency>
-			<groupId>com.projectbarbel.histo</groupId>
+			<groupId>org.projectbarbel.histo</groupId>
 			<artifactId>barbelhisto-persistence-api</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
