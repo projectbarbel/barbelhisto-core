@@ -49,6 +49,10 @@ public interface BarbelHistoContext<T> {
         }
     };
 
+    static BarbelMode getDefaultBarbelMode() {
+        return BarbelMode.PROXY;
+    }
+    
     static <T> Function<UpdateExecutionContext<T>, VersionUpdateResult<T>> getDefaultVersionUpdateExecutionStrategy() {
         return new DefaultVersionUpdateExecutionStrategy<T>();
     }
@@ -113,5 +117,7 @@ public interface BarbelHistoContext<T> {
     Function<UpdateExecutionContext<T>, VersionUpdateResult<T>> getVersionUpdateExecutionStrategy();
 
     BarbelHistoFactory<T> getBarbelFactory();
+
+    BarbelMode getMode();
 
 }

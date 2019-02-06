@@ -14,12 +14,16 @@ import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.query.Query;
 import com.googlecode.cqengine.query.option.QueryOptions;
 import com.projectbarbel.histo.journal.DocumentJournal;
+import com.projectbarbel.histo.journal.VersionUpdate;
+import com.projectbarbel.histo.journal.VersionUpdate.VersionUpdateResult;
+import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.EffectivePeriod;
 import com.projectbarbel.histo.model.RecordPeriod;
 
 public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 
+    private static final String DOCUMENT_ID_MUST_NOT_BE_NULL = "document id must not be null";
     private final BarbelHistoContext<T> context;
     private final IndexedCollection<T> backbone;
     private final Map<Object, DocumentJournal<T>> journals;
@@ -31,20 +35,34 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     }
 
     @Override
-    public void save(T currentVersion, LocalDate from, LocalDate until) {
-        Optional<Object> id = getIdValue(currentVersion);
-        doSaveInitial(currentVersion, from, until,
-                id.orElseThrow(() -> new IllegalArgumentException("document id must not be null")));
+    public boolean save(T newVersion, LocalDate from, LocalDate until) {
+        Object id = getIdValue(newVersion)
+                .orElseThrow(() -> new IllegalArgumentException(DOCUMENT_ID_MUST_NOT_BE_NULL));
+        if (journals.containsKey(id)) {
+            DocumentJournal<T> journal = journals.get(id);
+            Optional<T> effectiveVersion = journal.read().effectiveTime().effectiveAt(from);
+            if (effectiveVersion.isPresent()) {
+                VersionUpdate<T> update = context.getBarbelFactory().createVersionUpdate(effectiveVersion.get())
+                        .prepare().effectiveFrom(from).until(until).get();
+                VersionUpdateResult<T> result = update.execute();
+                result.setNewSubsequentVersion(context.getMode().stampVirgin(context, newVersion,
+                        ((Bitemporal) result.newSubsequentVersion()).getBitemporalStamp()));
+                journal.update(context.getBarbelFactory().createJournalUpdateStrategy(), result);
+                return true;
+            } else
+                return doSaveInitial(newVersion, from, until, id);
+        }
+        return doSaveInitial(newVersion, from, until, id);
     }
 
-    private void doSaveInitial(T currentVersion, LocalDate from, LocalDate until, Object id) {
+    private boolean doSaveInitial(T currentVersion, LocalDate from, LocalDate until, Object id) {
         BitemporalStamp stamp = BitemporalStamp.of(context.getActivity(), id,
                 EffectivePeriod.builder().from(from).until(until).build(),
                 RecordPeriod.builder().createdBy(context.getUser()).build());
         journals.put(id, DocumentJournal.create((IndexedCollection<T>) backbone, id));
         T copy = context.getPojoCopyFunction().apply(currentVersion);
         T proxy = context.getPojoProxyingFunction().apply(copy, stamp);
-        backbone.add(proxy);
+        return backbone.add(proxy);
     }
 
     @Override
@@ -56,7 +74,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     public List<T> retrieve(Query<T> query, QueryOptions options) {
         return backbone.retrieve(query, options).stream().collect(Collectors.toList());
     }
-    
+
     protected Optional<Object> getIdValue(T currentVersion) {
         List<Field> fields = FieldUtils.getFieldsListWithAnnotation(currentVersion.getClass(), DocumentId.class);
         Validate.isTrue(fields.size() == 1,

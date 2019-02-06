@@ -1,11 +1,8 @@
 package com.projectbarbel.histo.journal;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiPredicate;
-import java.util.function.Function;
 
 import org.apache.commons.lang3.Validate;
 
@@ -44,16 +41,11 @@ public final class VersionUpdate<T> {
     private T newSubsequentVersion;
     private LocalDate newEffectiveDate;
     private LocalDate newEffectiveUntil;
-    private String activity = "SYSTEM_ACTIVITY";
-    private String createdBy = "SYSTEM";
     private UpdateState state = UpdateState.PREPARATION;
-    private Function<UpdateExecutionContext<T>, VersionUpdateResult<T>> updateExecutionFunction;
-    private Function<T, T> copyFunction;
-    private final Map<String, Object> propertyUpdates = new HashMap<>();
+    private BarbelHistoContext<T> context;
     private VersionUpdateResult<T> result;
 
-    private VersionUpdate(Function<UpdateExecutionContext<T>, VersionUpdateResult<T>> updateExecutionFunction,
-            Function<T, T> copyFunction, T bitemporal) {
+    private VersionUpdate(BarbelHistoContext<T> context, T bitemporal) {
         oldVersion = Objects.requireNonNull(bitemporal, "bitemporal object must not be null");
         newEffectiveDate = Objects.requireNonNull(
                 ((Bitemporal) bitemporal).getBitemporalStamp().getEffectiveTime().from(),
@@ -61,14 +53,12 @@ public final class VersionUpdate<T> {
         newEffectiveUntil = Objects.requireNonNull(
                 ((Bitemporal) bitemporal).getBitemporalStamp().getEffectiveTime().until(),
                 "the bitemporal passed must not contain null value on effective until");
-        this.updateExecutionFunction = updateExecutionFunction;
-        this.copyFunction = copyFunction;
+        this.context = context;
     }
 
-    public static <T> VersionUpdate<T> of(
-            Function<UpdateExecutionContext<T>, VersionUpdateResult<T>> updateExecutionFunction,
-            Function<T, T> copyFunction, T document) {
-        return new VersionUpdate<T>(updateExecutionFunction, copyFunction, document);
+    public static <T> VersionUpdate<T> of(BarbelHistoContext<T> context, T document) {
+        Validate.isTrue(document instanceof Bitemporal, "only bitemporal objects can be the source for an update");
+        return new VersionUpdate<T>(context, document);
     }
 
     public VersionUpdateExecutionBuilder<T> prepare() {
@@ -77,7 +67,7 @@ public final class VersionUpdate<T> {
 
     @SuppressWarnings("unchecked")
     public <O> VersionUpdateResult<O> execute() {
-        result = state.set(updateExecutionFunction.apply(new UpdateExecutionContext<T>(this, propertyUpdates)));
+        result = state.set(context.getVersionUpdateExecutionStrategy().apply(new UpdateExecutionContext<T>(context, this)));
         state = UpdateState.EXECUTED;
         return (VersionUpdateResult<O>) result;
     }
@@ -120,6 +110,20 @@ public final class VersionUpdate<T> {
             return update.newEffectiveUntil;
         }
 
+        public void setNewSubsequentVersion(T newSubsequentVersion) {
+            Validate.isTrue(newSubsequentVersion.getClass().equals(update.newSubsequentVersion.getClass()),
+                    "new subsequent version must be of the same type as preceding version");
+            Validate.isTrue(
+                    ((Bitemporal) newSubsequentVersion).getBitemporalStamp().getDocumentId()
+                            .equals(((Bitemporal) update.newSubsequentVersion).getBitemporalStamp().getDocumentId()),
+                    "only objects with the same document is can be predecessor and successor in an update");
+            Validate.isTrue(
+                    ((Bitemporal) newSubsequentVersion).getBitemporalStamp().getEffectiveTime().from().equals(
+                            ((Bitemporal) update.newPrecedingVersion).getBitemporalStamp().getEffectiveTime().until()),
+                    "custom subsequent version must have effective from equal to effective until of preseding version");
+            update.newSubsequentVersion = newSubsequentVersion;
+        }
+
     }
 
     public static class VersionUpdateExecutionBuilder<T> {
@@ -148,16 +152,6 @@ public final class VersionUpdate<T> {
             return this;
         }
 
-        public VersionUpdateExecutionBuilder<T> activity(String activity) {
-            update.activity = update.state.set(activity);
-            return this;
-        }
-
-        public VersionUpdateExecutionBuilder<T> createdBy(String createdBy) {
-            update.createdBy = update.state.set(createdBy);
-            return this;
-        }
-
         @SuppressWarnings("unchecked")
         public <O> VersionUpdateResult<O> execute() {
             return (VersionUpdateResult<O>) update.execute();
@@ -170,17 +164,17 @@ public final class VersionUpdate<T> {
     }
 
     public static class UpdateExecutionContext<T> {
-        private VersionUpdate<T> update;
-        private Map<String, Object> propertyUpdates;
+        private final VersionUpdate<T> update;
+        private final BarbelHistoContext<T> context;
 
-        public Map<String, Object> propertyUpdates() {
-            return propertyUpdates;
-        }
-
-        private UpdateExecutionContext(VersionUpdate<T> update, Map<String, Object> propertyUpdates) {
+        private UpdateExecutionContext(BarbelHistoContext<T> context, VersionUpdate<T> update) {
             super();
             this.update = update;
-            this.propertyUpdates = propertyUpdates;
+            this.context = context;
+        }
+        
+        public BarbelHistoContext<T> getContext() {
+            return context;
         }
 
         public T oldVersion() {
@@ -189,18 +183,6 @@ public final class VersionUpdate<T> {
 
         public LocalDate newEffectiveFrom() {
             return update.newEffectiveDate;
-        }
-
-        public String activity() {
-            return update.activity;
-        }
-
-        public String createdBy() {
-            return update.createdBy;
-        }
-
-        public Function<T, T> copyFunction() {
-            return update.copyFunction;
         }
 
         public VersionUpdateResult<T> createExecutionResult(T newPrecedingVersion, T newSubsequentVersion) {

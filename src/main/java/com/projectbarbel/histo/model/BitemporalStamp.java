@@ -65,28 +65,31 @@ public final class BitemporalStamp {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (o == this)
-            return true;
-        if (!(o instanceof BitemporalStamp)) {
-            return false;
-        }
-        BitemporalStamp abstractValueObject = (BitemporalStamp) o;
-        return Objects.equals(documentId, abstractValueObject.getDocumentId())
-                && Objects.equals(effectiveTime, abstractValueObject.getEffectiveTime())
-                && Objects.equals(recordTime, abstractValueObject.getRecordTime())
-                && Objects.equals(activity, abstractValueObject.getActivity());
+    public String toString() {
+        return "BitemporalStamp [versionId=" + versionId + ", documentId=" + documentId + ", activity=" + activity
+                + ", effectiveTime=" + effectiveTime + ", recordTime=" + recordTime + "]";
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(documentId, effectiveTime, recordTime, activity);
+        return Objects.hash(activity, documentId, effectiveTime, recordTime, versionId);
     }
 
     @Override
-    public String toString() {
-        return "BitemporalStamp [documentId=" + documentId + ", activity=" + activity + ", effectiveTime="
-                + effectiveTime + ", recordTime=" + recordTime + "]";
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof BitemporalStamp)) {
+            return false;
+        }
+        BitemporalStamp other = (BitemporalStamp) obj;
+        return Objects.equals(activity, other.activity) && Objects.equals(documentId, other.documentId)
+                && Objects.equals(effectiveTime, other.effectiveTime) && Objects.equals(recordTime, other.recordTime)
+                && Objects.equals(versionId, other.versionId);
     }
 
     /**

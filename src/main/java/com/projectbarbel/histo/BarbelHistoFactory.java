@@ -1,10 +1,14 @@
 package com.projectbarbel.histo;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.function.BiFunction;
 
 import org.apache.commons.lang3.Validate;
 
+import com.projectbarbel.histo.journal.DocumentJournal;
 import com.projectbarbel.histo.journal.VersionUpdate;
+import com.projectbarbel.histo.journal.VersionUpdate.VersionUpdateResult;
 import com.projectbarbel.histo.model.Bitemporal;
 
 public class BarbelHistoFactory<T> {
@@ -15,20 +19,22 @@ public class BarbelHistoFactory<T> {
         this.context = context;
     }
 
+    public static <T> VersionUpdate<T> createDefaultVersionUpdate(T currentVersion) {
+        Validate.isTrue(currentVersion instanceof Bitemporal, "only bitemporals are valid inputs");
+        return VersionUpdate.<T>of(BarbelHistoBuilder.barbel(), currentVersion);
+    }
+
     public BarbelHistoFactory<T> create(BarbelHistoContext<T> context) {
         return new BarbelHistoFactory<T>(context);
     }
 
-    public static <T> VersionUpdate<T> createDefaultVersionUpdate(T currentVersion) {
-        Validate.isTrue(currentVersion instanceof Bitemporal, "only bitemporals are valid inputs");
-        return VersionUpdate.<T>of(BarbelHistoContext.getDefaultVersionUpdateExecutionStrategy(),
-                BarbelHistoContext.getDefaultCopyFunction(), currentVersion);
+    public BiFunction<DocumentJournal<T>, VersionUpdateResult<T>, List<T>> createJournalUpdateStrategy() {
+        return context.getJournalUpdateStrategy().apply(context);
     }
 
     public VersionUpdate<T> createVersionUpdate(T currentVersion) {
         Validate.isTrue(currentVersion instanceof Bitemporal, "only type Bitemporal allowed as oldVersion");
-        return VersionUpdate.of(context.getVersionUpdateExecutionStrategy(), context.getPojoCopyFunction(),
-                currentVersion);
+        return VersionUpdate.of(context, currentVersion);
     }
 
     public static <T> String prettyPrint(T bitemporal) {

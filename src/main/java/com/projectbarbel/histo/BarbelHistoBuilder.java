@@ -19,13 +19,13 @@ import com.projectbarbel.histo.model.BitemporalStamp;
 
 public final class BarbelHistoBuilder<T> implements BarbelHistoContext<T> {
 
+    // simple context types
+    private BarbelMode mode = BarbelHistoContext.getDefaultBarbelMode();
     private BiFunction<T, BitemporalStamp, T> pojoProxyingFunction = BarbelHistoContext.getDefaultProxyingFunction();
     private Function<T, T> pojoCopyFunction = BarbelHistoContext.getDefaultCopyFunction();
     private String defaultActivity = BarbelHistoContext.getDefaultActivity();
     private Supplier<?> versionIdGenerator = BarbelHistoContext.getDefaultVersionIDGenerator();
     private Supplier<?> documentIdGenerator = BarbelHistoContext.getDefaultDocumentIDGenerator();
-    private Function<BarbelHistoContext<T>, BiFunction<DocumentJournal<T>, VersionUpdateResult<T>, List<T>>> journalUpdateStrategy = (
-            context) -> new JournalUpdateStrategyEmbedding<T>(this);
     private IndexedCollection<T> backbone = new ConcurrentIndexedCollection<>();
     private String activity = BarbelHistoContext.getDefaultActivity();
     private String user = BarbelHistoContext.getDefaultUser();
@@ -33,6 +33,9 @@ public final class BarbelHistoBuilder<T> implements BarbelHistoContext<T> {
     private Gson gson = BarbelHistoContext.getDefaultGson();
     private Function<UpdateExecutionContext<T>, VersionUpdateResult<T>> versionUpdateExecutionStrategy = BarbelHistoContext
             .getDefaultVersionUpdateExecutionStrategy();
+    // some more complex context types
+    private Function<BarbelHistoContext<T>, BiFunction<DocumentJournal<T>, VersionUpdateResult<T>, List<T>>> journalUpdateStrategy = (
+            context) -> new JournalUpdateStrategyEmbedding<T>(this);
     private BarbelHistoFactory<T> barbelFactory;
 
     public static <T> BarbelHistoBuilder<T> barbel() {
@@ -49,6 +52,15 @@ public final class BarbelHistoBuilder<T> implements BarbelHistoContext<T> {
         if (pojoCopyFunction instanceof GsonPojoCopier)
             ((GsonPojoCopier<T>) pojoCopyFunction).setGson(gson);
         return new BarbelHistoCore<O>((BarbelHistoContext<O>) this);
+    }
+
+    @Override
+    public BarbelMode getMode() {
+        return mode;
+    }
+
+    public void withMode(BarbelMode mode) {
+        this.mode = mode;
     }
 
     @Override

@@ -49,7 +49,7 @@ public class DocumentJournal<T> {
         return newjournal;
     }
 
-    public void update(BiFunction<DocumentJournal<T>, VersionUpdateResult<T>, List<T>> updateFunction,
+    public void update(BiFunction<DocumentJournal<T>, VersionUpdateResult<T>, List<T>> journalUpdateStrategy,
             VersionUpdateResult<T> update) {
         Validate.notNull(update, "update passed must not be null");
         Validate.validState(journal.contains(update.oldVersion()),
@@ -59,7 +59,7 @@ public class DocumentJournal<T> {
         Validate.validState(!journal.contains(update.newSubsequentVersion()),
                 "the new generated subsequent version by this update was already added to the journal");
         if (journal.contains(update.oldVersion())) {
-            journal.addAll(updateFunction.apply(this, update));
+            journal.addAll(journalUpdateStrategy.apply(this, update));
         }
     }
 

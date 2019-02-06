@@ -16,7 +16,7 @@ public class CGIPojoProxyingFunction<T> implements BiFunction<T, BitemporalStamp
     public T apply(T template, BitemporalStamp stamp) {
         
         Enhancer enhancer = new Enhancer();
-
+        
         enhancer.setClassLoader(getClass().getClassLoader());
         enhancer.setSuperclass(template.getClass());
 
@@ -30,6 +30,9 @@ public class CGIPojoProxyingFunction<T> implements BiFunction<T, BitemporalStamp
                     return sp;
                 } else if (method.getName().equals("setBitemporalStamp")) {
                     sp = args.length > 0 ? (BitemporalStamp)args[0] : null;
+                    if (template instanceof Bitemporal) { // if target is bitemporal sync bitemporal stamps
+                        ((Bitemporal)template).setBitemporalStamp(sp);
+                    }
                     return null;
                 } else if (method.getName().equals("getTarget")) {
                     return target;
