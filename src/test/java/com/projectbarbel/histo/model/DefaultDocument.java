@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import javax.annotation.Generated;
 
-public class DefaultDocument implements Bitemporal<String> {
+public class DefaultDocument implements Bitemporal {
 
     private BitemporalStamp bitemporalStamp;
     private String data;

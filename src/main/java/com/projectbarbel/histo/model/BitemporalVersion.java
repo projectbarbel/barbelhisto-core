@@ -4,7 +4,7 @@ import com.googlecode.cqengine.attribute.Attribute;
 import com.googlecode.cqengine.attribute.SimpleAttribute;
 import com.googlecode.cqengine.query.option.QueryOptions;
 
-public class BitemporalVersion implements Bitemporal<BitemporalVersion> {
+public class BitemporalVersion implements Bitemporal {
 
     private BitemporalStamp stamp;
     private Object object;
@@ -41,8 +41,8 @@ public class BitemporalVersion implements Bitemporal<BitemporalVersion> {
         this.object = object;
     }
 
-    public static final Attribute<BitemporalVersion, String> DOCUMENT_ID = new SimpleAttribute<BitemporalVersion, String>("documentId") {
-        public String getValue(BitemporalVersion object, QueryOptions queryOptions) { return object.getDocumentId(); }
+    public static final Attribute<BitemporalVersion, Object> DOCUMENT_ID = new SimpleAttribute<BitemporalVersion, Object>("documentId") {
+        public Object getValue(BitemporalVersion object, QueryOptions queryOptions) { return object.getBitemporalStamp().getDocumentId(); }
     };
     
 }

@@ -23,20 +23,20 @@ public class BitemporalCollectionPreparedStatements {
 
     //// @formatter:off
     @SuppressWarnings("unchecked")
-    public static <T extends Bitemporal<?>> ResultSet<T> getAll_ByID_orderByEffectiveFrom(IndexedCollection<T> documents, String id) {
-        return documents.retrieve(equal((Attribute<T, String>) Bitemporal.DOCUMENT_ID, (String) id),
+    public static <T> ResultSet<T> getAll_ByID_orderByEffectiveFrom(IndexedCollection<T> documents, String id) {
+        return documents.retrieve(equal((Attribute<T, Object>) Bitemporal.DOCUMENT_ID, (String) id),
                                   queryOptions(orderBy(ascending(Bitemporal.EFFECTIVE_FROM))));
     }
     
     @SuppressWarnings("unchecked")
-    public static <T extends Bitemporal<?>> ResultSet<T> getActiveVersionsEffectiveAfter_ByDate_orderByEffectiveFrom(IndexedCollection<T> documents, LocalDate date) {
+    public static <T> ResultSet<T> getActiveVersionsEffectiveAfter_ByDate_orderByEffectiveFrom(IndexedCollection<T> documents, LocalDate date) {
         return documents.retrieve(and(greaterThanOrEqualTo((Attribute<T, ChronoLocalDate>) Bitemporal.EFFECTIVE_FROM, date),
                                       equal((Attribute<T, BitemporalObjectState>) Bitemporal.STATE, BitemporalObjectState.ACTIVE)),
                                   queryOptions(orderBy(ascending(Bitemporal.EFFECTIVE_FROM))));
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends Bitemporal<?>> ResultSet<T> getActiveVersionsEffectiveBetween_ByFromAndUntilDate_orderByEffectiveFrom(IndexedCollection<T> documents, EffectivePeriod period) {
+    public static <T> ResultSet<T> getActiveVersionsEffectiveBetween_ByFromAndUntilDate_orderByEffectiveFrom(IndexedCollection<T> documents, EffectivePeriod period) {
         return documents.retrieve(and(greaterThanOrEqualTo((Attribute<T, ChronoLocalDate>) Bitemporal.EFFECTIVE_FROM, period.from()),
                                       lessThanOrEqualTo((Attribute<T, ChronoLocalDate>) Bitemporal.EFFECTIVE_UNTIL, period.until()),
                                       equal((Attribute<T, BitemporalObjectState>) Bitemporal.STATE, BitemporalObjectState.ACTIVE)),
@@ -44,7 +44,7 @@ public class BitemporalCollectionPreparedStatements {
     }
     
     @SuppressWarnings("unchecked")
-    public static <T extends Bitemporal<?>> ResultSet<T> getActiveVersionEffectiveOn_ByDate(IndexedCollection<T> documents, LocalDate date) {
+    public static <T> ResultSet<T> getActiveVersionEffectiveOn_ByDate(IndexedCollection<T> documents, LocalDate date) {
         ResultSet<T> set = documents.retrieve(and(lessThanOrEqualTo((Attribute<T, ChronoLocalDate>) Bitemporal.EFFECTIVE_FROM, date),
                                                   greaterThan((Attribute<T, ChronoLocalDate>) Bitemporal.EFFECTIVE_UNTIL, date),
                                                   equal((Attribute<T, BitemporalObjectState>) Bitemporal.STATE, BitemporalObjectState.ACTIVE)));

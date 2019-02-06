@@ -12,11 +12,12 @@ import org.junit.Test;
 
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
+import com.projectbarbel.histo.BarbelHistoBuilder;
 import com.projectbarbel.histo.BarbelHistoContext;
+import com.projectbarbel.histo.BarbelHistoFactory;
 import com.projectbarbel.histo.BarbelTestHelper;
-import com.projectbarbel.histo.journal.DocumentJournal;
-import com.projectbarbel.histo.journal.VersionUpdate;
 import com.projectbarbel.histo.journal.VersionUpdate.VersionUpdateResult;
+import com.projectbarbel.histo.journal.functions.JournalUpdateStrategyEmbedding;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.DefaultDocument;
 
@@ -66,10 +67,10 @@ public class DocumentJournalTest {
         DefaultDocument doc = DefaultDocument.builder().withData("some data")
                 .withBitemporalStamp(BitemporalStamp.defaultValues()).build();
         coll.add(doc);
-        DocumentJournal<DefaultDocument> journal = DocumentJournal.create(coll, doc.getDocumentId());
-        VersionUpdateResult<DefaultDocument> update = VersionUpdate.of(doc).prepare()
+        DocumentJournal<DefaultDocument> journal = DocumentJournal.create(coll, doc.getBitemporalStamp().getDocumentId());
+        VersionUpdateResult<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(doc).prepare()
                 .effectiveFrom(BarbelHistoContext.getClock().now().plusDays(1).toLocalDate()).execute();
-        journal.update(update);
+        journal.update(new JournalUpdateStrategyEmbedding<DefaultDocument>(BarbelHistoBuilder.barbel()), update);
         System.out.println(journal.prettyPrint());
     }
 
@@ -78,7 +79,7 @@ public class DocumentJournalTest {
         DocumentJournal<DefaultDocument> journal = DocumentJournal
                 .create(BarbelTestHelper.generateJournalOfDefaultValueObjects("#12345",
                         Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 4, 1))), "#12345");
-        assertEquals(journal.list().get(0).getEffectiveFrom(), LocalDate.of(2019, 1, 1));
+        assertEquals(journal.list().get(0).getBitemporalStamp().getEffectiveTime().from(), LocalDate.of(2019, 1, 1));
     }
 
 }

@@ -11,11 +11,11 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.projectbarbel.histo.BarbelHistoFactory;
 import com.projectbarbel.histo.BarbelTestHelper;
 import com.projectbarbel.histo.journal.DocumentJournal;
 import com.projectbarbel.histo.journal.VersionUpdate;
 import com.projectbarbel.histo.journal.VersionUpdate.VersionUpdateResult;
-import com.projectbarbel.histo.journal.functions.JournalUpdateStrategyInactivateSubsequent;
 import com.projectbarbel.histo.model.DefaultDocument;
 import com.projectbarbel.histo.model.Systemclock;
 
@@ -31,10 +31,11 @@ public class JournalUpdateStrategyInactivateSubsequentTest {
     
     @Test
     public void testApply_InactivateSubsequent() throws Exception {
-        VersionUpdate<DefaultDocument> update = VersionUpdate.of(journal.list().get(3)).prepare().effectiveFrom(clock.now().toLocalDate()).untilInfinite().setProperty("data", "some new data").get();
+        VersionUpdate<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(journal.list().get(3)).prepare().effectiveFrom(clock.now().toLocalDate()).untilInfinite().get();
         assertTrue(journal.read().activeVersions().size()==4);
         VersionUpdateResult<DefaultDocument> result = update.execute();
-        JournalUpdateStrategyInactivateSubsequent<DefaultDocument> updateFunction = new JournalUpdateStrategyInactivateSubsequent<DefaultDocument>();
+        result.newSubsequentVersion().setData("some new data");
+        JournalUpdateStrategyInactivateSubsequent<DefaultDocument> updateFunction = new JournalUpdateStrategyInactivateSubsequent<DefaultDocument>("system");
         List<DefaultDocument> updateVersion = updateFunction.apply(journal, update.result());
         assertTrue(result.newSubsequentVersion().getData().equals("some new data"));
         assertTrue(result.newPrecedingVersion().getData().equals(journal.list().get(3).getData()));
@@ -44,10 +45,11 @@ public class JournalUpdateStrategyInactivateSubsequentTest {
     
     @Test
     public void testApply_InactivateSubsequent_subsequentPeriodsExist_andShouldBeInactivated() throws Exception {
-        VersionUpdate<DefaultDocument> update = VersionUpdate.of(journal.list().get(2)).prepare().effectiveFrom(LocalDate.of(2018, 7, 1)).untilInfinite().setProperty("data", "some new data").get();
+        VersionUpdate<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(journal.list().get(2)).prepare().effectiveFrom(LocalDate.of(2018, 7, 1)).untilInfinite().get();
         assertTrue(journal.read().activeVersions().size()==4);
         VersionUpdateResult<DefaultDocument> result = update.execute();
-        JournalUpdateStrategyInactivateSubsequent<DefaultDocument> updateFunction = new JournalUpdateStrategyInactivateSubsequent<DefaultDocument>();
+        result.newSubsequentVersion().setData("some new data");
+        JournalUpdateStrategyInactivateSubsequent<DefaultDocument> updateFunction = new JournalUpdateStrategyInactivateSubsequent<DefaultDocument>("system");
         List<DefaultDocument> updateVersion = updateFunction.apply(journal, update.result());
         assertTrue(result.newSubsequentVersion().getData().equals("some new data"));
         assertTrue(result.newPrecedingVersion().getData().equals(journal.list().get(2).getData()));
@@ -57,10 +59,11 @@ public class JournalUpdateStrategyInactivateSubsequentTest {
     
     @Test
     public void testApply_InactivateSubsequent_multipleSubsequentPeriodsExist_andShouldBeInactivated() throws Exception {
-        VersionUpdate<DefaultDocument> update = VersionUpdate.of(journal.list().get(0)).prepare().effectiveFrom(LocalDate.of(2016, 7, 1)).untilInfinite().setProperty("data", "some new data").get();
+        VersionUpdate<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(journal.list().get(0)).prepare().effectiveFrom(LocalDate.of(2016, 7, 1)).untilInfinite().get();
         assertTrue(journal.read().activeVersions().size()==4);
         VersionUpdateResult<DefaultDocument> result = update.execute();
-        JournalUpdateStrategyInactivateSubsequent<DefaultDocument> updateFunction = new JournalUpdateStrategyInactivateSubsequent<DefaultDocument>();
+        result.newSubsequentVersion().setData("some new data");
+        JournalUpdateStrategyInactivateSubsequent<DefaultDocument> updateFunction = new JournalUpdateStrategyInactivateSubsequent<DefaultDocument>("system");
         List<DefaultDocument> updateVersion = updateFunction.apply(journal, update.result());
         assertTrue(result.newSubsequentVersion().getData().equals("some new data"));
         assertTrue(result.newPrecedingVersion().getData().equals(journal.list().get(0).getData()));

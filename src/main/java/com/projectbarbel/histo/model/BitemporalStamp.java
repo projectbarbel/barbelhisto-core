@@ -1,29 +1,20 @@
 package com.projectbarbel.histo.model;
 
-import java.io.Serializable;
 import java.util.Objects;
-import java.util.function.Supplier;
 
 import com.projectbarbel.histo.BarbelHistoContext;
 
 public final class BitemporalStamp {
 
-    protected final Serializable versionId;
-    protected final String documentId;
+    protected final Object versionId;
+    protected final Object documentId;
     protected final String activity;
     protected final EffectivePeriod effectiveTime;
     protected final RecordPeriod recordTime;
-    protected final Supplier<Serializable> versionIdGenerator;
-    protected final Supplier<Serializable> documentIdGenerator;
 
     private BitemporalStamp(Builder builder) {
-        this.versionIdGenerator = builder.versionIdGenerator != null ? builder.versionIdGenerator
-                : BarbelHistoContext.getDefaultVersionIDGenerator();
-        this.documentIdGenerator = builder.documentIdGenerator != null ? builder.documentIdGenerator
-                : BarbelHistoContext.getDefaultDocumentIDGenerator();
-        ;
-        this.versionId = builder.versionId != null ? builder.versionId : versionIdGenerator.get();
-        this.documentId = builder.documentId != null ? builder.documentId : (String) documentIdGenerator.get();
+        this.versionId = builder.versionId != null ? builder.versionId : BarbelHistoContext.getDefaultVersionIDGenerator().get();
+        this.documentId = builder.documentId != null ? builder.documentId : BarbelHistoContext.getDefaultDocumentIDGenerator().get();
         this.activity = builder.activity != null ? builder.activity : BarbelHistoContext.getDefaultActivity();
         this.effectiveTime = Objects.requireNonNull(builder.effectiveTime);
         this.recordTime = Objects.requireNonNull(builder.recordTime);
@@ -37,7 +28,7 @@ public final class BitemporalStamp {
                 .build();
     }
 
-    public static BitemporalStamp of(String activity, String documentId, EffectivePeriod effectiveTime,
+    public static BitemporalStamp of(String activity, Object documentId, EffectivePeriod effectiveTime,
             RecordPeriod recordTime) {
         return builder().withActivity(activity).withDocumentId(documentId).withEffectiveTime(effectiveTime)
                 .withRecordTime(recordTime).withVersionId(BarbelHistoContext.getDefaultVersionIDGenerator().get())
@@ -56,7 +47,7 @@ public final class BitemporalStamp {
         return recordTime;
     }
 
-    public String getDocumentId() {
+    public Object getDocumentId() {
         return documentId;
     }
 
@@ -111,23 +102,21 @@ public final class BitemporalStamp {
      * Builder to build {@link BitemporalStamp}.
      */
     public static final class Builder {
-        private Serializable versionId;
-        private String documentId;
+        private Object versionId;
+        private Object documentId;
         private String activity;
         private EffectivePeriod effectiveTime;
         private RecordPeriod recordTime;
-        private Supplier<Serializable> versionIdGenerator;
-        private Supplier<Serializable> documentIdGenerator;
 
         private Builder() {
         }
 
-        public Builder withVersionId(Serializable versionId) {
+        public Builder withVersionId(Object versionId) {
             this.versionId = versionId;
             return this;
         }
 
-        public Builder withDocumentId(String documentId) {
+        public Builder withDocumentId(Object documentId) {
             this.documentId = documentId;
             return this;
         }
@@ -144,16 +133,6 @@ public final class BitemporalStamp {
 
         public Builder withRecordTime(RecordPeriod recordTime) {
             this.recordTime = recordTime;
-            return this;
-        }
-
-        public Builder withVersionIdGenerator(Supplier<Serializable> versionIdGenerator) {
-            this.versionIdGenerator = versionIdGenerator;
-            return this;
-        }
-
-        public Builder withDocumentIdGenerator(Supplier<Serializable> documentIdGenerator) {
-            this.documentIdGenerator = documentIdGenerator;
             return this;
         }
 

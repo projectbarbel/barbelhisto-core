@@ -5,8 +5,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
@@ -15,29 +13,20 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.query.Query;
 import com.projectbarbel.histo.journal.DocumentJournal;
-import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.EffectivePeriod;
 import com.projectbarbel.histo.model.RecordPeriod;
 
-public class BarbelHistoCore<T> implements BarbelHisto<T> {
+public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 
     private final BarbelHistoContext<T> context;
     private final IndexedCollection<T> backbone;
-    private final Map<Object, DocumentJournal<? extends Bitemporal<?>>> journals;
-    private final String activity;
-    private final String user;
-    private BiFunction<T, BitemporalStamp, T> pojoProxyingFunction;
-    private Function<T, T> pojoCopyFunction;
+    private final Map<Object, DocumentJournal<T>> journals;
 
     protected BarbelHistoCore(BarbelHistoContext<T> context) {
         this.context = context;
         this.backbone = context.getBackbone();
-        this.activity = context.getActivity();
-        this.user = context.getUser();
         this.journals = context.getJournalStore();
-        this.pojoCopyFunction = context.getPojoCopyFunction();
-        this.pojoProxyingFunction = context.getPojoProxyingFunction();
     }
 
     @Override
@@ -47,15 +36,13 @@ public class BarbelHistoCore<T> implements BarbelHisto<T> {
                 id.orElseThrow(() -> new IllegalArgumentException("document id must not be null")));
     }
 
-    @SuppressWarnings("unchecked")
     private void doSaveInitial(T currentVersion, LocalDate from, LocalDate until, Object id) {
-        BitemporalStamp stamp = BitemporalStamp.of(activity, (String) id,
+        BitemporalStamp stamp = BitemporalStamp.of(context.getActivity(), id,
                 EffectivePeriod.builder().from(from).until(until).build(),
-                RecordPeriod.builder().createdBy(user).build());
-        journals.put(id, (DocumentJournal<? extends Bitemporal<?>>) DocumentJournal
-                .create((IndexedCollection<? extends Bitemporal<?>>) backbone, id));
-        T copy = pojoCopyFunction.apply(currentVersion);
-        T proxy = pojoProxyingFunction.apply(copy, stamp);
+                RecordPeriod.builder().createdBy(context.getUser()).build());
+        journals.put(id, DocumentJournal.create((IndexedCollection<T>) backbone, id));
+        T copy = context.getPojoCopyFunction().apply(currentVersion);
+        T proxy = context.getPojoProxyingFunction().apply(copy, stamp);
         backbone.add(proxy);
     }
 

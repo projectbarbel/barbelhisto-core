@@ -37,14 +37,14 @@ public class BitemporalCollectionPreparedStatements_getActiveVersionEffectiveOn_
     public void testApply() throws Exception {
         ResultSet<DefaultDocument> document = function.apply(journal.collection(), BarbelHistoContext.getClock().now().toLocalDate());
         assertTrue(document.iterator().hasNext());
-        assertEquals(document.iterator().next().getEffectiveFrom(), LocalDate.of(2017, 12, 1));
+        assertEquals(document.iterator().next().getBitemporalStamp().getEffectiveTime().from(), LocalDate.of(2017, 12, 1));
     }
 
     @Test
     public void testApply_laterDoc() throws Exception {
         ResultSet<DefaultDocument> document = function.apply(journal.collection(), LocalDate.of(2021, 12, 1));
         assertTrue(document.iterator().hasNext());
-        assertEquals(document.iterator().next().getEffectiveFrom(), LocalDate.of(2020, 1, 1));
+        assertEquals(document.iterator().next().getBitemporalStamp().getEffectiveTime().from(), LocalDate.of(2020, 1, 1));
     }
 
     @Test
@@ -57,7 +57,7 @@ public class BitemporalCollectionPreparedStatements_getActiveVersionEffectiveOn_
     public void testApply_earlierDoc() throws Exception {
         ResultSet<DefaultDocument> document = function.apply(journal.collection(), LocalDate.of(2012, 12, 1));
         assertTrue(document.iterator().hasNext());
-        assertEquals(document.iterator().next().getEffectiveFrom(), LocalDate.of(2010, 12, 1));
+        assertEquals(document.iterator().next().getBitemporalStamp().getEffectiveTime().from(), LocalDate.of(2010, 12, 1));
     }
 
 }

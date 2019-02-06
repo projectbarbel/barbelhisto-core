@@ -17,7 +17,7 @@ public class EffectivePeriod {
     }
     
     public boolean isInfinite() {
-       return from.equals(BarbelHistoContext.getInfiniteDate());
+       return until.equals(BarbelHistoContext.getInfiniteDate());
     }
     
     public LocalDate from() {

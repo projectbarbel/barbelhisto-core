@@ -20,20 +20,19 @@ import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.attribute.Attribute;
 import com.googlecode.cqengine.resultset.ResultSet;
 import com.projectbarbel.histo.BarbelHistoContext;
+import com.projectbarbel.histo.BarbelHistoFactory;
 import com.projectbarbel.histo.journal.VersionUpdate.VersionUpdateResult;
 import com.projectbarbel.histo.journal.functions.BitemporalCollectionPreparedStatements;
-import com.projectbarbel.histo.journal.functions.JournalUpdateStrategyEmbedding;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.EffectivePeriod;
 import com.projectbarbel.histo.model.Systemclock;
 
-public class DocumentJournal<T extends Bitemporal<?>> {
+public class DocumentJournal<T> {
 
     private IndexedCollection<T> journal;
     private BiFunction<IndexedCollection<T>, LocalDate, ResultSet<T>> effectiveReaderFunction = BitemporalCollectionPreparedStatements::getActiveVersionEffectiveOn_ByDate;
     private BiFunction<IndexedCollection<T>, LocalDate, ResultSet<T>> effectiveAfterFunction = BitemporalCollectionPreparedStatements::getActiveVersionsEffectiveAfter_ByDate_orderByEffectiveFrom;
     private BiFunction<IndexedCollection<T>, EffectivePeriod, ResultSet<T>> effectiveBetweenFunction = BitemporalCollectionPreparedStatements::getActiveVersionsEffectiveBetween_ByFromAndUntilDate_orderByEffectiveFrom;
-    private BiFunction<DocumentJournal<T>, VersionUpdateResult<T>, List<T>> updateFunction = new JournalUpdateStrategyEmbedding<T>();
     private Object id;
 
     private DocumentJournal(IndexedCollection<T> backbone, Object id) {
@@ -43,20 +42,22 @@ public class DocumentJournal<T extends Bitemporal<?>> {
     }
 
     /**
-     * Creates the journal using the backbone as pre-created collection. This collection may contain objects with other Ids.
-     *  
+     * Creates the journal using the backbone as pre-created collection. This
+     * collection may contain objects with other Ids.
+     * 
      * @param backbone the collection containing the journal objects
-     * @param id document id of the document under barbel control
+     * @param id       document id of the document under barbel control
      * @return
      */
-    public static <T extends Bitemporal<?>> DocumentJournal<T> create(IndexedCollection<T> backbone, Object id) {
+    public static <T> DocumentJournal<T> create(IndexedCollection<T> backbone, Object id) {
         Validate.notNull(backbone, "new document list must not be null when creating new journal");
         Validate.notNull(id, "must specify document id for this collection");
         DocumentJournal<T> newjournal = (DocumentJournal<T>) new DocumentJournal<T>(backbone, id);
         return newjournal;
     }
 
-    public void update(VersionUpdateResult<T> update) {
+    public void update(BiFunction<DocumentJournal<T>, VersionUpdateResult<T>, List<T>> updateFunction,
+            VersionUpdateResult<T> update) {
         Validate.notNull(update, "update passed must not be null");
         Validate.validState(journal.contains(update.oldVersion()),
                 "the old version of that update passed is unknown in this journal - please only add valid update whose origin are objects from this journal");
@@ -75,13 +76,13 @@ public class DocumentJournal<T extends Bitemporal<?>> {
     }
 
     public long size() {
-        return journal.stream().filter(d -> d.getDocumentId().equals(id)).count();
+        return journal.stream().filter(d -> ((Bitemporal) d).getBitemporalStamp().getDocumentId().equals(id)).count();
     }
 
     @SuppressWarnings("unchecked")
     public List<T> list() {
         return journal
-                .retrieve(equal((Attribute<T, String>) Bitemporal.DOCUMENT_ID, (String) id),
+                .retrieve(equal((Attribute<T, Object>) Bitemporal.DOCUMENT_ID, (String) id),
                         queryOptions(orderBy(ascending(Bitemporal.EFFECTIVE_FROM))))
                 .stream().collect(Collectors.toCollection(ArrayList::new));
     }
@@ -89,7 +90,7 @@ public class DocumentJournal<T extends Bitemporal<?>> {
     @SuppressWarnings("unchecked")
     public IndexedCollection<T> collection() {
         return journal
-                .retrieve(equal((Attribute<T, String>) Bitemporal.DOCUMENT_ID, (String) id),
+                .retrieve(equal((Attribute<T, Object>) Bitemporal.DOCUMENT_ID, (String) id),
                         queryOptions(orderBy(ascending(Bitemporal.EFFECTIVE_FROM))))
                 .stream().collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
     }
@@ -104,7 +105,7 @@ public class DocumentJournal<T extends Bitemporal<?>> {
                 + StringUtils.leftPad("|", 17, "-") + StringUtils.leftPad("|", 9, "-")
                 + StringUtils.leftPad("|", 22, "-") + StringUtils.leftPad("|", 24, "-")
                 + StringUtils.leftPad("|", 22, "-") + StringUtils.leftPad("|", 24, "-") + "\n"
-                + journal.stream().map(Bitemporal::prettyPrint).collect(Collectors.joining("\n"));
+                + journal.stream().map(BarbelHistoFactory::prettyPrint).collect(Collectors.joining("\n"));
     }
     // @formatter:on
 
@@ -116,7 +117,7 @@ public class DocumentJournal<T extends Bitemporal<?>> {
         return new JournalReader<T>(this, BarbelHistoContext.getClock());
     }
 
-    public static class JournalReader<T extends Bitemporal<?>> {
+    public static class JournalReader<T> {
         private DocumentJournal<T> journal;
         private Systemclock clock;
 
@@ -134,17 +135,17 @@ public class DocumentJournal<T extends Bitemporal<?>> {
         }
 
         public List<T> activeVersions() {
-            return journal.list().stream().filter(d -> d.getDocumentId().equals(journal.id)).filter((d) -> d.isActive())
-                    .collect(Collectors.toList());
+            return journal.list().stream().filter(d -> ((Bitemporal) d).getBitemporalStamp().getDocumentId().equals(journal.id))
+                    .filter((d) -> ((Bitemporal) d).getBitemporalStamp().isActive()).collect(Collectors.toList());
         }
 
         public List<T> inactiveVersions() {
-            return journal.list().stream().filter(d -> d.getDocumentId().equals(journal.id))
-                    .filter((d) -> !d.isActive()).collect(Collectors.toList());
+            return journal.list().stream().filter(d -> ((Bitemporal) d).getBitemporalStamp().getDocumentId().equals(journal.id))
+                    .filter((d) -> !((Bitemporal) d).getBitemporalStamp().isActive()).collect(Collectors.toList());
         }
     }
 
-    public static class EffectiveReader<T extends Bitemporal<?>> {
+    public static class EffectiveReader<T> {
 
         private DocumentJournal<T> journal;
         private Systemclock clock;
@@ -155,8 +156,8 @@ public class DocumentJournal<T extends Bitemporal<?>> {
         }
 
         public List<T> activeVersions() {
-            return journal.list().stream().filter(d -> d.getDocumentId().equals(journal.id)).filter((d) -> d.isActive())
-                    .collect(Collectors.toList());
+            return journal.list().stream().filter(d -> ((Bitemporal) d).getBitemporalStamp().getDocumentId().equals(journal.id))
+                    .filter((d) -> ((Bitemporal) d).getBitemporalStamp().isActive()).collect(Collectors.toList());
         }
 
         public Optional<T> effectiveNow() {
@@ -182,7 +183,7 @@ public class DocumentJournal<T extends Bitemporal<?>> {
 
     }
 
-    public static class RecordtimeReader<T extends Bitemporal<?>> {
+    public static class RecordtimeReader<T> {
 
         @SuppressWarnings("unused")
         private DocumentJournal<T> journal;

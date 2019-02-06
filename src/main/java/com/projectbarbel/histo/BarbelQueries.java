@@ -8,15 +8,17 @@ import com.googlecode.cqengine.query.Query;
 import com.googlecode.cqengine.query.option.QueryOptions;
 import com.projectbarbel.histo.model.Bitemporal;
 
-public class BarbelQueries {
+public final class BarbelQueries {
 
-    public static final Attribute<Object, String> DOCUMENT_ID = new SimpleAttribute<Object, String>("documentId") {
-        public String getValue(Object object, QueryOptions queryOptions) { return ((Bitemporal<?>)object).getDocumentId(); }
+    public static final Attribute<Object, Object> DOCUMENT_ID = new SimpleAttribute<Object, Object>("documentId") {
+        public Object getValue(Object object, QueryOptions queryOptions) {
+            return ((Bitemporal) object).getBitemporalStamp().getDocumentId();
+        }
     };
-    
+
     @SuppressWarnings("unchecked")
     public static <T> Query<T> all(Object id) {
-        return (Query<T>) equal(DOCUMENT_ID, (String)id);
+        return (Query<T>) equal(DOCUMENT_ID, (String) id);
     }
-    
+
 }

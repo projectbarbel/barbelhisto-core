@@ -7,9 +7,9 @@ import com.projectbarbel.histo.journal.DocumentJournal;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.persistence.api.JournalStoreProvider;
 
-public class JournalStoreService<T extends Bitemporal<?>> {
+public class JournalStoreService<T extends Bitemporal> {
     
-    private static JournalStoreService<?> service = new JournalStoreService<Bitemporal<?>>();
+    private static JournalStoreService<?> service = new JournalStoreService<Bitemporal>();
     @SuppressWarnings("rawtypes")
     private ServiceLoader<JournalStoreProvider> loader;
     private JournalStoreProvider<T> provider;
@@ -22,7 +22,7 @@ public class JournalStoreService<T extends Bitemporal<?>> {
     }
  
     @SuppressWarnings("unchecked")
-    public static <T extends Bitemporal<?>> JournalStoreService<T> getInstance() {
+    public static <T extends Bitemporal> JournalStoreService<T> getInstance() {
         return (JournalStoreService<T>)service;
     }
 

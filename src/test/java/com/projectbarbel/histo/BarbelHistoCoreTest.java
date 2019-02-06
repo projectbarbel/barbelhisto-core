@@ -35,4 +35,9 @@ public class BarbelHistoCoreTest {
         assertEquals(1, core.retrieve(and(BarbelQueries.all(pojo.getDocumentId()), BarbelQueries.all(pojo.getDocumentId()))).size());
     }
 
+    @Test
+    public void testSave() throws Exception {
+        
+    }
+
 }

@@ -26,11 +26,16 @@ public class CGIPojoProxyingFunction<T> implements BiFunction<T, BitemporalStamp
             private T target = template;
 
             public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-                if (method.getName().equals("getBitemporalStamp"))
+                if (method.getName().equals("getBitemporalStamp")) {
                     return sp;
-                if (method.getName().equals("getTarget"))
+                } else if (method.getName().equals("setBitemporalStamp")) {
+                    sp = args.length > 0 ? (BitemporalStamp)args[0] : null;
+                    return null;
+                } else if (method.getName().equals("getTarget")) {
                     return target;
-                return proxy.invoke(target, args);
+                } else {
+                    return proxy.invoke(target, args);
+                }
             }
 
         });

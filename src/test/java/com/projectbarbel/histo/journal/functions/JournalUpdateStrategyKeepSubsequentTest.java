@@ -10,6 +10,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.projectbarbel.histo.BarbelHistoFactory;
 import com.projectbarbel.histo.BarbelTestHelper;
 import com.projectbarbel.histo.journal.DocumentJournal;
 import com.projectbarbel.histo.journal.VersionUpdate;
@@ -30,10 +31,11 @@ public class JournalUpdateStrategyKeepSubsequentTest {
     
     @Test
     public void testApply_KeepSubsequent() throws Exception {
-        VersionUpdate<DefaultDocument> update = VersionUpdate.of(journal.list().get(3)).prepare().effectiveFrom(clock.now().toLocalDate()).setProperty("data", "some new data").get();
+        VersionUpdate<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(journal.list().get(3)).prepare().effectiveFrom(clock.now().toLocalDate()).get();
         assertTrue(journal.read().activeVersions().size()==4);
         VersionUpdateResult<DefaultDocument> result = update.execute();
-        JournalUpdateStrategyKeepSubsequent<DefaultDocument> updateFunction = new JournalUpdateStrategyKeepSubsequent<DefaultDocument>();
+        result.newSubsequentVersion().setData("some new data");
+        JournalUpdateStrategyKeepSubsequent<DefaultDocument> updateFunction = new JournalUpdateStrategyKeepSubsequent<DefaultDocument>("system");
         List<DefaultDocument> updateVersion = updateFunction.apply(journal, update.result());
         assertTrue(result.newSubsequentVersion().getData().equals("some new data"));
         assertTrue(result.newPrecedingVersion().getData().equals(journal.list().get(3).getData()));
@@ -43,10 +45,11 @@ public class JournalUpdateStrategyKeepSubsequentTest {
 
     @Test
     public void testApply_KeepSubsequent_subsequentPeriodsExist_andShouldNotBeInactivated() throws Exception {
-        VersionUpdate<DefaultDocument> update = VersionUpdate.of(journal.list().get(2)).prepare().effectiveFrom(LocalDate.of(2018, 7, 1)).setProperty("data", "some new data").get();
+        VersionUpdate<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(journal.list().get(2)).prepare().effectiveFrom(LocalDate.of(2018, 7, 1)).get();
         assertTrue(journal.read().activeVersions().size()==4);
         VersionUpdateResult<DefaultDocument> result = update.execute();
-        JournalUpdateStrategyKeepSubsequent<DefaultDocument> updateFunction = new JournalUpdateStrategyKeepSubsequent<DefaultDocument>();
+        result.newSubsequentVersion().setData("some new data");
+        JournalUpdateStrategyKeepSubsequent<DefaultDocument> updateFunction = new JournalUpdateStrategyKeepSubsequent<DefaultDocument>("system");
         List<DefaultDocument> updateVersion = updateFunction.apply(journal, update.result());
         assertTrue(result.newSubsequentVersion().getData().equals("some new data"));
         assertTrue(result.newPrecedingVersion().getData().equals(journal.list().get(2).getData()));
@@ -56,10 +59,11 @@ public class JournalUpdateStrategyKeepSubsequentTest {
     
     @Test
     public void testApply_KeepSubsequent_multiplieSubsequentPeriodsExist_andShouldNotBeInactivated() throws Exception {
-        VersionUpdate<DefaultDocument> update = VersionUpdate.of(journal.list().get(0)).prepare().effectiveFrom(LocalDate.of(2016, 7, 1)).setProperty("data", "some new data").get();
+        VersionUpdate<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(journal.list().get(0)).prepare().effectiveFrom(LocalDate.of(2016, 7, 1)).get();
         assertTrue(journal.read().activeVersions().size()==4);
         VersionUpdateResult<DefaultDocument> result = update.execute();
-        JournalUpdateStrategyKeepSubsequent<DefaultDocument> updateFunction = new JournalUpdateStrategyKeepSubsequent<DefaultDocument>();
+        result.newSubsequentVersion().setData("some new data");
+        JournalUpdateStrategyKeepSubsequent<DefaultDocument> updateFunction = new JournalUpdateStrategyKeepSubsequent<DefaultDocument>("system");
         List<DefaultDocument> updateVersion = updateFunction.apply(journal, update.result());
         assertTrue(result.newSubsequentVersion().getData().equals("some new data"));
         assertTrue(result.newPrecedingVersion().getData().equals(journal.list().get(0).getData()));

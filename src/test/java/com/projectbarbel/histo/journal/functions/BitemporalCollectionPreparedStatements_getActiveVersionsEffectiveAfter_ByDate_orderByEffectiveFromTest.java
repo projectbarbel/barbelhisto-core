@@ -39,28 +39,28 @@ public class BitemporalCollectionPreparedStatements_getActiveVersionsEffectiveAf
         ResultSet<DefaultDocument> documents = function.apply(journal.collection(),
                 BarbelHistoContext.getClock().now().toLocalDate());
         assertTrue(documents.size() == 1);
-        assertEquals(documents.iterator().next().getEffectiveFrom(), LocalDate.of(2020, 1, 1));
+        assertEquals(documents.iterator().next().getBitemporalStamp().getEffectiveTime().from(), LocalDate.of(2020, 1, 1));
     }
 
     @Test
     public void testApply_threeRecord_allAfter_DueDateOnBeginning() throws Exception {
         ResultSet<DefaultDocument> documents = function.apply(journal.collection(), LocalDate.of(2010, 12, 1));
         assertTrue(documents.size() == 3);
-        assertEquals(LocalDate.of(2010, 12, 1), documents.iterator().next().getEffectiveFrom());
+        assertEquals(LocalDate.of(2010, 12, 1), documents.iterator().next().getBitemporalStamp().getEffectiveTime().from());
     }
 
     @Test
     public void testApply_threeRecord_allAfter_DueDateBefore() throws Exception {
         ResultSet<DefaultDocument> documents = function.apply(journal.collection(), LocalDate.of(2010, 11, 1));
         assertTrue(documents.size() == 3);
-        assertEquals(LocalDate.of(2010, 12, 1), documents.iterator().next().getEffectiveFrom());
+        assertEquals(LocalDate.of(2010, 12, 1), documents.iterator().next().getBitemporalStamp().getEffectiveTime().from());
     }
 
     @Test
     public void testApply_threeRecord_twoAfter() throws Exception {
         ResultSet<DefaultDocument> documents = function.apply(journal.collection(), LocalDate.of(2011, 12, 1));
         assertTrue(documents.size() == 2);
-        assertEquals(LocalDate.of(2017, 12, 1), documents.iterator().next().getEffectiveFrom());
+        assertEquals(LocalDate.of(2017, 12, 1), documents.iterator().next().getBitemporalStamp().getEffectiveTime().from());
     }
 
     @Test
