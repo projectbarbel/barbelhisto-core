@@ -59,9 +59,10 @@ public final class BarbelHistoBuilder<T> implements BarbelHistoContext<T> {
         return mode;
     }
 
-    public BarbelHistoBuilder<T> withMode(BarbelMode mode) {
+    @SuppressWarnings("unchecked")
+    public <O> BarbelHistoBuilder<O> withMode(BarbelMode mode) {
         this.mode = mode;
-        return this;
+        return (BarbelHistoBuilder<O>)this;
     }
 
     @Override

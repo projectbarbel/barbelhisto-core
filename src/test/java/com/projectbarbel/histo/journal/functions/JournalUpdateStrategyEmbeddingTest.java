@@ -33,7 +33,7 @@ public class JournalUpdateStrategyEmbeddingTest {
     
     @Test
     public void testApply_lastIntervall() throws Exception {
-        VersionUpdate<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(BarbelHistoBuilder.<DefaultDocument>barbel().withMode(BarbelMode.BITEMPORAL), journal.list().get(3)).prepare().effectiveFrom(clock.now().toLocalDate()).untilInfinite().get();
+        VersionUpdate<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL), journal.list().get(3)).prepare().effectiveFrom(clock.now().toLocalDate()).untilInfinite().get();
         VersionUpdateResult<DefaultDocument> result = update.execute();
         result.newSubsequentVersion().setData("some new data");
         List<DefaultDocument> list = new JournalUpdateStrategyEmbedding<DefaultDocument>(BarbelHistoBuilder.barbel()).apply(journal, result);
