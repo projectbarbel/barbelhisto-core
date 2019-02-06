@@ -11,7 +11,9 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.projectbarbel.histo.BarbelHistoBuilder;
 import com.projectbarbel.histo.BarbelHistoFactory;
+import com.projectbarbel.histo.BarbelMode;
 import com.projectbarbel.histo.BarbelTestHelper;
 import com.projectbarbel.histo.journal.DocumentJournal;
 import com.projectbarbel.histo.journal.VersionUpdate;
@@ -31,7 +33,7 @@ public class JournalUpdateStrategyInactivateSubsequentTest {
     
     @Test
     public void testApply_InactivateSubsequent() throws Exception {
-        VersionUpdate<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(journal.list().get(3)).prepare().effectiveFrom(clock.now().toLocalDate()).untilInfinite().get();
+        VersionUpdate<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(BarbelHistoBuilder.<DefaultDocument>barbel().withMode(BarbelMode.BITEMPORAL), journal.list().get(3)).prepare().effectiveFrom(clock.now().toLocalDate()).untilInfinite().get();
         assertTrue(journal.read().activeVersions().size()==4);
         VersionUpdateResult<DefaultDocument> result = update.execute();
         result.newSubsequentVersion().setData("some new data");
@@ -45,7 +47,7 @@ public class JournalUpdateStrategyInactivateSubsequentTest {
     
     @Test
     public void testApply_InactivateSubsequent_subsequentPeriodsExist_andShouldBeInactivated() throws Exception {
-        VersionUpdate<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(journal.list().get(2)).prepare().effectiveFrom(LocalDate.of(2018, 7, 1)).untilInfinite().get();
+        VersionUpdate<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(BarbelHistoBuilder.<DefaultDocument>barbel().withMode(BarbelMode.BITEMPORAL), journal.list().get(2)).prepare().effectiveFrom(LocalDate.of(2018, 7, 1)).untilInfinite().get();
         assertTrue(journal.read().activeVersions().size()==4);
         VersionUpdateResult<DefaultDocument> result = update.execute();
         result.newSubsequentVersion().setData("some new data");
@@ -59,7 +61,7 @@ public class JournalUpdateStrategyInactivateSubsequentTest {
     
     @Test
     public void testApply_InactivateSubsequent_multipleSubsequentPeriodsExist_andShouldBeInactivated() throws Exception {
-        VersionUpdate<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(journal.list().get(0)).prepare().effectiveFrom(LocalDate.of(2016, 7, 1)).untilInfinite().get();
+        VersionUpdate<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(BarbelHistoBuilder.<DefaultDocument>barbel().withMode(BarbelMode.BITEMPORAL), journal.list().get(0)).prepare().effectiveFrom(LocalDate.of(2016, 7, 1)).untilInfinite().get();
         assertTrue(journal.read().activeVersions().size()==4);
         VersionUpdateResult<DefaultDocument> result = update.execute();
         result.newSubsequentVersion().setData("some new data");

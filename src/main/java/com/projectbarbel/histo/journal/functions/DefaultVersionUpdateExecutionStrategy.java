@@ -45,20 +45,13 @@ public class DefaultVersionUpdateExecutionStrategy<T>
         return executionContext.createExecutionResult(newPrecedingVersionBitemporal, newSupsequentVersionBitemporal);
     }
 
-    @SuppressWarnings("unchecked")
     private T generateNewBitemporal(UpdateExecutionContext<T> executionContext, BitemporalStamp stamp) {
-        T newVersion = null;
-        if (executionContext.oldVersion() instanceof BarbelProxy) { // copy proxy target
-            newVersion = executionContext.getContext().getPojoCopyFunction()
-                    .apply(((BarbelProxy<T>) executionContext.oldVersion()).getTarget());
-        } else { // copy plain old version
-            newVersion = executionContext.getContext().getPojoCopyFunction().apply(executionContext.oldVersion());
+        T newVersion = executionContext.getContext().getMode().copy(executionContext.getContext(),
+                executionContext.oldVersion());
+        if (newVersion instanceof Bitemporal) { // make sure target and proxy will always sync their stamps
+            ((Bitemporal) newVersion).setBitemporalStamp(stamp);
         }
-        if (newVersion instanceof Bitemporal) { // make sure target and proxy will always sync their stamps 
-            ((Bitemporal)newVersion).setBitemporalStamp(stamp);
-        }
-        T newVersionBitemporal = executionContext.getContext().getPojoProxyingFunction().apply(newVersion, stamp);
-        return newVersionBitemporal;
+        return executionContext.getContext().getPojoProxyingFunction().apply(newVersion, stamp);
     }
 
     public void setNestedProperty(Object bean, String fieldname, Object value) {

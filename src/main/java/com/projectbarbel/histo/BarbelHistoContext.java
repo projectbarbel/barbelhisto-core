@@ -50,7 +50,7 @@ public interface BarbelHistoContext<T> {
     };
 
     static BarbelMode getDefaultBarbelMode() {
-        return BarbelMode.PROXY;
+        return BarbelMode.POJO;
     }
     
     static <T> Function<UpdateExecutionContext<T>, VersionUpdateResult<T>> getDefaultVersionUpdateExecutionStrategy() {

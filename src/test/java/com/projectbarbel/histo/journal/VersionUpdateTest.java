@@ -9,10 +9,11 @@ import java.time.LocalDate;
 
 import org.junit.Test;
 
+import com.projectbarbel.histo.BarbelHistoBuilder;
 import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelHistoFactory;
+import com.projectbarbel.histo.BarbelMode;
 import com.projectbarbel.histo.BarbelTestHelper;
-import com.projectbarbel.histo.journal.VersionUpdate;
 import com.projectbarbel.histo.journal.VersionUpdate.VersionUpdateExecutionBuilder;
 import com.projectbarbel.histo.journal.VersionUpdate.VersionUpdateResult;
 import com.projectbarbel.histo.model.BitemporalStamp;
@@ -25,7 +26,7 @@ public class VersionUpdateTest {
     @Test
     public void testOf() throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
-        VersionUpdateResult<DefaultDocument> result = BarbelHistoFactory.createDefaultVersionUpdate(object).execute();
+        VersionUpdateResult<DefaultDocument> result = BarbelHistoFactory.createDefaultVersionUpdate(BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL), object).execute();
         assertNotNull(result);
         assertNotNull(result.newPrecedingVersion());
         assertNotNull(result.newSubsequentVersion());
@@ -36,7 +37,7 @@ public class VersionUpdateTest {
     @Test(expected = IllegalArgumentException.class)
     public void testOf_effectiveDateOfNewVersionMustBeWithinBoundaries_onOriginEffectiveUntil() throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
-        VersionUpdate<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(object);
+        VersionUpdate<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(BarbelHistoBuilder.<DefaultDocument>barbel().withMode(BarbelMode.BITEMPORAL), object);
         update.prepare().effectiveFrom(object.getBitemporalStamp().getEffectiveTime().until());
         update.execute();
     }
@@ -45,31 +46,31 @@ public class VersionUpdateTest {
     public void testOf_effectiveDateOfNewVersionMustBeWithinBoundaries_onOriginEffectiveUntil_effectiveUntilIsInfinite()
             throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
-        BarbelHistoFactory.createDefaultVersionUpdate(object).prepare().effectiveFrom(LocalDate.MAX).execute();
+        BarbelHistoFactory.createDefaultVersionUpdate(BarbelHistoBuilder.<DefaultDocument>barbel().withMode(BarbelMode.BITEMPORAL), object).prepare().effectiveFrom(LocalDate.MAX).execute();
     }
 
     @Test
     public void testOf_effectiveDateOfNewVersionMustBeWithinBoundaries_onOriginEffectiveFrom() throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
-        BarbelHistoFactory.createDefaultVersionUpdate(object).prepare().effectiveFrom(object.getBitemporalStamp().getEffectiveTime().from()).execute();
+        BarbelHistoFactory.createDefaultVersionUpdate(BarbelHistoBuilder.<DefaultDocument>barbel().withMode(BarbelMode.BITEMPORAL), object).prepare().effectiveFrom(object.getBitemporalStamp().getEffectiveTime().from()).execute();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testOf_effectiveDateOfNewVersionMustBeWithinBoundaries_toHigh() throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
-        BarbelHistoFactory.createDefaultVersionUpdate(object).prepare().effectiveFrom(object.getBitemporalStamp().getEffectiveTime().until().plusDays(1)).execute();
+        BarbelHistoFactory.createDefaultVersionUpdate(BarbelHistoBuilder.<DefaultDocument>barbel().withMode(BarbelMode.BITEMPORAL), object).prepare().effectiveFrom(object.getBitemporalStamp().getEffectiveTime().until().plusDays(1)).execute();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testOf_effectiveDateOfNewVersionMustBeWithinBoundaries_toLow() throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
-        BarbelHistoFactory.createDefaultVersionUpdate(object).prepare().effectiveFrom(object.getBitemporalStamp().getEffectiveTime().from().minusDays(1)).execute();
+        BarbelHistoFactory.createDefaultVersionUpdate(BarbelHistoBuilder.<DefaultDocument>barbel().withMode(BarbelMode.BITEMPORAL), object).prepare().effectiveFrom(object.getBitemporalStamp().getEffectiveTime().from().minusDays(1)).execute();
     }
 
     @Test
     public void testOf_bothNewVersionsMustBeActive() throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
-        VersionUpdateResult<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(object).prepare()
+        VersionUpdateResult<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(BarbelHistoBuilder.<DefaultDocument>barbel().withMode(BarbelMode.BITEMPORAL), object).prepare()
                 .effectiveFrom(validNewEffectiveDate(object)).execute();
         assertTrue(update.newPrecedingVersion().getBitemporalStamp().isActive());
         assertTrue(update.newSubsequentVersion().getBitemporalStamp().isActive());
@@ -84,7 +85,7 @@ public class VersionUpdateTest {
     public void testOf_correctEffectiveFromDates() throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
         LocalDate newEffectDate = validNewEffectiveDate(object);
-        VersionUpdateResult<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(object).prepare().effectiveFrom(newEffectDate)
+        VersionUpdateResult<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(BarbelHistoBuilder.<DefaultDocument>barbel().withMode(BarbelMode.BITEMPORAL), object).prepare().effectiveFrom(newEffectDate)
                 .execute();
         assertEquals(update.newPrecedingVersion().getBitemporalStamp().getEffectiveTime().from(), object.getBitemporalStamp().getEffectiveTime().from());
         assertEquals(update.newSubsequentVersion().getBitemporalStamp().getEffectiveTime().from(), newEffectDate);
@@ -95,7 +96,7 @@ public class VersionUpdateTest {
     public void testOf_correctEffectiveFromDates_twoExecutesShouldCauseError() throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
         LocalDate newEffectDate = validNewEffectiveDate(object);
-        VersionUpdateExecutionBuilder<DefaultDocument> builder = BarbelHistoFactory.createDefaultVersionUpdate(object).prepare()
+        VersionUpdateExecutionBuilder<DefaultDocument> builder = BarbelHistoFactory.createDefaultVersionUpdate(BarbelHistoBuilder.<DefaultDocument>barbel().withMode(BarbelMode.BITEMPORAL), object).prepare()
                 .effectiveFrom(newEffectDate);
         builder.execute();
         builder.execute();
@@ -105,7 +106,7 @@ public class VersionUpdateTest {
     public void testOf_correctEffectiveUntilDates() throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
         LocalDate newEffectDate = validNewEffectiveDate(object);
-        VersionUpdateResult<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(object).prepare().effectiveFrom(newEffectDate)
+        VersionUpdateResult<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(BarbelHistoBuilder.<DefaultDocument>barbel().withMode(BarbelMode.BITEMPORAL), object).prepare().effectiveFrom(newEffectDate)
                 .execute();
         assertEquals(update.newPrecedingVersion().getBitemporalStamp().getEffectiveTime().until(), newEffectDate);
         assertEquals(update.newSubsequentVersion().getBitemporalStamp().getEffectiveTime().until(), object.getBitemporalStamp().getEffectiveTime().until());
@@ -116,7 +117,7 @@ public class VersionUpdateTest {
     public void testOf_newEffectivePeriods_nextToEachOther() throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
         LocalDate newEffectDate = validNewEffectiveDate(object);
-        VersionUpdateResult<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(object).prepare().effectiveFrom(newEffectDate)
+        VersionUpdateResult<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(BarbelHistoBuilder.<DefaultDocument>barbel().withMode(BarbelMode.BITEMPORAL), object).prepare().effectiveFrom(newEffectDate)
                 .execute();
         assertEquals(update.newPrecedingVersion().getBitemporalStamp().getEffectiveTime().until(),
                 update.newSubsequentVersion().getBitemporalStamp().getEffectiveTime().from());
@@ -126,7 +127,7 @@ public class VersionUpdateTest {
     public void testOf_newEffectivePeriods_nextToEachOther_FiniteOrigin() throws Exception {
         DefaultDocument object = BarbelTestHelper.random(DefaultDocument.class);
         LocalDate newEffectDate = validNewEffectiveDate(object);
-        VersionUpdateResult<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(object).prepare().effectiveFrom(newEffectDate)
+        VersionUpdateResult<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(BarbelHistoBuilder.<DefaultDocument>barbel().withMode(BarbelMode.BITEMPORAL), object).prepare().effectiveFrom(newEffectDate)
                 .execute();
         assertEquals(update.newSubsequentVersion().getBitemporalStamp().getEffectiveTime().until(), object.getBitemporalStamp().getEffectiveTime().until());
     }
@@ -138,7 +139,7 @@ public class VersionUpdateTest {
                         EffectivePeriod.builder().fromNow().toInfinite().build(), RecordPeriod.builder().build()))
                 .build();
         LocalDate newEffectDate = validNewEffectiveDate(object);
-        VersionUpdateResult<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(object).prepare().effectiveFrom(newEffectDate)
+        VersionUpdateResult<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(BarbelHistoBuilder.<DefaultDocument>barbel().withMode(BarbelMode.BITEMPORAL), object).prepare().effectiveFrom(newEffectDate)
                 .execute();
         assertEquals(object.getBitemporalStamp().getEffectiveTime().until(), BarbelHistoContext.getInfiniteDate());
         assertTrue(object.getBitemporalStamp().getEffectiveTime().isInfinite());

@@ -19,9 +19,9 @@ public class BarbelHistoFactory<T> {
         this.context = context;
     }
 
-    public static <T> VersionUpdate<T> createDefaultVersionUpdate(T currentVersion) {
+    public static <T> VersionUpdate<T> createDefaultVersionUpdate(BarbelHistoContext<T> context, T currentVersion) {
         Validate.isTrue(currentVersion instanceof Bitemporal, "only bitemporals are valid inputs");
-        return VersionUpdate.<T>of(BarbelHistoBuilder.barbel(), currentVersion);
+        return VersionUpdate.<T>of(context, currentVersion);
     }
 
     public BarbelHistoFactory<T> create(BarbelHistoContext<T> context) {

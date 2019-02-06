@@ -59,8 +59,9 @@ public final class BarbelHistoBuilder<T> implements BarbelHistoContext<T> {
         return mode;
     }
 
-    public void withMode(BarbelMode mode) {
+    public BarbelHistoBuilder<T> withMode(BarbelMode mode) {
         this.mode = mode;
+        return this;
     }
 
     @Override

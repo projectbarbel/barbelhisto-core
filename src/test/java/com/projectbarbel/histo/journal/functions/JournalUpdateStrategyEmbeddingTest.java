@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import com.projectbarbel.histo.BarbelHistoBuilder;
 import com.projectbarbel.histo.BarbelHistoFactory;
+import com.projectbarbel.histo.BarbelMode;
 import com.projectbarbel.histo.BarbelTestHelper;
 import com.projectbarbel.histo.journal.DocumentJournal;
 import com.projectbarbel.histo.journal.VersionUpdate;
@@ -32,7 +33,7 @@ public class JournalUpdateStrategyEmbeddingTest {
     
     @Test
     public void testApply_lastIntervall() throws Exception {
-        VersionUpdate<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(journal.list().get(3)).prepare().effectiveFrom(clock.now().toLocalDate()).untilInfinite().get();
+        VersionUpdate<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(BarbelHistoBuilder.<DefaultDocument>barbel().withMode(BarbelMode.BITEMPORAL), journal.list().get(3)).prepare().effectiveFrom(clock.now().toLocalDate()).untilInfinite().get();
         VersionUpdateResult<DefaultDocument> result = update.execute();
         result.newSubsequentVersion().setData("some new data");
         List<DefaultDocument> list = new JournalUpdateStrategyEmbedding<DefaultDocument>(BarbelHistoBuilder.barbel()).apply(journal, result);
