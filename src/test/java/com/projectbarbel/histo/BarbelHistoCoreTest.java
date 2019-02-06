@@ -27,12 +27,6 @@ public class BarbelHistoCoreTest {
     }
 
     @Test
-    public void testGetIdValue() throws Exception {
-        DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
-        assertEquals(pojo.getDocumentId(), core.getIdValue(pojo).get());
-    }
-
-    @Test
     public void testRetrieve() throws Exception {
         DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
         core.save(pojo, LocalDate.now(), LocalDate.MAX);
