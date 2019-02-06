@@ -21,8 +21,8 @@ public class JournalUpdateStrategyKeepSubsequent<T extends Bitemporal> implement
         List<T> newVersions = new ArrayList<T>();
         Optional<T> interruptedVersion = journal.read().effectiveTime().effectiveAt(update.effectiveFrom());
         interruptedVersion.ifPresent(d -> d.getBitemporalStamp().inactivatedCopy(user));
-        newVersions.add((T) update.newPrecedingVersion());
-        newVersions.add((T) update.newSubsequentVersion());
+        newVersions.add(update.newPrecedingVersion());
+        newVersions.add(update.newSubsequentVersion());
         return newVersions;
     }
 

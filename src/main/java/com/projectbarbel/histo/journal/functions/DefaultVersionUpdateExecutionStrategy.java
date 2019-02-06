@@ -17,22 +17,31 @@ public class DefaultVersionUpdateExecutionStrategy<T>
 
     @Override
     public VersionUpdateResult<T> apply(UpdateExecutionContext<T> executionContext) {
+
         BitemporalStamp newPrecedingStamp = BitemporalStamp.builder().withActivity(executionContext.activity())
-                .withDocumentId(((Bitemporal)executionContext.oldVersion()).getBitemporalStamp().getDocumentId())
-                .withEffectiveTime(EffectivePeriod.builder().from(((Bitemporal)executionContext.oldVersion()).getBitemporalStamp().getEffectiveTime().from())
+                .withDocumentId(((Bitemporal) executionContext.oldVersion()).getBitemporalStamp().getDocumentId())
+                .withEffectiveTime(EffectivePeriod.builder()
+                        .from(((Bitemporal) executionContext.oldVersion()).getBitemporalStamp().getEffectiveTime()
+                                .from())
                         .until(executionContext.newEffectiveFrom()).build())
                 .withRecordTime(RecordPeriod.builder().createdBy(executionContext.createdBy()).build()).build();
+
         BitemporalStamp newSubsequentStamp = BitemporalStamp.builder().withActivity(executionContext.activity())
-                .withDocumentId(((Bitemporal)executionContext.oldVersion()).getBitemporalStamp().getDocumentId())
+                .withDocumentId(((Bitemporal) executionContext.oldVersion()).getBitemporalStamp().getDocumentId())
                 .withEffectiveTime(EffectivePeriod.builder().from(executionContext.newEffectiveFrom())
-                        .until(((Bitemporal)executionContext.oldVersion()).getBitemporalStamp().getEffectiveTime().until()).build())
+                        .until(((Bitemporal) executionContext.oldVersion()).getBitemporalStamp().getEffectiveTime()
+                                .until())
+                        .build())
                 .withRecordTime(RecordPeriod.builder().createdBy(executionContext.createdBy()).build()).build();
-        T newPrecedingVersion = executionContext.copyFunction().apply((T)executionContext.oldVersion());
-        ((Bitemporal)newPrecedingVersion).setBitemporalStamp(newPrecedingStamp);
-        T newSubsequentVersion = executionContext.copyFunction().apply((T)executionContext.oldVersion());
-        ((Bitemporal)newSubsequentVersion).setBitemporalStamp(newSubsequentStamp);
+
+        T newPrecedingVersion = executionContext.copyFunction().apply((T) executionContext.oldVersion());
+        ((Bitemporal) newPrecedingVersion).setBitemporalStamp(newPrecedingStamp);
+        T newSubsequentVersion = executionContext.copyFunction().apply((T) executionContext.oldVersion());
+        ((Bitemporal) newSubsequentVersion).setBitemporalStamp(newSubsequentStamp);
+
         executionContext.propertyUpdates().keySet().stream()
                 .forEach((k) -> setNestedProperty(newSubsequentVersion, k, executionContext.propertyUpdates().get(k)));
+
         return executionContext.createExecutionResult(newPrecedingVersion, newSubsequentVersion);
     }
 

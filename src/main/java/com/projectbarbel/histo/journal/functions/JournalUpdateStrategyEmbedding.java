@@ -29,14 +29,14 @@ public class JournalUpdateStrategyEmbedding<T>
             VersionUpdateResult<T> result = context.getBarbelFactory().createVersionUpdate(interruptedUntilVersion.get()).prepare()
                     .effectiveFrom(update.effectiveUntil()).until(((Bitemporal)interruptedUntilVersion.get()).getBitemporalStamp().getEffectiveTime().until()).execute();
             ((Bitemporal)interruptedUntilVersion.get()).getBitemporalStamp().inactivatedCopy(context.getUser());
-            newVersions.add((T)result.newSubsequentVersion());
+            newVersions.add(result.newSubsequentVersion());
         }
         IndexedCollection<T> betweenVersions = journal.read().effectiveTime()
                 .effectiveBetween(((Bitemporal)update.newSubsequentVersion()).getBitemporalStamp().getEffectiveTime());
         betweenVersions.stream().forEach(d->((Bitemporal)d).getBitemporalStamp().inactivatedCopy(context.getUser()));
         interruptedFromVersion.ifPresent(d->((Bitemporal)d).getBitemporalStamp().inactivatedCopy(context.getUser()));
-        newVersions.add((T) update.newPrecedingVersion());
-        newVersions.add((T) update.newSubsequentVersion());
+        newVersions.add(update.newPrecedingVersion());
+        newVersions.add(update.newSubsequentVersion());
         return newVersions;
     }
 

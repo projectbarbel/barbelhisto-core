@@ -1,7 +1,6 @@
 package com.projectbarbel.histo.journal;
 
 import static com.googlecode.cqengine.query.QueryFactory.ascending;
-import static com.googlecode.cqengine.query.QueryFactory.equal;
 import static com.googlecode.cqengine.query.QueryFactory.orderBy;
 import static com.googlecode.cqengine.query.QueryFactory.queryOptions;
 
@@ -17,22 +16,16 @@ import org.apache.commons.lang3.Validate;
 
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
-import com.googlecode.cqengine.attribute.Attribute;
-import com.googlecode.cqengine.resultset.ResultSet;
 import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelHistoFactory;
+import com.projectbarbel.histo.BarbelQueries;
 import com.projectbarbel.histo.journal.VersionUpdate.VersionUpdateResult;
-import com.projectbarbel.histo.journal.functions.BitemporalCollectionPreparedStatements;
-import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.EffectivePeriod;
 import com.projectbarbel.histo.model.Systemclock;
 
 public class DocumentJournal<T> {
 
     private IndexedCollection<T> journal;
-    private BiFunction<IndexedCollection<T>, LocalDate, ResultSet<T>> effectiveReaderFunction = BitemporalCollectionPreparedStatements::getActiveVersionEffectiveOn_ByDate;
-    private BiFunction<IndexedCollection<T>, LocalDate, ResultSet<T>> effectiveAfterFunction = BitemporalCollectionPreparedStatements::getActiveVersionsEffectiveAfter_ByDate_orderByEffectiveFrom;
-    private BiFunction<IndexedCollection<T>, EffectivePeriod, ResultSet<T>> effectiveBetweenFunction = BitemporalCollectionPreparedStatements::getActiveVersionsEffectiveBetween_ByFromAndUntilDate_orderByEffectiveFrom;
     private Object id;
 
     private DocumentJournal(IndexedCollection<T> backbone, Object id) {
@@ -76,22 +69,16 @@ public class DocumentJournal<T> {
     }
 
     public long size() {
-        return journal.stream().filter(d -> ((Bitemporal) d).getBitemporalStamp().getDocumentId().equals(id)).count();
+        return journal.retrieve(BarbelQueries.all(id)).stream().count();
     }
 
-    @SuppressWarnings("unchecked")
     public List<T> list() {
-        return journal
-                .retrieve(equal((Attribute<T, Object>) Bitemporal.DOCUMENT_ID, (String) id),
-                        queryOptions(orderBy(ascending(Bitemporal.EFFECTIVE_FROM))))
+        return journal.retrieve(BarbelQueries.all(id), queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM))))
                 .stream().collect(Collectors.toCollection(ArrayList::new));
     }
 
-    @SuppressWarnings("unchecked")
     public IndexedCollection<T> collection() {
-        return journal
-                .retrieve(equal((Attribute<T, Object>) Bitemporal.DOCUMENT_ID, (String) id),
-                        queryOptions(orderBy(ascending(Bitemporal.EFFECTIVE_FROM))))
+        return journal.retrieve(BarbelQueries.all(id), queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM))))
                 .stream().collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
     }
 
@@ -119,15 +106,13 @@ public class DocumentJournal<T> {
 
     public static class JournalReader<T> {
         private DocumentJournal<T> journal;
-        private Systemclock clock;
 
         private JournalReader(DocumentJournal<T> journal, Systemclock clock) {
             this.journal = journal;
-            this.clock = clock;
         }
 
         public EffectiveReader<T> effectiveTime() {
-            return new EffectiveReader<T>(journal, clock);
+            return new EffectiveReader<T>(journal);
         }
 
         public RecordtimeReader<T> recordTime() {
@@ -135,50 +120,52 @@ public class DocumentJournal<T> {
         }
 
         public List<T> activeVersions() {
-            return journal.list().stream().filter(d -> ((Bitemporal) d).getBitemporalStamp().getDocumentId().equals(journal.id))
-                    .filter((d) -> ((Bitemporal) d).getBitemporalStamp().isActive()).collect(Collectors.toList());
+            return journal.journal.retrieve(BarbelQueries.allActive(journal.id)).stream().collect(Collectors.toList());
         }
 
         public List<T> inactiveVersions() {
-            return journal.list().stream().filter(d -> ((Bitemporal) d).getBitemporalStamp().getDocumentId().equals(journal.id))
-                    .filter((d) -> !((Bitemporal) d).getBitemporalStamp().isActive()).collect(Collectors.toList());
+            return journal.journal.retrieve(BarbelQueries.allInactive(journal.id)).stream()
+                    .collect(Collectors.toList());
         }
     }
 
     public static class EffectiveReader<T> {
 
         private DocumentJournal<T> journal;
-        private Systemclock clock;
 
-        public EffectiveReader(DocumentJournal<T> journal, Systemclock clock) {
+        public EffectiveReader(DocumentJournal<T> journal) {
             this.journal = journal;
-            this.clock = clock;
         }
 
         public List<T> activeVersions() {
-            return journal.list().stream().filter(d -> ((Bitemporal) d).getBitemporalStamp().getDocumentId().equals(journal.id))
-                    .filter((d) -> ((Bitemporal) d).getBitemporalStamp().isActive()).collect(Collectors.toList());
+            return journal.journal
+                    .retrieve(BarbelQueries.allActive(journal.id),
+                            queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM))))
+                    .stream().collect(Collectors.toList());
         }
 
         public Optional<T> effectiveNow() {
-            ResultSet<T> result = journal.effectiveReaderFunction.apply(journal.collection(),
-                    clock.now().toLocalDate());
-            return result.iterator().hasNext() ? Optional.of(result.iterator().next()) : Optional.empty();
+            return journal.journal.retrieve(BarbelQueries.effectiveNow(journal.id),
+                    queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM)))).stream().findFirst();
         }
 
         public Optional<T> effectiveAt(LocalDate day) {
-            ResultSet<T> result = journal.effectiveReaderFunction.apply(journal.collection(), day);
-            return result.iterator().hasNext() ? Optional.of(result.iterator().next()) : Optional.empty();
+            return journal.journal.retrieve(BarbelQueries.effectiveAt(journal.id, day),
+                    queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM)))).stream().findFirst();
         }
 
         public IndexedCollection<T> effectiveAfter(LocalDate day) {
-            return journal.effectiveAfterFunction.apply(journal.collection(), day).stream()
-                    .collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
+            return journal.journal
+                    .retrieve(BarbelQueries.effectiveAfter(journal.id, day),
+                            queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM))))
+                    .stream().collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
         }
 
-        public IndexedCollection<T> effectiveBetween(EffectivePeriod effectiveTime) {
-            return journal.effectiveBetweenFunction.apply(journal.collection(), effectiveTime).stream()
-                    .collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
+        public IndexedCollection<T> effectiveBetween(EffectivePeriod period) {
+            return journal.journal
+                    .retrieve(BarbelQueries.effectiveBetween(journal.id, period),
+                            queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM))))
+                    .stream().collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
         }
 
     }

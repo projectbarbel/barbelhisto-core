@@ -12,6 +12,7 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 
 import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.query.Query;
+import com.googlecode.cqengine.query.option.QueryOptions;
 import com.projectbarbel.histo.journal.DocumentJournal;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.EffectivePeriod;
@@ -51,6 +52,11 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
         return backbone.retrieve(query).stream().collect(Collectors.toList());
     }
 
+    @Override
+    public List<T> retrieve(Query<T> query, QueryOptions options) {
+        return backbone.retrieve(query, options).stream().collect(Collectors.toList());
+    }
+    
     protected Optional<Object> getIdValue(T currentVersion) {
         List<Field> fields = FieldUtils.getFieldsListWithAnnotation(currentVersion.getClass(), DocumentId.class);
         Validate.isTrue(fields.size() == 1,

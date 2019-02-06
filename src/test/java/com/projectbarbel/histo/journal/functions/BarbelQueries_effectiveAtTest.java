@@ -7,7 +7,6 @@ import static org.junit.Assert.assertTrue;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.function.BiFunction;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,47 +14,44 @@ import org.junit.Test;
 import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.resultset.ResultSet;
 import com.projectbarbel.histo.BarbelHistoContext;
+import com.projectbarbel.histo.BarbelQueries;
 import com.projectbarbel.histo.BarbelTestHelper;
-import com.projectbarbel.histo.journal.DocumentJournal;
-import com.projectbarbel.histo.journal.functions.BitemporalCollectionPreparedStatements;
 import com.projectbarbel.histo.model.DefaultDocument;
 
-public class BitemporalCollectionPreparedStatements_getActiveVersionEffectiveOn_ByDateTest {
+public class BarbelQueries_effectiveAtTest {
 
-    private DocumentJournal<DefaultDocument> journal;
-    private BiFunction<IndexedCollection<DefaultDocument>, LocalDate, ResultSet<DefaultDocument>> function;
+    private IndexedCollection<DefaultDocument> journal;
 
     @Before
     public void setUp() {
-        journal = DocumentJournal.create(BarbelTestHelper.generateJournalOfDefaultValueObjects("docid1",
-                Arrays.asList(LocalDate.of(2010, 12, 1), LocalDate.of(2017, 12, 1), LocalDate.of(2020, 1, 1))), "docid1");
+        journal = BarbelTestHelper.generateJournalOfDefaultValueObjects("docid1",
+                Arrays.asList(LocalDate.of(2010, 12, 1), LocalDate.of(2017, 12, 1), LocalDate.of(2020, 1, 1)));
         BarbelHistoContext.getClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 8, 0, 0));
-        function = BitemporalCollectionPreparedStatements::getActiveVersionEffectiveOn_ByDate;
     }
 
     @Test
     public void testApply() throws Exception {
-        ResultSet<DefaultDocument> document = function.apply(journal.collection(), BarbelHistoContext.getClock().now().toLocalDate());
+        ResultSet<DefaultDocument> document = journal.retrieve(BarbelQueries.effectiveAt("docid1", BarbelHistoContext.getClock().now().toLocalDate()));
         assertTrue(document.iterator().hasNext());
         assertEquals(document.iterator().next().getBitemporalStamp().getEffectiveTime().from(), LocalDate.of(2017, 12, 1));
     }
 
     @Test
     public void testApply_laterDoc() throws Exception {
-        ResultSet<DefaultDocument> document = function.apply(journal.collection(), LocalDate.of(2021, 12, 1));
+        ResultSet<DefaultDocument> document = journal.retrieve(BarbelQueries.effectiveAt("docid1", LocalDate.of(2021, 12, 1)));
         assertTrue(document.iterator().hasNext());
         assertEquals(document.iterator().next().getBitemporalStamp().getEffectiveTime().from(), LocalDate.of(2020, 1, 1));
     }
 
     @Test
     public void testApply_nonEffective() throws Exception {
-        ResultSet<DefaultDocument> document = function.apply(journal.collection(), LocalDate.of(2000, 12, 1));
+        ResultSet<DefaultDocument> document = journal.retrieve(BarbelQueries.effectiveAt("docid1", LocalDate.of(2000, 12, 1)));
         assertFalse(document.iterator().hasNext());
     }
     
     @Test
     public void testApply_earlierDoc() throws Exception {
-        ResultSet<DefaultDocument> document = function.apply(journal.collection(), LocalDate.of(2012, 12, 1));
+        ResultSet<DefaultDocument> document = journal.retrieve(BarbelQueries.effectiveAt("docid1", LocalDate.of(2012, 12, 1)));
         assertTrue(document.iterator().hasNext());
         assertEquals(document.iterator().next().getBitemporalStamp().getEffectiveTime().from(), LocalDate.of(2010, 12, 1));
     }

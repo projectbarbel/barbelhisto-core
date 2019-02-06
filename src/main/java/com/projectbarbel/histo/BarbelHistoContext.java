@@ -1,6 +1,5 @@
 package com.projectbarbel.histo;
 
-import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -66,11 +65,11 @@ public interface BarbelHistoContext<T> {
         return CLOCK;
     }
 
-    static Supplier<Serializable> getDefaultDocumentIDGenerator() {
+    static Supplier<Object> getDefaultDocumentIDGenerator() {
         return new DefaultIDGenerator();
     }
 
-    static Supplier<Serializable> getDefaultVersionIDGenerator() {
+    static Supplier<Object> getDefaultVersionIDGenerator() {
         return new DefaultIDGenerator();
     }
 

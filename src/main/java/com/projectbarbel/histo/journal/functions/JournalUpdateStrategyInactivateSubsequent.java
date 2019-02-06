@@ -23,8 +23,8 @@ public class JournalUpdateStrategyInactivateSubsequent<T extends Bitemporal> imp
         Optional<T> interruptedVersion = journal.read().effectiveTime().effectiveAt(update.effectiveFrom());
         interruptedVersion.ifPresent(d->d.getBitemporalStamp().inactivatedCopy(user));
         journal.read().effectiveTime().effectiveAfter(update.effectiveFrom()).stream().forEach((d)->d.getBitemporalStamp().inactivatedCopy(user));
-        newVersions.add((T) update.newPrecedingVersion());
-        newVersions.add((T) update.newSubsequentVersion());
+        newVersions.add(update.newPrecedingVersion());
+        newVersions.add(update.newSubsequentVersion());
         return newVersions;
     }
 
