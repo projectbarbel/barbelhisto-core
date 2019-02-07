@@ -17,9 +17,8 @@ import io.github.benas.randombeans.api.EnhancedRandom;
 
 public class BarbelHistoCoreTest {
 
-    private BarbelHistoCore<DefaultPojo> core;
+    private BarbelHistoCore core;
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Before
     public void setup() {
         core = (BarbelHistoCore) BarbelHistoBuilder.barbel().build();

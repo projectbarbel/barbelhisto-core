@@ -18,12 +18,13 @@ import com.projectbarbel.histo.journal.DocumentJournal;
 import com.projectbarbel.histo.journal.VersionUpdate;
 import com.projectbarbel.histo.journal.VersionUpdate.VersionUpdateResult;
 import com.projectbarbel.histo.journal.functions.JournalUpdateStrategyEmbedding;
+import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.DefaultDocument;
 import com.projectbarbel.histo.model.Systemclock;
 
 public class JournalUpdateStrategyEmbeddingTest {
 
-    private DocumentJournal<DefaultDocument> journal;
+    private DocumentJournal journal;
     private Systemclock clock = new Systemclock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 10, 0));
 
     @Before
@@ -33,10 +34,10 @@ public class JournalUpdateStrategyEmbeddingTest {
     
     @Test
     public void testApply_lastIntervall() throws Exception {
-        VersionUpdate<DefaultDocument> update = BarbelHistoFactory.createDefaultVersionUpdate(BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL), journal.list().get(3)).prepare().effectiveFrom(clock.now().toLocalDate()).untilInfinite().get();
-        VersionUpdateResult<DefaultDocument> result = update.execute();
-        result.newSubsequentVersion().setData("some new data");
-        List<DefaultDocument> list = new JournalUpdateStrategyEmbedding<DefaultDocument>(BarbelHistoBuilder.barbel()).apply(journal, result);
+        VersionUpdate update = BarbelHistoFactory.createDefaultVersionUpdate(BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL), (Bitemporal)journal.list().get(3)).prepare().effectiveFrom(clock.now().toLocalDate()).untilInfinite().get();
+        VersionUpdateResult result = update.execute();
+        ((DefaultDocument)result.newSubsequentVersion()).setData("some new data");
+        List<Object> list = new JournalUpdateStrategyEmbedding(BarbelHistoBuilder.barbel()).apply(journal, result);
         assertTrue(list.size()==2);
         assertTrue(journal.read().activeVersions().size()==3);
         assertTrue(journal.read().inactiveVersions().size()==1);        

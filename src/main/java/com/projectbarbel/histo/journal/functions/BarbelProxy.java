@@ -1,7 +1,7 @@
 package com.projectbarbel.histo.journal.functions;
 
-public interface BarbelProxy<T> {
+public interface BarbelProxy {
 
-    T getTarget();
+    Object getTarget();
     
 }

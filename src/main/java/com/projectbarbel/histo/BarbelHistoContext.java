@@ -30,7 +30,7 @@ import com.projectbarbel.histo.journal.functions.GsonPojoCopier;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.Systemclock;
 
-public interface BarbelHistoContext<T> {
+public interface BarbelHistoContext {
 
     public static final String SYSTEM = "SYSTEM";
     public static final String SYSTEMACTIVITY = "SYSTEMACTIVITY";
@@ -53,8 +53,8 @@ public interface BarbelHistoContext<T> {
         return BarbelMode.POJO;
     }
     
-    static <T> Function<UpdateExecutionContext<T>, VersionUpdateResult<T>> getDefaultVersionUpdateExecutionStrategy() {
-        return new DefaultVersionUpdateExecutionStrategy<T>();
+    static Function<UpdateExecutionContext, VersionUpdateResult> getDefaultVersionUpdateExecutionStrategy() {
+        return new DefaultVersionUpdateExecutionStrategy();
     }
 
     static String getDefaultActivity() {
@@ -81,8 +81,8 @@ public interface BarbelHistoContext<T> {
         return SYSTEM;
     }
 
-    static <T> BiFunction<T, BitemporalStamp, T> getDefaultProxyingFunction() {
-        return new CGIPojoProxyingFunction<T>();
+    static BiFunction<Object, BitemporalStamp, Object> getDefaultProxyingFunction() {
+        return new CGIPojoProxyingFunction();
     }
 
     static Gson getDefaultGson() {
@@ -90,33 +90,33 @@ public interface BarbelHistoContext<T> {
                 .registerTypeAdapter(ZonedDateTime.class, ZDT_SERIALIZER).create();
     }
 
-    static <T> Function<T, T> getDefaultCopyFunction() {
-        return new GsonPojoCopier<T>();
+    static Function<Object, Object> getDefaultCopyFunction() {
+        return new GsonPojoCopier();
     }
 
-    Supplier<?> getDocumentIdGenerator();
+    Supplier<Object> getDocumentIdGenerator();
 
-    Supplier<?> getVersionIdGenerator();
+    Supplier<Object> getVersionIdGenerator();
 
-    IndexedCollection<T> getBackbone();
+    IndexedCollection<Object> getBackbone();
 
     String getActivity();
 
     String getUser();
 
-    Map<Object, DocumentJournal<T>> getJournalStore();
+    Map<Object, DocumentJournal> getJournalStore();
 
-    BiFunction<T, BitemporalStamp, T> getPojoProxyingFunction();
+    BiFunction<Object, BitemporalStamp, Object> getPojoProxyingFunction();
 
-    Function<T, T> getPojoCopyFunction();
+    Function<Object, Object> getPojoCopyFunction();
 
     Gson getGson();
 
-    Function<BarbelHistoContext<T>, BiFunction<DocumentJournal<T>, VersionUpdateResult<T>, List<T>>> getJournalUpdateStrategy();
+    Function<BarbelHistoContext, BiFunction<DocumentJournal, VersionUpdateResult, List<Object>>> getJournalUpdateStrategy();
 
-    Function<UpdateExecutionContext<T>, VersionUpdateResult<T>> getVersionUpdateExecutionStrategy();
+    Function<UpdateExecutionContext, VersionUpdateResult> getVersionUpdateExecutionStrategy();
 
-    BarbelHistoFactory<T> getBarbelFactory();
+    BarbelHistoFactory getBarbelFactory();
 
     BarbelMode getMode();
 

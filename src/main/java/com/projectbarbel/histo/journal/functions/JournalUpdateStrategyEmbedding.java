@@ -11,30 +11,30 @@ import com.projectbarbel.histo.journal.DocumentJournal;
 import com.projectbarbel.histo.journal.VersionUpdate.VersionUpdateResult;
 import com.projectbarbel.histo.model.Bitemporal;
 
-public class JournalUpdateStrategyEmbedding<T>
-        implements BiFunction<DocumentJournal<T>, VersionUpdateResult<T>, List<T>> {
+public class JournalUpdateStrategyEmbedding
+        implements BiFunction<DocumentJournal, VersionUpdateResult, List<Object>> {
 
-    private final BarbelHistoContext<T> context;
+    private final BarbelHistoContext context;
 
-    public JournalUpdateStrategyEmbedding(BarbelHistoContext<T> context) {
+    public JournalUpdateStrategyEmbedding(BarbelHistoContext context) {
         this.context = context;
     }
 
     @Override
-    public List<T> apply(DocumentJournal<T> journal, final VersionUpdateResult<T> update) {
-        List<T> newVersions = new ArrayList<>();
-        Optional<T> interruptedFromVersion = journal.read().effectiveTime().effectiveAt(update.effectiveFrom());
-        Optional<T> interruptedUntilVersion = journal.read().effectiveTime().effectiveAt(update.effectiveUntil());
+    public List<Object> apply(DocumentJournal journal, final VersionUpdateResult update) {
+        List<Object> newVersions = new ArrayList<>();
+        Optional<Bitemporal> interruptedFromVersion = journal.read().effectiveTime().effectiveAt(update.effectiveFrom());
+        Optional<Bitemporal> interruptedUntilVersion = journal.read().effectiveTime().effectiveAt(update.effectiveUntil());
         if (interruptedUntilVersion.isPresent()) {
-            VersionUpdateResult<T> result = context.getBarbelFactory().createVersionUpdate(interruptedUntilVersion.get()).prepare()
-                    .effectiveFrom(update.effectiveUntil()).until(((Bitemporal)interruptedUntilVersion.get()).getBitemporalStamp().getEffectiveTime().until()).execute();
-            ((Bitemporal)interruptedUntilVersion.get()).getBitemporalStamp().inactivatedCopy(context.getUser());
+            VersionUpdateResult result = context.getBarbelFactory().createVersionUpdate(interruptedUntilVersion.get()).prepare()
+                    .effectiveFrom(update.effectiveUntil()).until((interruptedUntilVersion.get()).getBitemporalStamp().getEffectiveTime().until()).execute();
+            (interruptedUntilVersion.get()).getBitemporalStamp().inactivatedCopy(context.getUser());
             newVersions.add(result.newSubsequentVersion());
         }
-        IndexedCollection<T> betweenVersions = journal.read().effectiveTime()
-                .effectiveBetween(((Bitemporal)update.newSubsequentVersion()).getBitemporalStamp().getEffectiveTime());
-        betweenVersions.stream().forEach(d->((Bitemporal)d).getBitemporalStamp().inactivatedCopy(context.getUser()));
-        interruptedFromVersion.ifPresent(d->((Bitemporal)d).getBitemporalStamp().inactivatedCopy(context.getUser()));
+        IndexedCollection<Bitemporal> betweenVersions = journal.read().effectiveTime()
+                .effectiveBetween((update.newSubsequentVersion()).getBitemporalStamp().getEffectiveTime());
+        betweenVersions.stream().forEach(d->d.getBitemporalStamp().inactivatedCopy(context.getUser()));
+        interruptedFromVersion.ifPresent(d->d.getBitemporalStamp().inactivatedCopy(context.getUser()));
         newVersions.add(update.newPrecedingVersion());
         newVersions.add(update.newSubsequentVersion());
         return newVersions;

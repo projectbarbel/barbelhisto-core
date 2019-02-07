@@ -12,17 +12,17 @@ import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.EffectivePeriod;
 import com.projectbarbel.histo.model.RecordPeriod;
 
-public class DefaultVersionUpdateExecutionStrategy<T>
-        implements Function<UpdateExecutionContext<T>, VersionUpdateResult<T>> {
+public class DefaultVersionUpdateExecutionStrategy
+        implements Function<UpdateExecutionContext, VersionUpdateResult> {
 
     @Override
-    public VersionUpdateResult<T> apply(UpdateExecutionContext<T> executionContext) {
+    public VersionUpdateResult apply(UpdateExecutionContext executionContext) {
 
         BitemporalStamp newPrecedingStamp = BitemporalStamp.builder()
                 .withActivity(executionContext.getContext().getActivity())
-                .withDocumentId(((Bitemporal) executionContext.oldVersion()).getBitemporalStamp().getDocumentId())
+                .withDocumentId(executionContext.oldVersion().getBitemporalStamp().getDocumentId())
                 .withEffectiveTime(EffectivePeriod.builder()
-                        .from(((Bitemporal) executionContext.oldVersion()).getBitemporalStamp().getEffectiveTime()
+                        .from(executionContext.oldVersion().getBitemporalStamp().getEffectiveTime()
                                 .from())
                         .until(executionContext.newEffectiveFrom()).build())
                 .withRecordTime(RecordPeriod.builder().createdBy(executionContext.getContext().getUser()).build())
@@ -30,28 +30,19 @@ public class DefaultVersionUpdateExecutionStrategy<T>
 
         BitemporalStamp newSubsequentStamp = BitemporalStamp.builder()
                 .withActivity(executionContext.getContext().getActivity())
-                .withDocumentId(((Bitemporal) executionContext.oldVersion()).getBitemporalStamp().getDocumentId())
+                .withDocumentId(executionContext.oldVersion().getBitemporalStamp().getDocumentId())
                 .withEffectiveTime(EffectivePeriod.builder().from(executionContext.newEffectiveFrom())
-                        .until(((Bitemporal) executionContext.oldVersion()).getBitemporalStamp().getEffectiveTime()
+                        .until(executionContext.oldVersion().getBitemporalStamp().getEffectiveTime()
                                 .until())
                         .build())
                 .withRecordTime(RecordPeriod.builder().createdBy(executionContext.getContext().getUser()).build())
                 .build();
 
-        // doing the copies and the proxies
-        T newPrecedingVersionBitemporal = generateNewBitemporal(executionContext, newPrecedingStamp);
-        T newSupsequentVersionBitemporal = generateNewBitemporal(executionContext, newSubsequentStamp);
+        // doing the copies and the proxies depends on the barbel mode
+        Bitemporal newPrecedingVersionBitemporal = executionContext.getContext().getMode().snapshotManagedBitemporal(executionContext.getContext(), executionContext.oldVersion(), newPrecedingStamp);
+        Bitemporal newSupsequentVersionBitemporal = executionContext.getContext().getMode().snapshotManagedBitemporal(executionContext.getContext(), executionContext.oldVersion(), newSubsequentStamp);
 
         return executionContext.createExecutionResult(newPrecedingVersionBitemporal, newSupsequentVersionBitemporal);
-    }
-
-    private T generateNewBitemporal(UpdateExecutionContext<T> executionContext, BitemporalStamp stamp) {
-        T newVersion = executionContext.getContext().getMode().copy(executionContext.getContext(),
-                executionContext.oldVersion());
-        if (newVersion instanceof Bitemporal) { // make sure target and proxy will always sync their stamps
-            ((Bitemporal) newVersion).setBitemporalStamp(stamp);
-        }
-        return executionContext.getContext().getPojoProxyingFunction().apply(newVersion, stamp);
     }
 
     public void setNestedProperty(Object bean, String fieldname, Object value) {

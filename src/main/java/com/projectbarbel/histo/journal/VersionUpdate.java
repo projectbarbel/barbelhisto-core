@@ -10,7 +10,7 @@ import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.journal.functions.ValidateEffectiveDate;
 import com.projectbarbel.histo.model.Bitemporal;
 
-public final class VersionUpdate<T> {
+public final class VersionUpdate {
 
     public enum UpdateState {
         PREPARATION(() -> {
@@ -36,43 +36,41 @@ public final class VersionUpdate<T> {
         }
     }
 
-    private final T oldVersion;
-    private T newPrecedingVersion;
-    private T newSubsequentVersion;
+    private final Bitemporal oldVersion;
+    private Bitemporal newPrecedingVersion;
+    private Bitemporal newSubsequentVersion;
     private LocalDate newEffectiveDate;
     private LocalDate newEffectiveUntil;
     private UpdateState state = UpdateState.PREPARATION;
-    private BarbelHistoContext<T> context;
-    private VersionUpdateResult<T> result;
+    private BarbelHistoContext context;
+    private VersionUpdateResult result;
 
-    private VersionUpdate(BarbelHistoContext<T> context, T bitemporal) {
+    private VersionUpdate(BarbelHistoContext context, Bitemporal bitemporal) {
         oldVersion = Objects.requireNonNull(bitemporal, "bitemporal object must not be null");
-        newEffectiveDate = Objects.requireNonNull(
-                ((Bitemporal) bitemporal).getBitemporalStamp().getEffectiveTime().from(),
+        newEffectiveDate = Objects.requireNonNull(bitemporal.getBitemporalStamp().getEffectiveTime().from(),
                 "the bitemporal passed must not contain null value on effective from");
-        newEffectiveUntil = Objects.requireNonNull(
-                ((Bitemporal) bitemporal).getBitemporalStamp().getEffectiveTime().until(),
+        newEffectiveUntil = Objects.requireNonNull(bitemporal.getBitemporalStamp().getEffectiveTime().until(),
                 "the bitemporal passed must not contain null value on effective until");
         this.context = context;
     }
 
-    public static <T> VersionUpdate<T> of(BarbelHistoContext<T> context, T document) {
+    public static VersionUpdate of(BarbelHistoContext context, Bitemporal document) {
         Validate.isTrue(document instanceof Bitemporal, "only bitemporal objects can be the source for an update");
-        return new VersionUpdate<T>(context, document);
+        return new VersionUpdate(context, document);
     }
 
-    public VersionUpdateExecutionBuilder<T> prepare() {
-        return new VersionUpdateExecutionBuilder<T>(this);
+    public VersionUpdateExecutionBuilder prepare() {
+        return new VersionUpdateExecutionBuilder(this);
     }
 
-    @SuppressWarnings("unchecked")
-    public <O> VersionUpdateResult<O> execute() {
-        result = state.set(context.getVersionUpdateExecutionStrategy().apply(new UpdateExecutionContext<T>(context, this)));
+    public VersionUpdateResult execute() {
+        result = state
+                .set(context.getVersionUpdateExecutionStrategy().apply(new UpdateExecutionContext(context, this)));
         state = UpdateState.EXECUTED;
-        return (VersionUpdateResult<O>) result;
+        return result;
     }
 
-    public VersionUpdateResult<T> result() {
+    public VersionUpdateResult result() {
         return state.get(result);
     }
 
@@ -80,25 +78,26 @@ public final class VersionUpdate<T> {
         return state.equals(UpdateState.EXECUTED);
     }
 
-    public static class VersionUpdateResult<T> {
+    public static class VersionUpdateResult {
 
-        private VersionUpdate<T> update;
+        private VersionUpdate update;
 
-        private VersionUpdateResult(VersionUpdate<T> update, T newPrecedingVersion, T subSequentVersion) {
+        private VersionUpdateResult(VersionUpdate update, Bitemporal newPrecedingVersion,
+                Bitemporal subSequentVersion) {
             update.newPrecedingVersion = newPrecedingVersion;
             update.newSubsequentVersion = subSequentVersion;
             this.update = update;
         }
 
-        public T oldVersion() {
+        public Bitemporal oldVersion() {
             return update.oldVersion;
         }
 
-        public T newPrecedingVersion() {
+        public Bitemporal newPrecedingVersion() {
             return update.newPrecedingVersion;
         }
 
-        public T newSubsequentVersion() {
+        public Bitemporal newSubsequentVersion() {
             return update.newSubsequentVersion;
         }
 
@@ -110,74 +109,73 @@ public final class VersionUpdate<T> {
             return update.newEffectiveUntil;
         }
 
-        public void setNewSubsequentVersion(T newSubsequentVersion) {
+        public void setNewSubsequentVersion(Bitemporal newSubsequentVersion) {
             Validate.isTrue(newSubsequentVersion.getClass().equals(update.newSubsequentVersion.getClass()),
                     "new subsequent version must be of the same type as preceding version");
             Validate.isTrue(
-                    ((Bitemporal) newSubsequentVersion).getBitemporalStamp().getDocumentId()
-                            .equals(((Bitemporal) update.newSubsequentVersion).getBitemporalStamp().getDocumentId()),
+                    newSubsequentVersion.getBitemporalStamp().getDocumentId()
+                            .equals(update.newSubsequentVersion.getBitemporalStamp().getDocumentId()),
                     "only objects with the same document is can be predecessor and successor in an update");
             Validate.isTrue(
-                    ((Bitemporal) newSubsequentVersion).getBitemporalStamp().getEffectiveTime().from().equals(
-                            ((Bitemporal) update.newPrecedingVersion).getBitemporalStamp().getEffectiveTime().until()),
+                    newSubsequentVersion.getBitemporalStamp().getEffectiveTime().from()
+                            .equals(update.newPrecedingVersion.getBitemporalStamp().getEffectiveTime().until()),
                     "custom subsequent version must have effective from equal to effective until of preseding version");
             update.newSubsequentVersion = newSubsequentVersion;
         }
 
     }
 
-    public static class VersionUpdateExecutionBuilder<T> {
-        private final VersionUpdate<T> update;
+    public static class VersionUpdateExecutionBuilder {
+        private final VersionUpdate update;
         private BiPredicate<Bitemporal, LocalDate> effectiveDateValidationFuction = new ValidateEffectiveDate();
 
-        private VersionUpdateExecutionBuilder(VersionUpdate<T> update) {
+        private VersionUpdateExecutionBuilder(VersionUpdate update) {
             this.update = update;
         }
 
-        public VersionUpdateExecutionBuilder<T> effectiveFrom(LocalDate newEffectiveFrom) {
-            if (!effectiveDateValidationFuction.test((Bitemporal) update.oldVersion, newEffectiveFrom))
+        public VersionUpdateExecutionBuilder effectiveFrom(LocalDate newEffectiveFrom) {
+            if (!effectiveDateValidationFuction.test(update.oldVersion, newEffectiveFrom))
                 throw new IllegalArgumentException("new effective date is not valid: " + newEffectiveFrom
                         + " - old version: " + update.oldVersion.toString());
             update.newEffectiveDate = update.state.set(newEffectiveFrom);
             return this;
         }
 
-        public VersionUpdateExecutionBuilder<T> untilInfinite() {
+        public VersionUpdateExecutionBuilder untilInfinite() {
             update.newEffectiveUntil = update.state.set(BarbelHistoContext.getInfiniteDate());
             return this;
         }
 
-        public VersionUpdateExecutionBuilder<T> until(LocalDate newEffectiveUntil) {
+        public VersionUpdateExecutionBuilder until(LocalDate newEffectiveUntil) {
             update.newEffectiveUntil = update.state.set(newEffectiveUntil);
             return this;
         }
 
-        @SuppressWarnings("unchecked")
-        public <O> VersionUpdateResult<O> execute() {
-            return (VersionUpdateResult<O>) update.execute();
+        public VersionUpdateResult execute() {
+            return update.execute();
         }
 
-        public VersionUpdate<T> get() {
+        public VersionUpdate get() {
             return update;
         }
 
     }
 
-    public static class UpdateExecutionContext<T> {
-        private final VersionUpdate<T> update;
-        private final BarbelHistoContext<T> context;
+    public static class UpdateExecutionContext {
+        private final VersionUpdate update;
+        private final BarbelHistoContext context;
 
-        private UpdateExecutionContext(BarbelHistoContext<T> context, VersionUpdate<T> update) {
+        private UpdateExecutionContext(BarbelHistoContext context, VersionUpdate update) {
             super();
             this.update = update;
             this.context = context;
         }
-        
-        public BarbelHistoContext<T> getContext() {
+
+        public BarbelHistoContext getContext() {
             return context;
         }
 
-        public T oldVersion() {
+        public Bitemporal oldVersion() {
             return update.oldVersion;
         }
 
@@ -185,8 +183,9 @@ public final class VersionUpdate<T> {
             return update.newEffectiveDate;
         }
 
-        public VersionUpdateResult<T> createExecutionResult(T newPrecedingVersion, T newSubsequentVersion) {
-            return new VersionUpdateResult<T>(update, newPrecedingVersion, newSubsequentVersion);
+        public VersionUpdateResult createExecutionResult(Bitemporal newPrecedingVersion,
+                Bitemporal newSubsequentVersion) {
+            return new VersionUpdateResult(update, newPrecedingVersion, newSubsequentVersion);
         }
 
     }

@@ -17,59 +17,59 @@ import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.EffectivePeriod;
 import com.projectbarbel.histo.model.RecordPeriod;
 
-public final class BarbelHistoCore<T> implements BarbelHisto<T> {
+public final class BarbelHistoCore implements BarbelHisto {
 
-    private final BarbelHistoContext<T> context;
-    private final IndexedCollection<T> backbone;
-    private final Map<Object, DocumentJournal<T>> journals;
+    private final BarbelHistoContext context;
+    private final IndexedCollection<Object> backbone;
+    private final Map<Object, DocumentJournal> journals;
 
-    protected BarbelHistoCore(BarbelHistoContext<T> context) {
+    protected BarbelHistoCore(BarbelHistoContext context) {
         this.context = context;
         this.backbone = context.getBackbone();
         this.journals = context.getJournalStore();
     }
 
     @Override
-    public boolean save(T newVersion, LocalDate from, LocalDate until) {
+    public boolean save(Object newVersion, LocalDate from, LocalDate until) {
         Object id = context.getMode().drawDocumentId(newVersion);
         if (journals.containsKey(id)) {
-            DocumentJournal<T> journal = journals.get(id);
-            Optional<T> effectiveVersion = journal.read().effectiveTime().effectiveAt(from);
+            DocumentJournal journal = journals.get(id);
+            Optional<Bitemporal> effectiveVersion = journal.read().effectiveTime().effectiveAt(from);
             if (effectiveVersion.isPresent()) {
-                VersionUpdate<T> update = context.getBarbelFactory().createVersionUpdate(effectiveVersion.get())
+                VersionUpdate update = context.getBarbelFactory().createVersionUpdate(effectiveVersion.get())
                         .prepare().effectiveFrom(from).until(until).get();
-                VersionUpdateResult<T> result = update.execute();
+                VersionUpdateResult result = update.execute();
                 result.setNewSubsequentVersion(context.getMode().stampVirgin(context, newVersion,
-                        ((Bitemporal) result.newSubsequentVersion()).getBitemporalStamp()));
+                        (result.newSubsequentVersion()).getBitemporalStamp()));
                 journal.update(context.getBarbelFactory().createJournalUpdateStrategy(), result);
                 return true;
             } else
-                return straightInsert(newVersion, from, until, id);
+                return straightInsertVirgin(newVersion, from, until, id);
         }
-        return straightInsert(newVersion, from, until, id);
+        return straightInsertVirgin(newVersion, from, until, id);
     }
 
-    private boolean straightInsert(T currentVersion, LocalDate from, LocalDate until, Object id) {
+    private boolean straightInsertVirgin(Object currentVersion, LocalDate from, LocalDate until, Object id) {
         BitemporalStamp stamp = BitemporalStamp.of(context.getActivity(), id,
                 EffectivePeriod.builder().from(from).until(until).build(),
                 RecordPeriod.builder().createdBy(context.getUser()).build());
-        journals.put(id, DocumentJournal.create((IndexedCollection<T>) backbone, id));
-        T copy = context.getPojoCopyFunction().apply(currentVersion);
-        T proxy = context.getPojoProxyingFunction().apply(copy, stamp);
-        return backbone.add(proxy);
+        journals.put(id, DocumentJournal.create(backbone, id));
+        return backbone.add(context.getMode().stampVirgin(context, currentVersion, stamp));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public List<T> retrieve(Query<T> query) {
-        return backbone.retrieve(query).stream().collect(Collectors.toList());
+    public <T> List<T> retrieve(Query<T> query) {
+        return (List<T>)backbone.retrieve((Query<Object>)query).stream().collect(Collectors.toList());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public List<T> retrieve(Query<T> query, QueryOptions options) {
-        return backbone.retrieve(query, options).stream().collect(Collectors.toList());
+    public <T> List<T> retrieve(Query<T> query, QueryOptions options) {
+        return (List<T>)backbone.retrieve((Query<Object>)query, options).stream().collect(Collectors.toList());
     }
 
-    public BarbelHistoContext<T> getContext() {
+    public BarbelHistoContext getContext() {
         return context;
     }
 

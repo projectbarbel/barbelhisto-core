@@ -17,29 +17,42 @@ public abstract class BarbelMode {
     public static BarbelMode POJO = new PojoMode();
     public static BarbelMode BITEMPORAL = new BitemporalMode();
 
-    public abstract <T> T stampVirgin(BarbelHistoContext<T> context, T newVersion, BitemporalStamp stamp);
+    public abstract Bitemporal stampVirgin(BarbelHistoContext context, Object newVersion, BitemporalStamp stamp);
 
-    public abstract <T> T copy(BarbelHistoContext<T> context, T pojo);
+    public abstract Bitemporal snapshotManagedBitemporal(BarbelHistoContext context, Bitemporal sourceBitemporal, BitemporalStamp stamp);
+
+    public abstract Bitemporal snapshotPojo(BarbelHistoContext context, Object pojo, BitemporalStamp stamp);
     
-    public abstract <T> Object drawDocumentId(T pojo);
+    public abstract Object drawDocumentId(Object pojo);
 
     public static class PojoMode extends BarbelMode {
 
         @Override
-        public <T> T stampVirgin(BarbelHistoContext<T> context, T newVersion, BitemporalStamp stamp) {
-            return context.getPojoProxyingFunction().apply(newVersion, stamp);
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public <T> T copy(BarbelHistoContext<T> context, T pojo) {
-            return context.getPojoCopyFunction().apply(((BarbelProxy<T>) pojo).getTarget());
+        public Bitemporal stampVirgin(BarbelHistoContext context, Object newVersion, BitemporalStamp stamp) {
+            return (Bitemporal)context.getPojoProxyingFunction().apply(newVersion, stamp);
         }
 
         @Override
-        public <T> Object drawDocumentId(T pojo) {
+        public Bitemporal snapshotManagedBitemporal(BarbelHistoContext context, Bitemporal pojo, BitemporalStamp stamp) {
+            Object newVersion = context.getPojoCopyFunction().apply(((BarbelProxy) pojo).getTarget());
+            if (newVersion instanceof Bitemporal) { // make sure target and proxy will always sync their stamps
+                ((Bitemporal) newVersion).setBitemporalStamp(stamp);
+            }
+            Object newBitemporal = context.getPojoProxyingFunction().apply(newVersion, stamp);
+            return (Bitemporal)newBitemporal;
+        }
+
+        @Override
+        public Object drawDocumentId(Object pojo) {
             return getIdValue(pojo)
                     .orElseThrow(() -> new IllegalArgumentException("document id must not be null"));
+        }
+
+        @Override
+        public Bitemporal snapshotPojo(BarbelHistoContext context, Object pojo, BitemporalStamp stamp) {
+            Object copy = context.getPojoCopyFunction().apply(pojo);
+            Object proxy = context.getPojoProxyingFunction().apply(copy, stamp);
+            return (Bitemporal)proxy;
         }
 
     }
@@ -47,19 +60,28 @@ public abstract class BarbelMode {
     public static class BitemporalMode extends BarbelMode {
 
         @Override
-        public <T> T stampVirgin(BarbelHistoContext<T> context, T newVersion, BitemporalStamp stamp) {
+        public Bitemporal stampVirgin(BarbelHistoContext context, Object newVersion, BitemporalStamp stamp) {
             ((BitemporalVersion) newVersion).setBitemporalStamp(stamp);
-            return newVersion;
+            return (Bitemporal)newVersion;
         }
 
         @Override
-        public <T> T copy(BarbelHistoContext<T> context, T pojo) {
-            return context.getPojoCopyFunction().apply(pojo);
+        public Bitemporal snapshotManagedBitemporal(BarbelHistoContext context, Bitemporal pojo, BitemporalStamp stamp) {
+            Object newVersion = context.getPojoCopyFunction().apply(pojo);
+            ((Bitemporal)newVersion).setBitemporalStamp(stamp);
+            return (Bitemporal)newVersion;
         }
 
         @Override
-        public <T> Object drawDocumentId(T pojo) {
+        public Object drawDocumentId(Object pojo) {
             return ((Bitemporal)pojo).getBitemporalStamp().getDocumentId();
+        }
+
+        @Override
+        public Bitemporal snapshotPojo(BarbelHistoContext context, Object pojo, BitemporalStamp stamp) {
+            Object copy = context.getPojoCopyFunction().apply(pojo);
+            ((Bitemporal)copy).setBitemporalStamp(stamp);
+            return (Bitemporal)copy;
         }
 
     }

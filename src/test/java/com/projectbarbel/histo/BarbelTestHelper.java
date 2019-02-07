@@ -92,11 +92,12 @@ public class BarbelTestHelper {
                 .withRecordTime(RecordPeriod.builder().build()).build();
     }
 
-    public static IndexedCollection<DefaultDocument> generateJournalOfDefaultValueObjects(String docId,
+    @SuppressWarnings("unchecked")
+    public static <T> IndexedCollection<T> generateJournalOfDefaultValueObjects(String docId,
             List<LocalDate> effectiveDates) {
-        IndexedCollection<DefaultDocument> journal = new ConcurrentIndexedCollection<DefaultDocument>();
+        IndexedCollection<T> journal = new ConcurrentIndexedCollection<T>();
         for (int i = 0; i < effectiveDates.size(); i++) {
-            journal.add(DefaultDocument.builder().withBitemporalStamp(createPeriod(docId, effectiveDates, i))
+            journal.add((T)DefaultDocument.builder().withBitemporalStamp(createPeriod(docId, effectiveDates, i))
                     .withData(EnhancedRandom.random(String.class)).build());
         }
         return journal;

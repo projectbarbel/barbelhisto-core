@@ -6,12 +6,12 @@ import java.util.List;
 import com.googlecode.cqengine.query.Query;
 import com.googlecode.cqengine.query.option.QueryOptions;
 
-public interface BarbelHisto<T> {
+public interface BarbelHisto {
     
-    boolean save(T currentVersion, LocalDate from, LocalDate until);
+    boolean save(Object currentVersion, LocalDate from, LocalDate until);
 
-    List<T> retrieve(Query<T> query);
+    <T> List<T> retrieve(Query<T> query);
 
-    List<T> retrieve(Query<T> query, QueryOptions options);
+    <T> List<T> retrieve(Query<T> query, QueryOptions options);
 
 }

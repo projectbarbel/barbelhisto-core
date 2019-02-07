@@ -12,7 +12,7 @@ import io.github.benas.randombeans.api.EnhancedRandom;
 
 public class CGIPojoProxyingFunctionTest {
 
-    private CGIPojoProxyingFunction<DefaultPojo> proxying = new CGIPojoProxyingFunction<DefaultPojo>();
+    private CGIPojoProxyingFunction proxying = new CGIPojoProxyingFunction();
     
     @Test
     public void testApply_setBitemporal() throws Exception {
@@ -36,20 +36,19 @@ public class CGIPojoProxyingFunctionTest {
         assertEquals(null, proxy.getBitemporalStamp());
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testApply_getTargetPojo() throws Exception {
         DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
         BitemporalStamp stamp = BitemporalStamp.defaultValues();
-        DefaultPojo proxy = proxying.apply(pojo, stamp);
-        assertEquals(pojo, ((BarbelProxy<DefaultPojo>)proxy).getTarget());
+        DefaultPojo proxy = (DefaultPojo)proxying.apply(pojo, stamp);
+        assertEquals(pojo, ((BarbelProxy)proxy).getTarget());
     }
 
     @Test
     public void testApply_getBitemporal() throws Exception {
         DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
         BitemporalStamp stamp = BitemporalStamp.defaultValues();
-        DefaultPojo proxy = proxying.apply(pojo, stamp);
+        DefaultPojo proxy = (DefaultPojo)proxying.apply(pojo, stamp);
         assertEquals(stamp, ((Bitemporal)proxy).getBitemporalStamp());
     }
 
@@ -57,7 +56,7 @@ public class CGIPojoProxyingFunctionTest {
     public void testApply_checkData() throws Exception {
         DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
         BitemporalStamp stamp = BitemporalStamp.defaultValues();
-        DefaultPojo proxy = proxying.apply(pojo, stamp);
+        DefaultPojo proxy = (DefaultPojo)proxying.apply(pojo, stamp);
         assertEquals(pojo.getData(), proxy.getData());
         assertEquals(pojo.getDocumentId(), proxy.getDocumentId());
     }

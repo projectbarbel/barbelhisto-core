@@ -9,7 +9,7 @@ import com.projectbarbel.histo.journal.DocumentJournal;
 import com.projectbarbel.histo.journal.VersionUpdate.VersionUpdateResult;
 import com.projectbarbel.histo.model.Bitemporal;
 
-public class JournalUpdateStrategyInactivateSubsequent<T extends Bitemporal> implements BiFunction<DocumentJournal<T>, VersionUpdateResult<T>, List<T>> {
+public class JournalUpdateStrategyInactivateSubsequent implements BiFunction<DocumentJournal, VersionUpdateResult, List<Object>> {
 
     private final String user;
 
@@ -18,9 +18,9 @@ public class JournalUpdateStrategyInactivateSubsequent<T extends Bitemporal> imp
     }
 
     @Override
-    public List<T> apply(DocumentJournal<T> journal, VersionUpdateResult<T> update) {
-        List<T> newVersions = new ArrayList<T>();
-        Optional<T> interruptedVersion = journal.read().effectiveTime().effectiveAt(update.effectiveFrom());
+    public List<Object> apply(DocumentJournal journal, VersionUpdateResult update) {
+        List<Object> newVersions = new ArrayList<Object>();
+        Optional<Bitemporal> interruptedVersion = journal.read().effectiveTime().effectiveAt(update.effectiveFrom());
         interruptedVersion.ifPresent(d->d.getBitemporalStamp().inactivatedCopy(user));
         journal.read().effectiveTime().effectiveAfter(update.effectiveFrom()).stream().forEach((d)->d.getBitemporalStamp().inactivatedCopy(user));
         newVersions.add(update.newPrecedingVersion());

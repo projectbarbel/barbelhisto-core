@@ -10,10 +10,10 @@ import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
-public class CGIPojoProxyingFunction<T> implements BiFunction<T, BitemporalStamp, T> {
+public class CGIPojoProxyingFunction implements BiFunction<Object, BitemporalStamp, Object> {
 
     @Override
-    public T apply(T template, BitemporalStamp stamp) {
+    public Object apply(Object template, BitemporalStamp stamp) {
         
         Enhancer enhancer = new Enhancer();
         
@@ -23,7 +23,7 @@ public class CGIPojoProxyingFunction<T> implements BiFunction<T, BitemporalStamp
         enhancer.setCallback(new MethodInterceptor() {
         
             private BitemporalStamp sp = stamp;
-            private T target = template;
+            private Object target = template;
 
             public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
                 if (method.getName().equals("getBitemporalStamp")) {
@@ -45,8 +45,7 @@ public class CGIPojoProxyingFunction<T> implements BiFunction<T, BitemporalStamp
         
         enhancer.setInterfaces(new Class[] { Bitemporal.class, BarbelProxy.class });
         
-        @SuppressWarnings("unchecked")
-        T myProxy = (T) enhancer.create();
+        Object myProxy = enhancer.create();
 
         return myProxy;
 

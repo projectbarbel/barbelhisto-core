@@ -5,7 +5,7 @@ import java.util.function.Function;
 import com.google.gson.Gson;
 import com.projectbarbel.histo.BarbelHistoContext;
 
-public class GsonPojoCopier<T> implements Function<T, T>{
+public class GsonPojoCopier implements Function<Object, Object>{
 
     private Gson gson = BarbelHistoContext.getDefaultGson();
     
@@ -14,9 +14,8 @@ public class GsonPojoCopier<T> implements Function<T, T>{
     }
 
     @Override
-    public T apply(T objectFrom) {
-        @SuppressWarnings("unchecked")
-        T copy = (T) gson.fromJson(gson.toJson(objectFrom), objectFrom.getClass());
+    public Object apply(Object objectFrom) {
+        Object copy = gson.fromJson(gson.toJson(objectFrom), objectFrom.getClass());
         return copy;
     }
 

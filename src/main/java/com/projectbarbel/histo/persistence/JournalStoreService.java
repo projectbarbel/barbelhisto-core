@@ -4,36 +4,33 @@ import java.util.ServiceLoader;
 
 import com.google.gson.Gson;
 import com.projectbarbel.histo.journal.DocumentJournal;
-import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.persistence.api.JournalStoreProvider;
 
-public class JournalStoreService<T extends Bitemporal> {
+public class JournalStoreService {
     
-    private static JournalStoreService<?> service = new JournalStoreService<Bitemporal>();
+    private static JournalStoreService service = new JournalStoreService();
     @SuppressWarnings("rawtypes")
     private ServiceLoader<JournalStoreProvider> loader;
-    private JournalStoreProvider<T> provider;
+    @SuppressWarnings("rawtypes")
+    private JournalStoreProvider provider;
     private Gson gson = new Gson();
  
-    @SuppressWarnings("unchecked")
     private JournalStoreService() {
         loader = ServiceLoader.load(JournalStoreProvider.class);
         provider = loader.iterator().next();
     }
  
-    @SuppressWarnings("unchecked")
-    public static <T extends Bitemporal> JournalStoreService<T> getInstance() {
-        return (JournalStoreService<T>)service;
+    public static JournalStoreService getInstance() {
+        return service;
     }
 
-    @SuppressWarnings("unchecked")
-    public DocumentJournal<T> loadJournal(String documentId) {
+    public DocumentJournal loadJournal(String documentId) {
         String persistenceJournal = gson.toJson(provider.loadJournal(documentId));
-        DocumentJournal<?> journal = gson.fromJson(persistenceJournal, DocumentJournal.class);
-        return (DocumentJournal<T>)journal;
+        DocumentJournal journal = gson.fromJson(persistenceJournal, DocumentJournal.class);
+        return journal;
     }
 
-    public long persistJournal(DocumentJournal<T> journal) {
+    public long persistJournal(DocumentJournal journal) {
         return 0;
     }
 
