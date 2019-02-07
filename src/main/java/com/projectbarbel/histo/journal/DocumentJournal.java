@@ -5,6 +5,7 @@ import static com.googlecode.cqengine.query.QueryFactory.orderBy;
 import static com.googlecode.cqengine.query.QueryFactory.queryOptions;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -18,8 +19,8 @@ import org.apache.commons.lang3.Validate;
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
 import com.projectbarbel.histo.BarbelHistoContext;
-import com.projectbarbel.histo.BarbelHistoFactory;
 import com.projectbarbel.histo.BarbelQueries;
+import com.projectbarbel.histo.BarbelQueryOptions;
 import com.projectbarbel.histo.journal.VersionUpdate.VersionUpdateResult;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.EffectivePeriod;
@@ -40,7 +41,7 @@ public class DocumentJournal {
                 r1.addAll(r2);
                 return r1;
             });
-    
+
     private DocumentJournal(IndexedCollection<Object> backbone, Object id) {
         super();
         this.journal = backbone;
@@ -86,8 +87,7 @@ public class DocumentJournal {
     }
 
     public List<Bitemporal> list() {
-        return journal
-                .retrieve(BarbelQueries.all(id), queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM))))
+        return journal.retrieve(BarbelQueries.all(id), queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM))))
                 .stream().collect(objectToBitemporalList);
     }
 
@@ -97,7 +97,7 @@ public class DocumentJournal {
     }
 
     // @formatter:off
-    public String prettyPrint() {
+    public static String prettyPrint(IndexedCollection<Bitemporal> journal, Object id) {
         return "\n" + "Document-ID: " + (journal.size() > 0 ? id : "<empty jounral>")
                 + "\n\n"
                 + String.format("|%-40s|%-15s|%-16s|%-8s|%-21s|%-23s|%-21s|%-23s|", "Version-ID", "Effective-From",
@@ -106,7 +106,22 @@ public class DocumentJournal {
                 + StringUtils.leftPad("|", 17, "-") + StringUtils.leftPad("|", 9, "-")
                 + StringUtils.leftPad("|", 22, "-") + StringUtils.leftPad("|", 24, "-")
                 + StringUtils.leftPad("|", 22, "-") + StringUtils.leftPad("|", 24, "-") + "\n"
-                + journal.stream().map(d->BarbelHistoFactory.prettyPrint((Bitemporal)d)).collect(Collectors.joining("\n"));
+                + journal.retrieve(BarbelQueries.all(id), BarbelQueryOptions.sortAscendingByEffectiveFrom()).stream()
+                     .map(DocumentJournal::prettyPrint).collect(Collectors.joining("\n"));
+    }
+
+    public static String prettyPrint(Bitemporal bitemporal) {
+        return String.format("|%1$-40s|%2$-15tF|%3$-16tF|%4$-8s|%5$-21s|%6$-23s|%7$-21s|%8$-23s|",
+                bitemporal.getBitemporalStamp().getVersionId(), bitemporal.getBitemporalStamp().getEffectiveTime().from(),
+                bitemporal.getBitemporalStamp().getEffectiveTime().until(),
+                bitemporal.getBitemporalStamp().getRecordTime().getState().name(),
+                bitemporal.getBitemporalStamp().getRecordTime().getCreatedBy().substring(0,
+                        Math.min(bitemporal.getBitemporalStamp().getRecordTime().getCreatedBy().length(), 20)),
+                DateTimeFormatter.ofPattern("dd/MM/yyyy - hh:mm:ss")
+                        .format(bitemporal.getBitemporalStamp().getRecordTime().getCreatedAt()),
+                        bitemporal.getBitemporalStamp().getRecordTime().getInactivatedBy().substring(0,
+                        Math.min(bitemporal.getBitemporalStamp().getRecordTime().getCreatedBy().length(), 20)),
+                        bitemporal.getBitemporalStamp().getRecordTime().getInactivatedAt());
     }
     // @formatter:on
 
@@ -134,7 +149,8 @@ public class DocumentJournal {
         }
 
         public List<Bitemporal> activeVersions() {
-            return journal.journal.retrieve(BarbelQueries.allActive(journal.id)).stream().collect(journal.objectToBitemporalList);
+            return journal.journal.retrieve(BarbelQueries.allActive(journal.id)).stream()
+                    .collect(journal.objectToBitemporalList);
         }
 
         public List<Bitemporal> inactiveVersions() {
@@ -159,13 +175,17 @@ public class DocumentJournal {
         }
 
         public Optional<Bitemporal> effectiveNow() {
-            return journal.journal.retrieve(BarbelQueries.effectiveNow(journal.id),
-                    queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM)))).stream().findFirst().flatMap(o->Optional.of((Bitemporal)o));
+            return journal.journal
+                    .retrieve(BarbelQueries.effectiveNow(journal.id),
+                            queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM))))
+                    .stream().findFirst().flatMap(o -> Optional.of((Bitemporal) o));
         }
 
         public Optional<Bitemporal> effectiveAt(LocalDate day) {
-            return journal.journal.retrieve(BarbelQueries.effectiveAt(journal.id, day),
-                    queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM)))).stream().findFirst().flatMap(o->Optional.of((Bitemporal)o));
+            return journal.journal
+                    .retrieve(BarbelQueries.effectiveAt(journal.id, day),
+                            queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM))))
+                    .stream().findFirst().flatMap(o -> Optional.of((Bitemporal) o));
         }
 
         public IndexedCollection<Bitemporal> effectiveAfter(LocalDate day) {

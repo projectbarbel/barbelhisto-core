@@ -41,7 +41,7 @@ public class JournalUpdateStrategyEmbeddingTest {
         assertTrue(list.size()==2);
         assertTrue(journal.read().activeVersions().size()==3);
         assertTrue(journal.read().inactiveVersions().size()==1);        
-        System.out.println(journal.prettyPrint());
+        System.out.println(DocumentJournal.prettyPrint(journal.collection(), journal.list().get(0).getBitemporalStamp().getDocumentId()));
     }
 
 }

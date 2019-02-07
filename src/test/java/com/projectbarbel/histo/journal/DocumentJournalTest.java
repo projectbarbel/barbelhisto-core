@@ -56,10 +56,8 @@ public class DocumentJournalTest {
 
     @Test
     public void testPrettyPrint() throws Exception {
-        DocumentJournal journal = DocumentJournal
-                .create(BarbelTestHelper.asIndexedCollection(BarbelTestHelper.random(DefaultDocument.class),
-                        BarbelTestHelper.random(DefaultDocument.class)), "arbitrary");
-        assertNotNull(journal.prettyPrint());
+        assertNotNull(DocumentJournal.prettyPrint(BarbelTestHelper.asIndexedCollection(BarbelTestHelper.random(DefaultDocument.class),
+                BarbelTestHelper.random(DefaultDocument.class)), "arbitrary"));
     }
 
     @Test
@@ -73,7 +71,7 @@ public class DocumentJournalTest {
         VersionUpdateResult update = BarbelHistoFactory.createDefaultVersionUpdate(BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL), doc).prepare()
                 .effectiveFrom(BarbelHistoContext.getClock().now().plusDays(1).toLocalDate()).execute();
         journal.update(new JournalUpdateStrategyEmbedding(BarbelHistoBuilder.barbel()), update);
-        System.out.println(journal.prettyPrint());
+        System.out.println(DocumentJournal.prettyPrint(journal.collection(), doc.getBitemporalStamp().getDocumentId()));
     }
 
     @Test

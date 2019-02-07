@@ -55,41 +55,40 @@ public final class BarbelQueries {
     @SuppressWarnings("unchecked")
     public static <T> Query<T> allActive(Object id) {
         return (Query<T>)and(all(id),
-                              equal(STATE, BitemporalObjectState.ACTIVE));
+                             equal(STATE, BitemporalObjectState.ACTIVE));
     }
     
     @SuppressWarnings("unchecked")
     public static <T> Query<T> allInactive(Object id) {
         return (Query<T>)and(all(id),
-                              equal(STATE, BitemporalObjectState.INACTIVE));
+                             equal(STATE, BitemporalObjectState.INACTIVE));
     }
     
     @SuppressWarnings("unchecked")
     public static <T> Query<T> effectiveNow(Object id) {
-        return (Query<T>)and(all(id), 
-                              lessThanOrEqualTo(EFFECTIVE_FROM, BarbelHistoContext.getClock().now().toLocalDate()),
-                              greaterThan(EFFECTIVE_UNTIL, BarbelHistoContext.getClock().now().toLocalDate()));
+        return (Query<T>)and(allActive(id), 
+                             lessThanOrEqualTo(EFFECTIVE_FROM, BarbelHistoContext.getClock().now().toLocalDate()),
+                             greaterThan(EFFECTIVE_UNTIL, BarbelHistoContext.getClock().now().toLocalDate()));
     }
     
     @SuppressWarnings("unchecked")
     public static <T> Query<T> effectiveAt(Object id, LocalDate day) {
-        return (Query<T>)and(all(id), 
-                              lessThanOrEqualTo(EFFECTIVE_FROM, day),
-                              greaterThan(EFFECTIVE_UNTIL, day));
+        return (Query<T>)and(allActive(id), 
+                             lessThanOrEqualTo(EFFECTIVE_FROM, day),
+                             greaterThan(EFFECTIVE_UNTIL, day));
     }
     
     @SuppressWarnings("unchecked")
     public static <T> Query<T> effectiveAfter(Object id, LocalDate day) {
-        return (Query<T>)and(all(id), 
-                          greaterThanOrEqualTo(EFFECTIVE_FROM, day),
-                          equal(STATE, BitemporalObjectState.ACTIVE));
+        return (Query<T>)and(allActive(id), 
+                             greaterThanOrEqualTo(EFFECTIVE_FROM, day));
     }
     
     @SuppressWarnings("unchecked")
     public static <T> Query<T> effectiveBetween(Object id, EffectivePeriod period) {
-        return (Query<T>)and(greaterThanOrEqualTo(EFFECTIVE_FROM, period.from()),
-                lessThanOrEqualTo(EFFECTIVE_UNTIL, period.until()),
-                equal(STATE, BitemporalObjectState.ACTIVE));
+        return (Query<T>)and(allActive(id),
+                             greaterThanOrEqualTo(EFFECTIVE_FROM, period.from()),
+                             lessThanOrEqualTo(EFFECTIVE_UNTIL, period.until()));
     }
     // @formatter:on
 

@@ -17,7 +17,7 @@ public abstract class BarbelMode {
     public static BarbelMode POJO = new PojoMode();
     public static BarbelMode BITEMPORAL = new BitemporalMode();
 
-    public abstract Bitemporal stampVirgin(BarbelHistoContext context, Object newVersion, BitemporalStamp stamp);
+    public abstract Bitemporal stampPojo(BarbelHistoContext context, Object newVersion, BitemporalStamp stamp);
 
     public abstract Bitemporal snapshotManagedBitemporal(BarbelHistoContext context, Bitemporal sourceBitemporal, BitemporalStamp stamp);
 
@@ -28,7 +28,7 @@ public abstract class BarbelMode {
     public static class PojoMode extends BarbelMode {
 
         @Override
-        public Bitemporal stampVirgin(BarbelHistoContext context, Object newVersion, BitemporalStamp stamp) {
+        public Bitemporal stampPojo(BarbelHistoContext context, Object newVersion, BitemporalStamp stamp) {
             return (Bitemporal)context.getPojoProxyingFunction().apply(newVersion, stamp);
         }
 
@@ -60,7 +60,7 @@ public abstract class BarbelMode {
     public static class BitemporalMode extends BarbelMode {
 
         @Override
-        public Bitemporal stampVirgin(BarbelHistoContext context, Object newVersion, BitemporalStamp stamp) {
+        public Bitemporal stampPojo(BarbelHistoContext context, Object newVersion, BitemporalStamp stamp) {
             ((BitemporalVersion) newVersion).setBitemporalStamp(stamp);
             return (Bitemporal)newVersion;
         }

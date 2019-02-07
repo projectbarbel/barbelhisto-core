@@ -14,4 +14,6 @@ public interface BarbelHisto {
 
     <T> List<T> retrieve(Query<T> query, QueryOptions options);
 
+    String prettyPrintJournal(Object id);
+
 }

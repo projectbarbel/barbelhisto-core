@@ -39,22 +39,22 @@ public final class BarbelHistoCore implements BarbelHisto {
                 VersionUpdate update = context.getBarbelFactory().createVersionUpdate(effectiveVersion.get())
                         .prepare().effectiveFrom(from).until(until).get();
                 VersionUpdateResult result = update.execute();
-                result.setNewSubsequentVersion(context.getMode().stampVirgin(context, newVersion,
+                result.setNewSubsequentVersion(context.getMode().snapshotPojo(context, newVersion,
                         (result.newSubsequentVersion()).getBitemporalStamp()));
                 journal.update(context.getBarbelFactory().createJournalUpdateStrategy(), result);
                 return true;
             } else
-                return straightInsertVirgin(newVersion, from, until, id);
+                return straightInsert(newVersion, from, until, id);
         }
-        return straightInsertVirgin(newVersion, from, until, id);
+        return straightInsert(newVersion, from, until, id);
     }
 
-    private boolean straightInsertVirgin(Object currentVersion, LocalDate from, LocalDate until, Object id) {
+    private boolean straightInsert(Object currentVersion, LocalDate from, LocalDate until, Object id) {
         BitemporalStamp stamp = BitemporalStamp.of(context.getActivity(), id,
                 EffectivePeriod.builder().from(from).until(until).build(),
                 RecordPeriod.builder().createdBy(context.getUser()).build());
         journals.put(id, DocumentJournal.create(backbone, id));
-        return backbone.add(context.getMode().stampVirgin(context, currentVersion, stamp));
+        return backbone.add(context.getMode().snapshotPojo(context, currentVersion, stamp));
     }
 
     @SuppressWarnings("unchecked")
@@ -67,6 +67,14 @@ public final class BarbelHistoCore implements BarbelHisto {
     @Override
     public <T> List<T> retrieve(Query<T> query, QueryOptions options) {
         return (List<T>)backbone.retrieve((Query<Object>)query, options).stream().collect(Collectors.toList());
+    }
+    
+    @Override
+    public String prettyPrintJournal(Object id) {
+        if (journals.containsKey(id))
+            return DocumentJournal.prettyPrint(journals.get(id).collection(), id);
+        else
+            return "";
     }
 
     public BarbelHistoContext getContext() {

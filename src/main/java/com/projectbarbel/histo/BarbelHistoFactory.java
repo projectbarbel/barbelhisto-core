@@ -37,18 +37,4 @@ public class BarbelHistoFactory {
         return VersionUpdate.of(context, currentVersion);
     }
 
-    public static String prettyPrint(Bitemporal bitemporal) {
-        return String.format("|%1$-40s|%2$-15tF|%3$-16tF|%4$-8s|%5$-21s|%6$-23s|%7$-21s|%8$-23s|",
-                bitemporal.getBitemporalStamp().getVersionId(), bitemporal.getBitemporalStamp().getEffectiveTime().from(),
-                bitemporal.getBitemporalStamp().getEffectiveTime().until(),
-                bitemporal.getBitemporalStamp().getRecordTime().getState().name(),
-                bitemporal.getBitemporalStamp().getRecordTime().getCreatedBy().substring(0,
-                        Math.min(bitemporal.getBitemporalStamp().getRecordTime().getCreatedBy().length(), 20)),
-                DateTimeFormatter.ofPattern("dd/MM/yyyy - hh:mm:ss")
-                        .format(bitemporal.getBitemporalStamp().getRecordTime().getCreatedAt()),
-                        bitemporal.getBitemporalStamp().getRecordTime().getInactivatedBy().substring(0,
-                        Math.min(bitemporal.getBitemporalStamp().getRecordTime().getCreatedBy().length(), 20)),
-                        bitemporal.getBitemporalStamp().getRecordTime().getInactivatedAt());
-    }
-
 }
