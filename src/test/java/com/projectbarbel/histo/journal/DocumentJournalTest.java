@@ -14,21 +14,19 @@ import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
 import com.projectbarbel.histo.BarbelHistoBuilder;
 import com.projectbarbel.histo.BarbelHistoContext;
-import com.projectbarbel.histo.BarbelHistoFactory;
 import com.projectbarbel.histo.BarbelMode;
 import com.projectbarbel.histo.BarbelTestHelper;
-import com.projectbarbel.histo.journal.VersionUpdate.VersionUpdateResult;
 import com.projectbarbel.histo.journal.functions.JournalUpdateStrategyEmbedding;
+import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.DefaultDocument;
-import com.projectbarbel.histo.model.Bitemporal;
 
 public class DocumentJournalTest {
 
     @Test
     public void testCreate_withList() {
         DocumentJournal journal = DocumentJournal
-                .create(BarbelTestHelper.generateJournalOfDefaultValueObjects("#12345",
+                .create(BarbelTestHelper.generateJournalOfDefaultDocuments("#12345",
                         Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 4, 1))), "#12345");
         assertEquals(2, journal.size());
     }
@@ -57,27 +55,25 @@ public class DocumentJournalTest {
     @Test
     public void testPrettyPrint() throws Exception {
         assertNotNull(DocumentJournal.prettyPrint(BarbelTestHelper.asIndexedCollection(BarbelTestHelper.random(DefaultDocument.class),
-                BarbelTestHelper.random(DefaultDocument.class)), "arbitrary"));
+                BarbelTestHelper.random(DefaultDocument.class)), "arbitrary", (d) -> ((DefaultDocument)d).getData()));
     }
 
     @Test
     public void testUpdate() throws Exception {
         IndexedCollection<Object> coll = new ConcurrentIndexedCollection<Object>();
-        BarbelHistoContext.getClock().useFixedClockAt(LocalDateTime.of(2019, 2, 1, 8, 0));
+        BarbelHistoContext.getDefaultClock().useFixedClockAt(LocalDateTime.of(2019, 2, 1, 8, 0));
         DefaultDocument doc = DefaultDocument.builder().withData("some data")
-                .withBitemporalStamp(BitemporalStamp.defaultValues()).build();
+                .withBitemporalStamp(BitemporalStamp.createWithDefaultValues()).build();
         coll.add(doc);
         DocumentJournal journal = DocumentJournal.create(coll, doc.getBitemporalStamp().getDocumentId());
-        VersionUpdateResult update = BarbelHistoFactory.createDefaultVersionUpdate(BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL), doc).prepare()
-                .effectiveFrom(BarbelHistoContext.getClock().now().plusDays(1).toLocalDate()).execute();
-        journal.update(new JournalUpdateStrategyEmbedding(BarbelHistoBuilder.barbel()), update);
-        System.out.println(DocumentJournal.prettyPrint(journal.collection(), doc.getBitemporalStamp().getDocumentId()));
+        journal.update(new JournalUpdateStrategyEmbedding(BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL)), doc);
+        System.out.println(DocumentJournal.prettyPrint(journal.collection(), doc.getBitemporalStamp().getDocumentId(),(d) -> ((DefaultDocument)d).getData()));
     }
 
     @Test
     public void testList() throws Exception {
         DocumentJournal journal = DocumentJournal
-                .create(BarbelTestHelper.generateJournalOfDefaultValueObjects("#12345",
+                .create(BarbelTestHelper.generateJournalOfDefaultDocuments("#12345",
                         Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 4, 1))), "#12345");
         assertEquals(((Bitemporal)journal.list().get(0)).getBitemporalStamp().getEffectiveTime().from(), LocalDate.of(2019, 1, 1));
     }

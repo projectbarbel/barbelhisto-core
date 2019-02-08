@@ -24,23 +24,24 @@ public class BarbelQueries_effectiveBetween {
 
     @Before
     public void setUp() {
-        journal = BarbelTestHelper.generateJournalOfDefaultValueObjects("docid1",
+        journal = BarbelTestHelper.generateJournalOfDefaultDocuments("docid1",
                 Arrays.asList(LocalDate.of(2010, 12, 1), LocalDate.of(2017, 12, 1), LocalDate.of(2020, 1, 1)));
-        BarbelHistoContext.getClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 8, 0, 0));
+        BarbelHistoContext.getDefaultClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 8, 0, 0));
     }
 
     @Test
     public void testApply_threeRecord_onePeriodBetween() throws Exception {
-        ResultSet<DefaultDocument> documents = journal.retrieve(BarbelQueries.effectiveBetween("docid1", 
-                EffectivePeriod.builder().from(LocalDate.of(2010, 12, 2)).until(LocalDate.of(2020, 1, 2)).build()));
+        ResultSet<DefaultDocument> documents = journal.retrieve(BarbelQueries.effectiveBetween("docid1",
+                EffectivePeriod.of(LocalDate.of(2010, 12, 2), LocalDate.of(2020, 1, 2))));
         assertTrue(documents.size() == 1);
-        assertEquals(documents.iterator().next().getBitemporalStamp().getEffectiveTime().from(), LocalDate.of(2017, 12, 1));
+        assertEquals(documents.iterator().next().getBitemporalStamp().getEffectiveTime().from(),
+                LocalDate.of(2017, 12, 1));
     }
 
     @Test
     public void testApply_threeRecord_allBetween() throws Exception {
-        ResultSet<DefaultDocument> documents = journal.retrieve(BarbelQueries.effectiveBetween("docid1", EffectivePeriod.builder()
-                .from(LocalDate.of(2010, 11, 1)).until(BarbelHistoContext.getInfiniteDate()).build()));
+        ResultSet<DefaultDocument> documents = journal.retrieve(BarbelQueries.effectiveBetween("docid1",
+                EffectivePeriod.of(LocalDate.of(2010, 11, 1), BarbelHistoContext.getInfiniteDate())));
         assertTrue(documents.size() == 3);
     }
 

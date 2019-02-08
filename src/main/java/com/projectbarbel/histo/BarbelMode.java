@@ -10,27 +10,19 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import com.projectbarbel.histo.journal.functions.BarbelProxy;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
-import com.projectbarbel.histo.model.BitemporalVersion;
 
 public abstract class BarbelMode {
 
     public static BarbelMode POJO = new PojoMode();
     public static BarbelMode BITEMPORAL = new BitemporalMode();
 
-    public abstract Bitemporal stampPojo(BarbelHistoContext context, Object newVersion, BitemporalStamp stamp);
-
     public abstract Bitemporal snapshotManagedBitemporal(BarbelHistoContext context, Bitemporal sourceBitemporal, BitemporalStamp stamp);
 
-    public abstract Bitemporal snapshotPojo(BarbelHistoContext context, Object pojo, BitemporalStamp stamp);
+    public abstract Bitemporal snapshotMaiden(BarbelHistoContext context, Object pojo, BitemporalStamp stamp);
     
     public abstract Object drawDocumentId(Object pojo);
 
     public static class PojoMode extends BarbelMode {
-
-        @Override
-        public Bitemporal stampPojo(BarbelHistoContext context, Object newVersion, BitemporalStamp stamp) {
-            return (Bitemporal)context.getPojoProxyingFunction().apply(newVersion, stamp);
-        }
 
         @Override
         public Bitemporal snapshotManagedBitemporal(BarbelHistoContext context, Bitemporal pojo, BitemporalStamp stamp) {
@@ -49,7 +41,7 @@ public abstract class BarbelMode {
         }
 
         @Override
-        public Bitemporal snapshotPojo(BarbelHistoContext context, Object pojo, BitemporalStamp stamp) {
+        public Bitemporal snapshotMaiden(BarbelHistoContext context, Object pojo, BitemporalStamp stamp) {
             Object copy = context.getPojoCopyFunction().apply(pojo);
             Object proxy = context.getPojoProxyingFunction().apply(copy, stamp);
             return (Bitemporal)proxy;
@@ -58,12 +50,6 @@ public abstract class BarbelMode {
     }
 
     public static class BitemporalMode extends BarbelMode {
-
-        @Override
-        public Bitemporal stampPojo(BarbelHistoContext context, Object newVersion, BitemporalStamp stamp) {
-            ((BitemporalVersion) newVersion).setBitemporalStamp(stamp);
-            return (Bitemporal)newVersion;
-        }
 
         @Override
         public Bitemporal snapshotManagedBitemporal(BarbelHistoContext context, Bitemporal pojo, BitemporalStamp stamp) {
@@ -78,7 +64,8 @@ public abstract class BarbelMode {
         }
 
         @Override
-        public Bitemporal snapshotPojo(BarbelHistoContext context, Object pojo, BitemporalStamp stamp) {
+        public Bitemporal snapshotMaiden(BarbelHistoContext context, Object pojo, BitemporalStamp stamp) {
+            Validate.isTrue(pojo instanceof Bitemporal, "must inherit interface Bitemporal.class when running bitemporal mode");
             Object copy = context.getPojoCopyFunction().apply(pojo);
             ((Bitemporal)copy).setBitemporalStamp(stamp);
             return (Bitemporal)copy;

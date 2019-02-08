@@ -36,6 +36,8 @@ public class CGIPojoProxyingFunction implements BiFunction<Object, BitemporalSta
                     return null;
                 } else if (method.getName().equals("getTarget")) {
                     return target;
+                } else if (method.getName().equals("toString")) {
+                    return target.toString() + "/" + sp.getEffectiveTime().toString();
                 } else {
                     return proxy.invoke(target, args);
                 }

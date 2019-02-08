@@ -21,12 +21,10 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.googlecode.cqengine.IndexedCollection;
 import com.projectbarbel.histo.journal.DocumentJournal;
-import com.projectbarbel.histo.journal.VersionUpdate.UpdateExecutionContext;
-import com.projectbarbel.histo.journal.VersionUpdate.VersionUpdateResult;
 import com.projectbarbel.histo.journal.functions.CGIPojoProxyingFunction;
 import com.projectbarbel.histo.journal.functions.DefaultIDGenerator;
-import com.projectbarbel.histo.journal.functions.DefaultVersionUpdateExecutionStrategy;
 import com.projectbarbel.histo.journal.functions.GsonPojoCopier;
+import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.Systemclock;
 
@@ -53,10 +51,6 @@ public interface BarbelHistoContext {
         return BarbelMode.POJO;
     }
     
-    static Function<UpdateExecutionContext, VersionUpdateResult> getDefaultVersionUpdateExecutionStrategy() {
-        return new DefaultVersionUpdateExecutionStrategy();
-    }
-
     static String getDefaultActivity() {
         return SYSTEMACTIVITY;
     }
@@ -65,7 +59,7 @@ public interface BarbelHistoContext {
         return LocalDate.MAX;
     }
 
-    static Systemclock getClock() {
+    static Systemclock getDefaultClock() {
         return CLOCK;
     }
 
@@ -112,12 +106,12 @@ public interface BarbelHistoContext {
 
     Gson getGson();
 
-    Function<BarbelHistoContext, BiFunction<DocumentJournal, VersionUpdateResult, List<Object>>> getJournalUpdateStrategy();
-
-    Function<UpdateExecutionContext, VersionUpdateResult> getVersionUpdateExecutionStrategy();
+    Function<BarbelHistoContext, BiFunction<DocumentJournal, Bitemporal, List<Object>>> getJournalUpdateStrategy();
 
     BarbelHistoFactory getBarbelFactory();
 
     BarbelMode getMode();
+
+    Systemclock getClock();
 
 }

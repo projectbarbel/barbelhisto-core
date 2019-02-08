@@ -11,11 +11,11 @@ import com.google.gson.Gson;
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
 import com.projectbarbel.histo.journal.DocumentJournal;
-import com.projectbarbel.histo.journal.VersionUpdate.UpdateExecutionContext;
-import com.projectbarbel.histo.journal.VersionUpdate.VersionUpdateResult;
 import com.projectbarbel.histo.journal.functions.GsonPojoCopier;
 import com.projectbarbel.histo.journal.functions.JournalUpdateStrategyEmbedding;
+import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
+import com.projectbarbel.histo.model.Systemclock;
 
 public final class BarbelHistoBuilder implements BarbelHistoContext {
 
@@ -31,10 +31,10 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     private String user = BarbelHistoContext.getDefaultUser();
     private Map<Object, DocumentJournal> journalStore = new ConcurrentHashMap<Object, DocumentJournal>();
     private Gson gson = BarbelHistoContext.getDefaultGson();
-    private Function<UpdateExecutionContext, VersionUpdateResult> versionUpdateExecutionStrategy = BarbelHistoContext
-            .getDefaultVersionUpdateExecutionStrategy();
+    private Systemclock clock = BarbelHistoContext.getDefaultClock();
+    
     // some more complex context types
-    private Function<BarbelHistoContext, BiFunction<DocumentJournal, VersionUpdateResult, List<Object>>> journalUpdateStrategy = (
+    private Function<BarbelHistoContext, BiFunction<DocumentJournal, Bitemporal, List<Object>>> journalUpdateStrategy = (
             context) -> new JournalUpdateStrategyEmbedding(this);
     private BarbelHistoFactory barbelFactory;
 
@@ -54,6 +54,16 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     @Override
+    public Systemclock getClock() {
+        return clock;
+    }
+
+    public BarbelHistoBuilder withClock(Systemclock clock) {
+        this.clock = clock;
+        return this;
+    }
+
+    @Override
     public BarbelMode getMode() {
         return mode;
     }
@@ -68,28 +78,20 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
         return barbelFactory;
     }
 
-    public void withBarbelFactory(BarbelHistoFactory barbelFactory) {
+    public BarbelHistoContext withBarbelFactory(BarbelHistoFactory barbelFactory) {
         this.barbelFactory = barbelFactory;
+        return this;
     }
 
     @Override
-    public Function<UpdateExecutionContext, VersionUpdateResult> getVersionUpdateExecutionStrategy() {
-        return versionUpdateExecutionStrategy;
-    }
-
-    public void withVersionUpdateExecutionStrategy(
-            Function<UpdateExecutionContext, VersionUpdateResult> versionUpdateExecutionStrategy) {
-        this.versionUpdateExecutionStrategy = versionUpdateExecutionStrategy;
-    }
-
-    @Override
-    public Function<BarbelHistoContext, BiFunction<DocumentJournal, VersionUpdateResult, List<Object>>> getJournalUpdateStrategy() {
+    public Function<BarbelHistoContext, BiFunction<DocumentJournal, Bitemporal, List<Object>>> getJournalUpdateStrategy() {
         return journalUpdateStrategy;
     }
 
-    public void withJournalUpdateStrategy(
-            Function<BarbelHistoContext, BiFunction<DocumentJournal, VersionUpdateResult, List<Object>>> journalUpdateStrategy) {
+    public BarbelHistoContext withJournalUpdateStrategy(
+            Function<BarbelHistoContext, BiFunction<DocumentJournal, Bitemporal, List<Object>>> journalUpdateStrategy) {
         this.journalUpdateStrategy = journalUpdateStrategy;
+        return this;
     }
 
     @Override
@@ -97,16 +99,18 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
         return pojoCopyFunction;
     }
 
-    public void withPojoCopyFunction(Function<Object, Object> pojoCopyFunction) {
+    public BarbelHistoContext withPojoCopyFunction(Function<Object, Object> pojoCopyFunction) {
         this.pojoCopyFunction = pojoCopyFunction;
-    }
+        return this;
+   }
 
     public Gson getGson() {
         return gson;
     }
 
-    public void withGson(Gson gson) {
+    public BarbelHistoContext withGson(Gson gson) {
         this.gson = gson;
+        return this;
     }
 
     @Override
@@ -114,8 +118,9 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
         return pojoProxyingFunction;
     }
 
-    public void withPojoProxyingFunction(BiFunction<Object, BitemporalStamp, Object> proxyingFunction) {
+    public BarbelHistoContext withPojoProxyingFunction(BiFunction<Object, BitemporalStamp, Object> proxyingFunction) {
         this.pojoProxyingFunction = proxyingFunction;
+        return this;
     }
 
     @Override
@@ -123,8 +128,9 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
         return journalStore;
     }
 
-    public void withJournalStore(Map<Object, DocumentJournal> journalStore) {
+    public BarbelHistoContext withJournalStore(Map<Object, DocumentJournal> journalStore) {
         this.journalStore = journalStore;
+        return this;
     }
 
     @Override
@@ -176,8 +182,9 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
         return this;
     }
 
-    public void withUser(String user) {
+    public BarbelHistoContext withUser(String user) {
         this.user = user;
+        return this;
     }
 
     @Override

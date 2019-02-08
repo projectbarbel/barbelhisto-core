@@ -7,6 +7,16 @@ import com.projectbarbel.histo.DocumentId;
 
 public class DefaultPojo {
 
+    public DefaultPojo(String documentId, String data) {
+        super();
+        this.documentId = documentId;
+        this.data = data;
+    }
+
+    public DefaultPojo() {
+        super();
+    }
+
     public static final Attribute<DefaultPojo, String> DOCUMENT_ID = new SimpleAttribute<DefaultPojo, String>("documentId") {
         public String getValue(DefaultPojo object, QueryOptions queryOptions) { return object.getDocumentId(); }
     };
@@ -26,6 +36,11 @@ public class DefaultPojo {
     }
     public void setData(String data) {
         this.data = data;
+    }
+
+    @Override
+    public String toString() {
+        return "DefaultPojo [documentId=" + documentId + ", data=" + data + "]";
     }
     
 }

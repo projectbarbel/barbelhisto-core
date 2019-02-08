@@ -19,6 +19,7 @@ import com.googlecode.cqengine.IndexedCollection;
 import com.projectbarbel.histo.journal.functions.DefaultIDGenerator;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.DefaultDocument;
+import com.projectbarbel.histo.model.DefaultPojo;
 import com.projectbarbel.histo.model.EffectivePeriod;
 import com.projectbarbel.histo.model.RecordPeriod;
 
@@ -47,8 +48,7 @@ public class BarbelTestHelper {
             @Override
             public EffectivePeriod get() {
                 LocalDate effectiveFrom = randomLocalDate(2000, 2020);
-                return EffectivePeriod.builder().from(effectiveFrom)
-                        .until(randomLocalDate(effectiveFrom.plusDays(1), 2020)).build();
+                return EffectivePeriod.of(effectiveFrom, randomLocalDate(effectiveFrom.plusDays(1), 2020));
             }
         }).randomize(RecordPeriod.class, new Supplier<RecordPeriod>() {
 
@@ -56,23 +56,22 @@ public class BarbelTestHelper {
             public RecordPeriod get() {
                 return RecordPeriod.builder().build();
             }
-        }).randomize(
-                new FieldDefinition<BitemporalStamp, Supplier>("versionIdGenerator", Supplier.class, BitemporalStamp.class),
-                new Supplier<DefaultIDGenerator>() {
+        }).randomize(new FieldDefinition<BitemporalStamp, Supplier>("versionIdGenerator", Supplier.class,
+                BitemporalStamp.class), new Supplier<DefaultIDGenerator>() {
 
                     @Override
                     public DefaultIDGenerator get() {
                         return new DefaultIDGenerator();
                     }
-                }).randomize(
-                        new FieldDefinition<BitemporalStamp, Supplier>("documentIdGenerator", Supplier.class, BitemporalStamp.class),
-                        new Supplier<DefaultIDGenerator>() {
+                }).randomize(new FieldDefinition<BitemporalStamp, Supplier>("documentIdGenerator", Supplier.class,
+                        BitemporalStamp.class), new Supplier<DefaultIDGenerator>() {
 
                             @Override
                             public DefaultIDGenerator get() {
                                 return new DefaultIDGenerator();
                             }
-                        }).build().nextObject(clazz, excludedFields);
+                        })
+                .build().nextObject(clazz, excludedFields);
     }
 
     public static List<BitemporalStamp> generateListOfBitemporals(String docId, List<LocalDate> effectiveDates) {
@@ -86,30 +85,40 @@ public class BarbelTestHelper {
     private static BitemporalStamp createPeriod(String docId, List<LocalDate> effectiveDates, int listPointer) {
         return BitemporalStamp.builder().withDocumentId(docId)
                 .withEffectiveTime(effectiveDates.size() - 1 == listPointer
-                        ? EffectivePeriod.builder().from(effectiveDates.get(listPointer)).toInfinite().build()
-                        : EffectivePeriod.builder().from(effectiveDates.get(listPointer))
-                                .until(effectiveDates.get(listPointer + 1)).build())
+                        ? EffectivePeriod.of(effectiveDates.get(listPointer), LocalDate.MAX)
+                        : EffectivePeriod.of(effectiveDates.get(listPointer), effectiveDates.get(listPointer + 1)))
                 .withRecordTime(RecordPeriod.builder().build()).build();
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> IndexedCollection<T> generateJournalOfDefaultValueObjects(String docId,
+    public static <T> IndexedCollection<T> generateJournalOfDefaultDocuments(String docId,
             List<LocalDate> effectiveDates) {
         IndexedCollection<T> journal = new ConcurrentIndexedCollection<T>();
         for (int i = 0; i < effectiveDates.size(); i++) {
-            journal.add((T)DefaultDocument.builder().withBitemporalStamp(createPeriod(docId, effectiveDates, i))
+            journal.add((T) DefaultDocument.builder().withBitemporalStamp(createPeriod(docId, effectiveDates, i))
                     .withData(EnhancedRandom.random(String.class)).build());
         }
         return journal;
     }
 
+    public static IndexedCollection<Object> generateJournalOfDefaultPojos(String docId,
+            List<LocalDate> effectiveDates) {
+        IndexedCollection<Object> journal = new ConcurrentIndexedCollection<Object>();
+        DefaultPojo pojo = new DefaultPojo(docId, "first original");
+        for (int i = 0; i < effectiveDates.size(); i++) {
+            journal.add((DefaultPojo) BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(), pojo,
+                    createPeriod(docId, effectiveDates, i)));
+        }
+        return journal;
+    }
+
     @SuppressWarnings("unchecked")
-    public static <T> IndexedCollection<T> asIndexedCollection(T... objects){
+    public static <T> IndexedCollection<T> asIndexedCollection(T... objects) {
         ConcurrentIndexedCollection<T> collection = new ConcurrentIndexedCollection<>();
-        Arrays.asList(objects).stream().forEach(d->collection.add((T)d));
+        Arrays.asList(objects).stream().forEach(d -> collection.add((T) d));
         return collection;
     }
-    
+
     public static LocalDate randomLocalDate(int startYear, int endYear) {
         long minDay = LocalDate.of(startYear, 1, 1).toEpochDay();
         long maxDay = LocalDate.of(endYear, 12, 31).toEpochDay();

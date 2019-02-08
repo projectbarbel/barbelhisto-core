@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -21,7 +22,6 @@ import com.googlecode.cqengine.IndexedCollection;
 import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelQueries;
 import com.projectbarbel.histo.BarbelQueryOptions;
-import com.projectbarbel.histo.journal.VersionUpdate.VersionUpdateResult;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.EffectivePeriod;
 import com.projectbarbel.histo.model.Systemclock;
@@ -63,18 +63,9 @@ public class DocumentJournal {
         return newjournal;
     }
 
-    public void update(BiFunction<DocumentJournal, VersionUpdateResult, List<Object>> journalUpdateStrategy,
-            VersionUpdateResult update) {
+    public void update(BiFunction<DocumentJournal, Bitemporal, List<Object>> journalUpdateStrategy, Bitemporal update) {
         Validate.notNull(update, "update passed must not be null");
-        Validate.validState(journal.contains(update.oldVersion()),
-                "the old version of that update passed is unknown in this journal - please only add valid update whose origin are objects from this journal");
-        Validate.validState(!journal.contains(update.newPrecedingVersion()),
-                "the new generated preceeding version by this update was already added to the journal");
-        Validate.validState(!journal.contains(update.newSubsequentVersion()),
-                "the new generated subsequent version by this update was already added to the journal");
-        if (journal.contains(update.oldVersion())) {
-            journal.addAll(journalUpdateStrategy.apply(this, update));
-        }
+        journal.addAll(journalUpdateStrategy.apply(this, update));
     }
 
     @Override
@@ -97,31 +88,31 @@ public class DocumentJournal {
     }
 
     // @formatter:off
-    public static String prettyPrint(IndexedCollection<Bitemporal> journal, Object id) {
+    public static String prettyPrint(IndexedCollection<Bitemporal> journal, Object id, Function<Bitemporal, String> customField) {
         return "\n" + "Document-ID: " + (journal.size() > 0 ? id : "<empty jounral>")
                 + "\n\n"
-                + String.format("|%-40s|%-15s|%-16s|%-8s|%-21s|%-23s|%-21s|%-23s|", "Version-ID", "Effective-From",
-                        "Effective-Until", "State", "Created-By", "Created-At", "Inactivated-By", "Inactivated-At")
+                + String.format("|%-40s|%-15s|%-16s|%-8s|%-21s|%-45s|%-21s|%-45s|%-31s|", "Version-ID", "Effective-From",
+                        "Effective-Until", "State", "Created-By", "Created-At", "Inactivated-By", "Inactivated-At", "Data")
                 + "\n|" + StringUtils.leftPad("|", 41, "-") + StringUtils.leftPad("|", 16, "-")
                 + StringUtils.leftPad("|", 17, "-") + StringUtils.leftPad("|", 9, "-")
-                + StringUtils.leftPad("|", 22, "-") + StringUtils.leftPad("|", 24, "-")
-                + StringUtils.leftPad("|", 22, "-") + StringUtils.leftPad("|", 24, "-") + "\n"
+                + StringUtils.leftPad("|", 22, "-") + StringUtils.leftPad("|", 46, "-")
+                + StringUtils.leftPad("|", 22, "-") + StringUtils.leftPad("|", 46, "-") + StringUtils.leftPad("|", 32, "-") + 
+                "\n"
                 + journal.retrieve(BarbelQueries.all(id), BarbelQueryOptions.sortAscendingByEffectiveFrom()).stream()
-                     .map(DocumentJournal::prettyPrint).collect(Collectors.joining("\n"));
+                     .map(d -> prettyPrint(d, customField)).collect(Collectors.joining("\n"));
     }
 
-    public static String prettyPrint(Bitemporal bitemporal) {
-        return String.format("|%1$-40s|%2$-15tF|%3$-16tF|%4$-8s|%5$-21s|%6$-23s|%7$-21s|%8$-23s|",
+    private static String prettyPrint(Bitemporal bitemporal, Function<Bitemporal, String> customField) {
+        return String.format("|%1$-40s|%2$-15tF|%3$-16tF|%4$-8s|%5$-21s|%6$-45s|%7$-21s|%8$-45s|%9$-31s|",
                 bitemporal.getBitemporalStamp().getVersionId(), bitemporal.getBitemporalStamp().getEffectiveTime().from(),
                 bitemporal.getBitemporalStamp().getEffectiveTime().until(),
                 bitemporal.getBitemporalStamp().getRecordTime().getState().name(),
-                bitemporal.getBitemporalStamp().getRecordTime().getCreatedBy().substring(0,
-                        Math.min(bitemporal.getBitemporalStamp().getRecordTime().getCreatedBy().length(), 20)),
-                DateTimeFormatter.ofPattern("dd/MM/yyyy - hh:mm:ss")
+                StringUtils.truncate(bitemporal.getBitemporalStamp().getRecordTime().getCreatedBy(), 20),
+                DateTimeFormatter.ISO_ZONED_DATE_TIME
                         .format(bitemporal.getBitemporalStamp().getRecordTime().getCreatedAt()),
-                        bitemporal.getBitemporalStamp().getRecordTime().getInactivatedBy().substring(0,
-                        Math.min(bitemporal.getBitemporalStamp().getRecordTime().getCreatedBy().length(), 20)),
-                        bitemporal.getBitemporalStamp().getRecordTime().getInactivatedAt());
+                        StringUtils.truncate(bitemporal.getBitemporalStamp().getRecordTime().getInactivatedBy(), 20),
+                        DateTimeFormatter.ISO_ZONED_DATE_TIME
+                        .format(bitemporal.getBitemporalStamp().getRecordTime().getInactivatedAt()), StringUtils.truncate(customField.apply(bitemporal),30));
     }
     // @formatter:on
 
@@ -130,7 +121,7 @@ public class DocumentJournal {
     }
 
     public JournalReader read() {
-        return new JournalReader(this, BarbelHistoContext.getClock());
+        return new JournalReader(this, BarbelHistoContext.getDefaultClock());
     }
 
     public static class JournalReader {

@@ -1,5 +1,6 @@
 package com.projectbarbel.histo.model;
 
+import java.time.LocalDate;
 import java.util.Objects;
 
 import com.projectbarbel.histo.BarbelHistoContext;
@@ -13,19 +14,28 @@ public final class BitemporalStamp {
     protected final RecordPeriod recordTime;
 
     private BitemporalStamp(Builder builder) {
-        this.versionId = builder.versionId != null ? builder.versionId : BarbelHistoContext.getDefaultVersionIDGenerator().get();
-        this.documentId = builder.documentId != null ? builder.documentId : BarbelHistoContext.getDefaultDocumentIDGenerator().get();
+        this.versionId = builder.versionId != null ? builder.versionId
+                : BarbelHistoContext.getDefaultVersionIDGenerator().get();
+        this.documentId = builder.documentId != null ? builder.documentId
+                : BarbelHistoContext.getDefaultDocumentIDGenerator().get();
         this.activity = builder.activity != null ? builder.activity : BarbelHistoContext.getDefaultActivity();
         this.effectiveTime = Objects.requireNonNull(builder.effectiveTime);
         this.recordTime = Objects.requireNonNull(builder.recordTime);
     }
 
-    public static BitemporalStamp defaultValues() {
+    public static BitemporalStamp createWithDefaultValues() {
         return builder().withActivity(BarbelHistoContext.getDefaultActivity())
                 .withDocumentId((String) BarbelHistoContext.getDefaultDocumentIDGenerator().get())
                 .withVersionId(BarbelHistoContext.getDefaultVersionIDGenerator().get())
-                .withEffectiveTime(EffectivePeriod.builder().build()).withRecordTime(RecordPeriod.builder().build())
+                .withEffectiveTime(EffectivePeriod.of(BarbelHistoContext.getDefaultClock().today(), LocalDate.MAX)).withRecordTime(RecordPeriod.builder().build())
                 .build();
+    }
+
+    public static BitemporalStamp createActiveWithContext(BarbelHistoContext context, Object documentId,
+            EffectivePeriod period) {
+        return builder().withActivity(context.getActivity()).withDocumentId(documentId)
+                .withVersionId(context.getVersionIdGenerator().get()).withEffectiveTime(period)
+                .withRecordTime(RecordPeriod.createActive(context)).build();
     }
 
     public static BitemporalStamp of(String activity, Object documentId, EffectivePeriod effectiveTime,
@@ -55,9 +65,9 @@ public final class BitemporalStamp {
         return activity;
     }
 
-    public BitemporalStamp inactivatedCopy(String inactivatedBy) {
+    public BitemporalStamp inactivatedCopy(BarbelHistoContext context) {
         return builder().withActivity(activity).withDocumentId(documentId).withEffectiveTime(effectiveTime)
-                .withRecordTime(recordTime.inactivate(inactivatedBy)).withVersionId(versionId).build();
+                .withRecordTime(recordTime.inactivate(context)).withVersionId(versionId).build();
     }
 
     public boolean isActive() {

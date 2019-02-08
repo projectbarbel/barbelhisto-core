@@ -9,9 +9,9 @@ import com.projectbarbel.histo.BarbelHistoContext;
 
 public class RecordPeriod {
 
-    private final static ZonedDateTime NOT_INACTIVATED = ZonedDateTime.of(LocalDateTime.of(2199, 12, 31, 23, 59),
+    public final static ZonedDateTime NOT_INACTIVATED = ZonedDateTime.of(LocalDateTime.of(2199, 12, 31, 23, 59),
             ZoneId.of("Z"));
-    private final static String NOBODY = "NOBODY";
+    public final static String NOBODY = "NOBODY";
 
     private final ZonedDateTime createdAt;
     private final String createdBy;
@@ -20,13 +20,17 @@ public class RecordPeriod {
     private BitemporalObjectState state;
 
     private RecordPeriod(Builder builder) {
-        this.createdAt = builder.createdAt != null ? builder.createdAt : BarbelHistoContext.getClock().now();
+        this.createdAt = builder.createdAt != null ? builder.createdAt : BarbelHistoContext.getDefaultClock().now();
         this.createdBy = builder.createdBy != null ? builder.createdBy : BarbelHistoContext.getDefaultUser();
         this.inactivatedAt = builder.inactivatedAt != null ? builder.inactivatedAt : NOT_INACTIVATED;
         this.inactivatedBy = builder.inactivatedBy != null ? builder.inactivatedBy : NOBODY;
         this.state = compileState();
     }
 
+    public static RecordPeriod createActive(BarbelHistoContext context) {
+        return builder().createdBy(context.getUser()).createdAt(context.getClock().now()).build();
+    }
+    
     private BitemporalObjectState compileState() {
         if (inactivatedAt.equals(NOT_INACTIVATED) && inactivatedBy.equals(NOBODY))
             return BitemporalObjectState.ACTIVE;
@@ -36,10 +40,10 @@ public class RecordPeriod {
             throw new IllegalStateException("cannot compile state: " + toString());
     }
 
-    public RecordPeriod inactivate(String inactivatedBy) {
-        this.inactivatedAt = BarbelHistoContext.getClock().now();
+    public RecordPeriod inactivate(BarbelHistoContext context) {
+        this.inactivatedAt = context.getClock().now();
         this.state = BitemporalObjectState.INACTIVE;
-        this.inactivatedBy = Objects.requireNonNull(inactivatedBy);
+        this.inactivatedBy = Objects.requireNonNull(context.getUser());
         return this;
     }
 

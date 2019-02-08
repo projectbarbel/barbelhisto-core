@@ -26,15 +26,15 @@ public class BarbelQueries_effectiveAfterTest {
 
     @Before
     public void setUp() {
-        journal = BarbelTestHelper.generateJournalOfDefaultValueObjects("docid1",
+        journal = BarbelTestHelper.generateJournalOfDefaultDocuments("docid1",
                 Arrays.asList(LocalDate.of(2010, 12, 1), LocalDate.of(2017, 12, 1), LocalDate.of(2020, 1, 1)));
-        BarbelHistoContext.getClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 8, 0, 0));
+        BarbelHistoContext.getDefaultClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 8, 0, 0));
     }
 
     @Test
     public void testApply_threeRecord_onePeriodAfterCurrent() throws Exception {
         ResultSet<DefaultDocument> documents = journal
-                .retrieve(BarbelQueries.effectiveAfter("docid1", BarbelHistoContext.getClock().now().toLocalDate()));
+                .retrieve(BarbelQueries.effectiveAfter("docid1", BarbelHistoContext.getDefaultClock().now().toLocalDate()));
         assertTrue(documents.size() == 1);
         assertEquals(documents.iterator().next().getBitemporalStamp().getEffectiveTime().from(),
                 LocalDate.of(2020, 1, 1));

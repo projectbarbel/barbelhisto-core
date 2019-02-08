@@ -24,14 +24,14 @@ public class BarbelQueries_effectiveAtTest {
 
     @Before
     public void setUp() {
-        journal = BarbelTestHelper.generateJournalOfDefaultValueObjects("docid1",
+        journal = BarbelTestHelper.generateJournalOfDefaultDocuments("docid1",
                 Arrays.asList(LocalDate.of(2010, 12, 1), LocalDate.of(2017, 12, 1), LocalDate.of(2020, 1, 1)));
-        BarbelHistoContext.getClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 8, 0, 0));
+        BarbelHistoContext.getDefaultClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 8, 0, 0));
     }
 
     @Test
     public void testApply() throws Exception {
-        ResultSet<DefaultDocument> document = journal.retrieve(BarbelQueries.effectiveAt("docid1", BarbelHistoContext.getClock().now().toLocalDate()));
+        ResultSet<DefaultDocument> document = journal.retrieve(BarbelQueries.effectiveAt("docid1", BarbelHistoContext.getDefaultClock().now().toLocalDate()));
         assertTrue(document.iterator().hasNext());
         assertEquals(document.iterator().next().getBitemporalStamp().getEffectiveTime().from(), LocalDate.of(2017, 12, 1));
     }

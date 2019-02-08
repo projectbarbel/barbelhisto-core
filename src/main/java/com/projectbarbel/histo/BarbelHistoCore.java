@@ -4,14 +4,13 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.query.Query;
 import com.googlecode.cqengine.query.option.QueryOptions;
 import com.projectbarbel.histo.journal.DocumentJournal;
-import com.projectbarbel.histo.journal.VersionUpdate;
-import com.projectbarbel.histo.journal.VersionUpdate.VersionUpdateResult;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.EffectivePeriod;
@@ -32,29 +31,24 @@ public final class BarbelHistoCore implements BarbelHisto {
     @Override
     public boolean save(Object newVersion, LocalDate from, LocalDate until) {
         Object id = context.getMode().drawDocumentId(newVersion);
+        BitemporalStamp stamp = BitemporalStamp.of(context.getActivity(), id,
+                EffectivePeriod.of(from,until),
+                RecordPeriod.builder().createdBy(context.getUser()).build());
         if (journals.containsKey(id)) {
             DocumentJournal journal = journals.get(id);
             Optional<Bitemporal> effectiveVersion = journal.read().effectiveTime().effectiveAt(from);
             if (effectiveVersion.isPresent()) {
-                VersionUpdate update = context.getBarbelFactory().createVersionUpdate(effectiveVersion.get())
-                        .prepare().effectiveFrom(from).until(until).get();
-                VersionUpdateResult result = update.execute();
-                result.setNewSubsequentVersion(context.getMode().snapshotPojo(context, newVersion,
-                        (result.newSubsequentVersion()).getBitemporalStamp()));
-                journal.update(context.getBarbelFactory().createJournalUpdateStrategy(), result);
+                journal.update(context.getBarbelFactory().createJournalUpdateStrategy(), context.getMode().snapshotMaiden(context, newVersion, stamp));
                 return true;
             } else
-                return straightInsert(newVersion, from, until, id);
+                return straightInsert(newVersion, stamp, id);
         }
-        return straightInsert(newVersion, from, until, id);
+        return straightInsert(newVersion, stamp, id);
     }
 
-    private boolean straightInsert(Object currentVersion, LocalDate from, LocalDate until, Object id) {
-        BitemporalStamp stamp = BitemporalStamp.of(context.getActivity(), id,
-                EffectivePeriod.builder().from(from).until(until).build(),
-                RecordPeriod.builder().createdBy(context.getUser()).build());
+    private boolean straightInsert(Object currentVersion, BitemporalStamp stamp, Object id) {
         journals.put(id, DocumentJournal.create(backbone, id));
-        return backbone.add(context.getMode().snapshotPojo(context, currentVersion, stamp));
+        return backbone.add(context.getMode().snapshotMaiden(context, currentVersion, stamp));
     }
 
     @SuppressWarnings("unchecked")
@@ -70,9 +64,9 @@ public final class BarbelHistoCore implements BarbelHisto {
     }
     
     @Override
-    public String prettyPrintJournal(Object id) {
+    public String prettyPrintJournal(Object id, Function<Bitemporal, String> customField) {
         if (journals.containsKey(id))
-            return DocumentJournal.prettyPrint(journals.get(id).collection(), id);
+            return DocumentJournal.prettyPrint(journals.get(id).collection(), id,customField);
         else
             return "";
     }

@@ -5,8 +5,6 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
-import com.projectbarbel.histo.journal.functions.DefaultIDGenerator;
-
 public class DefaultIDGeneratorTest {
 
     @Test

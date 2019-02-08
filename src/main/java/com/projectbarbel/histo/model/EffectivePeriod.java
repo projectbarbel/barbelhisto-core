@@ -3,19 +3,20 @@ package com.projectbarbel.histo.model;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import javax.annotation.Generated;
-
 import com.projectbarbel.histo.BarbelHistoContext;
 
 public class EffectivePeriod {
     private final LocalDate until;
     private final LocalDate from;
 
-    private EffectivePeriod(Builder builder) {
-        this.until = builder.until != null ? builder.until : BarbelHistoContext.getInfiniteDate();
-        this.from = builder.from != null ? builder.from : BarbelHistoContext.getClock().now().toLocalDate();
+    public EffectivePeriod(LocalDate from, LocalDate until) {
+        this.from = from;
+        this.until = until;
     }
-    
+
+    public static EffectivePeriod of(LocalDate from, LocalDate until) {
+        return new EffectivePeriod(from, until);
+    }
     public boolean isInfinite() {
        return until.equals(BarbelHistoContext.getInfiniteDate());
     }
@@ -48,47 +49,6 @@ public class EffectivePeriod {
     @Override
     public String toString() {
         return "EffectivePeriod [from=" + from + ", until=" + until + "]";
-    }
-
-    /**
-     * Creates builder to build {@link EffectivePeriod}.
-     * @return created builder
-     */
-    @Generated("SparkTools")
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static final class Builder {
-        private LocalDate until;
-        private LocalDate from;
-
-        private Builder() {
-        }
-
-        public Builder until(LocalDate until) {
-            this.until = until;
-            return this;
-        }
-
-        public Builder toInfinite() {
-            this.until = BarbelHistoContext.getInfiniteDate();
-            return this;
-        }
-        
-        public Builder from(LocalDate from) {
-            this.from = from;
-            return this;
-        }
-
-        public Builder fromNow() {
-            this.from = BarbelHistoContext.getClock().now().toLocalDate();
-            return this;
-        }
-        
-        public EffectivePeriod build() {
-            return new EffectivePeriod(this);
-        }
     }
 
 }
