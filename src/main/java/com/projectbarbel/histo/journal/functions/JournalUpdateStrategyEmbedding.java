@@ -34,39 +34,39 @@ public class JournalUpdateStrategyEmbedding implements BiFunction<DocumentJourna
         Validate.isTrue(journal.getId().equals(update.getBitemporalStamp().getDocumentId()),
                 "update and journal must have same document id");
         Validate.isTrue(update.getBitemporalStamp().isActive(), "only active bitemporals are allowed here");
-        Optional<Bitemporal> interruptedFromVersion = journal.read().effectiveTime()
+        Optional<Bitemporal> interruptedLeftVersion = journal.read().effectiveTime()
                 .effectiveAt(update.getBitemporalStamp().getEffectiveTime().from());
-        Optional<Bitemporal> interruptedUntilVersion = journal.read().effectiveTime()
+        Optional<Bitemporal> interruptedRightVersion = journal.read().effectiveTime()
                 .effectiveAt(update.getBitemporalStamp().getEffectiveTime().until());
         IndexedCollection<Bitemporal> betweenVersions = journal.read().effectiveTime()
                 .effectiveBetween(update.getBitemporalStamp().getEffectiveTime());
-        actualCase = JournalUpdateCase.validate(interruptedFromVersion.isPresent(), interruptedUntilVersion.isPresent(),
-                interruptedFromVersion.equals(interruptedUntilVersion), !betweenVersions.isEmpty());
+        actualCase = JournalUpdateCase.validate(interruptedLeftVersion.isPresent(), interruptedRightVersion.isPresent(),
+                interruptedLeftVersion.equals(interruptedRightVersion), !betweenVersions.isEmpty());
         newVersions.add(update);
-        interruptedFromVersion.ifPresent(d -> processInterruptedFrom(update, d));
-        interruptedUntilVersion.ifPresent(d -> processInterruptedUntil(update, d));
-        interruptedFromVersion
+        interruptedLeftVersion.ifPresent(d -> processInterruptedLeftVersion(update, d));
+        interruptedRightVersion.ifPresent(d -> processInterruptedRightVersion(update, d));
+        interruptedLeftVersion
                 .ifPresent(d -> d.setBitemporalStamp(d.getBitemporalStamp().inactivatedCopy(context)));
-        interruptedUntilVersion
+        interruptedRightVersion
                 .ifPresent(d -> d.setBitemporalStamp(d.getBitemporalStamp().inactivatedCopy(context)));
         betweenVersions.stream()
                 .forEach(d -> d.setBitemporalStamp(d.getBitemporalStamp().inactivatedCopy(context)));
         return newVersions;
     }
 
-    private void processInterruptedFrom(final Bitemporal update, Bitemporal interruptedFrom) {
-        Bitemporal newPrecedingVersion = context.getMode().snapshotManagedBitemporal(context, interruptedFrom,
+    private void processInterruptedLeftVersion(final Bitemporal update, Bitemporal interruptedLeftVersion) {
+        Bitemporal newPrecedingVersion = context.getMode().snapshotManagedBitemporal(context, interruptedLeftVersion,
                 BitemporalStamp.createActiveWithContext(context, update.getBitemporalStamp().getDocumentId(),
-                        EffectivePeriod.of(interruptedFrom.getBitemporalStamp().getEffectiveTime().from(),
+                        EffectivePeriod.of(interruptedLeftVersion.getBitemporalStamp().getEffectiveTime().from(),
                                 update.getBitemporalStamp().getEffectiveTime().from())));
         newVersions.add(newPrecedingVersion);
     }
 
-    private void processInterruptedUntil(final Bitemporal update, Bitemporal interruptedUntil) {
-        Bitemporal newSubsequentVersion = context.getMode().snapshotManagedBitemporal(context, interruptedUntil,
+    private void processInterruptedRightVersion(final Bitemporal update, Bitemporal interruptedRightVersion) {
+        Bitemporal newSubsequentVersion = context.getMode().snapshotManagedBitemporal(context, interruptedRightVersion,
                 BitemporalStamp.createActiveWithContext(context, update.getBitemporalStamp().getDocumentId(),
                         EffectivePeriod.of(update.getBitemporalStamp().getEffectiveTime().until(),
-                                interruptedUntil.getBitemporalStamp().getEffectiveTime().until())));
+                                interruptedRightVersion.getBitemporalStamp().getEffectiveTime().until())));
         newVersions.add(newSubsequentVersion);
     }
 
