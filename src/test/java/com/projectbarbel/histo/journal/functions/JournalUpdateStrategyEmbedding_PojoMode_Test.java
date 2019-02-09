@@ -64,8 +64,6 @@ public class JournalUpdateStrategyEmbedding_PojoMode_Test {
         List<Bitemporal> inactivated = journal.read().inactiveVersions();
         assertEquals(1, inactivated.size());
         assertInactivatedVersion(inactivated.get(0), LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1));
-        System.out.println(DocumentJournal.prettyPrint(journal.collection(),
-                journal.list().get(0).getBitemporalStamp().getDocumentId(), d -> ((DefaultPojo) d).getData()));
     }
 
     @Test
@@ -79,8 +77,6 @@ public class JournalUpdateStrategyEmbedding_PojoMode_Test {
         List<Bitemporal> inactivated = journal.read().inactiveVersions();
         assertEquals(1, inactivated.size());
         assertInactivatedVersion(inactivated.get(0), LocalDate.of(2019, 1, 1), LocalDate.MAX);
-        System.out.println(DocumentJournal.prettyPrint(journal.collection(),
-                journal.list().get(0).getBitemporalStamp().getDocumentId(), d -> ((DefaultPojo) d).getData()));
     }
 
     private UpdateReturn performUpdate(LocalDate from, LocalDate until) {
