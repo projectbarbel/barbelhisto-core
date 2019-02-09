@@ -1,14 +1,15 @@
 package com.projectbarbel.histo.journal;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
@@ -43,10 +44,10 @@ public class DocumentJournalTest {
         assertNotNull(journal);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testCreate_withList_null() throws Exception {
         IndexedCollection<Object> list = null;
-        DocumentJournal.create(list, "");
+        assertThrows(NullPointerException.class, () -> DocumentJournal.create(list, ""));
     }
 
     @Test

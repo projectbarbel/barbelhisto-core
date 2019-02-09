@@ -1,8 +1,9 @@
 package com.projectbarbel.histo.journal.functions;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,8 +12,8 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.projectbarbel.histo.BarbelHistoBuilder;
 import com.projectbarbel.histo.BarbelHistoContext;
@@ -34,7 +35,7 @@ public class JournalUpdateStrategyEmbedding_PojoMode_Test {
     private DocumentJournal journal;
     private BarbelHistoContext context;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         journal = DocumentJournal
                 .create(BarbelTestHelper.generateJournalOfDefaultPojos("someId", Arrays.asList(LocalDate.of(2016, 1, 1),
@@ -44,13 +45,13 @@ public class JournalUpdateStrategyEmbedding_PojoMode_Test {
                 .withUser("testUser");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testApply_wrongId() throws Exception {
         DefaultDocument doc = new DefaultDocument();
         BarbelHistoContext context = BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL);
         Bitemporal bitemporal = BarbelMode.BITEMPORAL.snapshotMaiden(context, doc,
                 BitemporalStamp.createWithDefaultValues());
-        new JournalUpdateStrategyEmbedding(context).accept(journal, bitemporal);
+        assertThrows(IllegalArgumentException.class, ()->new JournalUpdateStrategyEmbedding(context).accept(journal, bitemporal));
     }
 
     @Test

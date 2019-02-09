@@ -1,6 +1,6 @@
 package com.projectbarbel.histo.journal.functions;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -8,8 +8,8 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.projectbarbel.histo.BarbelHistoBuilder;
 import com.projectbarbel.histo.BarbelHistoContext;
@@ -28,7 +28,7 @@ public class JournalUpdateStrategyEmbedding_PojoMode_EdgeCases_Test {
     @SuppressWarnings("unused")
     private BarbelHistoContext context;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         journal = DocumentJournal
                 .create(BarbelTestHelper.generateJournalOfDefaultPojos("someId", Arrays.asList(LocalDate.of(2016, 1, 1),

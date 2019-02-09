@@ -1,14 +1,14 @@
 package com.projectbarbel.histo;
 
 import static com.googlecode.cqengine.query.QueryFactory.and;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.DefaultPojo;
@@ -19,7 +19,7 @@ public class BarbelHistoCoreTest {
 
     private BarbelHistoCore core;
 
-    @Before
+    @BeforeEach
     public void setup() {
         core = (BarbelHistoCore) BarbelHistoBuilder.barbel().build();
         BarbelHistoContext.getDefaultClock().useFixedClockAt(LocalDate.of(2019, 2, 6).atStartOfDay());
