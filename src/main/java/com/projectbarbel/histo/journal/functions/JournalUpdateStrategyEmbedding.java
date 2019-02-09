@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
+import java.util.function.BiConsumer;
 
 import org.apache.commons.lang3.Validate;
 
@@ -15,10 +15,10 @@ import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.EffectivePeriod;
 
-public class JournalUpdateStrategyEmbedding implements BiFunction<DocumentJournal, Bitemporal, List<Object>> {
+public class JournalUpdateStrategyEmbedding implements BiConsumer<DocumentJournal, Bitemporal> {
 
     private final BarbelHistoContext context;
-    private List<Object> newVersions = new ArrayList<>();
+    private List<Bitemporal> newVersions = new ArrayList<>();
     private JournalUpdateCase actualCase;
 
     public JournalUpdateCase getActualCase() {
@@ -30,7 +30,7 @@ public class JournalUpdateStrategyEmbedding implements BiFunction<DocumentJourna
     }
 
     @Override
-    public List<Object> apply(DocumentJournal journal, final Bitemporal update) {
+    public void accept(DocumentJournal journal, final Bitemporal update) {
         Validate.isTrue(journal.getId().equals(update.getBitemporalStamp().getDocumentId()),
                 "update and journal must have same document id");
         Validate.isTrue(update.getBitemporalStamp().isActive(), "only active bitemporals are allowed here");
@@ -51,7 +51,7 @@ public class JournalUpdateStrategyEmbedding implements BiFunction<DocumentJourna
                 .ifPresent(d -> d.setBitemporalStamp(d.getBitemporalStamp().inactivatedCopy(context)));
         betweenVersions.stream()
                 .forEach(d -> d.setBitemporalStamp(d.getBitemporalStamp().inactivatedCopy(context)));
-        return newVersions;
+        journal.accept(newVersions);
     }
 
     private void processInterruptedLeftVersion(final Bitemporal update, Bitemporal interruptedLeftVersion) {

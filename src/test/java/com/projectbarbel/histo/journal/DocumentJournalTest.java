@@ -12,11 +12,8 @@ import org.junit.Test;
 
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
-import com.projectbarbel.histo.BarbelHistoBuilder;
 import com.projectbarbel.histo.BarbelHistoContext;
-import com.projectbarbel.histo.BarbelMode;
 import com.projectbarbel.histo.BarbelTestHelper;
-import com.projectbarbel.histo.journal.functions.JournalUpdateStrategyEmbedding;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.DefaultDocument;
@@ -66,8 +63,8 @@ public class DocumentJournalTest {
                 .withBitemporalStamp(BitemporalStamp.createWithDefaultValues()).build();
         coll.add(doc);
         DocumentJournal journal = DocumentJournal.create(coll, doc.getBitemporalStamp().getDocumentId());
-        journal.update(new JournalUpdateStrategyEmbedding(BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL)), doc);
-        System.out.println(DocumentJournal.prettyPrint(journal.collection(), doc.getBitemporalStamp().getDocumentId(),(d) -> ((DefaultDocument)d).getData()));
+        journal.accept(Arrays.asList(doc));
+        assertTrue(journal.list().size()==1);
     }
 
     @Test

@@ -1,7 +1,6 @@
 package com.projectbarbel.histo;
 
-import java.util.List;
-import java.util.function.BiFunction;
+import java.util.function.BiConsumer;
 
 import com.projectbarbel.histo.journal.DocumentJournal;
 import com.projectbarbel.histo.model.Bitemporal;
@@ -18,7 +17,7 @@ public class BarbelHistoFactory {
         return new BarbelHistoFactory(context);
     }
 
-    public BiFunction<DocumentJournal, Bitemporal, List<Object>> createJournalUpdateStrategy() {
+    public BiConsumer<DocumentJournal, Bitemporal> createJournalUpdateStrategy() {
         return context.getJournalUpdateStrategy().apply(context);
     }
     

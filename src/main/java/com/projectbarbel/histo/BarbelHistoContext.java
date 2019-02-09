@@ -4,8 +4,8 @@ import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -106,7 +106,7 @@ public interface BarbelHistoContext {
 
     Gson getGson();
 
-    Function<BarbelHistoContext, BiFunction<DocumentJournal, Bitemporal, List<Object>>> getJournalUpdateStrategy();
+    Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> getJournalUpdateStrategy();
 
     BarbelHistoFactory getBarbelFactory();
 

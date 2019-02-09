@@ -47,7 +47,7 @@ public class JournalUpdateStrategyEmbedding_BitemporalMode_Test {
         DefaultDocument doc = new DefaultDocument();
         Bitemporal bitemporal = BarbelMode.BITEMPORAL.snapshotMaiden(context, doc,
                 BitemporalStamp.createWithDefaultValues());
-        new JournalUpdateStrategyEmbedding(context).apply(journal, bitemporal);
+        new JournalUpdateStrategyEmbedding(context).accept(journal, bitemporal);
     }
 
     @Test
@@ -57,7 +57,8 @@ public class JournalUpdateStrategyEmbedding_BitemporalMode_Test {
                 context, "someId", EffectivePeriod.of(context.getClock().today(), LocalDate.MAX)));
 
         JournalUpdateStrategyEmbedding function = new JournalUpdateStrategyEmbedding(context);
-        List<Object> list = function.apply(journal, bitemporal);
+        function.accept(journal, bitemporal);
+        List<Bitemporal> list = journal.getLastInsert();
         
         assertTrue(list.size() == 2);
         assertEquals(JournalUpdateCase.POSTOVERLAPPING, function.getActualCase());

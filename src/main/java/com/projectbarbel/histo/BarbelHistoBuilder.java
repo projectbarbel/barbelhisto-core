@@ -1,8 +1,8 @@
 package com.projectbarbel.histo;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -34,7 +34,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     private Systemclock clock = BarbelHistoContext.getDefaultClock();
     
     // some more complex context types
-    private Function<BarbelHistoContext, BiFunction<DocumentJournal, Bitemporal, List<Object>>> journalUpdateStrategy = (
+    private Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> journalUpdateStrategy = (
             context) -> new JournalUpdateStrategyEmbedding(this);
     private BarbelHistoFactory barbelFactory;
 
@@ -84,12 +84,12 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     @Override
-    public Function<BarbelHistoContext, BiFunction<DocumentJournal, Bitemporal, List<Object>>> getJournalUpdateStrategy() {
+    public Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> getJournalUpdateStrategy() {
         return journalUpdateStrategy;
     }
 
-    public BarbelHistoContext withJournalUpdateStrategy(
-            Function<BarbelHistoContext, BiFunction<DocumentJournal, Bitemporal, List<Object>>> journalUpdateStrategy) {
+    public BarbelHistoContext withJournalUpdateStrategyProducer(
+            Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> journalUpdateStrategy) {
         this.journalUpdateStrategy = journalUpdateStrategy;
         return this;
     }

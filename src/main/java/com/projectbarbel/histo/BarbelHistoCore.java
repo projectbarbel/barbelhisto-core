@@ -38,7 +38,7 @@ public final class BarbelHistoCore implements BarbelHisto {
             DocumentJournal journal = journals.get(id);
             Optional<Bitemporal> effectiveVersion = journal.read().effectiveTime().effectiveAt(from);
             if (effectiveVersion.isPresent()) {
-                journal.update(context.getBarbelFactory().createJournalUpdateStrategy(), context.getMode().snapshotMaiden(context, newVersion, stamp));
+                context.getBarbelFactory().createJournalUpdateStrategy().accept(journal, context.getMode().snapshotMaiden(context, newVersion, stamp));
                 return true;
             } else
                 return straightInsert(newVersion, stamp, id);

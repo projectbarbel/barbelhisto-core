@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -26,10 +26,11 @@ import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.EffectivePeriod;
 import com.projectbarbel.histo.model.Systemclock;
 
-public class DocumentJournal {
+public class DocumentJournal implements Consumer<List<Bitemporal>> {
 
-    private IndexedCollection<Object> journal;
     private Object id;
+    private IndexedCollection<Object> journal;
+    private List<Bitemporal> lastInserts;
     private Collector<Object, ?, ConcurrentIndexedCollection<Bitemporal>> objectToBitemporalCollection = Collector
             .of(() -> new ConcurrentIndexedCollection<Bitemporal>(), (c, e) -> c.add((Bitemporal) e), (r1, r2) -> {
                 r1.addAll(r2);
@@ -63,9 +64,12 @@ public class DocumentJournal {
         return newjournal;
     }
 
-    public void update(BiFunction<DocumentJournal, Bitemporal, List<Object>> journalUpdateStrategy, Bitemporal update) {
-        Validate.notNull(update, "update passed must not be null");
-        journal.addAll(journalUpdateStrategy.apply(this, update));
+    public void accept(List<Bitemporal> newVersions) {
+        Validate.isTrue(
+                newVersions.stream().filter(d -> !d.getBitemporalStamp().getDocumentId().equals(id)).count() == 0,
+                "new versions must match document id of journal");
+        this.lastInserts = newVersions;
+        journal.addAll(newVersions);
     }
 
     @Override
@@ -85,6 +89,10 @@ public class DocumentJournal {
     public IndexedCollection<Bitemporal> collection() {
         return journal.retrieve(BarbelQueries.all(id), queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM))))
                 .stream().collect(objectToBitemporalCollection);
+    }
+
+    public List<Bitemporal> getLastInsert() {
+        return lastInserts;
     }
 
     // @formatter:off
