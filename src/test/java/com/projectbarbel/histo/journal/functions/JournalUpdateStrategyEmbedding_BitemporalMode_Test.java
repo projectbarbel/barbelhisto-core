@@ -1,6 +1,7 @@
 package com.projectbarbel.histo.journal.functions;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
@@ -52,6 +53,20 @@ public class JournalUpdateStrategyEmbedding_BitemporalMode_Test {
 
     @Test
     public void testApply_POSTOVERLAPPING_UntilIsLocalDateMax() throws Exception {
+        UpdateReturn returnValues = performUpdate(context.getClock().today(), LocalDate.MAX);
+        assertTrue(returnValues.newVersions.size() == 2);
+        assertEquals(JournalUpdateCase.POSTOVERLAPPING, returnValues.function.getActualCase());
+        assertTwoNewVersions((Bitemporal) returnValues.newVersions.get(0), context.getClock().today(), LocalDate.MAX,
+                (Bitemporal) returnValues.newVersions.get(1), LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 30),
+                returnValues.bitemporal);
+        List<Bitemporal> inactivated = journal.read().inactiveVersions();
+        assertEquals(1, inactivated.size());
+        assertInactivatedVersion(inactivated.get(0), LocalDate.of(2019, 1, 1), LocalDate.MAX);
+        System.out.println(DocumentJournal.prettyPrint(journal.collection(),
+                journal.list().get(0).getBitemporalStamp().getDocumentId(), d -> ((DefaultDocument) d).getData()));
+    }
+
+    private UpdateReturn performUpdate(LocalDate from, LocalDate until) {
         DefaultDocument doc = new DefaultDocument();
         Bitemporal bitemporal = BarbelMode.BITEMPORAL.snapshotMaiden(context, doc, BitemporalStamp.createActiveWithContext(
                 context, "someId", EffectivePeriod.of(context.getClock().today(), LocalDate.MAX)));
@@ -59,25 +74,62 @@ public class JournalUpdateStrategyEmbedding_BitemporalMode_Test {
         JournalUpdateStrategyEmbedding function = new JournalUpdateStrategyEmbedding(context);
         function.accept(journal, bitemporal);
         List<Bitemporal> list = journal.getLastInsert();
-        
-        assertTrue(list.size() == 2);
-        assertEquals(JournalUpdateCase.POSTOVERLAPPING, function.getActualCase());
-        
-        assertEquals(((Bitemporal)list.get(0)).getBitemporalStamp().getEffectiveTime().from(), context.getClock().today());
-        assertEquals(((Bitemporal)list.get(0)).getBitemporalStamp().getEffectiveTime().until(), LocalDate.MAX);
-        assertEquals(((Bitemporal)list.get(0)).getBitemporalStamp(), bitemporal.getBitemporalStamp());
-        
-        assertEquals(((Bitemporal)list.get(1)).getBitemporalStamp().getEffectiveTime().from(), LocalDate.of(2019, 1, 1));
-        assertEquals(((Bitemporal)list.get(1)).getBitemporalStamp().getEffectiveTime().until(), LocalDate.of(2019, 1, 30));
-        
-        assertEquals(((Bitemporal)list.get(1)).getBitemporalStamp().getRecordTime().getCreatedAt(), ZonedDateTime.of(LocalDateTime.of(2019, 1, 30, 10, 0), ZoneId.systemDefault()));
-        assertEquals(((Bitemporal)list.get(1)).getBitemporalStamp().getRecordTime().getCreatedBy(), "testUser");
-        assertEquals(((Bitemporal)list.get(1)).getBitemporalStamp().getRecordTime().getInactivatedAt(), RecordPeriod.NOT_INACTIVATED);
-        assertEquals(((Bitemporal)list.get(1)).getBitemporalStamp().getRecordTime().getInactivatedBy(), RecordPeriod.NOBODY);
-        assertEquals(((Bitemporal)list.get(1)).getBitemporalStamp().getRecordTime().getState(), BitemporalObjectState.ACTIVE);
-        
-        System.out.println(DocumentJournal.prettyPrint(journal.collection(),
-                journal.list().get(0).getBitemporalStamp().getDocumentId(), d -> ((DefaultDocument) d).getData()));
+        return new UpdateReturn(list, bitemporal, function);
+    }
+
+    private void assertTwoNewVersions(Bitemporal first, LocalDate from1, LocalDate until1, Bitemporal second,
+            LocalDate from2, LocalDate until2, Bitemporal update) {
+
+        assertEquals(first.getBitemporalStamp().getEffectiveTime().from(), from1);
+        assertEquals(first.getBitemporalStamp().getEffectiveTime().until(), until1);
+        assertEquals(first.getBitemporalStamp(), update.getBitemporalStamp());
+
+        assertEquals(second.getBitemporalStamp().getEffectiveTime().from(), from2);
+        assertEquals(second.getBitemporalStamp().getEffectiveTime().until(), until2);
+
+        assertEquals(first.getBitemporalStamp().getRecordTime().getCreatedAt(),
+                ZonedDateTime.of(LocalDateTime.of(2019, 1, 30, 10, 0), ZoneId.systemDefault()));
+        assertEquals(first.getBitemporalStamp().getRecordTime().getCreatedBy(), "testUser");
+        assertEquals(first.getBitemporalStamp().getRecordTime().getInactivatedAt(), RecordPeriod.NOT_INACTIVATED);
+        assertEquals(first.getBitemporalStamp().getRecordTime().getInactivatedBy(), RecordPeriod.NOBODY);
+        assertEquals(first.getBitemporalStamp().getRecordTime().getState(), BitemporalObjectState.ACTIVE);
+
+        assertEquals(second.getBitemporalStamp().getRecordTime().getCreatedAt(),
+                ZonedDateTime.of(LocalDateTime.of(2019, 1, 30, 10, 0), ZoneId.systemDefault()));
+        assertEquals(second.getBitemporalStamp().getRecordTime().getCreatedBy(), "testUser");
+        assertEquals(second.getBitemporalStamp().getRecordTime().getInactivatedAt(), RecordPeriod.NOT_INACTIVATED);
+        assertEquals(second.getBitemporalStamp().getRecordTime().getInactivatedBy(), RecordPeriod.NOBODY);
+        assertEquals(second.getBitemporalStamp().getRecordTime().getState(), BitemporalObjectState.ACTIVE);
+
+    }
+
+    private void assertInactivatedVersion(Bitemporal inactivated, LocalDate from, LocalDate until) {
+
+        assertEquals(inactivated.getBitemporalStamp().getEffectiveTime().from(), from);
+        assertEquals(inactivated.getBitemporalStamp().getEffectiveTime().until(), until);
+
+        assertNotEquals(inactivated.getBitemporalStamp().getRecordTime().getCreatedAt(),
+                ZonedDateTime.of(LocalDateTime.of(2019, 1, 30, 10, 0), ZoneId.systemDefault()));
+        assertEquals(inactivated.getBitemporalStamp().getRecordTime().getCreatedBy(), "SYSTEM");
+        assertEquals(inactivated.getBitemporalStamp().getRecordTime().getInactivatedAt(),
+                ZonedDateTime.of(LocalDateTime.of(2019, 1, 30, 10, 0), ZoneId.systemDefault()));
+        assertEquals(inactivated.getBitemporalStamp().getRecordTime().getInactivatedBy(), "testUser");
+        assertEquals(inactivated.getBitemporalStamp().getRecordTime().getState(), BitemporalObjectState.INACTIVE);
+
+    }
+
+    public static class UpdateReturn {
+        public List<Bitemporal> newVersions;
+        public Bitemporal bitemporal;
+        public JournalUpdateStrategyEmbedding function;
+
+        public UpdateReturn(List<Bitemporal> newVersions, Bitemporal bitemporal,
+                JournalUpdateStrategyEmbedding function) {
+            super();
+            this.newVersions = newVersions;
+            this.bitemporal = bitemporal;
+            this.function = function;
+        }
     }
 
 }
