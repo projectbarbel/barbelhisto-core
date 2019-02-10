@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +33,9 @@ public class BarbelHistoCore_Pojo_Test {
         return Stream.of(
                 Arguments.of(EnhancedRandom.random(PrimitivePrivatePojo.class)),
                 Arguments.of(EnhancedRandom.random(PrimitivePrivatePojoPartialContructor.class)),
-                Arguments.of(EnhancedRandom.random(NoPrimitivePrivatePojoPartialContructor.class))
+                Arguments.of(EnhancedRandom.random(NoPrimitivePrivatePojoPartialContructor.class)),
+                Arguments.of(EnhancedRandom.random(ComplexFieldsPrivatePojoPartialContructorWithComplexType.class)),
+                Arguments.of(EnhancedRandom.random(ComplexFieldsPrivatePojoPartialContructor.class))
                 );
     }
     
@@ -116,6 +120,28 @@ public class BarbelHistoCore_Pojo_Test {
         private double someDouble;
         public NoPrimitivePrivatePojoPartialContructor(String id) {
             this.id = id;
+        }
+    }
+    
+    @SuppressWarnings("unused")
+    public static class ComplexFieldsPrivatePojoPartialContructor {
+        @DocumentId
+        private String id;
+        private List<String> stringList;
+        private Map<String, NoPrimitivePrivatePojoPartialContructor> someMap;
+        public ComplexFieldsPrivatePojoPartialContructor(String id) {
+            this.id = id;
+        }
+    }
+    
+    @SuppressWarnings("unused")
+    public static class ComplexFieldsPrivatePojoPartialContructorWithComplexType {
+        @DocumentId
+        private String id;
+        private List<String> stringList;
+        private Map<String, NoPrimitivePrivatePojoPartialContructor> someMap;
+        public ComplexFieldsPrivatePojoPartialContructorWithComplexType(Map<String, NoPrimitivePrivatePojoPartialContructor> someMap) {
+            this.someMap = someMap;
         }
     }
     

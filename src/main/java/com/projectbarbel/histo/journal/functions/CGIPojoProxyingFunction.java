@@ -17,6 +17,7 @@ import com.projectbarbel.histo.model.BitemporalStamp;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
+import net.sf.cglib.proxy.Proxy;
 
 public class CGIPojoProxyingFunction implements BiFunction<Object, BitemporalStamp, Object> {
 
@@ -40,7 +41,7 @@ public class CGIPojoProxyingFunction implements BiFunction<Object, BitemporalSta
                 this.target = args.length > 0 ? args[0] : null;
                 return null;
             } else if (method.getName().equals("toString")) {
-                return target.toString() + "/" + sp.getEffectiveTime().toString();
+                return sp.getEffectiveTime().toString() + " | " + target.toString();
             } else {
                 return proxy.invoke(target, args);
             }
@@ -52,12 +53,12 @@ public class CGIPojoProxyingFunction implements BiFunction<Object, BitemporalSta
     public Object apply(Object template, BitemporalStamp stamp) {
 
         Enhancer enhancer = new Enhancer();
-        
+
         enhancer.setCallback(new Interceptor());
         enhancer.setInterfaces(new Class[] { Bitemporal.class, BarbelProxy.class });
         enhancer.setSuperclass(template.getClass());
         enhancer.setUseCache(false);
-        
+
         Object proxy = null;
         try {
             proxy = tryCreateStraight(enhancer);
@@ -65,13 +66,14 @@ public class CGIPojoProxyingFunction implements BiFunction<Object, BitemporalSta
             try {
                 proxy = tryCreateComplex(template, enhancer);
             } catch (Exception e2) {
-                throw new IllegalArgumentException("failed to create proxy for current object: " + template.getClass(), e2);
+                throw new IllegalArgumentException("failed to create proxy for current object: " + template.getClass(),
+                        e2);
             }
         }
-        
-        ((Bitemporal)proxy).setBitemporalStamp(stamp);
-        ((BarbelProxy)proxy).setTarget(template);
-        
+
+        ((Bitemporal) proxy).setBitemporalStamp(stamp);
+        ((BarbelProxy) proxy).setTarget(template);
+
         return proxy;
 
     }
@@ -84,17 +86,20 @@ public class CGIPojoProxyingFunction implements BiFunction<Object, BitemporalSta
     private Object tryCreateComplex(Object template, Enhancer enhancer) {
         Constructor<?>[] constructors = template.getClass().getConstructors();
         Objenesis objenesis = new ObjenesisStd();
-        if (constructors.length>0) {
+        if (constructors.length > 0) {
             Class<?>[] parameterTypes = constructors[0].getParameterTypes();
             ArrayList<Object> argumentList = new ArrayList<Object>();
             for (int i = 0; i < parameterTypes.length; i++) {
                 if (ClassUtils.isPrimitiveOrWrapper(parameterTypes[i]))
-                   argumentList.add(Defaults.defaultValue(parameterTypes[i]));
-                else {
+                    argumentList.add(Defaults.defaultValue(parameterTypes[i]));
+                else if (parameterTypes[i].isInterface()) {
+                    argumentList.add(Proxy.newProxyInstance(this.getClass().getClassLoader(),
+                            new Class[] { parameterTypes[i] }, (p, m, o) -> new Object()));
+                } else {
                     ObjectInstantiator<?> instantiator = objenesis.getInstantiatorOf(parameterTypes[i]);
                     argumentList.add(instantiator.newInstance());
                 }
-                    
+
             }
             Object[] arguments = new Object[argumentList.size()];
             argumentList.toArray(arguments);
