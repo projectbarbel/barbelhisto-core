@@ -7,6 +7,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.apache.commons.lang3.Validate;
+
 import com.google.gson.Gson;
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
@@ -61,6 +63,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     public BarbelHistoBuilder withUpdateLog(IndexedCollection<UpdateLogRecord> updateLog) {
+        Validate.isTrue(updateLog!=null,"null values not allowed when building barbel context");
         this.updateLog = updateLog;
         return this;
     }
@@ -71,6 +74,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     public BarbelHistoBuilder withClock(Systemclock clock) {
+        Validate.isTrue(clock!=null,"null values not allowed when building barbel context");
         this.clock = clock;
         return this;
     }
@@ -81,6 +85,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     public BarbelHistoBuilder withMode(BarbelMode mode) {
+        Validate.isTrue(mode!=null,"null values not allowed when building barbel context");
         this.mode = mode;
         return this;
     }
@@ -91,6 +96,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     public BarbelHistoBuilder withBarbelFactory(BarbelHistoFactory barbelFactory) {
+        Validate.isTrue(barbelFactory!=null,"null values not allowed when building barbel context");
         this.barbelFactory = barbelFactory;
         return this;
     }
@@ -102,6 +108,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 
     public BarbelHistoBuilder withJournalUpdateStrategyProducer(
             Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> journalUpdateStrategy) {
+        Validate.isTrue(journalUpdateStrategy!=null,"null values not allowed when building barbel context");
         this.journalUpdateStrategyProducer = journalUpdateStrategy;
         return this;
     }
@@ -112,6 +119,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     public BarbelHistoBuilder withPojoCopyFunction(Function<Object, Object> pojoCopyFunction) {
+        Validate.isTrue(pojoCopyFunction!=null,"null values not allowed when building barbel context");
         this.pojoCopyFunction = pojoCopyFunction;
         return this;
    }
@@ -121,6 +129,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     public BarbelHistoBuilder withGson(Gson gson) {
+        Validate.isTrue(gson!=null,"null values not allowed when building barbel context");
         this.gson = gson;
         return this;
     }
@@ -131,6 +140,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     public BarbelHistoBuilder withPojoProxyingFunction(BiFunction<Object, BitemporalStamp, Object> proxyingFunction) {
+        Validate.isTrue(proxyingFunction!=null,"null values not allowed when building barbel context");
         this.pojoProxyingFunction = proxyingFunction;
         return this;
     }
@@ -141,6 +151,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     public BarbelHistoBuilder withJournalStore(Map<Object, DocumentJournal> journalStore) {
+        Validate.isTrue(journalStore!=null,"null values not allowed when building barbel context");
         this.journalStore = journalStore;
         return this;
     }
@@ -151,6 +162,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     public BarbelHistoBuilder withBackbone(IndexedCollection<Object> backbone) {
+        Validate.isTrue(backbone!=null,"null values not allowed when building barbel context");
         this.backbone = backbone;
         return this;
     }
@@ -160,6 +172,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     public BarbelHistoBuilder withDefaultActivity(String defaultActivity) {
+        Validate.isTrue(defaultActivity!=null,"null values not allowed when building barbel context");
         this.defaultActivity = defaultActivity;
         return this;
     }
@@ -175,11 +188,13 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     public BarbelHistoBuilder withVersionIdGenerator(Supplier<Object> versionIdGenerator) {
+        Validate.isTrue(versionIdGenerator!=null,"null values not allowed when building barbel context");
         this.versionIdGenerator = versionIdGenerator;
         return this;
     }
 
     public BarbelHistoBuilder withDocumentIdGenerator(Supplier<Object> documentIdGenerator) {
+        Validate.isTrue(documentIdGenerator!=null,"null values not allowed when building barbel context");
         this.documentIdGenerator = documentIdGenerator;
         return this;
     }
@@ -190,11 +205,13 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     public BarbelHistoBuilder withActivity(String activity) {
+        Validate.isTrue(activity!=null,"null values not allowed when building barbel context");
         this.activity = activity;
         return this;
     }
 
     public BarbelHistoBuilder withUser(String user) {
+        Validate.isTrue(user!=null,"null values not allowed when building barbel context");
         this.user = user;
         return this;
     }
