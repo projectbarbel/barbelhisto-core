@@ -10,12 +10,13 @@ import org.apache.commons.lang3.Validate;
 
 import com.googlecode.cqengine.IndexedCollection;
 import com.projectbarbel.histo.BarbelHistoContext;
+import com.projectbarbel.histo.UpdateCaseAware;
 import com.projectbarbel.histo.journal.DocumentJournal;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.EffectivePeriod;
 
-public class JournalUpdateStrategyEmbedding implements BiConsumer<DocumentJournal, Bitemporal> {
+public class JournalUpdateStrategyEmbedding implements BiConsumer<DocumentJournal, Bitemporal>, UpdateCaseAware {
 
     private final BarbelHistoContext context;
     private List<Bitemporal> newVersions = new ArrayList<>();
@@ -74,6 +75,10 @@ public class JournalUpdateStrategyEmbedding implements BiConsumer<DocumentJourna
 
         //// @formatter:off
 
+        // A: <no record of this id>     
+        // U: |-------|
+        STRAIGHTINSERT(asByte(new boolean[] {false, false, true, false})),
+        
         PREOVERLAPPING(asByte(new boolean[] {false, true, false, false})),   
         // A:      |---------|
         // U: |-------|

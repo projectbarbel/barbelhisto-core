@@ -20,6 +20,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.projectbarbel.histo.BarbelHistoBuilder;
 import com.projectbarbel.histo.BarbelHistoContext;
+import com.projectbarbel.histo.BarbelHistoCore;
 import com.projectbarbel.histo.BarbelMode;
 import com.projectbarbel.histo.BarbelTestHelper;
 import com.projectbarbel.histo.journal.DocumentJournal;
@@ -33,7 +34,7 @@ import com.projectbarbel.histo.model.EffectivePeriod;
 import com.projectbarbel.histo.model.RecordPeriod;
 import com.projectbarbel.histo.model.Systemclock;
 
-public class JournalUpdateStrategyEmbeddingTest {
+public class JournalUpdateStrategyEmbeddingAndCoreTest {
 
     private DocumentJournal journal;
     private BarbelHistoContext context;
@@ -69,6 +70,28 @@ public class JournalUpdateStrategyEmbeddingTest {
 
     @ParameterizedTest
     @MethodSource("createJournalUpdateCases")
+    public void testSave_Pojo(LocalDate updateFrom, LocalDate updateUntil, int countOfNewVersions,
+            JournalUpdateCase updateCase, List<LocalDate> activeEffective, int inactiveCount,
+            List<LocalDate> inactiveEffective) throws Exception {
+        context = BarbelHistoBuilder.barbel().withMode(BarbelMode.POJO)
+                .withClock(new Systemclock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 10, 0))).withUser("testUser")
+                .withBackbone(
+                        BarbelTestHelper.generateJournalOfDefaultPojos("someId", Arrays.asList(LocalDate.of(2016, 1, 1),
+                                LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))));
+        BarbelHistoCore core = ((BarbelHistoCore)((BarbelHistoBuilder)context).build());
+        DefaultPojo update = new DefaultPojo();
+        update.setDocumentId("someId");
+        update.setData("some data");
+        core.save(update, updateFrom, updateUntil);
+        journal = core.getDocumentJournal("someId");
+        assertEquals(countOfNewVersions, core.getLastUpdate().newVersions.size());
+        assertEquals(updateCase, core.getLastUpdate().updateCase);
+        assertNewVersions(core.getLastUpdate().requestedUpdate, core.getLastUpdate().newVersions, activeEffective);
+        assertInactivatedVersions(inactiveCount, inactiveEffective);
+    }
+
+    @ParameterizedTest
+    @MethodSource("createJournalUpdateCases")
     public void testAccept_Pojo(LocalDate updateFrom, LocalDate updateUntil, int countOfNewVersions,
             JournalUpdateCase updateCase, List<LocalDate> activeEffective, int inactiveCount,
             List<LocalDate> inactiveEffective) throws Exception {
@@ -93,7 +116,7 @@ public class JournalUpdateStrategyEmbeddingTest {
                     inactiveEffective.get(i * 2 + 1));
         }
     }
-
+    
     private UpdateReturn performUpdate_Pojo(LocalDate from, LocalDate until) {
         DefaultPojo update = new DefaultPojo();
         update.setDocumentId("someId");
@@ -127,8 +150,7 @@ public class JournalUpdateStrategyEmbeddingTest {
     private UpdateReturn performUpdate_Bitemporal(LocalDate from, LocalDate until) {
         DefaultDocument doc = new DefaultDocument();
         Bitemporal bitemporal = BarbelMode.BITEMPORAL.snapshotMaiden(context, doc,
-                BitemporalStamp.createActiveWithContext(context, "someId",
-                        EffectivePeriod.of(from, until)));
+                BitemporalStamp.createActiveWithContext(context, "someId", EffectivePeriod.of(from, until)));
 
         JournalUpdateStrategyEmbedding function = new JournalUpdateStrategyEmbedding(context);
         function.accept(journal, bitemporal);

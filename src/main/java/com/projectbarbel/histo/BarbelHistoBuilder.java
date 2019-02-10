@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 import com.google.gson.Gson;
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
+import com.projectbarbel.histo.BarbelHistoCore.UpdateLogRecord;
 import com.projectbarbel.histo.journal.DocumentJournal;
 import com.projectbarbel.histo.journal.functions.GsonPojoCopier;
 import com.projectbarbel.histo.journal.functions.JournalUpdateStrategyEmbedding;
@@ -32,6 +33,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     private Map<Object, DocumentJournal> journalStore = new ConcurrentHashMap<Object, DocumentJournal>();
     private Gson gson = BarbelHistoContext.getDefaultGson();
     private Systemclock clock = BarbelHistoContext.getDefaultClock();
+    private IndexedCollection<UpdateLogRecord> updateLog = BarbelHistoContext.getDefaultUpdateLog();
     
     // some more complex context types
     private Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> journalUpdateStrategy = (
@@ -51,6 +53,16 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
         if (pojoCopyFunction instanceof GsonPojoCopier)
             ((GsonPojoCopier) pojoCopyFunction).setGson(gson);
         return new BarbelHistoCore(this);
+    }
+
+    @Override
+    public IndexedCollection<UpdateLogRecord> getUpdateLog() {
+        return updateLog;
+    }
+
+    public BarbelHistoContext withUpdateLog(IndexedCollection<UpdateLogRecord> updateLog) {
+        this.updateLog = updateLog;
+        return this;
     }
 
     @Override
@@ -138,7 +150,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
         return backbone;
     }
 
-    public BarbelHistoContext withBackbone(IndexedCollection<Object> backbone) {
+    public BarbelHistoBuilder withBackbone(IndexedCollection<Object> backbone) {
         this.backbone = backbone;
         return this;
     }
@@ -182,7 +194,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
         return this;
     }
 
-    public BarbelHistoContext withUser(String user) {
+    public BarbelHistoBuilder withUser(String user) {
         this.user = user;
         return this;
     }

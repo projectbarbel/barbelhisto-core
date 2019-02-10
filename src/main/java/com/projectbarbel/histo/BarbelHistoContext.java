@@ -19,7 +19,9 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
+import com.projectbarbel.histo.BarbelHistoCore.UpdateLogRecord;
 import com.projectbarbel.histo.journal.DocumentJournal;
 import com.projectbarbel.histo.journal.functions.CGIPojoProxyingFunction;
 import com.projectbarbel.histo.journal.functions.DefaultIDGenerator;
@@ -46,6 +48,10 @@ public interface BarbelHistoContext {
             return new JsonPrimitive(DATE_FORMATTER.format(src));
         }
     };
+
+    static IndexedCollection<UpdateLogRecord> getDefaultUpdateLog() {
+        return new ConcurrentIndexedCollection<BarbelHistoCore.UpdateLogRecord>();
+    }
 
     static BarbelMode getDefaultBarbelMode() {
         return BarbelMode.POJO;
@@ -113,5 +119,7 @@ public interface BarbelHistoContext {
     BarbelMode getMode();
 
     Systemclock getClock();
+
+    IndexedCollection<UpdateLogRecord> getUpdateLog();
 
 }

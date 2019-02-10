@@ -26,10 +26,10 @@ import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.EffectivePeriod;
 import com.projectbarbel.histo.model.Systemclock;
 
-public class DocumentJournal implements Consumer<List<Bitemporal>> {
+public final class DocumentJournal implements Consumer<List<Bitemporal>> {
 
-    private Object id;
-    private IndexedCollection<Object> journal;
+    private final Object id;
+    private final IndexedCollection<Object> journal;
     private List<Bitemporal> lastInserts;
     private Collector<Object, ?, ConcurrentIndexedCollection<Bitemporal>> objectToBitemporalCollection = Collector
             .of(() -> new ConcurrentIndexedCollection<Bitemporal>(), (c, e) -> c.add((Bitemporal) e), (r1, r2) -> {
