@@ -8,13 +8,13 @@ import static com.googlecode.cqengine.query.QueryFactory.queryOptions;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.chrono.ChronoZonedDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.Validate;
 
 import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.attribute.Attribute;
@@ -44,6 +44,7 @@ public final class BarbelHistoCore implements BarbelHisto {
 
     @Override
     public boolean save(Object newVersion, LocalDate from, LocalDate until) {
+        Validate.isTrue(newVersion!=null&&from!=null&&until!=null, "all arguments must not be null here");
         Object id = context.getMode().drawDocumentId(newVersion);
         BitemporalStamp stamp = BitemporalStamp.of(context.getActivity(), id, EffectivePeriod.of(from, until),
                 RecordPeriod.createActive(context));

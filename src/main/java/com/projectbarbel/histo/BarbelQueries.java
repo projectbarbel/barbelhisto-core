@@ -12,6 +12,7 @@ import java.time.chrono.ChronoLocalDate;
 import com.googlecode.cqengine.attribute.Attribute;
 import com.googlecode.cqengine.attribute.SimpleAttribute;
 import com.googlecode.cqengine.query.Query;
+import com.googlecode.cqengine.query.QueryFactory;
 import com.googlecode.cqengine.query.option.QueryOptions;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalObjectState;
@@ -47,6 +48,11 @@ public final class BarbelQueries {
     };
 
     //// @formatter:off    
+    @SuppressWarnings("unchecked")
+    public static <T> Query<T> all() {
+        return (Query<T>)QueryFactory.all(Object.class);
+    }
+    
     @SuppressWarnings("unchecked")
     public static <T> Query<T> all(Object id) {
         return (Query<T>)equal(DOCUMENT_ID, id);
