@@ -18,7 +18,7 @@ public class BarbelHistoFactory {
     }
 
     public BiConsumer<DocumentJournal, Bitemporal> createJournalUpdateStrategy() {
-        return context.getJournalUpdateStrategy().apply(context);
+        return context.getJournalUpdateStrategyProducer().apply(context);
     }
     
 }

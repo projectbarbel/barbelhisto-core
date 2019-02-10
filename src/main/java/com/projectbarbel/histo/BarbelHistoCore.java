@@ -106,9 +106,9 @@ public final class BarbelHistoCore implements BarbelHisto {
             }
         };
 
-        public static final Attribute<UpdateLogRecord, ChronoZonedDateTime> TIMESTAMP = new SimpleAttribute<UpdateLogRecord, ChronoZonedDateTime>(
+        public static final Attribute<UpdateLogRecord, ChronoZonedDateTime<LocalDate>> TIMESTAMP = new SimpleAttribute<UpdateLogRecord, ChronoZonedDateTime<LocalDate>>(
                 "timestamp") {
-            public ChronoZonedDateTime getValue(UpdateLogRecord logEntry, QueryOptions queryOptions) {
+            public ZonedDateTime getValue(UpdateLogRecord logEntry, QueryOptions queryOptions) {
                 return logEntry.timestamp;
             }
         };

@@ -112,7 +112,7 @@ public interface BarbelHistoContext {
 
     Gson getGson();
 
-    Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> getJournalUpdateStrategy();
+    Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> getJournalUpdateStrategyProducer();
 
     BarbelHistoFactory getBarbelFactory();
 

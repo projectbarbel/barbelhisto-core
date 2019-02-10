@@ -75,9 +75,9 @@ public class JournalUpdateStrategyEmbedding implements BiConsumer<DocumentJourna
 
         //// @formatter:off
 
+        STRAIGHTINSERT(asByte(new boolean[] {false, false, true, false})),
         // A: <no record of this id>     
         // U: |-------|
-        STRAIGHTINSERT(asByte(new boolean[] {false, false, true, false})),
         
         PREOVERLAPPING(asByte(new boolean[] {false, true, false, false})),   
         // A:      |---------|
@@ -103,11 +103,11 @@ public class JournalUpdateStrategyEmbedding implements BiConsumer<DocumentJourna
         // A: |-------|------|------|
         // U:     |--------------|
 
-        EMBEDDEDOVERLAY_PREOVERLAPPING(asByte(new boolean[] {false, true, false, true})),    
+        PREOVERLAPPING_OVERLAY(asByte(new boolean[] {false, true, false, true})),    
         // A:     |-------|------|
         // U: |--------------|
         
-        EMBEDDEDOVERLAY_POSTOVERLAPPING(asByte(new boolean[] {true, false, false, true}));    
+        POSTOVERLAPPING_OVERLAY(asByte(new boolean[] {true, false, false, true}));    
         // A: |------|------|
         // U:    |--------------|
 

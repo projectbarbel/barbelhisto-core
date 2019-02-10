@@ -36,7 +36,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     private IndexedCollection<UpdateLogRecord> updateLog = BarbelHistoContext.getDefaultUpdateLog();
     
     // some more complex context types
-    private Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> journalUpdateStrategy = (
+    private Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> journalUpdateStrategyProducer = (
             context) -> new JournalUpdateStrategyEmbedding(this);
     private BarbelHistoFactory barbelFactory;
 
@@ -60,7 +60,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
         return updateLog;
     }
 
-    public BarbelHistoContext withUpdateLog(IndexedCollection<UpdateLogRecord> updateLog) {
+    public BarbelHistoBuilder withUpdateLog(IndexedCollection<UpdateLogRecord> updateLog) {
         this.updateLog = updateLog;
         return this;
     }
@@ -90,19 +90,19 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
         return barbelFactory;
     }
 
-    public BarbelHistoContext withBarbelFactory(BarbelHistoFactory barbelFactory) {
+    public BarbelHistoBuilder withBarbelFactory(BarbelHistoFactory barbelFactory) {
         this.barbelFactory = barbelFactory;
         return this;
     }
 
     @Override
-    public Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> getJournalUpdateStrategy() {
-        return journalUpdateStrategy;
+    public Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> getJournalUpdateStrategyProducer() {
+        return journalUpdateStrategyProducer;
     }
 
-    public BarbelHistoContext withJournalUpdateStrategyProducer(
+    public BarbelHistoBuilder withJournalUpdateStrategyProducer(
             Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> journalUpdateStrategy) {
-        this.journalUpdateStrategy = journalUpdateStrategy;
+        this.journalUpdateStrategyProducer = journalUpdateStrategy;
         return this;
     }
 
@@ -111,7 +111,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
         return pojoCopyFunction;
     }
 
-    public BarbelHistoContext withPojoCopyFunction(Function<Object, Object> pojoCopyFunction) {
+    public BarbelHistoBuilder withPojoCopyFunction(Function<Object, Object> pojoCopyFunction) {
         this.pojoCopyFunction = pojoCopyFunction;
         return this;
    }
@@ -120,7 +120,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
         return gson;
     }
 
-    public BarbelHistoContext withGson(Gson gson) {
+    public BarbelHistoBuilder withGson(Gson gson) {
         this.gson = gson;
         return this;
     }
@@ -130,7 +130,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
         return pojoProxyingFunction;
     }
 
-    public BarbelHistoContext withPojoProxyingFunction(BiFunction<Object, BitemporalStamp, Object> proxyingFunction) {
+    public BarbelHistoBuilder withPojoProxyingFunction(BiFunction<Object, BitemporalStamp, Object> proxyingFunction) {
         this.pojoProxyingFunction = proxyingFunction;
         return this;
     }
@@ -140,7 +140,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
         return journalStore;
     }
 
-    public BarbelHistoContext withJournalStore(Map<Object, DocumentJournal> journalStore) {
+    public BarbelHistoBuilder withJournalStore(Map<Object, DocumentJournal> journalStore) {
         this.journalStore = journalStore;
         return this;
     }
@@ -159,7 +159,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
         return defaultActivity;
     }
 
-    public BarbelHistoContext withDefaultActivity(String defaultActivity) {
+    public BarbelHistoBuilder withDefaultActivity(String defaultActivity) {
         this.defaultActivity = defaultActivity;
         return this;
     }
@@ -174,12 +174,12 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
         return documentIdGenerator;
     }
 
-    public BarbelHistoContext withVersionIdGenerator(Supplier<Object> versionIdGenerator) {
+    public BarbelHistoBuilder withVersionIdGenerator(Supplier<Object> versionIdGenerator) {
         this.versionIdGenerator = versionIdGenerator;
         return this;
     }
 
-    public BarbelHistoContext withDocumentIdGenerator(Supplier<Object> documentIdGenerator) {
+    public BarbelHistoBuilder withDocumentIdGenerator(Supplier<Object> documentIdGenerator) {
         this.documentIdGenerator = documentIdGenerator;
         return this;
     }
@@ -189,7 +189,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
         return activity;
     }
 
-    public BarbelHistoContext withActivity(String activity) {
+    public BarbelHistoBuilder withActivity(String activity) {
         this.activity = activity;
         return this;
     }
