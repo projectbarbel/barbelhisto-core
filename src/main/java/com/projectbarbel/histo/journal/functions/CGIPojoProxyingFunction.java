@@ -2,6 +2,7 @@ package com.projectbarbel.histo.journal.functions;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.function.BiFunction;
 
@@ -17,7 +18,6 @@ import com.projectbarbel.histo.model.BitemporalStamp;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
-import net.sf.cglib.proxy.Proxy;
 
 public class CGIPojoProxyingFunction implements BiFunction<Object, BitemporalStamp, Object> {
 
@@ -66,7 +66,7 @@ public class CGIPojoProxyingFunction implements BiFunction<Object, BitemporalSta
             try {
                 proxy = tryCreateComplex(template, enhancer);
             } catch (Exception e2) {
-                throw new IllegalArgumentException("failed to create proxy for current object: " + template.getClass(),
+                throw new IllegalArgumentException("failed to create CGI proxy for type: " + template.getClass(),
                         e2);
             }
         }
@@ -94,7 +94,7 @@ public class CGIPojoProxyingFunction implements BiFunction<Object, BitemporalSta
                     argumentList.add(Defaults.defaultValue(parameterTypes[i]));
                 else if (parameterTypes[i].isInterface()) {
                     argumentList.add(Proxy.newProxyInstance(this.getClass().getClassLoader(),
-                            new Class[] { parameterTypes[i] }, (p, m, o) -> new Object()));
+                            new Class[] { parameterTypes[i] }, (p, m, a) -> new Object()));
                 } else {
                     ObjectInstantiator<?> instantiator = objenesis.getInstantiatorOf(parameterTypes[i]);
                     argumentList.add(instantiator.newInstance());
@@ -105,7 +105,7 @@ public class CGIPojoProxyingFunction implements BiFunction<Object, BitemporalSta
             argumentList.toArray(arguments);
             return enhancer.create(parameterTypes, arguments);
         }
-        throw new IllegalArgumentException("no constructor found for object of type: " + template.getClass());
+        throw new IllegalArgumentException("no constructor found for CGI proxying of type: " + template.getClass());
     }
 
 }
