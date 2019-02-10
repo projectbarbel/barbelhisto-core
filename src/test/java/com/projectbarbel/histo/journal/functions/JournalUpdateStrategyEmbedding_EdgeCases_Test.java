@@ -21,7 +21,7 @@ import com.projectbarbel.histo.model.BitemporalObjectState;
 import com.projectbarbel.histo.model.RecordPeriod;
 import com.projectbarbel.histo.model.Systemclock;
 
-public class JournalUpdateStrategyEmbedding_PojoMode_EdgeCases_Test {
+public class JournalUpdateStrategyEmbedding_EdgeCases_Test {
 
     @SuppressWarnings("unused")
     private DocumentJournal journal;

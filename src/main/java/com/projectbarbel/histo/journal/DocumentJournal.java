@@ -68,6 +68,8 @@ public class DocumentJournal implements Consumer<List<Bitemporal>> {
         Validate.isTrue(
                 newVersions.stream().filter(d -> !d.getBitemporalStamp().getDocumentId().equals(id)).count() == 0,
                 "new versions must match document id of journal");
+        newVersions.sort((v1,v2)->v1.getBitemporalStamp().getEffectiveTime().from().isBefore(v2.getBitemporalStamp().getEffectiveTime().from())?-1:1);
+        newVersions.sort((v1,v2)->v1.getBitemporalStamp().getEffectiveTime().until().isBefore(v2.getBitemporalStamp().getEffectiveTime().until())?-1:1);
         this.lastInserts = newVersions;
         journal.addAll(newVersions);
     }
@@ -148,12 +150,12 @@ public class DocumentJournal implements Consumer<List<Bitemporal>> {
         }
 
         public List<Bitemporal> activeVersions() {
-            return journal.journal.retrieve(BarbelQueries.allActive(journal.id)).stream()
+            return journal.journal.retrieve(BarbelQueries.allActive(journal.id), BarbelQueryOptions.sortAscendingByEffectiveFrom()).stream()
                     .collect(journal.objectToBitemporalList);
         }
 
         public List<Bitemporal> inactiveVersions() {
-            return journal.journal.retrieve(BarbelQueries.allInactive(journal.id)).stream()
+            return journal.journal.retrieve(BarbelQueries.allInactive(journal.id), BarbelQueryOptions.sortAscendingByEffectiveFrom()).stream()
                     .collect(journal.objectToBitemporalList);
         }
     }
