@@ -1,9 +1,11 @@
-package com.projectbarbel.histo.journal.functions;
+package com.projectbarbel.histo.functions;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
+
+import com.projectbarbel.histo.functions.DefaultIDGenerator;
 
 public class DefaultIDGeneratorTest {
 

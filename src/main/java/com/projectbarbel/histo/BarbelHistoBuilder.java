@@ -14,11 +14,11 @@ import com.google.gson.Gson;
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
 import com.projectbarbel.histo.BarbelHistoCore.UpdateLogRecord;
-import com.projectbarbel.histo.journal.DocumentJournal;
-import com.projectbarbel.histo.journal.functions.GsonPojoCopier;
-import com.projectbarbel.histo.journal.functions.JournalUpdateStrategyEmbedding;
+import com.projectbarbel.histo.functions.GsonPojoCopier;
+import com.projectbarbel.histo.functions.JournalUpdateStrategyEmbedding;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
+import com.projectbarbel.histo.model.DocumentJournal;
 import com.projectbarbel.histo.model.Systemclock;
 
 public final class BarbelHistoBuilder implements BarbelHistoContext {

@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.journal.functions;
+package com.projectbarbel.histo.functions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -23,13 +23,14 @@ import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelHistoCore;
 import com.projectbarbel.histo.BarbelMode;
 import com.projectbarbel.histo.BarbelTestHelper;
-import com.projectbarbel.histo.journal.DocumentJournal;
-import com.projectbarbel.histo.journal.functions.JournalUpdateStrategyEmbedding.JournalUpdateCase;
+import com.projectbarbel.histo.functions.JournalUpdateStrategyEmbedding;
+import com.projectbarbel.histo.functions.JournalUpdateStrategyEmbedding.JournalUpdateCase;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalObjectState;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.DefaultDocument;
 import com.projectbarbel.histo.model.DefaultPojo;
+import com.projectbarbel.histo.model.DocumentJournal;
 import com.projectbarbel.histo.model.EffectivePeriod;
 import com.projectbarbel.histo.model.RecordPeriod;
 import com.projectbarbel.histo.model.Systemclock;

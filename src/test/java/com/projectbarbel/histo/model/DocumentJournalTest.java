@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.journal;
+package com.projectbarbel.histo.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -17,7 +17,7 @@ import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelTestHelper;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
-import com.projectbarbel.histo.model.DefaultDocument;
+import com.projectbarbel.histo.model.DocumentJournal;
 
 public class DocumentJournalTest {
 

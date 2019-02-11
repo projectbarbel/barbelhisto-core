@@ -2,8 +2,8 @@ package com.projectbarbel.histo;
 
 import java.util.function.BiConsumer;
 
-import com.projectbarbel.histo.journal.DocumentJournal;
 import com.projectbarbel.histo.model.Bitemporal;
+import com.projectbarbel.histo.model.DocumentJournal;
 
 public class BarbelHistoFactory {
 

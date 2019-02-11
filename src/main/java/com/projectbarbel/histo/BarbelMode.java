@@ -11,7 +11,7 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
-import com.projectbarbel.histo.journal.functions.BarbelProxy;
+import com.projectbarbel.histo.functions.BarbelProxy;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.BitemporalVersion;

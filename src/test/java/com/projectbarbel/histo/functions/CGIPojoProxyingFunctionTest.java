@@ -1,9 +1,11 @@
-package com.projectbarbel.histo.journal.functions;
+package com.projectbarbel.histo.functions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
+import com.projectbarbel.histo.functions.BarbelProxy;
+import com.projectbarbel.histo.functions.CGIPojoProxyingFunction;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.DefaultPojo;

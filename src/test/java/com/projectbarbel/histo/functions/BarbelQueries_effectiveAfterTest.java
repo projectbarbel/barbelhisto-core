@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.journal.functions;
+package com.projectbarbel.histo.functions;
 
 import static com.googlecode.cqengine.query.QueryFactory.ascending;
 import static com.googlecode.cqengine.query.QueryFactory.orderBy;

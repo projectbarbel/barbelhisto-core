@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.journal.functions;
+package com.projectbarbel.histo.functions;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;

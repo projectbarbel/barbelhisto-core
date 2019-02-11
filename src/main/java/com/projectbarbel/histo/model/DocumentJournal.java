@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.journal;
+package com.projectbarbel.histo.model;
 
 import static com.googlecode.cqengine.query.QueryFactory.ascending;
 import static com.googlecode.cqengine.query.QueryFactory.orderBy;
@@ -18,9 +18,6 @@ import com.googlecode.cqengine.IndexedCollection;
 import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelQueries;
 import com.projectbarbel.histo.BarbelQueryOptions;
-import com.projectbarbel.histo.model.Bitemporal;
-import com.projectbarbel.histo.model.EffectivePeriod;
-import com.projectbarbel.histo.model.Systemclock;
 
 public final class DocumentJournal implements Consumer<List<Bitemporal>> {
 

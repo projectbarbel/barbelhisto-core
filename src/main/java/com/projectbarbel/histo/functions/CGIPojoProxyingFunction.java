@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.journal.functions;
+package com.projectbarbel.histo.functions;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;

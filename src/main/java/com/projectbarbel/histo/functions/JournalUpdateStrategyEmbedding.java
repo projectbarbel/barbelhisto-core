@@ -1,4 +1,4 @@
-package com.projectbarbel.histo.journal.functions;
+package com.projectbarbel.histo.functions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,9 +11,9 @@ import org.apache.commons.lang3.Validate;
 import com.googlecode.cqengine.IndexedCollection;
 import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.UpdateCaseAware;
-import com.projectbarbel.histo.journal.DocumentJournal;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
+import com.projectbarbel.histo.model.DocumentJournal;
 import com.projectbarbel.histo.model.EffectivePeriod;
 
 public class JournalUpdateStrategyEmbedding implements BiConsumer<DocumentJournal, Bitemporal>, UpdateCaseAware {

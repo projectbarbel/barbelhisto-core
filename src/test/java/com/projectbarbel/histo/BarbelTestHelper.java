@@ -16,7 +16,7 @@ import org.javers.common.collections.Arrays;
 
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
-import com.projectbarbel.histo.journal.functions.DefaultIDGenerator;
+import com.projectbarbel.histo.functions.DefaultIDGenerator;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.DefaultDocument;
 import com.projectbarbel.histo.model.DefaultPojo;
