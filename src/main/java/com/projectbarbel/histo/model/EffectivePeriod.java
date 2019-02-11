@@ -5,13 +5,13 @@ import java.util.Objects;
 
 import com.projectbarbel.histo.BarbelHistoContext;
 
-public class EffectivePeriod {
+public final class EffectivePeriod {
     private final LocalDate until;
     private final LocalDate from;
 
-    public EffectivePeriod(LocalDate from, LocalDate until) {
-        this.from = from;
-        this.until = until;
+    private EffectivePeriod(LocalDate from, LocalDate until) {
+        this.from = Objects.requireNonNull(from);
+        this.until = Objects.requireNonNull(until);
     }
 
     public static EffectivePeriod of(LocalDate from, LocalDate until) {

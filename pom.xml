@@ -129,11 +129,6 @@
 			<version>3.0.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.projectbarbel.histo</groupId>
-			<artifactId>barbelhisto-persistence-api</artifactId>
-			<version>1.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
 			<groupId>cglib</groupId>
 			<artifactId>cglib</artifactId>
 			<version>3.2.10</version>
@@ -143,12 +138,28 @@
 			<artifactId>guava</artifactId>
 			<version>27.0-jre</version>
 		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.25</version>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.4</version>
+			<scope>provided</scope>
+		</dependency>
 		<!-- Test Scope libraries -->
 		<dependency>
 			<groupId>org.javers</groupId>
 			<artifactId>javers-core</artifactId>
 			<version>5.1.3</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.javers</groupId>
+			<artifactId>javers-persistence-mongo</artifactId>
+			<version>5.1.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>

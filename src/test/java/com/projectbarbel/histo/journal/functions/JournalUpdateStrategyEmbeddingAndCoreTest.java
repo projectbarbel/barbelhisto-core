@@ -44,7 +44,7 @@ public class JournalUpdateStrategyEmbeddingAndCoreTest {
         DefaultDocument doc = new DefaultDocument();
         BarbelHistoContext context = BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL);
         Bitemporal bitemporal = BarbelMode.BITEMPORAL.snapshotMaiden(context, doc,
-                BitemporalStamp.createWithDefaultValues());
+                BitemporalStamp.createActive());
         journal = DocumentJournal
                 .create(BarbelTestHelper.generateJournalOfDefaultPojos("someId", Arrays.asList(LocalDate.of(2016, 1, 1),
                         LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))), "someId");
@@ -122,7 +122,7 @@ public class JournalUpdateStrategyEmbeddingAndCoreTest {
         update.setDocumentId("someId");
         update.setData("some data");
         Bitemporal bitemporal = context.getMode().snapshotMaiden(context, update,
-                BitemporalStamp.createActiveWithContext(context, "someId", EffectivePeriod.of(from, until)));
+                BitemporalStamp.createActive(context, "someId", EffectivePeriod.of(from, until)));
         JournalUpdateStrategyEmbedding updateStrategy = new JournalUpdateStrategyEmbedding(context);
         updateStrategy.accept(journal, bitemporal);
         return new UpdateReturn(journal.getLastInsert(), bitemporal, updateStrategy);
@@ -150,7 +150,7 @@ public class JournalUpdateStrategyEmbeddingAndCoreTest {
     private UpdateReturn performUpdate_Bitemporal(LocalDate from, LocalDate until) {
         DefaultDocument doc = new DefaultDocument();
         Bitemporal bitemporal = BarbelMode.BITEMPORAL.snapshotMaiden(context, doc,
-                BitemporalStamp.createActiveWithContext(context, "someId", EffectivePeriod.of(from, until)));
+                BitemporalStamp.createActive(context, "someId", EffectivePeriod.of(from, until)));
 
         JournalUpdateStrategyEmbedding function = new JournalUpdateStrategyEmbedding(context);
         function.accept(journal, bitemporal);

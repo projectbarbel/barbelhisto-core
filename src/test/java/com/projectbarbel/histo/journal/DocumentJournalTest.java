@@ -51,17 +51,11 @@ public class DocumentJournalTest {
     }
 
     @Test
-    public void testPrettyPrint() throws Exception {
-        assertNotNull(DocumentJournal.prettyPrint(BarbelTestHelper.asIndexedCollection(BarbelTestHelper.random(DefaultDocument.class),
-                BarbelTestHelper.random(DefaultDocument.class)), "arbitrary", (d) -> ((DefaultDocument)d).getData()));
-    }
-
-    @Test
     public void testUpdate() throws Exception {
         IndexedCollection<Object> coll = new ConcurrentIndexedCollection<Object>();
         BarbelHistoContext.getDefaultClock().useFixedClockAt(LocalDateTime.of(2019, 2, 1, 8, 0));
         DefaultDocument doc = DefaultDocument.builder().withData("some data")
-                .withBitemporalStamp(BitemporalStamp.createWithDefaultValues()).build();
+                .withBitemporalStamp(BitemporalStamp.createActive()).build();
         coll.add(doc);
         DocumentJournal journal = DocumentJournal.create(coll, doc.getBitemporalStamp().getDocumentId());
         journal.accept(Arrays.asList(doc));

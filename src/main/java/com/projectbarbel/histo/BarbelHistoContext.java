@@ -4,6 +4,7 @@ import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -25,6 +26,7 @@ import com.projectbarbel.histo.BarbelHistoCore.UpdateLogRecord;
 import com.projectbarbel.histo.journal.DocumentJournal;
 import com.projectbarbel.histo.journal.functions.CGIPojoProxyingFunction;
 import com.projectbarbel.histo.journal.functions.DefaultIDGenerator;
+import com.projectbarbel.histo.journal.functions.DefaultPrettyPrinter;
 import com.projectbarbel.histo.journal.functions.GsonPojoCopier;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
@@ -49,6 +51,10 @@ public interface BarbelHistoContext {
         }
     };
 
+    static Function<List<Bitemporal>, String> getDefaultPrettyPrinter() {
+        return new DefaultPrettyPrinter();
+    }
+    
     static IndexedCollection<UpdateLogRecord> getDefaultUpdateLog() {
         return new ConcurrentIndexedCollection<BarbelHistoCore.UpdateLogRecord>();
     }
@@ -121,5 +127,7 @@ public interface BarbelHistoContext {
     Systemclock getClock();
 
     IndexedCollection<UpdateLogRecord> getUpdateLog();
+
+    Function<List<Bitemporal>, String> getPrettyPrinter();
 
 }

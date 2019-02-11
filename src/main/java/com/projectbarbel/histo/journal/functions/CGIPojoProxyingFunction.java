@@ -2,14 +2,8 @@ package com.projectbarbel.histo.journal.functions;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.function.BiFunction;
-
-import org.apache.commons.lang3.ClassUtils;
-import org.objenesis.Objenesis;
-import org.objenesis.ObjenesisStd;
-import org.objenesis.instantiator.ObjectInstantiator;
 
 import com.google.common.base.Defaults;
 import com.projectbarbel.histo.model.Bitemporal;
@@ -66,8 +60,7 @@ public class CGIPojoProxyingFunction implements BiFunction<Object, BitemporalSta
             try {
                 proxy = tryCreateComplex(template, enhancer);
             } catch (Exception e2) {
-                throw new IllegalArgumentException("failed to create CGI proxy for type: " + template.getClass(),
-                        e2);
+                throw new IllegalArgumentException("failed to create CGI proxy for type: " + template.getClass(), e2);
             }
         }
 
@@ -85,20 +78,11 @@ public class CGIPojoProxyingFunction implements BiFunction<Object, BitemporalSta
 
     private Object tryCreateComplex(Object template, Enhancer enhancer) {
         Constructor<?>[] constructors = template.getClass().getConstructors();
-        Objenesis objenesis = new ObjenesisStd();
         if (constructors.length > 0) {
             Class<?>[] parameterTypes = constructors[0].getParameterTypes();
             ArrayList<Object> argumentList = new ArrayList<Object>();
             for (int i = 0; i < parameterTypes.length; i++) {
-                if (ClassUtils.isPrimitiveOrWrapper(parameterTypes[i]))
-                    argumentList.add(Defaults.defaultValue(parameterTypes[i]));
-                else if (parameterTypes[i].isInterface()) {
-                    argumentList.add(Proxy.newProxyInstance(this.getClass().getClassLoader(),
-                            new Class[] { parameterTypes[i] }, (p, m, a) -> new Object()));
-                } else {
-                    ObjectInstantiator<?> instantiator = objenesis.getInstantiatorOf(parameterTypes[i]);
-                    argumentList.add(instantiator.newInstance());
-                }
+                argumentList.add(Defaults.defaultValue(parameterTypes[i]));
 
             }
             Object[] arguments = new Object[argumentList.size()];

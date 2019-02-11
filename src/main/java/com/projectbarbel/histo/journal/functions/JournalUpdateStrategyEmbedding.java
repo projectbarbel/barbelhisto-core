@@ -57,7 +57,7 @@ public class JournalUpdateStrategyEmbedding implements BiConsumer<DocumentJourna
 
     private void processInterruptedLeftVersion(final Bitemporal update, Bitemporal interruptedLeftVersion) {
         Bitemporal newPrecedingVersion = context.getMode().snapshotManagedBitemporal(context, interruptedLeftVersion,
-                BitemporalStamp.createActiveWithContext(context, update.getBitemporalStamp().getDocumentId(),
+                BitemporalStamp.createActive(context, update.getBitemporalStamp().getDocumentId(),
                         EffectivePeriod.of(interruptedLeftVersion.getBitemporalStamp().getEffectiveTime().from(),
                                 update.getBitemporalStamp().getEffectiveTime().from())));
         newVersions.add(newPrecedingVersion);
@@ -65,7 +65,7 @@ public class JournalUpdateStrategyEmbedding implements BiConsumer<DocumentJourna
 
     private void processInterruptedRightVersion(final Bitemporal update, Bitemporal interruptedRightVersion) {
         Bitemporal newSubsequentVersion = context.getMode().snapshotManagedBitemporal(context, interruptedRightVersion,
-                BitemporalStamp.createActiveWithContext(context, update.getBitemporalStamp().getDocumentId(),
+                BitemporalStamp.createActive(context, update.getBitemporalStamp().getDocumentId(),
                         EffectivePeriod.of(update.getBitemporalStamp().getEffectiveTime().until(),
                                 interruptedRightVersion.getBitemporalStamp().getEffectiveTime().until())));
         newVersions.add(newSubsequentVersion);

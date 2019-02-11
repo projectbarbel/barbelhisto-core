@@ -8,10 +8,10 @@ import static com.googlecode.cqengine.query.QueryFactory.queryOptions;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.chrono.ChronoZonedDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
@@ -44,11 +44,11 @@ public final class BarbelHistoCore implements BarbelHisto {
 
     @Override
     public boolean save(Object newVersion, LocalDate from, LocalDate until) {
-        Validate.isTrue(newVersion!=null&&from!=null&&until!=null, "all arguments must not be null here");
+        Validate.isTrue(newVersion != null && from != null && until != null, "all arguments must not be null here");
         Object id = context.getMode().drawDocumentId(newVersion);
         BitemporalStamp stamp = BitemporalStamp.of(context.getActivity(), id, EffectivePeriod.of(from, until),
                 RecordPeriod.createActive(context));
-        DocumentJournal journal = journals.computeIfAbsent(id, (k)->DocumentJournal.create(backbone, k));
+        DocumentJournal journal = journals.computeIfAbsent(id, (k) -> DocumentJournal.create(backbone, k));
         // request lock für diese Document ID im backbone für diesen User! If fails
         // return AlreadyLockedException
         // TODO: ab hier sperren? Das komplette backbone für diese ID sperren?
@@ -64,20 +64,22 @@ public final class BarbelHistoCore implements BarbelHisto {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> List<T> retrieve(Query<T> query) {
-        return (List<T>) backbone.retrieve((Query<Object>) query).stream().collect(Collectors.toList());
+    public <T> List<T>  retrieve(Query<Object> query) {
+        return (List<T>) backbone.retrieve(query).stream()
+                .map(o -> context.getMode().snapshotManagedBitemporal(context, (Bitemporal) o, ((Bitemporal)o).getBitemporalStamp())).collect(Collectors.toList());
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> List<T> retrieve(Query<T> query, QueryOptions options) {
-        return (List<T>) backbone.retrieve((Query<Object>) query, options).stream().collect(Collectors.toList());
+    public <T> List<T> retrieve(Query<Object> query, QueryOptions options) {
+        return (List<T>) backbone.retrieve((Query<Object>) query, options).stream()
+                .map(o -> context.getMode().snapshotManagedBitemporal(context, (Bitemporal) o, ((Bitemporal)o).getBitemporalStamp())).collect(Collectors.toList());
     }
 
     @Override
-    public String prettyPrintJournal(Object id, Function<Bitemporal, String> customField) {
+    public String prettyPrintJournal(Object id) {
         if (journals.containsKey(id))
-            return DocumentJournal.prettyPrint(journals.get(id).collection(), id, customField);
+            return context.getPrettyPrinter().apply(journals.get(id).list());
         else
             return "";
     }
@@ -93,7 +95,7 @@ public final class BarbelHistoCore implements BarbelHisto {
                 .stream().findFirst()
                 .orElseThrow(() -> new IllegalStateException("not update performed by this user yet"));
     }
-    
+
     public DocumentJournal getDocumentJournal(Object id) {
         return journals.get(id);
     }
@@ -129,6 +131,24 @@ public final class BarbelHistoCore implements BarbelHisto {
             this.timestamp = ZonedDateTime.now();
             this.user = user;
         }
+    }
+
+    @Override
+    public void populate(Collection<Bitemporal> bitemporals) {
+        Validate.isTrue(bitemporals != null, "bitemporals cannot be null");
+        Validate.validState(
+                bitemporals.stream().filter(b -> backbone.contains(b.getBitemporalStamp().getDocumentId()))
+                        .count() == 0,
+                "it's not allowed to populate items with document IDs already managed by this BarbelHisto instance");
+        backbone.addAll(context.getMode().populateBitemporals(context, bitemporals));
+    }
+
+    @Override
+    public Collection<Bitemporal> dump() {
+        Collection<Bitemporal> collection = context.getMode()
+                .managedObjectsToBitemporals(backbone);
+        backbone.clear();
+        return collection;
     }
 
 }

@@ -15,7 +15,7 @@ import com.projectbarbel.histo.model.DefaultPojo;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
-public class BarbelHistoCoreTest {
+public class BarbelHistoCore_Journal_Test {
 
     private BarbelHistoCore core;
 
@@ -108,7 +108,7 @@ public class BarbelHistoCoreTest {
         core.save(pojo, BarbelHistoContext.getDefaultClock().today().minusDays(8), LocalDate.MAX);
 
         // checking complete archive
-        System.out.println(core.prettyPrintJournal(pojo.getDocumentId(),d->((DefaultPojo)d).getData()));
+        System.out.println(core.prettyPrintJournal(pojo.getDocumentId()));
         List<DefaultPojo> all = core.retrieve(BarbelQueries.all(pojo.getDocumentId()),
                 BarbelQueryOptions.sortAscendingByEffectiveFrom());
         assertEquals(4, all.stream().count());
@@ -228,7 +228,7 @@ public class BarbelHistoCoreTest {
         core.save(pojo, BarbelHistoContext.getDefaultClock().today(), LocalDate.MAX);
 
         // checking complete archive
-        System.out.println(core.prettyPrintJournal(pojo.getDocumentId(), d->((DefaultPojo)d).getData()));
+        System.out.println(core.prettyPrintJournal(pojo.getDocumentId()));
         List<DefaultPojo> all = core.retrieve(BarbelQueries.all(pojo.getDocumentId()),
                 BarbelQueryOptions.sortAscendingByEffectiveFrom());
         assertEquals(4, all.stream().count());
@@ -295,7 +295,7 @@ public class BarbelHistoCoreTest {
         core.save(pojo, BarbelHistoContext.getDefaultClock().today().minusDays(10), BarbelHistoContext.getDefaultClock().today().plusDays(10));
 
         // checking complete archive
-        System.out.println(core.prettyPrintJournal(pojo.getDocumentId(), d->((DefaultPojo)d).getData()));
+        System.out.println(core.prettyPrintJournal(pojo.getDocumentId()));
         List<DefaultPojo> all = core.retrieve(BarbelQueries.all(pojo.getDocumentId()),
                 BarbelQueryOptions.sortAscendingByEffectiveFrom());
         assertEquals(6, all.stream().count());

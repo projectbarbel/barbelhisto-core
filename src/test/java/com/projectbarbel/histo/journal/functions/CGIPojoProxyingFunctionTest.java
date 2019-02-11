@@ -17,10 +17,10 @@ public class CGIPojoProxyingFunctionTest {
     @Test
     public void testApply_setBitemporal() throws Exception {
         DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
-        BitemporalStamp stamp1 = BitemporalStamp.createWithDefaultValues();
+        BitemporalStamp stamp1 = BitemporalStamp.createActive();
         Bitemporal proxy = (Bitemporal)proxying.apply(pojo, stamp1);
         assertEquals(stamp1, proxy.getBitemporalStamp());
-        BitemporalStamp stamp2 = BitemporalStamp.createWithDefaultValues();
+        BitemporalStamp stamp2 = BitemporalStamp.createActive();
         proxy.setBitemporalStamp(stamp2);
         assertEquals(stamp2, proxy.getBitemporalStamp());
     }
@@ -28,7 +28,7 @@ public class CGIPojoProxyingFunctionTest {
     @Test
     public void testApply_setBitemporal_null() throws Exception {
         DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
-        BitemporalStamp stamp1 = BitemporalStamp.createWithDefaultValues();
+        BitemporalStamp stamp1 = BitemporalStamp.createActive();
         Bitemporal proxy = (Bitemporal)proxying.apply(pojo, stamp1);
         assertEquals(stamp1, proxy.getBitemporalStamp());
         BitemporalStamp stampNull = null;
@@ -39,7 +39,7 @@ public class CGIPojoProxyingFunctionTest {
     @Test
     public void testApply_getTargetPojo() throws Exception {
         DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
-        BitemporalStamp stamp = BitemporalStamp.createWithDefaultValues();
+        BitemporalStamp stamp = BitemporalStamp.createActive();
         DefaultPojo proxy = (DefaultPojo)proxying.apply(pojo, stamp);
         assertEquals(pojo, ((BarbelProxy)proxy).getTarget());
     }
@@ -47,7 +47,7 @@ public class CGIPojoProxyingFunctionTest {
     @Test
     public void testApply_getBitemporal() throws Exception {
         DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
-        BitemporalStamp stamp = BitemporalStamp.createWithDefaultValues();
+        BitemporalStamp stamp = BitemporalStamp.createActive();
         DefaultPojo proxy = (DefaultPojo)proxying.apply(pojo, stamp);
         assertEquals(stamp, ((Bitemporal)proxy).getBitemporalStamp());
     }
@@ -55,7 +55,7 @@ public class CGIPojoProxyingFunctionTest {
     @Test
     public void testApply_checkData() throws Exception {
         DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
-        BitemporalStamp stamp = BitemporalStamp.createWithDefaultValues();
+        BitemporalStamp stamp = BitemporalStamp.createActive();
         DefaultPojo proxy = (DefaultPojo)proxying.apply(pojo, stamp);
         assertEquals(pojo.getData(), proxy.getData());
         assertEquals(pojo.getDocumentId(), proxy.getDocumentId());
