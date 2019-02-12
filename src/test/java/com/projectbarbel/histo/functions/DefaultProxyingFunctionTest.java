@@ -5,16 +5,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 import com.projectbarbel.histo.functions.BarbelProxy;
-import com.projectbarbel.histo.functions.CGIPojoProxyingFunction;
+import com.projectbarbel.histo.functions.DefaultProxyingFunction;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.DefaultPojo;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
-public class CGIPojoProxyingFunctionTest {
+public class DefaultProxyingFunctionTest {
 
-    private CGIPojoProxyingFunction proxying = new CGIPojoProxyingFunction();
+    private DefaultProxyingFunction proxying = new DefaultProxyingFunction();
     
     @Test
     public void testApply_setBitemporal() throws Exception {

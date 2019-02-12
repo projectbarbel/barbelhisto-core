@@ -23,12 +23,14 @@ import com.google.gson.JsonSerializer;
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
 import com.projectbarbel.histo.BarbelHistoCore.UpdateLogRecord;
-import com.projectbarbel.histo.functions.CGIPojoProxyingFunction;
 import com.projectbarbel.histo.functions.DefaultIDGenerator;
+import com.projectbarbel.histo.functions.DefaultPersistenceSupplier;
+import com.projectbarbel.histo.functions.DefaultPojoCopier;
 import com.projectbarbel.histo.functions.DefaultPrettyPrinter;
-import com.projectbarbel.histo.functions.GsonPojoCopier;
+import com.projectbarbel.histo.functions.DefaultProxyingFunction;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
+import com.projectbarbel.histo.model.BitemporalVersion;
 import com.projectbarbel.histo.model.DocumentJournal;
 import com.projectbarbel.histo.model.Systemclock;
 
@@ -88,7 +90,7 @@ public interface BarbelHistoContext {
     }
 
     static BiFunction<Object, BitemporalStamp, Object> getDefaultProxyingFunction() {
-        return new CGIPojoProxyingFunction();
+        return new DefaultProxyingFunction();
     }
 
     static Gson getDefaultGson() {
@@ -97,7 +99,7 @@ public interface BarbelHistoContext {
     }
 
     static Function<Object, Object> getDefaultCopyFunction() {
-        return new GsonPojoCopier();
+        return new DefaultPojoCopier();
     }
 
     Supplier<Object> getDocumentIdGenerator();
@@ -129,5 +131,16 @@ public interface BarbelHistoContext {
     IndexedCollection<UpdateLogRecord> getUpdateLog();
 
     Function<List<Bitemporal>, String> getPrettyPrinter();
+
+    Supplier<IndexedCollection<BitemporalVersion>> getPersistenceCollection();
+
+        static IndexedCollection<Object> getDefaultBackbone() {
+        ConcurrentIndexedCollection<Object> backbone = new ConcurrentIndexedCollection<>();
+        return backbone;
+    }
+
+    static Supplier<IndexedCollection<BitemporalVersion>> getDefaultPersistenceCollection() {
+        return new DefaultPersistenceSupplier();
+    }
 
 }

@@ -16,7 +16,7 @@ import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.DocumentJournal;
 import com.projectbarbel.histo.model.EffectivePeriod;
 
-public class JournalUpdateStrategyEmbedding implements BiConsumer<DocumentJournal, Bitemporal>, UpdateCaseAware {
+public class DefaultJournalUpdateStrategy implements BiConsumer<DocumentJournal, Bitemporal>, UpdateCaseAware {
 
     private final BarbelHistoContext context;
     private List<Bitemporal> newVersions = new ArrayList<>();
@@ -26,7 +26,7 @@ public class JournalUpdateStrategyEmbedding implements BiConsumer<DocumentJourna
         return actualCase;
     }
 
-    public JournalUpdateStrategyEmbedding(BarbelHistoContext context) {
+    public DefaultJournalUpdateStrategy(BarbelHistoContext context) {
         this.context = context;
     }
 

@@ -33,15 +33,18 @@ public interface BarbelHisto {
      * in one Barbel Histo backbone. However, notice that {@link #retrieve(Query)}
      * does not clear the backbone. If you try to {@link #populate(Collection)}
      * items already managed in the current {@link BarbelHisto} instance you will
-     * receive errors.
-     * 
+     * receive errors. <br>
+     * <br>
+     * In {@link BarbelMode#POJO} (default) you have to pass a collection of
+     * {@link BitemporalVersion} objects. In {@link BarbelMode#BITEMPORAL} mode you
+     * can add arbitrary objects that implement {@link Bitemporal}. <br>
+     * <br>
      * Notice that this way of persistence to a custom data store is not the
-     * recommended way for BarbelHosto persistence. The cqengine backbone several
-     * build in on-heap (default), off-heap and disk persistence options. See
-     * {@link DiskPersistence} and {@link OffHeapPersistence} for details.
-     * 
-     * In Pojo mode (default) you have to pass a collection of {@link BitemporalVersion}
-     * objects. In Bitemporal mode you can ad the {@link Bitemporal} objects.
+     * recommended way for {@link BarbelHisto} persistence. {@link BarbelHisto} is
+     * based on cqengine. There are build in on-heap (default), off-heap and disk
+     * persistence options. See {@link DiskPersistence} and
+     * {@link OffHeapPersistence} for details. <br>
+     * <br>
      * 
      * @see <a href=
      *      "https://github.com/npgall/cqengine">https://github.com/npgall/cqengine</a>
@@ -51,15 +54,27 @@ public interface BarbelHisto {
 
     /**
      * Unloads the backbone into a collection and return that to the client. This
-     * method is recommended when client uses custom data store. Store this
-     * collection to the data store of your choice. Use in conjunction with
+     * method is used when client uses custom data store. Store this collection to
+     * the data store of your choice. Use in conjunction with
      * {@link #populate(Collection)} to re-load the stored versions back into
-     * {@link BarbelHisto}.
-     * 
+     * {@link BarbelHisto}.<br>
+     * <br>
+     * In {@link BarbelMode#POJO} (default) you receive a collection of
+     * {@link BitemporalVersion} objects. In {@link BarbelMode#BITEMPORAL} you
+     * receive objects that implement {@link Bitemporal}. <br>
+     * <br>
      * In Pojo mode (default) this method returns a collection of
      * {@link BitemporalVersion} objects. Use this collection to store the data and
-     * to relaod {@link BarbelHisto} in the {@link #populate(Collection)} method.
+     * to relaod {@link BarbelHisto} in the {@link #populate(Collection)} method.<br>
+     * <br>
+     * Notice that this way of persistence to a custom data store is not the
+     * recommended way for {@link BarbelHisto} persistence. {@link BarbelHisto} is
+     * based on cqengine. There are build in on-heap (default), off-heap and disk
+     * persistence options. See {@link DiskPersistence} and
+     * {@link OffHeapPersistence} for details. <br>
      * 
+     * @see <a href=
+     *      "https://github.com/npgall/cqengine">https://github.com/npgall/cqengine</a>
      * @return the collection of bitemporals to store into an arbitrary data store
      */
     Collection<Bitemporal> dump();

@@ -11,13 +11,13 @@ import java.util.function.Supplier;
 import org.apache.commons.lang3.Validate;
 
 import com.google.gson.Gson;
-import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
 import com.projectbarbel.histo.BarbelHistoCore.UpdateLogRecord;
-import com.projectbarbel.histo.functions.GsonPojoCopier;
-import com.projectbarbel.histo.functions.JournalUpdateStrategyEmbedding;
+import com.projectbarbel.histo.functions.DefaultJournalUpdateStrategy;
+import com.projectbarbel.histo.functions.DefaultPojoCopier;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
+import com.projectbarbel.histo.model.BitemporalVersion;
 import com.projectbarbel.histo.model.DocumentJournal;
 import com.projectbarbel.histo.model.Systemclock;
 
@@ -32,7 +32,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     private String defaultActivity = BarbelHistoContext.getDefaultActivity();
     private Supplier<Object> versionIdGenerator = BarbelHistoContext.getDefaultVersionIDGenerator();
     private Supplier<Object> documentIdGenerator = BarbelHistoContext.getDefaultDocumentIDGenerator();
-    private IndexedCollection<Object> backbone = new ConcurrentIndexedCollection<>();
+    private IndexedCollection<Object> backbone = BarbelHistoContext.getDefaultBackbone();
     private String activity = BarbelHistoContext.getDefaultActivity();
     private String user = BarbelHistoContext.getDefaultUser();
     private Map<Object, DocumentJournal> journalStore = new ConcurrentHashMap<Object, DocumentJournal>();
@@ -40,10 +40,11 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     private Systemclock clock = BarbelHistoContext.getDefaultClock();
     private IndexedCollection<UpdateLogRecord> updateLog = BarbelHistoContext.getDefaultUpdateLog();
     private Function<List<Bitemporal>, String> prettyPrinter = BarbelHistoContext.getDefaultPrettyPrinter(); 
+    private Supplier<IndexedCollection<BitemporalVersion>> persistenceCollection = BarbelHistoContext.getDefaultPersistenceCollection();
     
     // some more complex context types
     private Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> journalUpdateStrategyProducer = (
-            context) -> new JournalUpdateStrategyEmbedding(this);
+            context) -> new DefaultJournalUpdateStrategy(this);
     private BarbelHistoFactory barbelFactory = new BarbelHistoFactory(this);
 
     public static BarbelHistoBuilder barbel() {
@@ -55,9 +56,20 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     public  BarbelHisto build() {
-        if (pojoCopyFunction instanceof GsonPojoCopier)
-            ((GsonPojoCopier) pojoCopyFunction).setGson(gson);
+        if (pojoCopyFunction instanceof DefaultPojoCopier)
+            ((DefaultPojoCopier) pojoCopyFunction).setGson(gson);
         return new BarbelHistoCore(this);
+    }
+
+    public Supplier<IndexedCollection<BitemporalVersion>> getPersistenceCollection() {
+        return persistenceCollection;
+    }
+
+    public BarbelHistoBuilder withPersistenceCollection(
+            Supplier<IndexedCollection<BitemporalVersion>> persistenceLoaderFunction) {
+        Validate.isTrue(persistenceLoaderFunction!=null,NONULLS);
+        this.persistenceCollection = persistenceLoaderFunction;
+        return this;
     }
 
     @Override

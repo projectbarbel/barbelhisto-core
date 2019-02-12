@@ -20,7 +20,7 @@ import com.projectbarbel.histo.model.EffectivePeriod;
 
 public final class BarbelQueries {
 
-    public static final Attribute<Object, Object> DOCUMENT_ID = new SimpleAttribute<Object, Object>("documentId") {
+    public static final SimpleAttribute<Object, Object> DOCUMENT_ID = new SimpleAttribute<Object, Object>("documentId") {
         public Object getValue(Object object, QueryOptions queryOptions) {
             return ((Bitemporal) object).getBitemporalStamp().getDocumentId();
         }
