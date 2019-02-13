@@ -36,6 +36,12 @@ public class CQEnginePersistenceTest {
         }
     };
     
+    public static final SimpleAttribute<Bitemporal, String> DOCUMENT_ID_PK_BITEMPORAL = new SimpleAttribute<Bitemporal, String>("documentId") {
+        public String getValue(Bitemporal object, QueryOptions queryOptions) {
+            return (String)((Bitemporal) object).getBitemporalStamp().getDocumentId();
+        }
+    };
+    
     public static final SimpleAttribute<DefaultPojo, String> DOCUMENT_ID_PK_POJO = new SimpleAttribute<DefaultPojo, String>("documentId") {
         public String getValue(DefaultPojo object, QueryOptions queryOptions) {
             return (String)BarbelMode.POJO.drawDocumentId(object);
@@ -60,6 +66,22 @@ public class CQEnginePersistenceTest {
         Files.delete(Paths.get("def1.dat-wal"));
     }
 
+    @Test
+    public void bitemporal() throws IOException {
+        DiskPersistence<Bitemporal, String> pers = DiskPersistence.onPrimaryKeyInFile(DOCUMENT_ID_PK_BITEMPORAL, new File("def2.dat"));
+        ConcurrentIndexedCollection<Bitemporal> col = new ConcurrentIndexedCollection<Bitemporal>(pers);
+        col.add(DefaultDocument.builder().withBitemporalStamp(BitemporalStamp.createActive()).withData("some").build());
+        assertEquals("some",((DefaultDocument)col.retrieve(BarbelQueries.all()).stream().findFirst().get()).getData());
+        col = new ConcurrentIndexedCollection<Bitemporal>(pers);
+        assertEquals(1, col.size());
+        col.clear();
+        col = new ConcurrentIndexedCollection<Bitemporal>(pers);
+        assertEquals(0, col.size());
+        Files.delete(Paths.get("def2.dat"));
+        Files.delete(Paths.get("def2.dat-shm"));
+        Files.delete(Paths.get("def2.dat-wal"));
+    }
+    
     @Test
     public void concrete() throws IOException {
         DiskPersistence<DefaultDocument, String> pers = DiskPersistence.onPrimaryKeyInFile(DOCUMENT_ID_PK_CONCRETE, new File("def2.dat"));

@@ -4,6 +4,7 @@ import static com.googlecode.cqengine.query.QueryFactory.equal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -65,6 +66,7 @@ public class BarbelHistoCore_CQIndexing_Test {
         Bitemporal byPK = (Bitemporal)core.retrieve(equal(VERSION_ID_PK, (String)object.getBitemporalStamp().getVersionId())).stream().findFirst().get();
         assertNotEquals(object, byPK);
         assertEquals(object.getBitemporalStamp(), byPK.getBitemporalStamp());
+        assertNotSame(object.getBitemporalStamp(), byPK.getBitemporalStamp());
         Bitemporal record = (Bitemporal) core.retrieve(BarbelQueries.all()).stream().findFirst().get();
         assertNotNull(record.getBitemporalStamp().getDocumentId());
         core.dump();

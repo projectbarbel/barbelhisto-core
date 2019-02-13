@@ -1,6 +1,7 @@
 package com.projectbarbel.histo;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -19,8 +20,10 @@ public interface BarbelHisto {
 
     <T> List<T> retrieve(Query<Object> query, QueryOptions options);
 
+    RecordTimeShift timeshift(LocalDateTime time);
+    
     String prettyPrintJournal(Object id);
-
+    
     /**
      * Method for clients that use a custom data store. It's recomended to only add
      * complete journals previously created by {@link BarbelHisto}. That means only

@@ -6,6 +6,7 @@ import static com.googlecode.cqengine.query.QueryFactory.orderBy;
 import static com.googlecode.cqengine.query.QueryFactory.queryOptions;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.chrono.ChronoZonedDateTime;
 import java.util.Collection;
@@ -44,7 +45,8 @@ public final class BarbelHistoCore implements BarbelHisto {
         this.journals = context.getJournalStore();
         this.updateLog = context.getUpdateLog();
         this.persistence = context.getPersistenceCollection().get();
-        backbone.addAll(persistence.stream().map(bv -> context.getMode().fromInternalPersistenceObjectToManagedBitemporal(context, bv))
+        backbone.addAll(persistence.stream()
+                .map(bv -> context.getMode().fromInternalPersistenceObjectToManagedBitemporal(context, bv))
                 .collect(Collectors.toCollection(HashSet::new)));
     }
 
@@ -62,7 +64,8 @@ public final class BarbelHistoCore implements BarbelHisto {
         BiConsumer<DocumentJournal, Bitemporal> updateStrategy = context.getBarbelFactory()
                 .createJournalUpdateStrategy();
         updateStrategy.accept(journal, newManagedBitemporal);
-        persistence.add(context.getMode().fromManagedBitemporalToInternalPersistenceObject(context, newManagedBitemporal));
+        persistence
+                .add(context.getMode().fromManagedBitemporalToInternalPersistenceObject(context, newManagedBitemporal));
         updateLog.add(new UpdateLogRecord(journal.getLastInsert(), newManagedBitemporal,
                 updateStrategy instanceof UpdateCaseAware ? ((UpdateCaseAware) updateStrategy).getActualCase() : null,
                 context.getUser()));
@@ -72,16 +75,16 @@ public final class BarbelHistoCore implements BarbelHisto {
     @SuppressWarnings("unchecked")
     @Override
     public <T> List<T> retrieve(Query<Object> query) {
-        return (List<T>) backbone.retrieve(query).stream().map(o -> context.getMode().snapshotManagedBitemporal(context,
-                (Bitemporal) o, ((Bitemporal) o).getBitemporalStamp())).collect(Collectors.toList());
+        return (List<T>) backbone.retrieve(query).stream()
+                .map(o -> context.getMode().copyManagedBitemporal(context, (Bitemporal) o))
+                .collect(Collectors.toList());
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> List<T> retrieve(Query<Object> query, QueryOptions options) {
-        return (List<T>) backbone
-                .retrieve((Query<Object>) query, options).stream().map(o -> context.getMode()
-                        .snapshotManagedBitemporal(context, (Bitemporal) o, ((Bitemporal) o).getBitemporalStamp()))
+        return (List<T>) backbone.retrieve((Query<Object>) query, options).stream()
+                .map(o -> context.getMode().copyManagedBitemporal(context, (Bitemporal) o))
                 .collect(Collectors.toList());
     }
 
@@ -155,6 +158,12 @@ public final class BarbelHistoCore implements BarbelHisto {
         backbone.clear();
         persistence.clear();
         return collection;
+    }
+
+    @Override
+    public RecordTimeShift timeshift(LocalDateTime time) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

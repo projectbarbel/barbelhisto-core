@@ -23,7 +23,6 @@ import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelHistoCore;
 import com.projectbarbel.histo.BarbelMode;
 import com.projectbarbel.histo.BarbelTestHelper;
-import com.projectbarbel.histo.functions.DefaultJournalUpdateStrategy;
 import com.projectbarbel.histo.functions.DefaultJournalUpdateStrategy.JournalUpdateCase;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalObjectState;

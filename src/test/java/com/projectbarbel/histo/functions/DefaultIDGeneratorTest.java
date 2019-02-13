@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
 
-import com.projectbarbel.histo.functions.DefaultIDGenerator;
-
 public class DefaultIDGeneratorTest {
 
     @Test

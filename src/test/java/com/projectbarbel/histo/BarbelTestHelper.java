@@ -29,7 +29,6 @@ import io.github.benas.randombeans.api.EnhancedRandom;
 
 public class BarbelTestHelper {
 
-    @SuppressWarnings("rawtypes")
     public static <T> T random(Class<T> clazz, String... excludedFields) {
         return EnhancedRandomBuilder.aNewEnhancedRandomBuilder().randomize(Serializable.class, new Supplier<String>() {
 
@@ -56,19 +55,20 @@ public class BarbelTestHelper {
             public RecordPeriod get() {
                 return RecordPeriod.builder().build();
             }
-        }).randomize(new FieldDefinition<BitemporalStamp, Supplier>("versionIdGenerator", Supplier.class,
-                BitemporalStamp.class), new Supplier<DefaultIDGenerator>() {
+        }).randomize(new FieldDefinition<BitemporalStamp, Object>("versionId", Object.class,
+                BitemporalStamp.class), new Supplier<Object>() {
 
                     @Override
-                    public DefaultIDGenerator get() {
-                        return new DefaultIDGenerator();
+                    public Object get() {
+                        return new DefaultIDGenerator().get();
                     }
-                }).randomize(new FieldDefinition<BitemporalStamp, Supplier>("documentIdGenerator", Supplier.class,
-                        BitemporalStamp.class), new Supplier<DefaultIDGenerator>() {
+                })
+          .randomize(new FieldDefinition<BitemporalStamp, Object>("documentId", Object.class,
+                        BitemporalStamp.class), new Supplier<Object>() {
 
                             @Override
-                            public DefaultIDGenerator get() {
-                                return new DefaultIDGenerator();
+                            public Object get() {
+                                return new DefaultIDGenerator().get();
                             }
                         })
                 .build().nextObject(clazz, excludedFields);

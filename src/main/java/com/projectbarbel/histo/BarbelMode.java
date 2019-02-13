@@ -32,15 +32,18 @@ public abstract class BarbelMode {
 
     public abstract Object drawDocumentId(Object pojo);
 
-    public abstract Collection<Bitemporal> managedBitemporalToCustomPersistenceObjects(IndexedCollection<Object> objects);
+    public abstract Collection<Bitemporal> managedBitemporalToCustomPersistenceObjects(
+            IndexedCollection<Object> objects);
 
     public abstract Collection<Object> customPersistenceObjectsToManagedBitemporals(BarbelHistoContext context,
             Collection<Bitemporal> bitemporals);
 
-    public abstract Object fromInternalPersistenceObjectToManagedBitemporal(BarbelHistoContext context, BitemporalVersion bv);
+    public abstract Object fromInternalPersistenceObjectToManagedBitemporal(BarbelHistoContext context,
+            BitemporalVersion bv);
 
-    public abstract BitemporalVersion fromManagedBitemporalToInternalPersistenceObject(BarbelHistoContext context, Bitemporal bitemporal);
-    
+    public abstract BitemporalVersion fromManagedBitemporalToInternalPersistenceObject(BarbelHistoContext context,
+            Bitemporal bitemporal);
+
     public static class PojoMode extends BarbelMode {
 
         @Override
@@ -78,7 +81,8 @@ public abstract class BarbelMode {
         }
 
         @Override
-        public Collection<Object> customPersistenceObjectsToManagedBitemporals(BarbelHistoContext context, Collection<Bitemporal> bitemporals) {
+        public Collection<Object> customPersistenceObjectsToManagedBitemporals(BarbelHistoContext context,
+                Collection<Bitemporal> bitemporals) {
             try {
                 IndexedCollection<Object> output = bitemporals.stream()
                         .map(b -> snapshotMaiden(context, ((BitemporalVersion) b).getObject(),
@@ -99,11 +103,13 @@ public abstract class BarbelMode {
 
         @Override
         public Bitemporal copyManagedBitemporal(BarbelHistoContext context, Bitemporal bitemporal) {
-            return snapshotManagedBitemporal(context, bitemporal, bitemporal.getBitemporalStamp());
+            return snapshotManagedBitemporal(context, bitemporal,
+                    (BitemporalStamp) context.getPojoCopyFunction().apply(bitemporal.getBitemporalStamp()));
         }
 
         @Override
-        public Object fromInternalPersistenceObjectToManagedBitemporal(BarbelHistoContext context, BitemporalVersion bv) {
+        public Object fromInternalPersistenceObjectToManagedBitemporal(BarbelHistoContext context,
+                BitemporalVersion bv) {
             return context.getPojoProxyingFunction().apply(bv.getObject(), bv.getBitemporalStamp());
         }
 
@@ -111,7 +117,7 @@ public abstract class BarbelMode {
         public BitemporalVersion fromManagedBitemporalToInternalPersistenceObject(BarbelHistoContext context,
                 Bitemporal bitemporal) {
             BitemporalStamp stamp = bitemporal.getBitemporalStamp();
-            Object target = ((BarbelProxy)bitemporal).getTarget();
+            Object target = ((BarbelProxy) bitemporal).getTarget();
             return new BitemporalVersion(stamp, target);
         }
 
@@ -152,7 +158,8 @@ public abstract class BarbelMode {
         }
 
         @Override
-        public Collection<Object> customPersistenceObjectsToManagedBitemporals(BarbelHistoContext context, Collection<Bitemporal> bitemporals) {
+        public Collection<Object> customPersistenceObjectsToManagedBitemporals(BarbelHistoContext context,
+                Collection<Bitemporal> bitemporals) {
             return bitemporals.stream().map(b -> (Object) b)
                     .collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
         }
@@ -163,7 +170,8 @@ public abstract class BarbelMode {
         }
 
         @Override
-        public Object fromInternalPersistenceObjectToManagedBitemporal(BarbelHistoContext context, BitemporalVersion bv) {
+        public Object fromInternalPersistenceObjectToManagedBitemporal(BarbelHistoContext context,
+                BitemporalVersion bv) {
             return bv.getObject();
         }
 

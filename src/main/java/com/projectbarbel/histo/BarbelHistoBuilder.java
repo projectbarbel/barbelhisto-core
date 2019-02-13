@@ -12,6 +12,7 @@ import org.apache.commons.lang3.Validate;
 
 import com.google.gson.Gson;
 import com.googlecode.cqengine.IndexedCollection;
+import com.googlecode.cqengine.persistence.support.serialization.PojoSerializer;
 import com.projectbarbel.histo.BarbelHistoCore.UpdateLogRecord;
 import com.projectbarbel.histo.functions.DefaultJournalUpdateStrategy;
 import com.projectbarbel.histo.functions.DefaultPojoCopier;
@@ -24,6 +25,8 @@ import com.projectbarbel.histo.model.Systemclock;
 public final class BarbelHistoBuilder implements BarbelHistoContext {
 
     private static final String NONULLS = "null values not allowed when building barbel context";
+    private static PojoSerializer<Bitemporal> persistenceSerializerSingleton = BarbelHistoContext.getDefaultPersistenceSerializerSingleton();
+    private static BiFunction<Object, BitemporalStamp, Object> persistencePojoProxyingFunction = BarbelHistoContext.getDefaultProxyingFunction();
     
     // simple context types
     private BarbelMode mode = BarbelHistoContext.getDefaultBarbelMode();
@@ -245,6 +248,22 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     @Override
     public String getUser() {
         return user;
+    }
+
+    public static PojoSerializer<Bitemporal> getPersistenceSerializerSingleton() {
+        return persistenceSerializerSingleton;
+    }
+
+    public static void setPersistenceSerializerSingleton(PojoSerializer<Bitemporal> persistenceSerializerSingleton) {
+        BarbelHistoBuilder.persistenceSerializerSingleton = persistenceSerializerSingleton;
+    }
+
+    public static BiFunction<Object, BitemporalStamp, Object> getPersistencePojoProxyingFunction() {
+        return persistencePojoProxyingFunction;
+    }
+
+    public static void setPersistencePojoProxyingFunction(BiFunction<Object, BitemporalStamp, Object> persistencePojoProxyingFunction) {
+        BarbelHistoBuilder.persistencePojoProxyingFunction = persistencePojoProxyingFunction;
     }
     
 }

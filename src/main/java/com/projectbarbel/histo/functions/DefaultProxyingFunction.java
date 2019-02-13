@@ -3,6 +3,7 @@ package com.projectbarbel.histo.functions;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.function.BiFunction;
 
 import com.google.common.base.Defaults;
@@ -35,10 +36,28 @@ public class DefaultProxyingFunction implements BiFunction<Object, BitemporalSta
                 this.target = args.length > 0 ? args[0] : null;
                 return null;
             } else if (method.getName().equals("toString")) {
-                return sp.getEffectiveTime().toString() + " | " + target.toString();
+                return sp.getEffectiveTime().toString() + " | " + toString();
+            } else if (method.getName().equals("equals")) {
+                obj = args.length > 0 ? args[0] : null;
+                if (obj instanceof BarbelProxy)
+                    return target.equals(((BarbelProxy) obj).getTarget())
+                            && sp.equals(((Bitemporal) obj).getBitemporalStamp());
+                return target.equals(obj);
+            } else if (method.getName().equals("hashCode")) {
+                return hashCode();
             } else {
                 return proxy.invoke(target, args);
             }
+        }
+
+        @Override
+        public String toString() {
+            return "Interceptor [sp=" + sp + ", target=" + target + "]";
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(sp, target);
         }
 
     }

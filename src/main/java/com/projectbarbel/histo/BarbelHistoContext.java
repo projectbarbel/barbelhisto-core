@@ -22,6 +22,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
+import com.googlecode.cqengine.persistence.support.serialization.PojoSerializer;
 import com.projectbarbel.histo.BarbelHistoCore.UpdateLogRecord;
 import com.projectbarbel.histo.functions.DefaultIDGenerator;
 import com.projectbarbel.histo.functions.DefaultPersistenceSupplier;
@@ -53,10 +54,23 @@ public interface BarbelHistoContext {
         }
     };
 
+    static IndexedCollection<Object> getDefaultBackbone() {
+        ConcurrentIndexedCollection<Object> backbone = new ConcurrentIndexedCollection<>();
+        return backbone;
+    }
+
+    static Supplier<IndexedCollection<BitemporalVersion>> getDefaultPersistenceCollection() {
+        return new DefaultPersistenceSupplier();
+    }
+
+    static PojoSerializer<Bitemporal> getDefaultPersistenceSerializerSingleton() {
+        return new SimpleGsonPojoSerializer();
+    }
+
     static Function<List<Bitemporal>, String> getDefaultPrettyPrinter() {
         return new DefaultPrettyPrinter();
     }
-    
+
     static IndexedCollection<UpdateLogRecord> getDefaultUpdateLog() {
         return new ConcurrentIndexedCollection<BarbelHistoCore.UpdateLogRecord>();
     }
@@ -64,7 +78,7 @@ public interface BarbelHistoContext {
     static BarbelMode getDefaultBarbelMode() {
         return BarbelMode.POJO;
     }
-    
+
     static String getDefaultActivity() {
         return SYSTEMACTIVITY;
     }
@@ -133,14 +147,5 @@ public interface BarbelHistoContext {
     Function<List<Bitemporal>, String> getPrettyPrinter();
 
     Supplier<IndexedCollection<BitemporalVersion>> getPersistenceCollection();
-
-        static IndexedCollection<Object> getDefaultBackbone() {
-        ConcurrentIndexedCollection<Object> backbone = new ConcurrentIndexedCollection<>();
-        return backbone;
-    }
-
-    static Supplier<IndexedCollection<BitemporalVersion>> getDefaultPersistenceCollection() {
-        return new DefaultPersistenceSupplier();
-    }
 
 }

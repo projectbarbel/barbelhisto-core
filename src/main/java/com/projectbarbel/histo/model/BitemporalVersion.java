@@ -3,12 +3,14 @@ package com.projectbarbel.histo.model;
 public class BitemporalVersion implements Bitemporal {
 
     private BitemporalStamp stamp;
-    private Object object;
+    private final Object object;
+    private final String objectType;
     
     public BitemporalVersion(BitemporalStamp stamp, Object object) {
         super();
         this.stamp = stamp;
         this.object = object;
+        this.objectType = object.getClass().getName();
     }
 
     @Override
@@ -34,8 +36,8 @@ public class BitemporalVersion implements Bitemporal {
         this.stamp = stamp;
     }
 
-    public void setObject(Object object) {
-        this.object = object;
+    public String getObjectType() {
+        return objectType;
     }
 
 }
