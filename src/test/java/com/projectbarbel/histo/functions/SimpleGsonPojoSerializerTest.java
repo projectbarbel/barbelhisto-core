@@ -21,7 +21,7 @@ import io.github.benas.randombeans.api.EnhancedRandom;
 
 public class SimpleGsonPojoSerializerTest {
 
-    private SimpleGsonPojoSerializer serializer = new SimpleGsonPojoSerializer();
+    private SimpleGsonPojoSerializer serializer = new SimpleGsonPojoSerializer(BarbelHistoBuilder.barbel());
     
     @Test
     public void testSerialize_DefaultDocument() throws Exception {

@@ -49,10 +49,12 @@ public class BarbelHistoCore_CQIndexing_Test {
     @ParameterizedTest
     @MethodSource("createPojos")
     public <T> void testSave(T pojo) throws IOException {
-        IndexedCollection<T> backbone = new ConcurrentIndexedCollection<T>();
-        backbone.addIndex((Index<T>) NavigableIndex.onAttribute(VERSION_ID_PK));
         BarbelHisto<T> core = BarbelHistoBuilder.barbel()
-                .withBackbone(backbone)
+                .withBackboneSupplier(()->{
+                    IndexedCollection<T> backbone = new ConcurrentIndexedCollection<T>();
+                    backbone.addIndex((Index<T>) NavigableIndex.onAttribute(VERSION_ID_PK));
+                    return backbone;
+                })
                 .build();
         core.save(pojo, LocalDate.now(), LocalDate.MAX);
         core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX);

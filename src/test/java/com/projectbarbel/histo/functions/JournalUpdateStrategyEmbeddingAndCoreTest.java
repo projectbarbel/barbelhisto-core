@@ -76,7 +76,7 @@ public class JournalUpdateStrategyEmbeddingAndCoreTest {
             List<LocalDate> inactiveEffective) throws Exception {
         BarbelHistoContext context = BarbelHistoBuilder.barbel().withMode(BarbelMode.POJO)
                 .withClock(new Systemclock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 10, 0))).withUser("testUser")
-                .withBackbone(
+                .withBackboneSupplier(()->
                         BarbelTestHelper.generateJournalOfDefaultPojos("someId", Arrays.asList(LocalDate.of(2016, 1, 1),
                                 LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))));
         BarbelHisto<DefaultPojo> core = ((BarbelHistoBuilder)context).build();

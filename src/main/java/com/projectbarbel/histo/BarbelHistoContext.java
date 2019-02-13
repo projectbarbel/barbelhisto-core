@@ -55,13 +55,12 @@ public interface BarbelHistoContext {
         }
     };
 
-    static <T> IndexedCollection<T> getDefaultBackbone() {
-        ConcurrentIndexedCollection<T> backbone = new ConcurrentIndexedCollection<>();
-        return backbone;
+    static <T> Supplier<IndexedCollection<T>> getDefaultBackbone() {
+        return () -> new ConcurrentIndexedCollection<T>();
     }
 
-    static PojoSerializer<Bitemporal> getDefaultPersistenceSerializerSingleton() {
-        return new SimpleGsonPojoSerializer();
+    static Function<BarbelHistoContext, PojoSerializer<Bitemporal>> getDefaultPersistenceSerializerProducer() {
+        return (c) -> new SimpleGsonPojoSerializer(BarbelHistoBuilder.barbel());
     }
 
     static Function<List<Bitemporal>, String> getDefaultPrettyPrinter() {
@@ -117,7 +116,7 @@ public interface BarbelHistoContext {
 
     Supplier<Object> getVersionIdGenerator();
 
-    <T> IndexedCollection<T> getBackbone();
+    <T> Supplier<IndexedCollection<T>> getBackboneSupplier();
 
     String getActivity();
 
@@ -140,5 +139,7 @@ public interface BarbelHistoContext {
     IndexedCollection<UpdateLogRecord> getUpdateLog();
 
     Function<List<Bitemporal>, String> getPrettyPrinter();
+    
+    Function<BarbelHistoContext, PojoSerializer<Bitemporal>> getPersistenceSerializerProducer();
 
 }

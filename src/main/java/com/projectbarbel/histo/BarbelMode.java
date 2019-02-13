@@ -11,6 +11,7 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
+import com.googlecode.cqengine.persistence.support.serialization.PersistenceConfig;
 import com.projectbarbel.histo.functions.BarbelProxy;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
@@ -54,6 +55,8 @@ public abstract class BarbelMode {
 
     public abstract BitemporalVersion fromManagedBitemporalToInternalPersistenceObject(BarbelHistoContext context,
             Bitemporal bitemporal);
+
+    public abstract boolean validateManagedType(BarbelHistoContext context, Class<?> objectType);
 
     public static class PojoMode extends BarbelMode {
 
@@ -133,6 +136,13 @@ public abstract class BarbelMode {
             return new BitemporalVersion(stamp, target);
         }
 
+        @Override
+        public boolean validateManagedType(BarbelHistoContext context, Class<?> objectType) {
+            //Validate.isTrue(objectType.getAnnotation(PersistenceConfig.class)!=null, "don't forget to add @PersistenceConfig(serializer=BarbelPojoSerializer.class) to the pojo you want to manage");
+            Validate.isTrue(FieldUtils.getFieldsListWithAnnotation(objectType, DocumentId.class).size()==1, "don't forget to add @DocumentId to the document id attribute to the pojo you want to manage");
+            return true;
+        }
+
     }
 
     public static class BitemporalMode extends BarbelMode {
@@ -193,6 +203,12 @@ public abstract class BarbelMode {
                 Bitemporal bitemporal) {
             return new BitemporalVersion(bitemporal.getBitemporalStamp(), bitemporal);
         }
+
+        @Override
+        public boolean validateManagedType(BarbelHistoContext context, Class<?> objectType) {
+            Validate.isTrue(Bitemporal.class.isAssignableFrom(objectType), "don't forget to implement Bitemporal.class interface on the type you want to manage when in mode BarbelMode.BITEMPORAL");
+            return true;
+       }
 
     }
 

@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.chrono.ChronoZonedDateTime;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -37,17 +38,24 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     private final IndexedCollection<T> backbone;
     private final Map<Object, DocumentJournal> journals;
     private final IndexedCollection<UpdateLogRecord> updateLog;
-
+    private final static Map<Object,Object> validTypes = new HashMap<>();
+    public static ThreadLocal<BarbelHistoContext> CONSTRUCTION_CONTEXT = new ThreadLocal<BarbelHistoContext>();
+    
+    @SuppressWarnings("unchecked")
     protected BarbelHistoCore(BarbelHistoContext context) {
+        CONSTRUCTION_CONTEXT.set(context);
         this.context = context;
-        this.backbone = context.getBackbone();
+        this.backbone = (IndexedCollection<T>) context.getBackboneSupplier().get();
         this.journals = context.getJournalStore();
         this.updateLog = context.getUpdateLog();
+        CONSTRUCTION_CONTEXT.remove();
     }
 
     @Override
     public boolean save(T newVersion, LocalDate from, LocalDate until) {
         Validate.isTrue(newVersion != null && from != null && until != null, "all arguments must not be null here");
+        Validate.isTrue(from.isBefore(until), "from date must be before until date");
+        validTypes.computeIfAbsent(newVersion.getClass(), (k)->context.getMode().validateManagedType(context, (Class<?>)k));
         Object id = context.getMode().drawDocumentId(newVersion);
         BitemporalStamp stamp = BitemporalStamp.of(context.getActivity(), id, EffectivePeriod.of(from, until),
                 RecordPeriod.createActive(context));

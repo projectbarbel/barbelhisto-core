@@ -85,12 +85,12 @@ public class BarbelHistoCore_CQPersistence_Test {
     public void testSave_PrimitivePrivatePojo() throws IOException {
         PrimitivePrivatePojo pojo = EnhancedRandom.random(PrimitivePrivatePojo.class);
         BarbelHisto<PrimitivePrivatePojo> core = BarbelHistoBuilder.barbel()
-                .withBackbone(new ConcurrentIndexedCollection<PrimitivePrivatePojo>(
+                .withBackboneSupplier(()->new ConcurrentIndexedCollection<PrimitivePrivatePojo>(
                         DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO, new File(FILENAME))))
                 .build();
         core.save(pojo, LocalDate.now(), LocalDate.MAX);
         core = BarbelHistoBuilder.barbel()
-                .withBackbone(new ConcurrentIndexedCollection<PrimitivePrivatePojo>(
+                .withBackboneSupplier(()->new ConcurrentIndexedCollection<PrimitivePrivatePojo>(
                         DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO, new File(FILENAME))))
                 .build();
         core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX);
@@ -105,12 +105,12 @@ public class BarbelHistoCore_CQPersistence_Test {
     public void testSave_PrimitivePrivatePojoPartialContructor() throws IOException {
         PrimitivePrivatePojoPartialContructor pojo = EnhancedRandom.random(PrimitivePrivatePojoPartialContructor.class);
         BarbelHisto<PrimitivePrivatePojoPartialContructor> core = BarbelHistoBuilder.barbel()
-                .withBackbone(new ConcurrentIndexedCollection<PrimitivePrivatePojoPartialContructor>(
+                .withBackboneSupplier(()->new ConcurrentIndexedCollection<PrimitivePrivatePojoPartialContructor>(
                         DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO_PARTIAL, new File(FILENAME))))
                 .build();
         core.save(pojo, LocalDate.now(), LocalDate.MAX);
         core = BarbelHistoBuilder.barbel()
-                .withBackbone(new ConcurrentIndexedCollection<PrimitivePrivatePojoPartialContructor>(
+                .withBackboneSupplier(()->new ConcurrentIndexedCollection<PrimitivePrivatePojoPartialContructor>(
                         DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO_PARTIAL, new File(FILENAME))))
                 .build();
         core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX);
@@ -125,12 +125,12 @@ public class BarbelHistoCore_CQPersistence_Test {
     public void testSave_NoPrimitivePrivatePojoPartialContructor() throws IOException {
         NoPrimitivePrivatePojoPartialContructor pojo = EnhancedRandom.random(NoPrimitivePrivatePojoPartialContructor.class);
         BarbelHisto<NoPrimitivePrivatePojoPartialContructor> core = BarbelHistoBuilder.barbel()
-                .withBackbone(new ConcurrentIndexedCollection<NoPrimitivePrivatePojoPartialContructor>(
+                .withBackboneSupplier(()->new ConcurrentIndexedCollection<NoPrimitivePrivatePojoPartialContructor>(
                         DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_NO_PRIMITIVE_PRIVATE_POJO_PARTIAL, new File(FILENAME))))
                 .build();
         core.save(pojo, LocalDate.now(), LocalDate.MAX);
         core = BarbelHistoBuilder.barbel()
-                .withBackbone(new ConcurrentIndexedCollection<NoPrimitivePrivatePojoPartialContructor>(
+                .withBackboneSupplier(()->new ConcurrentIndexedCollection<NoPrimitivePrivatePojoPartialContructor>(
                         DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_NO_PRIMITIVE_PRIVATE_POJO_PARTIAL, new File(FILENAME))))
                 .build();
         core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX);
@@ -145,12 +145,12 @@ public class BarbelHistoCore_CQPersistence_Test {
     public void testSave_ComplexFieldsPrivatePojoPartialContructor() throws IOException {
         ComplexFieldsPrivatePojoPartialContructor pojo = EnhancedRandom.random(ComplexFieldsPrivatePojoPartialContructor.class);
         BarbelHisto<ComplexFieldsPrivatePojoPartialContructor> core = BarbelHistoBuilder.barbel()
-                .withBackbone(new ConcurrentIndexedCollection<ComplexFieldsPrivatePojoPartialContructor>(
+                .withBackboneSupplier(()->new ConcurrentIndexedCollection<ComplexFieldsPrivatePojoPartialContructor>(
                         DiskPersistence.onPrimaryKeyInFile(ComplexFieldsPrivatePojoPartialContructor_Field, new File(FILENAME))))
                 .build();
         core.save(pojo, LocalDate.now(), LocalDate.MAX);
         core = BarbelHistoBuilder.barbel()
-                .withBackbone(new ConcurrentIndexedCollection<ComplexFieldsPrivatePojoPartialContructor>(
+                .withBackboneSupplier(()->new ConcurrentIndexedCollection<ComplexFieldsPrivatePojoPartialContructor>(
                         DiskPersistence.onPrimaryKeyInFile(ComplexFieldsPrivatePojoPartialContructor_Field, new File(FILENAME))))
                 .build();
         core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX);
@@ -165,12 +165,12 @@ public class BarbelHistoCore_CQPersistence_Test {
     public void testSave_ComplexFieldsPrivatePojoPartialContructorWithComplexType() throws IOException {
         ComplexFieldsPrivatePojoPartialContructorWithComplexType pojo = EnhancedRandom.random(ComplexFieldsPrivatePojoPartialContructorWithComplexType.class);
         BarbelHisto<ComplexFieldsPrivatePojoPartialContructorWithComplexType> core = BarbelHistoBuilder.barbel()
-                .withBackbone(new ConcurrentIndexedCollection<ComplexFieldsPrivatePojoPartialContructorWithComplexType>(
+                .withBackboneSupplier(()->new ConcurrentIndexedCollection<ComplexFieldsPrivatePojoPartialContructorWithComplexType>(
                         DiskPersistence.onPrimaryKeyInFile(ComplexFieldsPrivatePojoPartialContructorWithComplexType_Field, new File(FILENAME))))
                 .build();
         core.save(pojo, LocalDate.now(), LocalDate.MAX);
         core = BarbelHistoBuilder.barbel()
-                .withBackbone(new ConcurrentIndexedCollection<ComplexFieldsPrivatePojoPartialContructorWithComplexType>(
+                .withBackboneSupplier(()->new ConcurrentIndexedCollection<ComplexFieldsPrivatePojoPartialContructorWithComplexType>(
                         DiskPersistence.onPrimaryKeyInFile(ComplexFieldsPrivatePojoPartialContructorWithComplexType_Field, new File(FILENAME))))
                 .build();
         core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX);

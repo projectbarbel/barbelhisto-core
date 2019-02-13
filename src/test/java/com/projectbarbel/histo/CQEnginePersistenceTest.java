@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
@@ -22,6 +23,13 @@ import com.projectbarbel.histo.model.DefaultDocument;
 import com.projectbarbel.histo.model.DefaultPojo;
 
 public class CQEnginePersistenceTest {
+
+    @AfterEach
+    public void tearDown() throws IOException {
+        Files.deleteIfExists(Paths.get("def.dat"));
+        Files.deleteIfExists(Paths.get("def.dat-shm"));
+        Files.deleteIfExists(Paths.get("def.dat-wal"));
+    }
     
     public static final SimpleAttribute<DefaultPojo, String> DOCUMENT_ID_PK = new SimpleAttribute<DefaultPojo, String>("documentId") {
         public String getValue(DefaultPojo object, QueryOptions queryOptions) {
@@ -55,7 +63,7 @@ public class CQEnginePersistenceTest {
     
     @Test
     public void bitemporal() throws IOException {
-        DiskPersistence<Bitemporal, String> pers = DiskPersistence.onPrimaryKeyInFile(DOCUMENT_ID_PK_BITEMPORAL, new File("def2.dat"));
+        DiskPersistence<Bitemporal, String> pers = DiskPersistence.onPrimaryKeyInFile(DOCUMENT_ID_PK_BITEMPORAL, new File("def.dat"));
         ConcurrentIndexedCollection<Bitemporal> col = new ConcurrentIndexedCollection<Bitemporal>(pers);
         col.add(DefaultDocument.builder().withBitemporalStamp(BitemporalStamp.createActive()).withData("some").build());
         assertEquals("some",((DefaultDocument)col.retrieve(BarbelQueries.all()).stream().findFirst().get()).getData());
@@ -64,14 +72,11 @@ public class CQEnginePersistenceTest {
         col.clear();
         col = new ConcurrentIndexedCollection<Bitemporal>(pers);
         assertEquals(0, col.size());
-        Files.delete(Paths.get("def2.dat"));
-        Files.delete(Paths.get("def2.dat-shm"));
-        Files.delete(Paths.get("def2.dat-wal"));
     }
     
     @Test
     public void concrete() throws IOException {
-        DiskPersistence<DefaultDocument, String> pers = DiskPersistence.onPrimaryKeyInFile(DOCUMENT_ID_PK_CONCRETE, new File("def2.dat"));
+        DiskPersistence<DefaultDocument, String> pers = DiskPersistence.onPrimaryKeyInFile(DOCUMENT_ID_PK_CONCRETE, new File("def.dat"));
         ConcurrentIndexedCollection<DefaultDocument> col = new ConcurrentIndexedCollection<DefaultDocument>(pers);
         col.add(DefaultDocument.builder().withBitemporalStamp(BitemporalStamp.createActive()).withData("some").build());
         assertEquals("some",((DefaultDocument)col.retrieve(BarbelQueries.all()).stream().findFirst().get()).getData());
@@ -80,35 +85,26 @@ public class CQEnginePersistenceTest {
         col.clear();
         col = new ConcurrentIndexedCollection<DefaultDocument>(pers);
         assertEquals(0, col.size());
-        Files.delete(Paths.get("def2.dat"));
-        Files.delete(Paths.get("def2.dat-shm"));
-        Files.delete(Paths.get("def2.dat-wal"));
     }
     
     @Test
     public void pojo() throws IOException {
-        DiskPersistence<DefaultPojo, String> pers = DiskPersistence.onPrimaryKeyInFile(DOCUMENT_ID_PK_POJO, new File("def3.dat"));
+        DiskPersistence<DefaultPojo, String> pers = DiskPersistence.onPrimaryKeyInFile(DOCUMENT_ID_PK_POJO, new File("def.dat"));
         ConcurrentIndexedCollection<DefaultPojo> col = new ConcurrentIndexedCollection<DefaultPojo>(pers);
         col.add(new DefaultPojo("id","some"));
         assertEquals("some",((DefaultPojo)col.retrieve(equal(DOCUMENT_ID_PK_POJO, "id")).stream().findFirst().get()).getData());
         col.clear();
-        Files.delete(Paths.get("def3.dat"));
-        Files.delete(Paths.get("def3.dat-shm"));
-        Files.delete(Paths.get("def3.dat-wal"));
     }
     
     @Test
     public void pojoProxied() throws IOException {
-        DiskPersistence<DefaultPojo, String> pers = DiskPersistence.onPrimaryKeyInFile(DOCUMENT_ID_PK_POJO_PROXY, new File("def4.dat"));
+        DiskPersistence<DefaultPojo, String> pers = DiskPersistence.onPrimaryKeyInFile(DOCUMENT_ID_PK_POJO_PROXY, new File("def.dat"));
         ConcurrentIndexedCollection<DefaultPojo> col = new ConcurrentIndexedCollection<DefaultPojo>(pers);
         DefaultPojo memproxy = (DefaultPojo)BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(), new DefaultPojo("id","some"), BitemporalStamp.createActive());
         col.add(memproxy);
         DefaultPojo pojoproxy = (DefaultPojo)col.retrieve(equal(DOCUMENT_ID_PK_POJO, "id")).stream().findFirst().get();
         assertNotEquals("some",pojoproxy.getData());
         col.clear();
-        Files.delete(Paths.get("def4.dat"));
-        Files.delete(Paths.get("def4.dat-shm"));
-        Files.delete(Paths.get("def4.dat-wal"));
     }
     
 }

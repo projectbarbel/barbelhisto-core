@@ -24,8 +24,6 @@ import com.projectbarbel.histo.model.Systemclock;
 public final class BarbelHistoBuilder implements BarbelHistoContext {
 
     private static final String NONULLS = "null values not allowed when building barbel context";
-    private static PojoSerializer<Bitemporal> persistenceSerializerSingleton = BarbelHistoContext.getDefaultPersistenceSerializerSingleton();
-    private static BiFunction<Object, BitemporalStamp, Object> persistencePojoProxyingFunction = BarbelHistoContext.getDefaultProxyingFunction();
     
     // simple context types
     private BarbelMode mode = BarbelHistoContext.getDefaultBarbelMode();
@@ -34,8 +32,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     private String defaultActivity = BarbelHistoContext.getDefaultActivity();
     private Supplier<Object> versionIdGenerator = BarbelHistoContext.getDefaultVersionIDGenerator();
     private Supplier<Object> documentIdGenerator = BarbelHistoContext.getDefaultDocumentIDGenerator();
-    @SuppressWarnings("rawtypes")
-    private IndexedCollection backbone = BarbelHistoContext.getDefaultBackbone();
+    private Object backboneSupplier = BarbelHistoContext.getDefaultBackbone();
     private String activity = BarbelHistoContext.getDefaultActivity();
     private String user = BarbelHistoContext.getDefaultUser();
     private Map<Object, DocumentJournal> journalStore = new ConcurrentHashMap<Object, DocumentJournal>();
@@ -45,6 +42,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     private Function<List<Bitemporal>, String> prettyPrinter = BarbelHistoContext.getDefaultPrettyPrinter(); 
     
     // some more complex context types
+    private Function<BarbelHistoContext, PojoSerializer<Bitemporal>> persistenceSerializerProducer = BarbelHistoContext.getDefaultPersistenceSerializerProducer();
     private Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> journalUpdateStrategyProducer = (
             context) -> new DefaultJournalUpdateStrategy(this);
 
@@ -163,13 +161,13 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> IndexedCollection<T> getBackbone() {
-        return backbone;
+    public <T> Supplier<IndexedCollection<T>> getBackboneSupplier() {
+        return (Supplier<IndexedCollection<T>>)backboneSupplier;
     }
 
-    public <T> BarbelHistoBuilder withBackbone(IndexedCollection<T> backbone) {
+    public <T> BarbelHistoBuilder withBackboneSupplier(Supplier<IndexedCollection<T>> backbone) {
         Validate.isTrue(backbone!=null,NONULLS);
-        this.backbone = backbone;
+        this.backboneSupplier = backbone;
         return this;
     }
 
@@ -227,20 +225,15 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
         return user;
     }
 
-    public static PojoSerializer<Bitemporal> getPersistenceSerializerSingleton() {
-        return persistenceSerializerSingleton;
+    @Override
+    public Function<BarbelHistoContext, PojoSerializer<Bitemporal>> getPersistenceSerializerProducer() {
+        return persistenceSerializerProducer;
     }
 
-    public static void setPersistenceSerializerSingleton(PojoSerializer<Bitemporal> persistenceSerializerSingleton) {
-        BarbelHistoBuilder.persistenceSerializerSingleton = persistenceSerializerSingleton;
+    public BarbelHistoBuilder withPersistenceSerializerProducer(Function<BarbelHistoContext, PojoSerializer<Bitemporal>> persistenceSerializerProducer) {
+        Validate.isTrue(persistenceSerializerProducer!=null,NONULLS);
+        this.persistenceSerializerProducer = persistenceSerializerProducer;
+        return this;
     }
 
-    public static BiFunction<Object, BitemporalStamp, Object> getPersistencePojoProxyingFunction() {
-        return persistencePojoProxyingFunction;
-    }
-
-    public static void setPersistencePojoProxyingFunction(BiFunction<Object, BitemporalStamp, Object> persistencePojoProxyingFunction) {
-        BarbelHistoBuilder.persistencePojoProxyingFunction = persistencePojoProxyingFunction;
-    }
-    
 }
