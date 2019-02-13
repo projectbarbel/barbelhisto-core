@@ -12,13 +12,13 @@ import com.googlecode.cqengine.query.option.QueryOptions;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalVersion;
 
-public interface BarbelHisto {
+public interface BarbelHisto<T> {
 
     boolean save(Object currentVersion, LocalDate from, LocalDate until);
 
-    <T> List<T> retrieve(Query<Object> query);
+    List<T> retrieve(Query<T> query);
 
-    <T> List<T> retrieve(Query<Object> query, QueryOptions options);
+    List<T> retrieve(Query<T> query, QueryOptions options);
 
     RecordTimeShift timeshift(LocalDateTime time);
     

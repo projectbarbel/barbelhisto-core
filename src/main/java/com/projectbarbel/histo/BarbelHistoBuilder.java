@@ -18,7 +18,6 @@ import com.projectbarbel.histo.functions.DefaultJournalUpdateStrategy;
 import com.projectbarbel.histo.functions.DefaultPojoCopier;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
-import com.projectbarbel.histo.model.BitemporalVersion;
 import com.projectbarbel.histo.model.DocumentJournal;
 import com.projectbarbel.histo.model.Systemclock;
 
@@ -35,7 +34,8 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     private String defaultActivity = BarbelHistoContext.getDefaultActivity();
     private Supplier<Object> versionIdGenerator = BarbelHistoContext.getDefaultVersionIDGenerator();
     private Supplier<Object> documentIdGenerator = BarbelHistoContext.getDefaultDocumentIDGenerator();
-    private IndexedCollection<Object> backbone = BarbelHistoContext.getDefaultBackbone();
+    @SuppressWarnings("rawtypes")
+    private IndexedCollection backbone = BarbelHistoContext.getDefaultBackbone();
     private String activity = BarbelHistoContext.getDefaultActivity();
     private String user = BarbelHistoContext.getDefaultUser();
     private Map<Object, DocumentJournal> journalStore = new ConcurrentHashMap<Object, DocumentJournal>();
@@ -43,7 +43,6 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     private Systemclock clock = BarbelHistoContext.getDefaultClock();
     private IndexedCollection<UpdateLogRecord> updateLog = BarbelHistoContext.getDefaultUpdateLog();
     private Function<List<Bitemporal>, String> prettyPrinter = BarbelHistoContext.getDefaultPrettyPrinter(); 
-    private Supplier<IndexedCollection<BitemporalVersion>> persistenceCollection = BarbelHistoContext.getDefaultPersistenceCollection();
     
     // some more complex context types
     private Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> journalUpdateStrategyProducer = (
@@ -58,21 +57,10 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     protected BarbelHistoBuilder() {
     }
 
-    public  BarbelHisto build() {
+    public <T> BarbelHisto<T> build() {
         if (pojoCopyFunction instanceof DefaultPojoCopier)
             ((DefaultPojoCopier) pojoCopyFunction).setGson(gson);
-        return new BarbelHistoCore(this);
-    }
-
-    public Supplier<IndexedCollection<BitemporalVersion>> getPersistenceCollection() {
-        return persistenceCollection;
-    }
-
-    public BarbelHistoBuilder withPersistenceCollection(
-            Supplier<IndexedCollection<BitemporalVersion>> persistenceLoaderFunction) {
-        Validate.isTrue(persistenceLoaderFunction!=null,NONULLS);
-        this.persistenceCollection = persistenceLoaderFunction;
-        return this;
+        return new BarbelHistoCore<T>(this);
     }
 
     @Override
@@ -185,12 +173,13 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
         return this;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public IndexedCollection<Object> getBackbone() {
+    public <T> IndexedCollection<T> getBackbone() {
         return backbone;
     }
 
-    public BarbelHistoBuilder withBackbone(IndexedCollection<Object> backbone) {
+    public <T> BarbelHistoBuilder withBackbone(IndexedCollection<T> backbone) {
         Validate.isTrue(backbone!=null,NONULLS);
         this.backbone = backbone;
         return this;

@@ -12,30 +12,67 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.attribute.SimpleAttribute;
 import com.googlecode.cqengine.persistence.disk.DiskPersistence;
+import com.googlecode.cqengine.persistence.support.serialization.PersistenceConfig;
 import com.googlecode.cqengine.query.option.QueryOptions;
 import com.projectbarbel.histo.model.Bitemporal;
-import com.projectbarbel.histo.model.BitemporalVersion;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
 public class BarbelHistoCore_CQPersistence_Test {
 
     private static final String FILENAME = "test.dat";
-    private BarbelHistoCore core;
-    public static final SimpleAttribute<BitemporalVersion, String> VERSION_ID_PK = new SimpleAttribute<BitemporalVersion, String>(
+    @SuppressWarnings("rawtypes")
+    private BarbelHisto core;
+    
+    final SimpleAttribute<PrimitivePrivatePojo, String> VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO = new SimpleAttribute<PrimitivePrivatePojo, String>(
             "documentId") {
-        public String getValue(BitemporalVersion object, QueryOptions queryOptions) {
-            return (String) object.getBitemporalStamp().getVersionId();
+        public String getValue(PrimitivePrivatePojo object, QueryOptions queryOptions) {
+            return (String) ((Bitemporal)object).getBitemporalStamp().getVersionId();
         }
     };
 
+    final SimpleAttribute<PrimitivePrivatePojoPartialContructor, String> VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO_PARTIAL = new SimpleAttribute<PrimitivePrivatePojoPartialContructor, String>(
+            "documentId") {
+        public String getValue(PrimitivePrivatePojoPartialContructor object, QueryOptions queryOptions) {
+            return (String) ((Bitemporal)object).getBitemporalStamp().getVersionId();
+        }
+    };
+    
+    final SimpleAttribute<NoPrimitivePrivatePojoPartialContructor, String> VERSION_ID_PK_NO_PRIMITIVE_PRIVATE_POJO_PARTIAL = new SimpleAttribute<NoPrimitivePrivatePojoPartialContructor, String>(
+            "documentId") {
+        public String getValue(NoPrimitivePrivatePojoPartialContructor object, QueryOptions queryOptions) {
+            return (String) ((Bitemporal)object).getBitemporalStamp().getVersionId();
+        }
+    };
+    
+    final SimpleAttribute<ComplexFieldsPrivatePojoPartialContructor, String> ComplexFieldsPrivatePojoPartialContructor_Field = new SimpleAttribute<ComplexFieldsPrivatePojoPartialContructor, String>(
+            "documentId") {
+        public String getValue(ComplexFieldsPrivatePojoPartialContructor object, QueryOptions queryOptions) {
+            return (String) ((Bitemporal)object).getBitemporalStamp().getVersionId();
+        }
+    };
+    
+    final SimpleAttribute<ComplexFieldsPrivatePojoPartialContructorWithComplexType, String> ComplexFieldsPrivatePojoPartialContructorWithComplexType_Field = new SimpleAttribute<ComplexFieldsPrivatePojoPartialContructorWithComplexType, String>(
+            "documentId") {
+        public String getValue(ComplexFieldsPrivatePojoPartialContructorWithComplexType object, QueryOptions queryOptions) {
+            return (String) ((Bitemporal)object).getBitemporalStamp().getVersionId();
+        }
+    };
+    
+    @AfterEach
+    public void tearDown() throws IOException {
+        Files.delete(Paths.get(FILENAME));
+        Files.delete(Paths.get(FILENAME+"-shm"));
+        Files.delete(Paths.get(FILENAME+"-wal"));
+    }
+    
     @SuppressWarnings("unused")
     private static Stream<Arguments> createPojos() {
         return Stream.of(Arguments.of(EnhancedRandom.random(PrimitivePrivatePojo.class)),
@@ -45,17 +82,18 @@ public class BarbelHistoCore_CQPersistence_Test {
                 Arguments.of(EnhancedRandom.random(ComplexFieldsPrivatePojoPartialContructor.class)));
     }
 
-    @ParameterizedTest
-    @MethodSource("createPojos")
-    public void testSave(Object pojo) throws IOException {
-        core = (BarbelHistoCore) BarbelHistoBuilder.barbel()
-                .withPersistenceCollection(() -> new ConcurrentIndexedCollection<BitemporalVersion>(
-                        DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK, new File(FILENAME))))
+    @SuppressWarnings({ "unchecked" })
+    @Test
+    public void testSave_PrimitivePrivatePojo() throws IOException {
+        PrimitivePrivatePojo pojo = EnhancedRandom.random(PrimitivePrivatePojo.class);
+        core = BarbelHistoBuilder.barbel()
+                .withBackbone(new ConcurrentIndexedCollection<PrimitivePrivatePojo>(
+                        DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO, new File(FILENAME))))
                 .build();
         core.save(pojo, LocalDate.now(), LocalDate.MAX);
-        core = (BarbelHistoCore) BarbelHistoBuilder.barbel()
-                .withPersistenceCollection(() -> new ConcurrentIndexedCollection<BitemporalVersion>(
-                        DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK, new File(FILENAME))))
+        core = BarbelHistoBuilder.barbel()
+                .withBackbone(new ConcurrentIndexedCollection<PrimitivePrivatePojo>(
+                        DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO, new File(FILENAME))))
                 .build();
         core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX);
         assertEquals(3, core.retrieve(BarbelQueries.all()).stream().count());
@@ -63,10 +101,94 @@ public class BarbelHistoCore_CQPersistence_Test {
         assertNotNull(record.getBitemporalStamp().getDocumentId());
         core.dump();
         assertEquals(0, core.retrieve(BarbelQueries.all()).stream().count());
-        Files.delete(Paths.get(FILENAME));
     }
 
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testSave_PrimitivePrivatePojoPartialContructor() throws IOException {
+        PrimitivePrivatePojoPartialContructor pojo = EnhancedRandom.random(PrimitivePrivatePojoPartialContructor.class);
+        core = BarbelHistoBuilder.barbel()
+                .withBackbone(new ConcurrentIndexedCollection<PrimitivePrivatePojoPartialContructor>(
+                        DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO_PARTIAL, new File(FILENAME))))
+                .build();
+        core.save(pojo, LocalDate.now(), LocalDate.MAX);
+        core = BarbelHistoBuilder.barbel()
+                .withBackbone(new ConcurrentIndexedCollection<PrimitivePrivatePojoPartialContructor>(
+                        DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO_PARTIAL, new File(FILENAME))))
+                .build();
+        core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX);
+        assertEquals(3, core.retrieve(BarbelQueries.all()).stream().count());
+        Bitemporal record = (Bitemporal) core.retrieve(BarbelQueries.all()).stream().findFirst().get();
+        assertNotNull(record.getBitemporalStamp().getDocumentId());
+        core.dump();
+        assertEquals(0, core.retrieve(BarbelQueries.all()).stream().count());
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testSave_NoPrimitivePrivatePojoPartialContructor() throws IOException {
+        NoPrimitivePrivatePojoPartialContructor pojo = EnhancedRandom.random(NoPrimitivePrivatePojoPartialContructor.class);
+        core = BarbelHistoBuilder.barbel()
+                .withBackbone(new ConcurrentIndexedCollection<NoPrimitivePrivatePojoPartialContructor>(
+                        DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_NO_PRIMITIVE_PRIVATE_POJO_PARTIAL, new File(FILENAME))))
+                .build();
+        core.save(pojo, LocalDate.now(), LocalDate.MAX);
+        core = BarbelHistoBuilder.barbel()
+                .withBackbone(new ConcurrentIndexedCollection<NoPrimitivePrivatePojoPartialContructor>(
+                        DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_NO_PRIMITIVE_PRIVATE_POJO_PARTIAL, new File(FILENAME))))
+                .build();
+        core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX);
+        assertEquals(3, core.retrieve(BarbelQueries.all()).stream().count());
+        Bitemporal record = (Bitemporal) core.retrieve(BarbelQueries.all()).stream().findFirst().get();
+        assertNotNull(record.getBitemporalStamp().getDocumentId());
+        core.dump();
+        assertEquals(0, core.retrieve(BarbelQueries.all()).stream().count());
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testSave_ComplexFieldsPrivatePojoPartialContructor() throws IOException {
+        ComplexFieldsPrivatePojoPartialContructor pojo = EnhancedRandom.random(ComplexFieldsPrivatePojoPartialContructor.class);
+        core = BarbelHistoBuilder.barbel()
+                .withBackbone(new ConcurrentIndexedCollection<ComplexFieldsPrivatePojoPartialContructor>(
+                        DiskPersistence.onPrimaryKeyInFile(ComplexFieldsPrivatePojoPartialContructor_Field, new File(FILENAME))))
+                .build();
+        core.save(pojo, LocalDate.now(), LocalDate.MAX);
+        core = BarbelHistoBuilder.barbel()
+                .withBackbone(new ConcurrentIndexedCollection<ComplexFieldsPrivatePojoPartialContructor>(
+                        DiskPersistence.onPrimaryKeyInFile(ComplexFieldsPrivatePojoPartialContructor_Field, new File(FILENAME))))
+                .build();
+        core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX);
+        assertEquals(3, core.retrieve(BarbelQueries.all()).stream().count());
+        Bitemporal record = (Bitemporal) core.retrieve(BarbelQueries.all()).stream().findFirst().get();
+        assertNotNull(record.getBitemporalStamp().getDocumentId());
+        core.dump();
+        assertEquals(0, core.retrieve(BarbelQueries.all()).stream().count());
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testSave_ComplexFieldsPrivatePojoPartialContructorWithComplexType() throws IOException {
+        ComplexFieldsPrivatePojoPartialContructorWithComplexType pojo = EnhancedRandom.random(ComplexFieldsPrivatePojoPartialContructorWithComplexType.class);
+        core = BarbelHistoBuilder.barbel()
+                .withBackbone(new ConcurrentIndexedCollection<ComplexFieldsPrivatePojoPartialContructorWithComplexType>(
+                        DiskPersistence.onPrimaryKeyInFile(ComplexFieldsPrivatePojoPartialContructorWithComplexType_Field, new File(FILENAME))))
+                .build();
+        core.save(pojo, LocalDate.now(), LocalDate.MAX);
+        core = BarbelHistoBuilder.barbel()
+                .withBackbone(new ConcurrentIndexedCollection<ComplexFieldsPrivatePojoPartialContructorWithComplexType>(
+                        DiskPersistence.onPrimaryKeyInFile(ComplexFieldsPrivatePojoPartialContructorWithComplexType_Field, new File(FILENAME))))
+                .build();
+        core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX);
+        assertEquals(3, core.retrieve(BarbelQueries.all()).stream().count());
+        Bitemporal record = (Bitemporal) core.retrieve(BarbelQueries.all()).stream().findFirst().get();
+        assertNotNull(record.getBitemporalStamp().getDocumentId());
+        core.dump();
+        assertEquals(0, core.retrieve(BarbelQueries.all()).stream().count());
+    }
+    
     @SuppressWarnings("unused")
+    @PersistenceConfig(serializer=BarbelPojoSerializer.class)
     public static class PrimitivePrivatePojo {
         @DocumentId
         private String id;
@@ -81,6 +203,7 @@ public class BarbelHistoCore_CQPersistence_Test {
     }
 
     @SuppressWarnings("unused")
+    @PersistenceConfig(serializer=BarbelPojoSerializer.class)
     public static class PrimitivePrivatePojoPartialContructor {
         @DocumentId
         private String id;
@@ -105,6 +228,7 @@ public class BarbelHistoCore_CQPersistence_Test {
     }
 
     @SuppressWarnings("unused")
+    @PersistenceConfig(serializer=BarbelPojoSerializer.class)
     public static class NoPrimitivePrivatePojoPartialContructor {
         @DocumentId
         private String id;
@@ -123,6 +247,7 @@ public class BarbelHistoCore_CQPersistence_Test {
     }
 
     @SuppressWarnings("unused")
+    @PersistenceConfig(serializer=BarbelPojoSerializer.class)
     public static class ComplexFieldsPrivatePojoPartialContructor {
         @DocumentId
         private String id;
@@ -135,6 +260,7 @@ public class BarbelHistoCore_CQPersistence_Test {
     }
 
     @SuppressWarnings("unused")
+    @PersistenceConfig(serializer=BarbelPojoSerializer.class)
     public static class ComplexFieldsPrivatePojoPartialContructorWithComplexType {
         @DocumentId
         private String id;

@@ -15,11 +15,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.javers.common.collections.Arrays;
 import org.junit.jupiter.api.Test;
 
+import com.projectbarbel.histo.model.DefaultPojo;
+
 public class BarbelHistoBuilderTest {
 
     @Test
     public void testBarbel_testAssignment() throws Exception {
-        BarbelHisto barbel = BarbelHistoBuilder.barbel().build();
+        BarbelHisto<DefaultPojo> barbel = BarbelHistoBuilder.barbel().build();
         assertNotNull(barbel);
     }
 

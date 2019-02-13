@@ -3,7 +3,6 @@ package com.projectbarbel.histo;
 import static com.googlecode.cqengine.query.QueryFactory.equal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,8 +23,8 @@ import com.projectbarbel.histo.model.DefaultPojo;
 
 public class CQEnginePersistenceTest {
     
-    public static final SimpleAttribute<Object, String> DOCUMENT_ID_PK = new SimpleAttribute<Object, String>("documentId") {
-        public String getValue(Object object, QueryOptions queryOptions) {
+    public static final SimpleAttribute<DefaultPojo, String> DOCUMENT_ID_PK = new SimpleAttribute<DefaultPojo, String>("documentId") {
+        public String getValue(DefaultPojo object, QueryOptions queryOptions) {
             return (String)((Bitemporal) object).getBitemporalStamp().getDocumentId();
         }
     };
@@ -54,18 +53,6 @@ public class CQEnginePersistenceTest {
         }
     };
     
-    @Test
-    public void object() throws IOException {
-        DiskPersistence<Object, String> pers = DiskPersistence.onPrimaryKeyInFile(DOCUMENT_ID_PK, new File("def1.dat"));
-        ConcurrentIndexedCollection<Object> col = new ConcurrentIndexedCollection<Object>(pers);
-        col.add(DefaultDocument.builder().withBitemporalStamp(BitemporalStamp.createActive()).withData("some").build());
-        assertThrows(ClassCastException.class,()-> ((DefaultDocument)col.retrieve(BarbelQueries.all()).stream().findFirst().get()).getData());
-        col.clear();
-        Files.delete(Paths.get("def1.dat"));
-        Files.delete(Paths.get("def1.dat-shm"));
-        Files.delete(Paths.get("def1.dat-wal"));
-    }
-
     @Test
     public void bitemporal() throws IOException {
         DiskPersistence<Bitemporal, String> pers = DiskPersistence.onPrimaryKeyInFile(DOCUMENT_ID_PK_BITEMPORAL, new File("def2.dat"));

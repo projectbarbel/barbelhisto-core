@@ -17,11 +17,11 @@ import io.github.benas.randombeans.api.EnhancedRandom;
 
 public class BarbelHistoCore_Journal_Test {
 
-    private BarbelHistoCore core;
+    private BarbelHisto<DefaultPojo> core;
 
     @BeforeEach
     public void setup() {
-        core = (BarbelHistoCore) BarbelHistoBuilder.barbel().build();
+        core = BarbelHistoBuilder.barbel().build();
         BarbelHistoContext.getDefaultClock().useFixedClockAt(LocalDate.of(2019, 2, 6).atStartOfDay());
     }
 

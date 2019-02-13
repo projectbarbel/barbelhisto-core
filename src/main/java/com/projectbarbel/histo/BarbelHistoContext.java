@@ -25,13 +25,11 @@ import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.persistence.support.serialization.PojoSerializer;
 import com.projectbarbel.histo.BarbelHistoCore.UpdateLogRecord;
 import com.projectbarbel.histo.functions.DefaultIDGenerator;
-import com.projectbarbel.histo.functions.DefaultPersistenceSupplier;
 import com.projectbarbel.histo.functions.DefaultPojoCopier;
 import com.projectbarbel.histo.functions.DefaultPrettyPrinter;
 import com.projectbarbel.histo.functions.DefaultProxyingFunction;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
-import com.projectbarbel.histo.model.BitemporalVersion;
 import com.projectbarbel.histo.model.DocumentJournal;
 import com.projectbarbel.histo.model.Systemclock;
 
@@ -54,13 +52,9 @@ public interface BarbelHistoContext {
         }
     };
 
-    static IndexedCollection<Object> getDefaultBackbone() {
-        ConcurrentIndexedCollection<Object> backbone = new ConcurrentIndexedCollection<>();
+    static <T> IndexedCollection<T> getDefaultBackbone() {
+        ConcurrentIndexedCollection<T> backbone = new ConcurrentIndexedCollection<>();
         return backbone;
-    }
-
-    static Supplier<IndexedCollection<BitemporalVersion>> getDefaultPersistenceCollection() {
-        return new DefaultPersistenceSupplier();
     }
 
     static PojoSerializer<Bitemporal> getDefaultPersistenceSerializerSingleton() {
@@ -120,7 +114,7 @@ public interface BarbelHistoContext {
 
     Supplier<Object> getVersionIdGenerator();
 
-    IndexedCollection<Object> getBackbone();
+    <T> IndexedCollection<T> getBackbone();
 
     String getActivity();
 
@@ -145,7 +139,5 @@ public interface BarbelHistoContext {
     IndexedCollection<UpdateLogRecord> getUpdateLog();
 
     Function<List<Bitemporal>, String> getPrettyPrinter();
-
-    Supplier<IndexedCollection<BitemporalVersion>> getPersistenceCollection();
 
 }

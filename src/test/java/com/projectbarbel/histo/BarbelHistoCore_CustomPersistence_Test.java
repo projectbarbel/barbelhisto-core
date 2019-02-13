@@ -18,11 +18,9 @@ import net.sf.cglib.proxy.Enhancer;
 
 public class BarbelHistoCore_CustomPersistence_Test {
 
-    private BarbelHisto histo;
-
     @Test
     public void testPopulateBitemporalVersion() {
-        histo = BarbelHistoBuilder.barbel().build();
+        BarbelHisto<DefaultPojo> histo = BarbelHistoBuilder.barbel().build();
         List<Bitemporal> bitemporals = Arrays.asList(
                 new BitemporalVersion(BitemporalStamp.createActive(), EnhancedRandom.random(DefaultPojo.class)),
                 new BitemporalVersion(BitemporalStamp.createActive(), EnhancedRandom.random(DefaultPojo.class)));
@@ -37,7 +35,7 @@ public class BarbelHistoCore_CustomPersistence_Test {
 
     @Test
     public void testPopulateBitemporal() {
-        histo = BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL).build();
+        BarbelHisto<BitemporalVersion> histo = BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL).build();
         List<Bitemporal> bitemporals = Arrays.asList(
                 new BitemporalVersion(BitemporalStamp.createActive(), EnhancedRandom.random(DefaultPojo.class)),
                 new BitemporalVersion(BitemporalStamp.createActive(), EnhancedRandom.random(DefaultPojo.class)));

@@ -32,10 +32,10 @@ public abstract class BarbelMode {
 
     public abstract Object drawDocumentId(Object pojo);
 
-    public abstract Collection<Bitemporal> managedBitemporalToCustomPersistenceObjects(
-            IndexedCollection<Object> objects);
+    public abstract <T> Collection<Bitemporal> managedBitemporalToCustomPersistenceObjects(
+            IndexedCollection<T> objects);
 
-    public abstract Collection<Object> customPersistenceObjectsToManagedBitemporals(BarbelHistoContext context,
+    public abstract <T> Collection<T> customPersistenceObjectsToManagedBitemporals(BarbelHistoContext context,
             Collection<Bitemporal> bitemporals);
 
     public abstract Object fromInternalPersistenceObjectToManagedBitemporal(BarbelHistoContext context,
@@ -74,21 +74,22 @@ public abstract class BarbelMode {
         }
 
         @Override
-        public Collection<Bitemporal> managedBitemporalToCustomPersistenceObjects(IndexedCollection<Object> objects) {
+        public <T> Collection<Bitemporal> managedBitemporalToCustomPersistenceObjects(IndexedCollection<T> objects) {
             return objects.stream().map(
                     o -> new BitemporalVersion(((Bitemporal) o).getBitemporalStamp(), ((BarbelProxy) o).getTarget()))
                     .collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
         }
 
+        @SuppressWarnings("unchecked")
         @Override
-        public Collection<Object> customPersistenceObjectsToManagedBitemporals(BarbelHistoContext context,
+        public <T> Collection<T> customPersistenceObjectsToManagedBitemporals(BarbelHistoContext context,
                 Collection<Bitemporal> bitemporals) {
             try {
                 IndexedCollection<Object> output = bitemporals.stream()
                         .map(b -> snapshotMaiden(context, ((BitemporalVersion) b).getObject(),
                                 ((BitemporalVersion) b).getStamp()))
                         .collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
-                return output;
+                return (Collection<T>)output;
             } catch (ClassCastException e) {
                 throw new IllegalArgumentException(
                         "Only BitemporalVersion type collection allowed. Use Mode Bitemporal if you want to use populate() with arbitrary Bitemporal objects. Or use save() to store plain Pojos to BarbelHisto.",
@@ -152,15 +153,16 @@ public abstract class BarbelMode {
         }
 
         @Override
-        public Collection<Bitemporal> managedBitemporalToCustomPersistenceObjects(IndexedCollection<Object> objects) {
+        public <T> Collection<Bitemporal> managedBitemporalToCustomPersistenceObjects(IndexedCollection<T> objects) {
             return objects.stream().map(o -> (Bitemporal) o)
                     .collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
         }
 
+        @SuppressWarnings("unchecked")
         @Override
-        public Collection<Object> customPersistenceObjectsToManagedBitemporals(BarbelHistoContext context,
+        public <T> Collection<T> customPersistenceObjectsToManagedBitemporals(BarbelHistoContext context,
                 Collection<Bitemporal> bitemporals) {
-            return bitemporals.stream().map(b -> (Object) b)
+            return (Collection<T>)bitemporals.stream().map(b -> (Object) b)
                     .collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
         }
 

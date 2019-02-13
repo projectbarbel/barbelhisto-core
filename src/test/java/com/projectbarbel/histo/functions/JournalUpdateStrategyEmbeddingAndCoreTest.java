@@ -18,6 +18,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import com.projectbarbel.histo.BarbelHisto;
 import com.projectbarbel.histo.BarbelHistoBuilder;
 import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelHistoCore;
@@ -73,20 +74,20 @@ public class JournalUpdateStrategyEmbeddingAndCoreTest {
     public void testSave_Pojo(LocalDate updateFrom, LocalDate updateUntil, int countOfNewVersions,
             JournalUpdateCase updateCase, List<LocalDate> activeEffective, int inactiveCount,
             List<LocalDate> inactiveEffective) throws Exception {
-        context = BarbelHistoBuilder.barbel().withMode(BarbelMode.POJO)
+        BarbelHistoContext context = BarbelHistoBuilder.barbel().withMode(BarbelMode.POJO)
                 .withClock(new Systemclock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 10, 0))).withUser("testUser")
                 .withBackbone(
                         BarbelTestHelper.generateJournalOfDefaultPojos("someId", Arrays.asList(LocalDate.of(2016, 1, 1),
                                 LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))));
-        BarbelHistoCore core = ((BarbelHistoCore)((BarbelHistoBuilder)context).build());
+        BarbelHisto<DefaultPojo> core = ((BarbelHistoBuilder)context).build();
         DefaultPojo update = new DefaultPojo();
         update.setDocumentId("someId");
         update.setData("some data");
         core.save(update, updateFrom, updateUntil);
-        journal = core.getDocumentJournal("someId");
-        assertEquals(countOfNewVersions, core.getLastUpdate().newVersions.size());
-        assertEquals(updateCase, core.getLastUpdate().updateCase);
-        assertNewVersions(core.getLastUpdate().requestedUpdate, core.getLastUpdate().newVersions, activeEffective);
+        journal = ((BarbelHistoCore<DefaultPojo>)core).getDocumentJournal("someId");
+        assertEquals(countOfNewVersions, ((BarbelHistoCore<DefaultPojo>)core).getLastUpdate().newVersions.size());
+        assertEquals(updateCase, ((BarbelHistoCore<DefaultPojo>)core).getLastUpdate().updateCase);
+        assertNewVersions(((BarbelHistoCore<DefaultPojo>)core).getLastUpdate().requestedUpdate, ((BarbelHistoCore<DefaultPojo>)core).getLastUpdate().newVersions, activeEffective);
         assertInactivatedVersions(inactiveCount, inactiveEffective);
     }
 
