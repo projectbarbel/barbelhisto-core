@@ -23,18 +23,17 @@ Even more complicated:
 
 This library enables you to store your data in a format that enables you to answer these questions.
 
-# Features
+# Features (in development)
 
-- bi-temporal data storage for No SQL and SQL data stores
+- bi-temporal data storage based on blazing fast cqengine collection
 - small easy-to-use API (as simple as bi-temporal data storage can get)
 - backed by transactional, high performance colections
 - works out of the box with default implementation and configuration
 - manage different time zones of client and server
-- persistence support for different data stores
+- persistence support for heap, off-heap, disk storage and custom data stores
 - provides basic functionality, extendible for individual needs
 - remember every change to the data, nothing is ever going to be deleted
-- build-in thread safety by minimizing mutability
-- highly configurable to adopt to specific needs
+- build-in thread safety by minimizing mutability and object locking
 - pretty print function to learn about bitemporal data storage
 
 # Build-in backends
