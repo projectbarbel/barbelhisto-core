@@ -4,9 +4,13 @@ import static com.googlecode.cqengine.query.QueryFactory.and;
 import static com.googlecode.cqengine.query.QueryFactory.equal;
 import static com.googlecode.cqengine.query.QueryFactory.greaterThan;
 import static com.googlecode.cqengine.query.QueryFactory.greaterThanOrEqualTo;
+import static com.googlecode.cqengine.query.QueryFactory.lessThan;
 import static com.googlecode.cqengine.query.QueryFactory.lessThanOrEqualTo;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.chrono.ChronoLocalDate;
 
 import com.googlecode.cqengine.attribute.Attribute;
@@ -20,7 +24,8 @@ import com.projectbarbel.histo.model.EffectivePeriod;
 
 public final class BarbelQueries {
 
-    public static final SimpleAttribute<Object, Object> DOCUMENT_ID = new SimpleAttribute<Object, Object>("documentId") {
+    public static final SimpleAttribute<Object, Object> DOCUMENT_ID = new SimpleAttribute<Object, Object>(
+            "documentId") {
         public Object getValue(Object object, QueryOptions queryOptions) {
             return ((Bitemporal) object).getBitemporalStamp().getDocumentId();
         }
@@ -44,6 +49,20 @@ public final class BarbelQueries {
             "effectiveUntil") {
         public LocalDate getValue(Object object, QueryOptions queryOptions) {
             return ((Bitemporal) object).getBitemporalStamp().getEffectiveTime().until();
+        }
+    };
+
+    public static final Attribute<Object, Long> CREATED_AT = new SimpleAttribute<Object, Long>("createdAt") {
+        public Long getValue(Object object, QueryOptions queryOptions) {
+            return ((Bitemporal) object).getBitemporalStamp().getRecordTime().getCreatedAt()
+                    .withZoneSameInstant(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        }
+    };
+
+    public static final Attribute<Object, Long> INACTIVATED_AT = new SimpleAttribute<Object, Long>("inactivatedAt") {
+        public Long getValue(Object object, QueryOptions queryOptions) {
+            return ((Bitemporal) object).getBitemporalStamp().getRecordTime().getInactivatedAt()
+                    .withZoneSameInstant(ZoneId.systemDefault()).toInstant().toEpochMilli();
         }
     };
 
@@ -96,6 +115,14 @@ public final class BarbelQueries {
                              greaterThanOrEqualTo(EFFECTIVE_FROM, period.from()),
                              lessThanOrEqualTo(EFFECTIVE_UNTIL, period.until()));
     }
+    
+    @SuppressWarnings("unchecked")
+    public static <T> Query<T> journalAt(Object id, LocalDateTime time) {
+        return (Query<T>)and(all(id),
+                             greaterThanOrEqualTo(CREATED_AT, ZonedDateTime.of(time, ZoneId.systemDefault()).toInstant().toEpochMilli()), 
+                             lessThan(INACTIVATED_AT, ZonedDateTime.of(time, ZoneId.systemDefault()).toInstant().toEpochMilli()));
+    }
+    
     // @formatter:on
 
 }

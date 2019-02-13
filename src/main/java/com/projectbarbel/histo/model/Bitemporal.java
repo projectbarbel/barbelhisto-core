@@ -1,7 +1,7 @@
 package com.projectbarbel.histo.model;
 
 import com.googlecode.cqengine.persistence.support.serialization.PersistenceConfig;
-import com.projectbarbel.histo.BarbelPojoSerializer;
+import com.projectbarbel.histo.functions.BarbelPojoSerializer;
 
 @PersistenceConfig(serializer=BarbelPojoSerializer.class)
 public interface Bitemporal {

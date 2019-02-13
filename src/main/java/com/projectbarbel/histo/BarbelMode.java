@@ -18,6 +18,17 @@ import com.projectbarbel.histo.model.BitemporalVersion;
 
 import net.sf.cglib.proxy.Enhancer;
 
+/**
+ * The wording:
+ * 
+ * - a 'managed bitemporal' is either a proxied pojo or an object implementing {@link Bitemporal}, managed objects are the backbone citizens
+ * - 'bitemporal objects' are objects implementing the {@link Bitemporal} interface, as long they don't live in the backbone, they're not considered managed bitemporals
+ * - a snapshot always creates a NEW managed bitemporal with a new given {@link BitemporalStamp}
+ * - a custom persistent object is always bitemporal object, but not managed
+ * 
+ * @author niklasschlimm
+ *
+ */
 public abstract class BarbelMode {
 
     public static BarbelMode POJO = new PojoMode();

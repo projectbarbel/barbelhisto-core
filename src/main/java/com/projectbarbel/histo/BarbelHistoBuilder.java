@@ -47,7 +47,6 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     // some more complex context types
     private Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> journalUpdateStrategyProducer = (
             context) -> new DefaultJournalUpdateStrategy(this);
-    private BarbelHistoFactory barbelFactory = new BarbelHistoFactory(this);
 
     public static BarbelHistoBuilder barbel() {
         BarbelHistoBuilder builder = new BarbelHistoBuilder();
@@ -104,17 +103,6 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     public BarbelHistoBuilder withMode(BarbelMode mode) {
         Validate.isTrue(mode!=null,NONULLS);
         this.mode = mode;
-        return this;
-    }
-
-    @Override
-    public BarbelHistoFactory getBarbelFactory() {
-        return barbelFactory;
-    }
-
-    public BarbelHistoBuilder withBarbelFactory(BarbelHistoFactory barbelFactory) {
-        Validate.isTrue(barbelFactory!=null,NONULLS);
-        this.barbelFactory = barbelFactory;
         return this;
     }
 

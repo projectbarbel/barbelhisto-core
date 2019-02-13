@@ -47,6 +47,13 @@ public class RecordPeriod {
         return this;
     }
 
+    public RecordPeriod activate() {
+        this.inactivatedAt = NOT_INACTIVATED;
+        this.state = BitemporalObjectState.ACTIVE;
+        this.inactivatedBy = NOBODY;
+        return this;
+    }
+    
     @Override
     public boolean equals(Object o) {
         if (o == this)

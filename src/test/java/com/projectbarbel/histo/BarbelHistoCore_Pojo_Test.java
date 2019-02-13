@@ -9,13 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import com.projectbarbel.histo.model.Bitemporal;
-import com.projectbarbel.histo.model.DefaultPojo;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
@@ -42,16 +40,10 @@ public class BarbelHistoCore_Pojo_Test {
                 );
     }
     
-    @Test
-    public void testNotAnnotated() {
-        BarbelHisto<DefaultPojo> core = BarbelHistoBuilder.barbel().build();
-        assertThrows(IllegalArgumentException.class, ()->core.save("dumb", LocalDate.now(), LocalDate.MAX));
-    }
-
     @ParameterizedTest
     @MethodSource("nullableParameters")
-    public void testSaveParameter(Object pojo, LocalDate from, LocalDate until) {
-        BarbelHisto<DefaultPojo> core = BarbelHistoBuilder.barbel().build();
+    public <T> void testSaveParameter(T pojo, LocalDate from, LocalDate until) {
+        BarbelHisto<T> core = BarbelHistoBuilder.barbel().build();
         assertThrows(IllegalArgumentException.class, ()->core.save(pojo, from, until));
     }
     

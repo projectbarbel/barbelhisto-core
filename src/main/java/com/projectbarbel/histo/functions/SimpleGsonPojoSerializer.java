@@ -1,4 +1,4 @@
-package com.projectbarbel.histo;
+package com.projectbarbel.histo.functions;
 
 import java.nio.charset.Charset;
 import java.time.ZonedDateTime;
@@ -8,7 +8,8 @@ import java.util.Map;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.googlecode.cqengine.persistence.support.serialization.PojoSerializer;
-import com.projectbarbel.histo.functions.BarbelProxy;
+import com.projectbarbel.histo.BarbelHistoBuilder;
+import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalVersion;
 

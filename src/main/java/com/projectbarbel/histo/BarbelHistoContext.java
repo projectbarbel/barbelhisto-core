@@ -28,6 +28,7 @@ import com.projectbarbel.histo.functions.DefaultIDGenerator;
 import com.projectbarbel.histo.functions.DefaultPojoCopier;
 import com.projectbarbel.histo.functions.DefaultPrettyPrinter;
 import com.projectbarbel.histo.functions.DefaultProxyingFunction;
+import com.projectbarbel.histo.functions.SimpleGsonPojoSerializer;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.DocumentJournal;
@@ -39,6 +40,7 @@ public interface BarbelHistoContext {
     public static final String SYSTEMACTIVITY = "SYSTEMACTIVITY";
     public static final Systemclock CLOCK = new Systemclock();
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
+    
     public static final JsonDeserializer<ZonedDateTime> ZDT_DESERIALIZER = new JsonDeserializer<ZonedDateTime>() {
         @Override
         public ZonedDateTime deserialize(final JsonElement json, final Type typeOfT,
@@ -46,6 +48,7 @@ public interface BarbelHistoContext {
             return DATE_FORMATTER.parse(json.getAsString(), ZonedDateTime::from);
         }
     };
+    
     public static final JsonSerializer<ZonedDateTime> ZDT_SERIALIZER = new JsonSerializer<ZonedDateTime>() {
         public JsonElement serialize(ZonedDateTime src, Type typeOfSrc, JsonSerializationContext context) {
             return new JsonPrimitive(DATE_FORMATTER.format(src));
@@ -129,8 +132,6 @@ public interface BarbelHistoContext {
     Gson getGson();
 
     Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> getJournalUpdateStrategyProducer();
-
-    BarbelHistoFactory getBarbelFactory();
 
     BarbelMode getMode();
 

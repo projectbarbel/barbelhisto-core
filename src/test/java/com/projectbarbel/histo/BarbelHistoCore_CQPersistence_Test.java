@@ -21,6 +21,7 @@ import com.googlecode.cqengine.attribute.SimpleAttribute;
 import com.googlecode.cqengine.persistence.disk.DiskPersistence;
 import com.googlecode.cqengine.persistence.support.serialization.PersistenceConfig;
 import com.googlecode.cqengine.query.option.QueryOptions;
+import com.projectbarbel.histo.functions.BarbelPojoSerializer;
 import com.projectbarbel.histo.model.Bitemporal;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
@@ -28,8 +29,6 @@ import io.github.benas.randombeans.api.EnhancedRandom;
 public class BarbelHistoCore_CQPersistence_Test {
 
     private static final String FILENAME = "test.dat";
-    @SuppressWarnings("rawtypes")
-    private BarbelHisto core;
     
     final SimpleAttribute<PrimitivePrivatePojo, String> VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO = new SimpleAttribute<PrimitivePrivatePojo, String>(
             "documentId") {
@@ -82,11 +81,10 @@ public class BarbelHistoCore_CQPersistence_Test {
                 Arguments.of(EnhancedRandom.random(ComplexFieldsPrivatePojoPartialContructor.class)));
     }
 
-    @SuppressWarnings({ "unchecked" })
     @Test
     public void testSave_PrimitivePrivatePojo() throws IOException {
         PrimitivePrivatePojo pojo = EnhancedRandom.random(PrimitivePrivatePojo.class);
-        core = BarbelHistoBuilder.barbel()
+        BarbelHisto<PrimitivePrivatePojo> core = BarbelHistoBuilder.barbel()
                 .withBackbone(new ConcurrentIndexedCollection<PrimitivePrivatePojo>(
                         DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO, new File(FILENAME))))
                 .build();
@@ -103,11 +101,10 @@ public class BarbelHistoCore_CQPersistence_Test {
         assertEquals(0, core.retrieve(BarbelQueries.all()).stream().count());
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testSave_PrimitivePrivatePojoPartialContructor() throws IOException {
         PrimitivePrivatePojoPartialContructor pojo = EnhancedRandom.random(PrimitivePrivatePojoPartialContructor.class);
-        core = BarbelHistoBuilder.barbel()
+        BarbelHisto<PrimitivePrivatePojoPartialContructor> core = BarbelHistoBuilder.barbel()
                 .withBackbone(new ConcurrentIndexedCollection<PrimitivePrivatePojoPartialContructor>(
                         DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO_PARTIAL, new File(FILENAME))))
                 .build();
@@ -124,11 +121,10 @@ public class BarbelHistoCore_CQPersistence_Test {
         assertEquals(0, core.retrieve(BarbelQueries.all()).stream().count());
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testSave_NoPrimitivePrivatePojoPartialContructor() throws IOException {
         NoPrimitivePrivatePojoPartialContructor pojo = EnhancedRandom.random(NoPrimitivePrivatePojoPartialContructor.class);
-        core = BarbelHistoBuilder.barbel()
+        BarbelHisto<NoPrimitivePrivatePojoPartialContructor> core = BarbelHistoBuilder.barbel()
                 .withBackbone(new ConcurrentIndexedCollection<NoPrimitivePrivatePojoPartialContructor>(
                         DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_NO_PRIMITIVE_PRIVATE_POJO_PARTIAL, new File(FILENAME))))
                 .build();
@@ -145,11 +141,10 @@ public class BarbelHistoCore_CQPersistence_Test {
         assertEquals(0, core.retrieve(BarbelQueries.all()).stream().count());
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testSave_ComplexFieldsPrivatePojoPartialContructor() throws IOException {
         ComplexFieldsPrivatePojoPartialContructor pojo = EnhancedRandom.random(ComplexFieldsPrivatePojoPartialContructor.class);
-        core = BarbelHistoBuilder.barbel()
+        BarbelHisto<ComplexFieldsPrivatePojoPartialContructor> core = BarbelHistoBuilder.barbel()
                 .withBackbone(new ConcurrentIndexedCollection<ComplexFieldsPrivatePojoPartialContructor>(
                         DiskPersistence.onPrimaryKeyInFile(ComplexFieldsPrivatePojoPartialContructor_Field, new File(FILENAME))))
                 .build();
@@ -166,11 +161,10 @@ public class BarbelHistoCore_CQPersistence_Test {
         assertEquals(0, core.retrieve(BarbelQueries.all()).stream().count());
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testSave_ComplexFieldsPrivatePojoPartialContructorWithComplexType() throws IOException {
         ComplexFieldsPrivatePojoPartialContructorWithComplexType pojo = EnhancedRandom.random(ComplexFieldsPrivatePojoPartialContructorWithComplexType.class);
-        core = BarbelHistoBuilder.barbel()
+        BarbelHisto<ComplexFieldsPrivatePojoPartialContructorWithComplexType> core = BarbelHistoBuilder.barbel()
                 .withBackbone(new ConcurrentIndexedCollection<ComplexFieldsPrivatePojoPartialContructorWithComplexType>(
                         DiskPersistence.onPrimaryKeyInFile(ComplexFieldsPrivatePojoPartialContructorWithComplexType_Field, new File(FILENAME))))
                 .build();

@@ -17,11 +17,13 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
 
+import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.attribute.Attribute;
 import com.googlecode.cqengine.attribute.SimpleAttribute;
 import com.googlecode.cqengine.query.Query;
 import com.googlecode.cqengine.query.option.QueryOptions;
+import com.googlecode.cqengine.resultset.ResultSet;
 import com.projectbarbel.histo.functions.DefaultJournalUpdateStrategy.JournalUpdateCase;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
@@ -44,7 +46,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     }
 
     @Override
-    public boolean save(Object newVersion, LocalDate from, LocalDate until) {
+    public boolean save(T newVersion, LocalDate from, LocalDate until) {
         Validate.isTrue(newVersion != null && from != null && until != null, "all arguments must not be null here");
         Object id = context.getMode().drawDocumentId(newVersion);
         BitemporalStamp stamp = BitemporalStamp.of(context.getActivity(), id, EffectivePeriod.of(from, until),
@@ -54,8 +56,8 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
         // return AlreadyLockedException
         // TODO: ab hier sperren? Das komplette backbone für diese ID sperren?
         Bitemporal newManagedBitemporal = context.getMode().snapshotMaiden(context, newVersion, stamp);
-        BiConsumer<DocumentJournal, Bitemporal> updateStrategy = context.getBarbelFactory()
-                .createJournalUpdateStrategy();
+        BiConsumer<DocumentJournal, Bitemporal> updateStrategy = context.getJournalUpdateStrategyProducer()
+                .apply(context);
         updateStrategy.accept(journal, newManagedBitemporal);
         updateLog.add(new UpdateLogRecord(journal.getLastInsert(), newManagedBitemporal,
                 updateStrategy instanceof UpdateCaseAware ? ((UpdateCaseAware) updateStrategy).getActualCase() : null,
@@ -151,9 +153,12 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     }
 
     @Override
-    public RecordTimeShift timeshift(LocalDateTime time) {
-        // TODO Auto-generated method stub
-        return null;
+    public DocumentJournal timeshift(Object id, LocalDateTime time) {
+        ResultSet<T> result = backbone.retrieve(BarbelQueries.journalAt(id, time));
+        return DocumentJournal
+                .create(result.stream().map(d -> context.getMode().copyManagedBitemporal(context, (Bitemporal) d))
+                        .map(d -> d.getBitemporalStamp().getRecordTime().activate())
+                        .collect(Collectors.toCollection(ConcurrentIndexedCollection::new)), id);
     }
 
 }

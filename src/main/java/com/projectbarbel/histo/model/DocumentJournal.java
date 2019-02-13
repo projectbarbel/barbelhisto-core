@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.Collector;
 
 import org.apache.commons.lang3.Validate;
@@ -19,7 +18,8 @@ import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelQueries;
 import com.projectbarbel.histo.BarbelQueryOptions;
 
-public final class DocumentJournal implements Consumer<List<Bitemporal>> {
+@SuppressWarnings("rawtypes")
+public final class DocumentJournal {
 
     private final Object id;
     private final IndexedCollection journal;
@@ -57,12 +57,15 @@ public final class DocumentJournal implements Consumer<List<Bitemporal>> {
         return newjournal;
     }
 
+    @SuppressWarnings("unchecked")
     public void accept(List<Bitemporal> newVersions) {
         Validate.isTrue(
                 newVersions.stream().filter(d -> !d.getBitemporalStamp().getDocumentId().equals(id)).count() == 0,
                 "new versions must match document id of journal");
-        newVersions.sort((v1,v2)->v1.getBitemporalStamp().getEffectiveTime().from().isBefore(v2.getBitemporalStamp().getEffectiveTime().from())?-1:1);
-        newVersions.sort((v1,v2)->v1.getBitemporalStamp().getEffectiveTime().until().isBefore(v2.getBitemporalStamp().getEffectiveTime().until())?-1:1);
+        newVersions.sort((v1, v2) -> v1.getBitemporalStamp().getEffectiveTime().from()
+                .isBefore(v2.getBitemporalStamp().getEffectiveTime().from()) ? -1 : 1);
+        newVersions.sort((v1, v2) -> v1.getBitemporalStamp().getEffectiveTime().until()
+                .isBefore(v2.getBitemporalStamp().getEffectiveTime().until()) ? -1 : 1);
         this.lastInserts = newVersions;
         journal.addAll(newVersions);
     }
@@ -72,17 +75,22 @@ public final class DocumentJournal implements Consumer<List<Bitemporal>> {
         return "DocumentJournal [journal=" + journal + "]";
     }
 
+    @SuppressWarnings("unchecked")
     public long size() {
         return journal.retrieve(BarbelQueries.all(id)).stream().count();
     }
 
+    @SuppressWarnings("unchecked")
     public <T> List<T> list() {
-        return (List<T>) journal.retrieve(BarbelQueries.all(id), queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM))))
+        return (List<T>) journal
+                .retrieve(BarbelQueries.all(id), queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM))))
                 .stream().collect(objectToBitemporalList);
     }
 
+    @SuppressWarnings("unchecked")
     public <T> IndexedCollection<T> collection() {
-        return (IndexedCollection<T>) journal.retrieve(BarbelQueries.all(id), queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM))))
+        return (IndexedCollection<T>) journal
+                .retrieve(BarbelQueries.all(id), queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM))))
                 .stream().collect(objectToBitemporalCollection);
     }
 
@@ -113,14 +121,18 @@ public final class DocumentJournal implements Consumer<List<Bitemporal>> {
             return new RecordtimeReader(journal);
         }
 
+        @SuppressWarnings("unchecked")
         public <O> List<O> activeVersions() {
-            return (List<O>) journal.journal.retrieve(BarbelQueries.allActive(journal.id), BarbelQueryOptions.sortAscendingByEffectiveFrom()).stream()
-                    .collect(journal.objectToBitemporalList);
+            return (List<O>) journal.journal
+                    .retrieve(BarbelQueries.allActive(journal.id), BarbelQueryOptions.sortAscendingByEffectiveFrom())
+                    .stream().collect(journal.objectToBitemporalList);
         }
 
+        @SuppressWarnings("unchecked")
         public <O> List<O> inactiveVersions() {
-            return (List<O>) journal.journal.retrieve(BarbelQueries.allInactive(journal.id), BarbelQueryOptions.sortAscendingByEffectiveFrom()).stream()
-                    .collect(journal.objectToBitemporalList);
+            return (List<O>) journal.journal
+                    .retrieve(BarbelQueries.allInactive(journal.id), BarbelQueryOptions.sortAscendingByEffectiveFrom())
+                    .stream().collect(journal.objectToBitemporalList);
         }
     }
 
@@ -132,6 +144,7 @@ public final class DocumentJournal implements Consumer<List<Bitemporal>> {
             this.journal = journal;
         }
 
+        @SuppressWarnings("unchecked")
         public <O> List<O> activeVersions() {
             return (List<O>) journal.journal
                     .retrieve(BarbelQueries.allActive(journal.id),
@@ -139,6 +152,7 @@ public final class DocumentJournal implements Consumer<List<Bitemporal>> {
                     .stream().collect(journal.objectToBitemporalList);
         }
 
+        @SuppressWarnings("unchecked")
         public <O> Optional<O> effectiveNow() {
             return journal.journal
                     .retrieve(BarbelQueries.effectiveNow(journal.id),
@@ -146,6 +160,7 @@ public final class DocumentJournal implements Consumer<List<Bitemporal>> {
                     .stream().findFirst().flatMap(o -> Optional.of((Bitemporal) o));
         }
 
+        @SuppressWarnings("unchecked")
         public <O> Optional<O> effectiveAt(LocalDate day) {
             return journal.journal
                     .retrieve(BarbelQueries.effectiveAt(journal.id, day),
@@ -153,6 +168,7 @@ public final class DocumentJournal implements Consumer<List<Bitemporal>> {
                     .stream().findFirst().flatMap(o -> Optional.of((Bitemporal) o));
         }
 
+        @SuppressWarnings("unchecked")
         public <O> IndexedCollection<O> effectiveAfter(LocalDate day) {
             return (IndexedCollection<O>) journal.journal
                     .retrieve(BarbelQueries.effectiveAfter(journal.id, day),
@@ -160,6 +176,7 @@ public final class DocumentJournal implements Consumer<List<Bitemporal>> {
                     .stream().collect(journal.objectToBitemporalCollection);
         }
 
+        @SuppressWarnings("unchecked")
         public <O> IndexedCollection<O> effectiveBetween(EffectivePeriod period) {
             return (IndexedCollection<O>) journal.journal
                     .retrieve(BarbelQueries.effectiveBetween(journal.id, period),

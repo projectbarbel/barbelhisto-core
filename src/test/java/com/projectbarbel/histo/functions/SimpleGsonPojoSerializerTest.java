@@ -1,4 +1,4 @@
-package com.projectbarbel.histo;
+package com.projectbarbel.histo.functions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
@@ -8,6 +8,10 @@ import java.util.Objects;
 
 import org.junit.jupiter.api.Test;
 
+import com.projectbarbel.histo.BarbelHistoBuilder;
+import com.projectbarbel.histo.BarbelMode;
+import com.projectbarbel.histo.BarbelTestHelper;
+import com.projectbarbel.histo.functions.SimpleGsonPojoSerializer;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.DefaultDocument;

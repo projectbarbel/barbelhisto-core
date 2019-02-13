@@ -1,7 +1,8 @@
-package com.projectbarbel.histo;
+package com.projectbarbel.histo.functions;
 
 import com.googlecode.cqengine.persistence.support.serialization.PersistenceConfig;
 import com.googlecode.cqengine.persistence.support.serialization.PojoSerializer;
+import com.projectbarbel.histo.BarbelHistoBuilder;
 import com.projectbarbel.histo.model.Bitemporal;
 
 public class BarbelPojoSerializer<O> implements PojoSerializer<O> {

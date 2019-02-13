@@ -10,17 +10,36 @@ import com.googlecode.cqengine.persistence.offheap.OffHeapPersistence;
 import com.googlecode.cqengine.query.Query;
 import com.googlecode.cqengine.query.option.QueryOptions;
 import com.projectbarbel.histo.model.Bitemporal;
+import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.BitemporalVersion;
+import com.projectbarbel.histo.model.DocumentJournal;
 
+/**
+ * Two time dimensions
+ * 
+ * Two {@link BarbelMode}s
+ * 
+ * 
+ * The wording:
+ * 
+ * - a 'managed bitemporal' is either a proxied pojo or an object implementing {@link Bitemporal}, managed objects are the backbone citizens
+ * - 'bitemporal objects' are objects implementing the {@link Bitemporal} interface, as long they don't live in the backbone, they're not considered managed bitemporals
+ * - a snapshot always creates a NEW managed bitemporal with a new given {@link BitemporalStamp}
+ * - a custom persistent object is always bitemporal object, but not managed; in {@link BarbelMode.PojoMode} it is always a {@link BitemporalVersion}
+ * 
+ * @author niklasschlimm
+ *
+ * @param <T>
+ */
 public interface BarbelHisto<T> {
 
-    boolean save(Object currentVersion, LocalDate from, LocalDate until);
+    boolean save(T currentVersion, LocalDate from, LocalDate until);
 
     List<T> retrieve(Query<T> query);
 
     List<T> retrieve(Query<T> query, QueryOptions options);
 
-    RecordTimeShift timeshift(LocalDateTime time);
+    DocumentJournal timeshift(Object id, LocalDateTime time);
     
     String prettyPrintJournal(Object id);
     

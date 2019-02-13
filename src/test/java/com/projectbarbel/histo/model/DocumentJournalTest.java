@@ -15,6 +15,10 @@ import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
 import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelTestHelper;
+import com.projectbarbel.histo.model.Bitemporal;
+import com.projectbarbel.histo.model.BitemporalStamp;
+import com.projectbarbel.histo.model.DefaultDocument;
+import com.projectbarbel.histo.model.DocumentJournal;
 
 public class DocumentJournalTest {
 
