@@ -25,7 +25,7 @@ This library enables you to store your data in a format that enables you to answ
 
 # Features (in development)
 
-- bi-temporal data storage based on blazing fast cqengine collection
+- bi-temporal data storage based on blazing fast [cqengine](https://github.com/npgall/cqengine) collections
 - small easy-to-use API (as simple as bi-temporal data storage can get)
 - backed by transactional, high performance colections
 - works out of the box with default implementation and configuration
