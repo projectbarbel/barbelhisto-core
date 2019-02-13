@@ -49,6 +49,8 @@ You can easily implement your own DAO object to integrate any data store you wan
 
 # Getting started
 
+COMING SOON !!
+
 Maven Central link
 Example code using the API
 Demo App
