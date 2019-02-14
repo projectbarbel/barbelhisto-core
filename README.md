@@ -17,7 +17,7 @@ When you use barbelhisto to store and read data you can find answers to these qu
 - What will be the effective state of my domain objects in two weeks?
 
 Even more complicated:
- 
+  
 - Two month ago, what did we know about the state of domain objects six month ago?
 - Two month ago, what did we know about the state of domain objects in four months?
 
