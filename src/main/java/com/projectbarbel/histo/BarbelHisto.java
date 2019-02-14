@@ -49,7 +49,7 @@ public interface BarbelHisto<T> {
      * complete journals previously created by {@link BarbelHisto}. That means only
      * add complete set of versions for one or more document IDs. To achieve this,
      * preferably use this method with version collections produced by
-     * {@link #dump()} method. That ensures consistent state with intermediate
+     * {@link #dump(DumpMode)} method. That ensures consistent state with intermediate
      * persistence operations to custom data stores. You can also use
      * {@link BarbelQueries#all(Object)} to retrieve a complete Journal for a single
      * document id, or use {@link BarbelQueries#all()} to retrieve the complete data

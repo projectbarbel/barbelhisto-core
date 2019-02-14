@@ -48,7 +48,7 @@ public final class DocumentJournal {
      * 
      * @param backbone the collection containing the journal objects
      * @param id       document id of the document under barbel control
-     * @return
+     * @return the {@link DocumentJournal} created
      */
     public static DocumentJournal create(IndexedCollection backbone, Object id) {
         Validate.notNull(backbone, "new document list must not be null when creating new journal");
