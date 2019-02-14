@@ -5,8 +5,8 @@ after_success:
 - bash <(curl -s https://codecov.io/bash)
 
 before_deploy:
-  - "mvn -DskipTests package"
-  - export HISTO=$(ls target/barbelhisto-core-*.jar)
+- "mvn -DskipTests package"
+- export HISTO=$(ls target/barbelhisto-core-*.jar)
   
 deploy:
  provider: releases
