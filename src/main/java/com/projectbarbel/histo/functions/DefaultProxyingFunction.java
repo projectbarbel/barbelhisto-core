@@ -6,12 +6,9 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
-import org.apache.commons.lang3.Validate;
-
 import com.google.common.base.Defaults;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
-import com.projectbarbel.histo.model.BitemporalVersion;
 
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
