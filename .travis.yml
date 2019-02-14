@@ -1,7 +1,17 @@
 language: java
-
 install: true
 script: mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -U
-
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+- bash <(curl -s https://codecov.io/bash)
+
+before_deploy:
+  - "mvn -DskipTests package"
+  - export HISTO=$(ls target/barbelhisto-core-*.jar)
+  
+deploy:
+ provider: releases
+ api_key:
+   secure: Szz1rG4h5sBG+Al0VfBqrez5v6w1BiHGeUFngzlWHI4LySzRjMezvE7qMXoaHEEpNbr6UdXnBB0JwLyVQ2nRucJwwJeLaC2Bpp/D8ZMqW+GERVlDgr/qmVJ6Anl/GEm0cq+wPuKlN7KKaGRhlSKCIRJntstkm+yjn4LM2doDkZhF0ERBEC0ICqWJqv0pEqHo1yQA9NIKG6HzQISdjiFYwtqwpUmYuKX0JJ/sEvsNSX6EEafeF2IVmw54TJfc5Lio9TeFEYdEsKh03GBF7hgPKdg6BsZ/TQrH5TwKMJyZjLidiaJ65R2psuyU6eGkMaupEeUCT+WEJ1/0vz11JMSgr3uvkPmuu87gM1Ua54vTKyK102v7B3hOWANTOC7kAUeS42Gi9QWSqsITXJOuFCcSUiSSOp2zk6wKpKeRNJjjAPNAODjDhrgFlQeW2e7A4OwE2jVz9IDeZV1KKf9De1aq9Qawkk6FScr6duQoFtOQVvobqiKbnQZPz+FyGRJAtE9Ft6YVgnKuxzyu0QPARUOQLlRS329/RZ8LQjWsbcEqTVBltuRTsAYif6hshY7lo5/rRBT/ZxPuI6bCnLYCkN7webBHaL5mYLsHFnFgjQ52oKw1aFnv//fWCu51vhcwgFE+a2g5cgDzRX5/qaihMGSH2rd7NqcvBtefymsjw1/BTi4=
+ file: "${HISTO}"
+ on:
+   repo: projectbarbel/barbelhisto-core
