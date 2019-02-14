@@ -9,6 +9,7 @@ import com.googlecode.cqengine.persistence.disk.DiskPersistence;
 import com.googlecode.cqengine.persistence.offheap.OffHeapPersistence;
 import com.googlecode.cqengine.query.Query;
 import com.googlecode.cqengine.query.option.QueryOptions;
+import com.projectbarbel.histo.BarbelHistoCore.DumpMode;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
 import com.projectbarbel.histo.model.BitemporalVersion;
@@ -99,6 +100,6 @@ public interface BarbelHisto<T> {
      *      "https://github.com/npgall/cqengine">https://github.com/npgall/cqengine</a>
      * @return the collection of bitemporals to store into an arbitrary data store
      */
-    Collection<Bitemporal> dump();
+    Collection<Bitemporal> dump(DumpMode mode);
 
 }

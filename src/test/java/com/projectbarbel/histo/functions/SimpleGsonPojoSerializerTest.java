@@ -14,6 +14,7 @@ import com.projectbarbel.histo.BarbelTestHelper;
 import com.projectbarbel.histo.functions.SimpleGsonPojoSerializer;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
+import com.projectbarbel.histo.model.BitemporalVersion;
 import com.projectbarbel.histo.model.DefaultDocument;
 import com.projectbarbel.histo.model.DefaultPojo;
 
@@ -21,10 +22,11 @@ import io.github.benas.randombeans.api.EnhancedRandom;
 
 public class SimpleGsonPojoSerializerTest {
 
-    private SimpleGsonPojoSerializer serializer = new SimpleGsonPojoSerializer(BarbelHistoBuilder.barbel());
+    private SimpleGsonPojoSerializer serializer;
     
     @Test
     public void testSerialize_DefaultDocument() throws Exception {
+        serializer = new SimpleGsonPojoSerializer(BarbelHistoBuilder.barbel());
         DefaultDocument initial = BarbelTestHelper.random(DefaultDocument.class);
         byte[] bytes = serializer.serialize(initial);
         DefaultDocument roundtrip = (DefaultDocument)serializer.deserialize(bytes);
@@ -33,7 +35,8 @@ public class SimpleGsonPojoSerializerTest {
     }
 
     @Test
-    public void testSerialize_DefaultOjo() throws Exception {
+    public void testSerialize_DefaultPojo() throws Exception {
+        serializer = new SimpleGsonPojoSerializer(BarbelHistoBuilder.barbel());
         DefaultPojo initial = EnhancedRandom.random(DefaultPojo.class);
         Bitemporal bitemporal = BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(), initial, BitemporalStamp.createActive());
         byte[] bytes = serializer.serialize(bitemporal);
@@ -44,11 +47,22 @@ public class SimpleGsonPojoSerializerTest {
     
     @Test
     public void testSerialize_SomePojo() throws Exception {
+        serializer = new SimpleGsonPojoSerializer(BarbelHistoBuilder.barbel());
         SomePojo initial = EnhancedRandom.random(SomePojo.class);
         Bitemporal bitemporal = BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(), initial, BitemporalStamp.createActive());
         byte[] bytes = serializer.serialize(bitemporal);
         SomePojo roundtrip = (SomePojo)serializer.deserialize(bytes);
         assertEquals(bitemporal, roundtrip);
+        assertNotSame(initial, roundtrip);
+    }
+    
+    @Test
+    public void testSerialize_BitemporalVersion() throws Exception {
+        serializer = new SimpleGsonPojoSerializer(BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL));
+        BitemporalVersion<SomePojo> initial = new BitemporalVersion<SomePojo>(BitemporalStamp.createActive(), EnhancedRandom.random(SomePojo.class));
+        byte[] bytes = serializer.serialize(initial);
+        Bitemporal roundtrip = serializer.deserialize(bytes);
+        assertEquals(initial, roundtrip);
         assertNotSame(initial, roundtrip);
     }
     

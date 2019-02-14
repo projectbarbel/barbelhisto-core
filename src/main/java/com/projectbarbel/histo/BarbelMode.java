@@ -11,7 +11,6 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
-import com.googlecode.cqengine.persistence.support.serialization.PersistenceConfig;
 import com.projectbarbel.histo.functions.BarbelProxy;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
@@ -51,9 +50,9 @@ public abstract class BarbelMode {
             Collection<Bitemporal> bitemporals);
 
     public abstract Object fromInternalPersistenceObjectToManagedBitemporal(BarbelHistoContext context,
-            BitemporalVersion bv);
+            BitemporalVersion<?> bv);
 
-    public abstract BitemporalVersion fromManagedBitemporalToInternalPersistenceObject(BarbelHistoContext context,
+    public abstract BitemporalVersion<?> fromManagedBitemporalToInternalPersistenceObject(BarbelHistoContext context,
             Bitemporal bitemporal);
 
     public abstract boolean validateManagedType(BarbelHistoContext context, Class<?> objectType);
@@ -90,7 +89,7 @@ public abstract class BarbelMode {
         @Override
         public <T> Collection<Bitemporal> managedBitemporalToCustomPersistenceObjects(IndexedCollection<T> objects) {
             return objects.stream().map(
-                    o -> new BitemporalVersion(((Bitemporal) o).getBitemporalStamp(), ((BarbelProxy) o).getTarget()))
+                    o -> new BitemporalVersion<>(((Bitemporal) o).getBitemporalStamp(), ((BarbelProxy) o).getTarget()))
                     .collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
         }
 
@@ -100,8 +99,8 @@ public abstract class BarbelMode {
                 Collection<Bitemporal> bitemporals) {
             try {
                 IndexedCollection<Object> output = bitemporals.stream()
-                        .map(b -> snapshotMaiden(context, ((BitemporalVersion) b).getObject(),
-                                ((BitemporalVersion) b).getStamp()))
+                        .map(b -> snapshotMaiden(context, ((BitemporalVersion<?>) b).getObject(),
+                                ((BitemporalVersion<?>) b).getStamp()))
                         .collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
                 return (Collection<T>)output;
             } catch (ClassCastException e) {
@@ -124,21 +123,22 @@ public abstract class BarbelMode {
 
         @Override
         public Object fromInternalPersistenceObjectToManagedBitemporal(BarbelHistoContext context,
-                BitemporalVersion bv) {
+                BitemporalVersion<?> bv) {
             return context.getPojoProxyingFunction().apply(bv.getObject(), bv.getBitemporalStamp());
         }
 
         @Override
-        public BitemporalVersion fromManagedBitemporalToInternalPersistenceObject(BarbelHistoContext context,
+        public BitemporalVersion<?> fromManagedBitemporalToInternalPersistenceObject(BarbelHistoContext context,
                 Bitemporal bitemporal) {
             BitemporalStamp stamp = bitemporal.getBitemporalStamp();
             Object target = ((BarbelProxy) bitemporal).getTarget();
-            return new BitemporalVersion(stamp, target);
+            return new BitemporalVersion<>(stamp, target);
         }
 
         @Override
         public boolean validateManagedType(BarbelHistoContext context, Class<?> objectType) {
-            //Validate.isTrue(objectType.getAnnotation(PersistenceConfig.class)!=null, "don't forget to add @PersistenceConfig(serializer=BarbelPojoSerializer.class) to the pojo you want to manage");
+            Validate.isTrue(!objectType.equals(BitemporalVersion.class),
+                    "BitemporalVersion cannot be used in BarbelMode.POJO - set BarbelMode.BITEMPORAL and try again");
             Validate.isTrue(FieldUtils.getFieldsListWithAnnotation(objectType, DocumentId.class).size()==1, "don't forget to add @DocumentId to the document id attribute to the pojo you want to manage");
             return true;
         }
@@ -194,14 +194,14 @@ public abstract class BarbelMode {
 
         @Override
         public Object fromInternalPersistenceObjectToManagedBitemporal(BarbelHistoContext context,
-                BitemporalVersion bv) {
+                BitemporalVersion<?> bv) {
             return bv.getObject();
         }
 
         @Override
-        public BitemporalVersion fromManagedBitemporalToInternalPersistenceObject(BarbelHistoContext context,
+        public BitemporalVersion<?> fromManagedBitemporalToInternalPersistenceObject(BarbelHistoContext context,
                 Bitemporal bitemporal) {
-            return new BitemporalVersion(bitemporal.getBitemporalStamp(), bitemporal);
+            return new BitemporalVersion<>(bitemporal.getBitemporalStamp(), bitemporal);
         }
 
         @Override

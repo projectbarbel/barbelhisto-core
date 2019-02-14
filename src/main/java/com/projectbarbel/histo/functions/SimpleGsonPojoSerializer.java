@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.googlecode.cqengine.persistence.support.serialization.PojoSerializer;
 import com.projectbarbel.histo.BarbelHistoContext;
+import com.projectbarbel.histo.BarbelMode;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalVersion;
 
@@ -19,9 +20,7 @@ public class SimpleGsonPojoSerializer implements PojoSerializer<Bitemporal> {
 
     private Gson gson = new GsonBuilder().registerTypeAdapter(ZonedDateTime.class, BarbelHistoContext.ZDT_DESERIALIZER)
             .registerTypeAdapter(ZonedDateTime.class, BarbelHistoContext.ZDT_SERIALIZER).create();
-
     private static Map<String, Class<?>> typeMap = new HashMap<>();
-
     private BarbelHistoContext context;
 
     public SimpleGsonPojoSerializer(BarbelHistoContext context) {
@@ -33,7 +32,7 @@ public class SimpleGsonPojoSerializer implements PojoSerializer<Bitemporal> {
         if (object instanceof BarbelProxy) { // change persisted type to BitemporalVersion
             Object target = ((BarbelProxy) object).getTarget();
             typeMap.put(target.getClass().getName(), target.getClass());
-            object = new BitemporalVersion(((Bitemporal) object).getBitemporalStamp(),
+            object = new BitemporalVersion<>(((Bitemporal) object).getBitemporalStamp(),
                     ((BarbelProxy) object).getTarget());
         }
         JsonTypeWrapper wrap = new JsonTypeWrapper(object.getClass().getName(), gson.toJson(object));
@@ -47,21 +46,23 @@ public class SimpleGsonPojoSerializer implements PojoSerializer<Bitemporal> {
         JsonTypeWrapper wrap = gson.fromJson(json, JsonTypeWrapper.class);
         Object object = gson.fromJson(wrap.json, typeMap.computeIfAbsent(wrap.type, computeIfAbsent()));
         if (object instanceof BitemporalVersion) {
-            BitemporalVersion bv = (BitemporalVersion) object;
-            Bitemporal bitemporal = (Bitemporal) context.getMode().snapshotMaiden(context,
-                    gson.fromJson(gson.toJsonTree(bv.getObject()).toString(), typeMap.computeIfAbsent(bv.getObjectType(), computeIfAbsent())),
-                    bv.getStamp());
-            return bitemporal;
+            BitemporalVersion<?> bv = (BitemporalVersion<?>) object;
+            Class<?> objectType = typeMap.computeIfAbsent(bv.getObjectType(), computeIfAbsent());
+            Object bvobject = gson.fromJson(gson.toJsonTree(bv.getObject()).toString(), objectType);
+            if (context.getMode()==BarbelMode.POJO) 
+                return (Bitemporal) context.getMode().snapshotMaiden(context, bvobject, bv.getStamp());
+            else
+                return new BitemporalVersion<>(bv.getBitemporalStamp(), bvobject);
         }
         return (Bitemporal) object;
     }
 
     private Function<? super String, ? extends Class<?>> computeIfAbsent() {
-        return (k)->{
+        return (k) -> {
             try {
                 return Class.forName(k);
             } catch (ClassNotFoundException e) {
-                throw new RuntimeException("failed to deserialize type from persistence", e);
+                throw new RuntimeException("failed with ClassNotFoundException on deserializing type from persistence", e);
             }
         };
     }

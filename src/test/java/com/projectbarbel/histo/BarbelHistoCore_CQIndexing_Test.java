@@ -23,6 +23,7 @@ import com.googlecode.cqengine.index.Index;
 import com.googlecode.cqengine.index.navigable.NavigableIndex;
 import com.googlecode.cqengine.query.Query;
 import com.googlecode.cqengine.query.option.QueryOptions;
+import com.projectbarbel.histo.BarbelHistoCore.DumpMode;
 import com.projectbarbel.histo.model.Bitemporal;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
@@ -66,7 +67,7 @@ public class BarbelHistoCore_CQIndexing_Test {
         assertNotSame(object.getBitemporalStamp(), byPK.getBitemporalStamp());
         Bitemporal record = (Bitemporal) core.retrieve(BarbelQueries.all()).stream().findFirst().get();
         assertNotNull(record.getBitemporalStamp().getDocumentId());
-        core.dump();
+        core.dump(DumpMode.CLEARCOLLECTION);
         assertEquals(0, core.retrieve(BarbelQueries.all()).stream().count());
     }
 

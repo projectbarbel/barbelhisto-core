@@ -1,12 +1,14 @@
 package com.projectbarbel.histo.model;
 
-public class BitemporalVersion implements Bitemporal {
+import java.util.Objects;
+
+public final class BitemporalVersion<T> implements Bitemporal {
 
     private BitemporalStamp stamp;
-    private final Object object;
+    private final T object;
     private final String objectType;
     
-    public BitemporalVersion(BitemporalStamp stamp, Object object) {
+    public BitemporalVersion(BitemporalStamp stamp, T object) {
         super();
         this.stamp = stamp;
         this.object = object;
@@ -27,9 +29,8 @@ public class BitemporalVersion implements Bitemporal {
         return stamp;
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> T getObject() {
-        return (T)object;
+    public T getObject() {
+        return object;
     }
 
     public void setStamp(BitemporalStamp stamp) {
@@ -40,4 +41,31 @@ public class BitemporalVersion implements Bitemporal {
         return objectType;
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(object, objectType, stamp);
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof BitemporalVersion)) {
+            return false;
+        }
+        BitemporalVersion<?> other = (BitemporalVersion<?>) obj;
+        return Objects.equals(object, other.object) && Objects.equals(objectType, other.objectType)
+                && Objects.equals(stamp, other.stamp);
+    }
+
+    @Override
+    public String toString() {
+        return "BitemporalVersion [stamp=" + stamp + ", object=" + object + ", objectType=" + objectType + "]";
+    }
+    
 }

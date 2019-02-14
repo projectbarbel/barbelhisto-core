@@ -21,6 +21,7 @@ import com.googlecode.cqengine.attribute.SimpleAttribute;
 import com.googlecode.cqengine.persistence.disk.DiskPersistence;
 import com.googlecode.cqengine.persistence.support.serialization.PersistenceConfig;
 import com.googlecode.cqengine.query.option.QueryOptions;
+import com.projectbarbel.histo.BarbelHistoCore.DumpMode;
 import com.projectbarbel.histo.functions.BarbelPojoSerializer;
 import com.projectbarbel.histo.model.Bitemporal;
 
@@ -97,7 +98,7 @@ public class BarbelHistoCore_CQPersistence_Test {
         assertEquals(3, core.retrieve(BarbelQueries.all()).stream().count());
         Bitemporal record = (Bitemporal) core.retrieve(BarbelQueries.all()).stream().findFirst().get();
         assertNotNull(record.getBitemporalStamp().getDocumentId());
-        core.dump();
+        core.dump(DumpMode.CLEARCOLLECTION);
         assertEquals(0, core.retrieve(BarbelQueries.all()).stream().count());
     }
 
@@ -117,7 +118,7 @@ public class BarbelHistoCore_CQPersistence_Test {
         assertEquals(3, core.retrieve(BarbelQueries.all()).stream().count());
         Bitemporal record = (Bitemporal) core.retrieve(BarbelQueries.all()).stream().findFirst().get();
         assertNotNull(record.getBitemporalStamp().getDocumentId());
-        core.dump();
+        core.dump(DumpMode.CLEARCOLLECTION);
         assertEquals(0, core.retrieve(BarbelQueries.all()).stream().count());
     }
     
@@ -137,7 +138,7 @@ public class BarbelHistoCore_CQPersistence_Test {
         assertEquals(3, core.retrieve(BarbelQueries.all()).stream().count());
         Bitemporal record = (Bitemporal) core.retrieve(BarbelQueries.all()).stream().findFirst().get();
         assertNotNull(record.getBitemporalStamp().getDocumentId());
-        core.dump();
+        core.dump(DumpMode.CLEARCOLLECTION);
         assertEquals(0, core.retrieve(BarbelQueries.all()).stream().count());
     }
     
@@ -157,7 +158,7 @@ public class BarbelHistoCore_CQPersistence_Test {
         assertEquals(3, core.retrieve(BarbelQueries.all()).stream().count());
         Bitemporal record = (Bitemporal) core.retrieve(BarbelQueries.all()).stream().findFirst().get();
         assertNotNull(record.getBitemporalStamp().getDocumentId());
-        core.dump();
+        core.dump(DumpMode.CLEARCOLLECTION);
         assertEquals(0, core.retrieve(BarbelQueries.all()).stream().count());
     }
     
@@ -177,7 +178,7 @@ public class BarbelHistoCore_CQPersistence_Test {
         assertEquals(3, core.retrieve(BarbelQueries.all()).stream().count());
         Bitemporal record = (Bitemporal) core.retrieve(BarbelQueries.all()).stream().findFirst().get();
         assertNotNull(record.getBitemporalStamp().getDocumentId());
-        core.dump();
+        core.dump(DumpMode.CLEARCOLLECTION);
         assertEquals(0, core.retrieve(BarbelQueries.all()).stream().count());
     }
     

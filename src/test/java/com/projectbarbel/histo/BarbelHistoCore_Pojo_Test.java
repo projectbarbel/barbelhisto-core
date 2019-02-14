@@ -2,7 +2,6 @@ package com.projectbarbel.histo;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,23 +27,6 @@ public class BarbelHistoCore_Pojo_Test {
                 Arguments.of(EnhancedRandom.random(ComplexFieldsPrivatePojoPartialContructorWithComplexType.class)),
                 Arguments.of(EnhancedRandom.random(ComplexFieldsPrivatePojoPartialContructor.class))
                 );
-    }
-    
-    @SuppressWarnings("unused")
-    private static Stream<Arguments> nullableParameters() {
-        return Stream.of(
-                Arguments.of(EnhancedRandom.random(PrimitivePrivatePojo.class), LocalDate.now(), null),
-                Arguments.of(EnhancedRandom.random(PrimitivePrivatePojo.class), null, LocalDate.now()),
-                Arguments.of(null, LocalDate.now(), LocalDate.MAX),
-                Arguments.of(new PrimitivePrivatePojo(), LocalDate.now(), LocalDate.MAX)
-                );
-    }
-    
-    @ParameterizedTest
-    @MethodSource("nullableParameters")
-    public <T> void testSaveParameter(T pojo, LocalDate from, LocalDate until) {
-        BarbelHisto<T> core = BarbelHistoBuilder.barbel().build();
-        assertThrows(IllegalArgumentException.class, ()->core.save(pojo, from, until));
     }
     
     @ParameterizedTest
