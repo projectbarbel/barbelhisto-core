@@ -44,7 +44,7 @@ BarbelHisto<Employee> core = BarbelHistoBuilder.barbel().build();
 ```
 Notice that, when you're using Pojos, they need to be regular [JavaBeans](https://docs.oracle.com/javase/8/docs/technotes/guides/beans/index.html). Behind the scenes `BarbelHisto` will create proxies for Pojos and make copies to protect the state of your object.
 
-## Store and retrieve one versions
+## Store and retrieve a version
 You're ready to store instances of `Employee` to your `BarbelHisto` instance.
 ```java
 Employee employee = new Employee("somePersonelNumber", "Niklas", "Schlimm");
@@ -68,8 +68,14 @@ That query retrieves the `Employee` version effective in to days. It will return
 Optional<Employee> effectiveYesterdayOptional = core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().minusDays(1)));
 assertFalse(effectiveYesterdayOptional.isPresent());
 ```
-Let's look at the pretty print of the journal. GThat shows what `BarbelHisto` knows about your version.
+Let's look at the pretty print of the journal. The pretty print shows what `BarbelHisto` knows about your employee.
+```java
+System.out.println(core.prettyPrintJournal(employee.getId()));
 ```
+That prints the following to your console.
+```
+Document-ID: somePersonelNumber
+
 |Version-ID                              |Effective-From |Effective-Until |State   |Created-By           |Created-At                                   |Inactivated-By       |Inactivated-At                               |Data                           |
 |----------------------------------------|---------------|----------------|--------|---------------------|---------------------------------------------|---------------------|---------------------------------------------|-------------------------------|
 |226ab05c-7c2d-4746-8861-18dc85a0188e    |2019-02-15     |999999999-12-31 |ACTIVE  |SYSTEM               |2019-02-15T08:46:56.495+01:00[Europe/Berlin] |NOBODY               |2199-12-31T23:59:00Z                         |EffectivePeriod [from=2019-02- |
@@ -90,6 +96,28 @@ And store that version into `BarbelHisto` to become effective in 10 days.
 ```java
 core.save(effectiveEmployeeVersion, LocalDate.now().plusDays(10), LocalDate.MAX);
 ```
-Done. `BarbelHisto` now knows aboiut that change.
+Done. `BarbelHisto` now knows about that change. If you retrieve versions now, you may become different states of the employee, since you've recorded a change in near future.
+```java
+effectiveNowOptional = core.retrieveOne(BarbelQueries.effectiveNow(employee.getId()));
+effectiveIn10DaysOptional = core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().plusDays(10)));
+
+effectiveEmployeeVersion = effectiveNowOptional.get();
+Employee effectiveIn10DaysVersion = effectiveIn10DaysOptional.get();
+        
+assertTrue(effectiveEmployeeVersion.getLastname().equals("Schlimm"));
+assertTrue(effectiveIn10DaysVersion.getLastname().equals("changedLastName"));
 ```
+Let's also look at the pretty print of that journal. Again call:
+```java
+System.out.println(core.prettyPrintJournal(employee.getId()));
+```
+That should return the following journal now.
+```
+Document-ID: somePersonelNumber
+
+|Version-ID                              |Effective-From |Effective-Until |State   |Created-By           |Created-At                                   |Inactivated-By       |Inactivated-At                               |Data                           |
+|----------------------------------------|---------------|----------------|--------|---------------------|---------------------------------------------|---------------------|---------------------------------------------|-------------------------------|
+|226ab05c-7c2d-4746-8861-18dc85a0188e    |2019-02-15     |999999999-12-31 |INACTIVE|SYSTEM               |2019-02-15T08:46:56.495+01:00[Europe/Berlin] |SYSTEM               |2019-02-15T08:46:56.546+01:00[Europe/Berlin] |EffectivePeriod [from=2019-02- |
+|c2d8a5b8-a8cf-4f19-aeb4-4ca61b4f8f70    |2019-02-15     |2019-02-25      |ACTIVE  |SYSTEM               |2019-02-15T08:46:56.541+01:00[Europe/Berlin] |NOBODY               |2199-12-31T23:59:00Z                         |EffectivePeriod [from=2019-02- |
+|c9302f79-9c7b-4b4a-b011-8bb6177278af    |2019-02-25     |999999999-12-31 |ACTIVE  |SYSTEM               |2019-02-15T08:46:56.536+01:00[Europe/Berlin] |NOBODY               |2199-12-31T23:59:00Z                         |EffectivePeriod [from=2019-02- |
 ```
