@@ -37,6 +37,7 @@ This library enables you to store your data in a format that enables you to answ
 - pretty print function to learn about bitemporal data storage
 # Get started
 Download the [actual snapshot releases](https://github.com/projectbarbel/barbelhisto-core/releases). Maven will follow as soon Version 1.0 is released.
+Or clone this git repository to try some of the features of `BarbelHisto`.
 
 # Two minutes tutorial
 [See this test case](https://github.com/projectbarbel/barbelhisto-core/blob/master/src/test/java/com/projectbarbel/histo/BarbelHistoCore_StdPojoUsage_Test.java) to get the complete code for this tutorial.
