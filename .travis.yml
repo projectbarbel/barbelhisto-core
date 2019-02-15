@@ -16,4 +16,5 @@ deploy:
       - target/barbelhisto-core-$project_version-javadoc.jar
   on:
     repo: projectbarbel/barbelhisto-core
+    tags: true
   name: $project_version

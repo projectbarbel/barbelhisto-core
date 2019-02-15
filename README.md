@@ -25,7 +25,7 @@ This library enables you to store your data in a format that enables you to answ
 
 # Features (in development)
 
-- bi-temporal data storage based on blazing fast [cqengine](https://github.com/npgall/cqengine) collections
+- bi-temporal (auditing-proof) data storage based on blazing fast [cqengine](https://github.com/npgall/cqengine) collections
 - small easy-to-use API (as simple as bi-temporal data storage can get)
 - backed by transactional, high performance colections
 - works out of the box with default implementation and configuration
@@ -35,8 +35,10 @@ This library enables you to store your data in a format that enables you to answ
 - remember every change to the data, nothing is ever going to be deleted
 - build-in thread safety by minimizing mutability and object locking
 - pretty print function to learn about bitemporal data storage
+
 # Get started
 Download the [actual snapshot releases](https://github.com/projectbarbel/barbelhisto-core/releases). Maven will follow as soon Version 1.0 is released.
+
 Or clone this git repository to try some of the features of `BarbelHisto`.
 
 # Two minutes tutorial
