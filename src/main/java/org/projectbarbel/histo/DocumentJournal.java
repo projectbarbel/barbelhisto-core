@@ -1,45 +1,67 @@
-package org.projectbarbel.histo.model;
+package org.projectbarbel.histo;
 
 import static com.googlecode.cqengine.query.QueryFactory.ascending;
 import static com.googlecode.cqengine.query.QueryFactory.orderBy;
 import static com.googlecode.cqengine.query.QueryFactory.queryOptions;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collector;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
-import org.projectbarbel.histo.BarbelHistoContext;
-import org.projectbarbel.histo.BarbelQueries;
-import org.projectbarbel.histo.BarbelQueryOptions;
+import org.projectbarbel.histo.model.Bitemporal;
+import org.projectbarbel.histo.model.EffectivePeriod;
+import org.projectbarbel.histo.model.Systemclock;
 
-import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
 
+/**
+ * Document Journal abstraction to work on for internal processing in
+ * {@link BarbelHistoCore} and for the client. When client work on instances of
+ * {@link DocumentJournal} it is essential that {@link ProcessingState} is set
+ * to {@link ProcessingState#EXTERNAL}. This ensures that clients only get copies
+ * of journal objects.
+ * 
+ * @author niklasschlimm
+ *
+ */
 @SuppressWarnings("rawtypes")
 public final class DocumentJournal {
+
+    public enum ProcessingState {
+        // @formatter:off
+        // internal processing -> return original objects
+        INTERNAL((c, o) -> o), 
+        // return copies to user clients
+        EXTERNAL((c, o) -> c.getMode().copyManagedBitemporal(c, (Bitemporal) o)); 
+        // @formatter:on
+        private BiFunction<BarbelHistoContext, Bitemporal, Bitemporal> exposer;
+
+        private ProcessingState(BiFunction<BarbelHistoContext, Bitemporal, Bitemporal> exposer) {
+            this.exposer = exposer;
+        }
+
+        private Bitemporal expose(BarbelHistoContext context, Bitemporal object) {
+            return exposer.apply(context, object);
+        }
+
+    }
 
     private final Object id;
     private final IndexedCollection journal;
     private List<Bitemporal> lastInserts;
     private AtomicBoolean locked = new AtomicBoolean();
-    private Collector<Object, ?, ConcurrentIndexedCollection<Bitemporal>> objectToBitemporalCollection = Collector
-            .of(() -> new ConcurrentIndexedCollection<Bitemporal>(), (c, e) -> c.add((Bitemporal) e), (r1, r2) -> {
-                r1.addAll(r2);
-                return r1;
-            });
+    private final BarbelHistoContext context;
+    private final ProcessingState processingState;
 
-    private Collector<Object, ?, List<Bitemporal>> objectToBitemporalList = Collector
-            .of(() -> new ArrayList<Bitemporal>(), (c, e) -> c.add((Bitemporal) e), (r1, r2) -> {
-                r1.addAll(r2);
-                return r1;
-            });
-
-    private DocumentJournal(IndexedCollection backbone, Object id) {
+    private DocumentJournal(ProcessingState processingState, BarbelHistoContext context, IndexedCollection backbone,
+            Object id) {
         super();
+        this.processingState = processingState;
+        this.context = context;
         this.journal = backbone;
         this.id = id;
     }
@@ -52,10 +74,12 @@ public final class DocumentJournal {
      * @param id       document id of the document under barbel control
      * @return the {@link DocumentJournal} created
      */
-    public static DocumentJournal create(IndexedCollection backbone, Object id) {
+    public static DocumentJournal create(ProcessingState processingState, BarbelHistoContext context,
+            IndexedCollection backbone, Object id) {
         Validate.notNull(backbone, "new document list must not be null when creating new journal");
         Validate.notNull(id, "must specify document id for this collection");
-        DocumentJournal newjournal = new DocumentJournal(backbone, id);
+        Validate.notNull(context, "must specify context for this journal");
+        DocumentJournal newjournal = new DocumentJournal(processingState, context, backbone, id);
         return newjournal;
     }
 
@@ -74,7 +98,7 @@ public final class DocumentJournal {
 
     @Override
     public String toString() {
-        return "DocumentJournal [journal=" + journal + "]";
+        return "DocumentJournal [id=" + id + ", lastInserts=" + lastInserts + ", locked=" + locked + "]";
     }
 
     @SuppressWarnings("unchecked")
@@ -86,17 +110,17 @@ public final class DocumentJournal {
     public <T> List<T> list() {
         return (List<T>) journal
                 .retrieve(BarbelQueries.all(id), queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM))))
-                .stream().collect(objectToBitemporalList);
+                .stream().map(d -> processingState.expose(context, (Bitemporal) d)).collect(Collectors.toList());
     }
 
     @SuppressWarnings("unchecked")
     public <T> IndexedCollection<T> collection() {
         return (IndexedCollection<T>) journal
                 .retrieve(BarbelQueries.all(id), queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM))))
-                .stream().collect(objectToBitemporalCollection);
+                .stream().map(d -> processingState.expose(context, (Bitemporal) d)).collect(Collectors.toList());
     }
 
-    public List<Bitemporal> getLastInsert() {
+    protected List<Bitemporal> getLastInsert() {
         return lastInserts;
     }
 
@@ -108,14 +132,14 @@ public final class DocumentJournal {
         return new JournalReader(this, BarbelHistoContext.getDefaultClock());
     }
 
-    public boolean lockAcquired() {
+    protected boolean lockAcquired() {
         return locked.compareAndSet(false, true);
     }
 
-    public boolean unlock() {
+    protected boolean unlock() {
         return locked.compareAndSet(true, false);
     }
-    
+
     public static class JournalReader {
         private DocumentJournal journal;
 
@@ -123,39 +147,19 @@ public final class DocumentJournal {
             this.journal = journal;
         }
 
-        public EffectiveReader effectiveTime() {
-            return new EffectiveReader(journal);
-        }
-
         @SuppressWarnings("unchecked")
         public <O> List<O> activeVersions() {
             return (List<O>) journal.journal
                     .retrieve(BarbelQueries.allActive(journal.id), BarbelQueryOptions.sortAscendingByEffectiveFrom())
-                    .stream().collect(journal.objectToBitemporalList);
+                    .stream().map(d -> journal.processingState.expose(journal.context, (Bitemporal) d))
+                    .collect(Collectors.toList());
         }
 
         @SuppressWarnings("unchecked")
         public <O> List<O> inactiveVersions() {
             return (List<O>) journal.journal
                     .retrieve(BarbelQueries.allInactive(journal.id), BarbelQueryOptions.sortAscendingByEffectiveFrom())
-                    .stream().collect(journal.objectToBitemporalList);
-        }
-    }
-
-    public static class EffectiveReader {
-
-        private DocumentJournal journal;
-
-        public EffectiveReader(DocumentJournal journal) {
-            this.journal = journal;
-        }
-
-        @SuppressWarnings("unchecked")
-        public <O> List<O> activeVersions() {
-            return (List<O>) journal.journal
-                    .retrieve(BarbelQueries.allActive(journal.id),
-                            queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM))))
-                    .stream().collect(journal.objectToBitemporalList);
+                    .stream().collect(Collectors.toList());
         }
 
         @SuppressWarnings("unchecked")
@@ -163,7 +167,8 @@ public final class DocumentJournal {
             return journal.journal
                     .retrieve(BarbelQueries.effectiveNow(journal.id),
                             queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM))))
-                    .stream().findFirst().flatMap(o -> Optional.of((Bitemporal) o));
+                    .stream().map(d -> journal.processingState.expose(journal.context, (Bitemporal) d)).findFirst()
+                    .flatMap(o -> Optional.of((Bitemporal) o));
         }
 
         @SuppressWarnings("unchecked")
@@ -171,23 +176,26 @@ public final class DocumentJournal {
             return journal.journal
                     .retrieve(BarbelQueries.effectiveAt(journal.id, day),
                             queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM))))
-                    .stream().findFirst().flatMap(o -> Optional.of((Bitemporal) o));
+                    .stream().map(d -> journal.processingState.expose(journal.context, (Bitemporal) d)).findFirst()
+                    .flatMap(o -> Optional.of((Bitemporal) o));
         }
 
         @SuppressWarnings("unchecked")
-        public <O> IndexedCollection<O> effectiveAfter(LocalDate day) {
-            return (IndexedCollection<O>) journal.journal
+        public <O> List<O> effectiveAfter(LocalDate day) {
+            return (List<O>) journal.journal
                     .retrieve(BarbelQueries.effectiveAfter(journal.id, day),
                             queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM))))
-                    .stream().collect(journal.objectToBitemporalCollection);
+                    .stream().map(d -> journal.processingState.expose(journal.context, (Bitemporal) d))
+                    .collect(Collectors.toList());
         }
 
         @SuppressWarnings("unchecked")
-        public <O> IndexedCollection<O> effectiveBetween(EffectivePeriod period) {
-            return (IndexedCollection<O>) journal.journal
+        public <O> List<O> effectiveBetween(EffectivePeriod period) {
+            return (List<O>) journal.journal
                     .retrieve(BarbelQueries.effectiveBetween(journal.id, period),
                             queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM))))
-                    .stream().collect(journal.objectToBitemporalCollection);
+                    .stream().map(d -> journal.processingState.expose(journal.context, (Bitemporal) d))
+                    .collect(Collectors.toList());
         }
 
     }

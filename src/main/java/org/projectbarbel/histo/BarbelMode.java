@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.projectbarbel.histo.functions.BarbelProxy;
+import org.projectbarbel.histo.model.BarbelProxy;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.BitemporalVersion;
@@ -64,8 +64,8 @@ public abstract class BarbelMode {
         @Override
         public Bitemporal snapshotManagedBitemporal(BarbelHistoContext context, Bitemporal pojo,
                 BitemporalStamp stamp) {
-            Validate.isTrue(pojo instanceof BarbelProxy, "pojo must be instance of BarbelProxy");
-            Validate.isTrue(Enhancer.isEnhanced(pojo.getClass()), "pojo must be CGI proxy type");
+            Validate.isTrue(pojo instanceof BarbelProxy, "pojo must be instance of BarbelProxy in BarbelMode.POJO");
+            Validate.isTrue(Enhancer.isEnhanced(pojo.getClass()), "pojo must be CGI proxy type in BarbelMode.POJO");
             Object newVersion = context.getPojoCopyFunction().apply(((BarbelProxy) pojo).getTarget());
             if (newVersion instanceof Bitemporal) { // make sure target and proxy will always sync their stamps
                 ((Bitemporal) newVersion).setBitemporalStamp(stamp);

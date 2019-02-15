@@ -1,4 +1,4 @@
-package org.projectbarbel.histo.functions;
+package org.projectbarbel.histo;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -22,23 +23,29 @@ import org.projectbarbel.histo.BarbelHistoBuilder;
 import org.projectbarbel.histo.BarbelHistoContext;
 import org.projectbarbel.histo.BarbelHistoCore;
 import org.projectbarbel.histo.BarbelMode;
-import org.projectbarbel.histo.BarbelTestHelper;
+import org.projectbarbel.histo.DocumentJournal;
+import org.projectbarbel.histo.DocumentJournal.ProcessingState;
+import org.projectbarbel.histo.functions.DefaultJournalUpdateStrategy;
 import org.projectbarbel.histo.functions.DefaultJournalUpdateStrategy.JournalUpdateCase;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalObjectState;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.DefaultDocument;
 import org.projectbarbel.histo.model.DefaultPojo;
-import org.projectbarbel.histo.model.DocumentJournal;
 import org.projectbarbel.histo.model.EffectivePeriod;
 import org.projectbarbel.histo.model.RecordPeriod;
 import org.projectbarbel.histo.model.Systemclock;
 
-public class JournalUpdateStrategyEmbeddingAndCoreTest {
+public class BarbelHistoCore_JournalUpdate_Test {
 
     private DocumentJournal journal;
     private BarbelHistoContext context;
 
+    @BeforeAll
+    public static void setup() {
+        BarbelHistoContext.getDefaultClock().useSystemDefaultZoneClock();
+    }
+    
     @Test
     public void testApply_wrongId() throws Exception {
         DefaultDocument doc = new DefaultDocument();
@@ -46,7 +53,7 @@ public class JournalUpdateStrategyEmbeddingAndCoreTest {
         Bitemporal bitemporal = BarbelMode.BITEMPORAL.snapshotMaiden(context, doc,
                 BitemporalStamp.createActive());
         journal = DocumentJournal
-                .create(BarbelTestHelper.generateJournalOfDefaultPojos("someId", Arrays.asList(LocalDate.of(2016, 1, 1),
+                .create(ProcessingState.INTERNAL, context, BarbelTestHelper.generateJournalOfDefaultPojos("someId", Arrays.asList(LocalDate.of(2016, 1, 1),
                         LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))), "someId");
         assertThrows(IllegalArgumentException.class,
                 () -> new DefaultJournalUpdateStrategy(context).accept(journal, bitemporal));
@@ -99,7 +106,7 @@ public class JournalUpdateStrategyEmbeddingAndCoreTest {
                 .withClock(new Systemclock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 10, 0)))
                 .withUser("testUser");
         journal = DocumentJournal
-                .create(BarbelTestHelper.generateJournalOfDefaultPojos("someId", Arrays.asList(LocalDate.of(2016, 1, 1),
+                .create(ProcessingState.INTERNAL, context, BarbelTestHelper.generateJournalOfDefaultPojos("someId", Arrays.asList(LocalDate.of(2016, 1, 1),
                         LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))), "someId");
         UpdateReturn updatReturn = performUpdate_Pojo(updateFrom, updateUntil);
         assertTrue(updatReturn.newVersions.size() == countOfNewVersions);
@@ -136,7 +143,7 @@ public class JournalUpdateStrategyEmbeddingAndCoreTest {
         context = BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL)
                 .withClock(new Systemclock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 10, 0)))
                 .withUser("testUser");
-        journal = DocumentJournal.create(
+        journal = DocumentJournal.create(ProcessingState.INTERNAL, context,
                 BarbelTestHelper.generateJournalOfDefaultDocuments("someId", Arrays.asList(LocalDate.of(2016, 1, 1),
                         LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))),
                 "someId");

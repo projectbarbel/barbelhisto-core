@@ -14,7 +14,6 @@ import org.projectbarbel.histo.functions.DefaultJournalUpdateStrategy;
 import org.projectbarbel.histo.functions.DefaultPojoCopier;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
-import org.projectbarbel.histo.model.DocumentJournal;
 import org.projectbarbel.histo.model.Systemclock;
 
 import com.google.gson.Gson;

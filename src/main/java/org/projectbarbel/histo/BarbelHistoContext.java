@@ -19,7 +19,6 @@ import org.projectbarbel.histo.functions.DefaultProxyingFunction;
 import org.projectbarbel.histo.functions.SimpleGsonPojoSerializer;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
-import org.projectbarbel.histo.model.DocumentJournal;
 import org.projectbarbel.histo.model.Systemclock;
 
 import com.google.gson.Gson;

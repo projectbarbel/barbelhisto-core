@@ -8,13 +8,11 @@ import java.util.function.BiConsumer;
 
 import org.apache.commons.lang3.Validate;
 import org.projectbarbel.histo.BarbelHistoContext;
-import org.projectbarbel.histo.UpdateCaseAware;
+import org.projectbarbel.histo.DocumentJournal;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
-import org.projectbarbel.histo.model.DocumentJournal;
 import org.projectbarbel.histo.model.EffectivePeriod;
-
-import com.googlecode.cqengine.IndexedCollection;
+import org.projectbarbel.histo.model.UpdateCaseAware;
 
 public class DefaultJournalUpdateStrategy implements BiConsumer<DocumentJournal, Bitemporal>, UpdateCaseAware {
 
@@ -35,23 +33,20 @@ public class DefaultJournalUpdateStrategy implements BiConsumer<DocumentJournal,
         Validate.isTrue(journal.getId().equals(update.getBitemporalStamp().getDocumentId()),
                 "update and journal must have same document id");
         Validate.isTrue(update.getBitemporalStamp().isActive(), "only active bitemporals are allowed here");
-        Optional<Bitemporal> interruptedLeftVersion = journal.read().effectiveTime()
+        Optional<Bitemporal> interruptedLeftVersion = journal.read()
                 .effectiveAt(update.getBitemporalStamp().getEffectiveTime().from());
-        Optional<Bitemporal> interruptedRightVersion = journal.read().effectiveTime()
+        Optional<Bitemporal> interruptedRightVersion = journal.read()
                 .effectiveAt(update.getBitemporalStamp().getEffectiveTime().until());
-        IndexedCollection<Bitemporal> betweenVersions = journal.read().effectiveTime()
+        List<Bitemporal> betweenVersions = journal.read()
                 .effectiveBetween(update.getBitemporalStamp().getEffectiveTime());
         actualCase = JournalUpdateCase.validate(interruptedLeftVersion.isPresent(), interruptedRightVersion.isPresent(),
                 interruptedLeftVersion.equals(interruptedRightVersion), !betweenVersions.isEmpty());
         newVersions.add(update);
         interruptedLeftVersion.ifPresent(d -> processInterruptedLeftVersion(update, d));
         interruptedRightVersion.ifPresent(d -> processInterruptedRightVersion(update, d));
-        interruptedLeftVersion
-                .ifPresent(d -> d.setBitemporalStamp(d.getBitemporalStamp().inactivatedCopy(context)));
-        interruptedRightVersion
-                .ifPresent(d -> d.setBitemporalStamp(d.getBitemporalStamp().inactivatedCopy(context)));
-        betweenVersions.stream()
-                .forEach(d -> d.setBitemporalStamp(d.getBitemporalStamp().inactivatedCopy(context)));
+        interruptedLeftVersion.ifPresent(d -> d.setBitemporalStamp(d.getBitemporalStamp().inactivatedCopy(context)));
+        interruptedRightVersion.ifPresent(d -> d.setBitemporalStamp(d.getBitemporalStamp().inactivatedCopy(context)));
+        betweenVersions.stream().forEach(d -> d.setBitemporalStamp(d.getBitemporalStamp().inactivatedCopy(context)));
         journal.accept(newVersions);
     }
 
@@ -119,12 +114,12 @@ public class DefaultJournalUpdateStrategy implements BiConsumer<DocumentJournal,
             this.pattern = pattern;
         }
 
-        public static JournalUpdateCase validate(boolean interruptedFrom, boolean interruptedUntil, boolean interruptedEqual,
-                boolean betweenVersions) {
+        public static JournalUpdateCase validate(boolean interruptedFrom, boolean interruptedUntil,
+                boolean interruptedEqual, boolean betweenVersions) {
             byte pattern = asByte(
                     new boolean[] { interruptedFrom, interruptedUntil, interruptedEqual, betweenVersions });
-            JournalUpdateCase validCase = Arrays.asList(JournalUpdateCase.values()).stream().filter(c -> pattern == c.getPattern()).findFirst()
-                    .orElseThrow(() -> new IllegalStateException(
+            JournalUpdateCase validCase = Arrays.asList(JournalUpdateCase.values()).stream()
+                    .filter(c -> pattern == c.getPattern()).findFirst().orElseThrow(() -> new IllegalStateException(
                             "unknown case for journal update: " + Byte.toString(pattern)));
             return validCase;
         }

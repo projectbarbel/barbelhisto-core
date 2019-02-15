@@ -4,7 +4,6 @@ import static com.googlecode.cqengine.query.QueryFactory.and;
 import static com.googlecode.cqengine.query.QueryFactory.equal;
 import static com.googlecode.cqengine.query.QueryFactory.greaterThan;
 import static com.googlecode.cqengine.query.QueryFactory.greaterThanOrEqualTo;
-import static com.googlecode.cqengine.query.QueryFactory.lessThan;
 import static com.googlecode.cqengine.query.QueryFactory.lessThanOrEqualTo;
 
 import java.time.LocalDate;
@@ -120,8 +119,8 @@ public final class BarbelQueries {
     @SuppressWarnings("unchecked")
     public static <T> Query<T> journalAt(Object id, LocalDateTime time) {
         return (Query<T>)and(all(id),
-                             greaterThanOrEqualTo(CREATED_AT, ZonedDateTime.of(time, ZoneId.systemDefault()).toInstant().toEpochMilli()), 
-                             lessThan(INACTIVATED_AT, ZonedDateTime.of(time, ZoneId.systemDefault()).toInstant().toEpochMilli()));
+                             lessThanOrEqualTo(CREATED_AT, ZonedDateTime.of(time, ZoneId.systemDefault()).toInstant().toEpochMilli()), 
+                             greaterThan(INACTIVATED_AT, ZonedDateTime.of(time, ZoneId.systemDefault()).toInstant().toEpochMilli()));
     }
     
     // @formatter:on

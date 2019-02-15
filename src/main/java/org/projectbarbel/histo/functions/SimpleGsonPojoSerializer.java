@@ -7,6 +7,7 @@ import java.util.function.Function;
 
 import org.projectbarbel.histo.BarbelHistoContext;
 import org.projectbarbel.histo.BarbelMode;
+import org.projectbarbel.histo.model.BarbelProxy;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalVersion;
 

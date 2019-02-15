@@ -1,4 +1,4 @@
-package org.projectbarbel.histo.functions;
+package org.projectbarbel.histo.model;
 
 public interface BarbelProxy {
 

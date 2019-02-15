@@ -21,12 +21,13 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
+import org.projectbarbel.histo.DocumentJournal.ProcessingState;
 import org.projectbarbel.histo.functions.DefaultJournalUpdateStrategy.JournalUpdateCase;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
-import org.projectbarbel.histo.model.DocumentJournal;
 import org.projectbarbel.histo.model.EffectivePeriod;
 import org.projectbarbel.histo.model.RecordPeriod;
+import org.projectbarbel.histo.model.UpdateCaseAware;
 
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
@@ -72,7 +73,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
         Bitemporal newManagedBitemporal = context.getMode().snapshotMaiden(context, maiden, stamp);
         BiConsumer<DocumentJournal, Bitemporal> updateStrategy = context.getJournalUpdateStrategyProducer()
                 .apply(context);
-        DocumentJournal journal = journals.computeIfAbsent(id, (k) -> DocumentJournal.create(backbone, k));
+        DocumentJournal journal = journals.computeIfAbsent(id, (k) -> DocumentJournal.create(ProcessingState.INTERNAL, context, backbone, k));
         if (journal.lockAcquired()) {
             updateStrategy.accept(journal, newManagedBitemporal);
         } else {
@@ -183,8 +184,8 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
         Validate.isTrue(id != null && time!=null, NOTNULL);
         ResultSet<T> result = backbone.retrieve(BarbelQueries.journalAt(id, time));
         return DocumentJournal
-                .create(result.stream().map(d -> context.getMode().copyManagedBitemporal(context, (Bitemporal) d))
-                        .map(d -> d.getBitemporalStamp().getRecordTime().activate())
+                .create(ProcessingState.EXTERNAL, context, result.stream().map(d -> context.getMode().copyManagedBitemporal(context, (Bitemporal) d))
+                        .peek(d -> d.getBitemporalStamp().getRecordTime().activate())
                         .collect(Collectors.toCollection(ConcurrentIndexedCollection::new)), id);
     }
 

@@ -14,9 +14,10 @@ import org.projectbarbel.histo.BarbelHistoBuilder;
 import org.projectbarbel.histo.BarbelHistoContext;
 import org.projectbarbel.histo.BarbelMode;
 import org.projectbarbel.histo.BarbelTestHelper;
+import org.projectbarbel.histo.DocumentJournal;
+import org.projectbarbel.histo.DocumentJournal.ProcessingState;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalObjectState;
-import org.projectbarbel.histo.model.DocumentJournal;
 import org.projectbarbel.histo.model.RecordPeriod;
 import org.projectbarbel.histo.model.Systemclock;
 
@@ -24,17 +25,16 @@ public class JournalUpdateStrategyEmbedding_EdgeCases_Test {
 
     @SuppressWarnings("unused")
     private DocumentJournal journal;
-    @SuppressWarnings("unused")
     private BarbelHistoContext context;
 
     @BeforeEach
     public void setUp() {
-        journal = DocumentJournal
-                .create(BarbelTestHelper.generateJournalOfDefaultPojos("someId", Arrays.asList(LocalDate.of(2016, 1, 1),
-                        LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))), "someId");
         context = BarbelHistoBuilder.barbel().withMode(BarbelMode.POJO)
                 .withClock(new Systemclock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 10, 0)))
                 .withUser("testUser");
+        journal = DocumentJournal
+                .create(ProcessingState.INTERNAL, context, BarbelTestHelper.generateJournalOfDefaultPojos("someId", Arrays.asList(LocalDate.of(2016, 1, 1),
+                        LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))), "someId");
     }
 
     @Test

@@ -1,4 +1,4 @@
-package org.projectbarbel.histo;
+package org.projectbarbel.histo.model;
 
 import org.projectbarbel.histo.functions.DefaultJournalUpdateStrategy.JournalUpdateCase;
 
