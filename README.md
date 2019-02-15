@@ -35,6 +35,8 @@ This library enables you to store your data in a format that enables you to answ
 - remember every change to the data, nothing is ever going to be deleted
 - build-in thread safety by minimizing mutability and object locking
 - pretty print function to learn about bitemporal data storage
+# Get started
+Download the [actual snapshot releases](https://github.com/projectbarbel/barbelhisto-core/releases). Maven will follow as soon Version 1.0 is released.
 
 # Two minutes tutorial
 ## Create an instance of BarbelHisto
