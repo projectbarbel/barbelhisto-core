@@ -10,10 +10,12 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.chrono.ChronoZonedDateTime;
 import java.util.Collection;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -27,6 +29,7 @@ import com.googlecode.cqengine.attribute.SimpleAttribute;
 import com.googlecode.cqengine.query.Query;
 import com.googlecode.cqengine.query.option.QueryOptions;
 import com.googlecode.cqengine.resultset.ResultSet;
+import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
 import com.projectbarbel.histo.functions.DefaultJournalUpdateStrategy.JournalUpdateCase;
 import com.projectbarbel.histo.model.Bitemporal;
 import com.projectbarbel.histo.model.BitemporalStamp;
@@ -60,19 +63,22 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     public boolean save(T newVersion, LocalDate from, LocalDate until) {
         Validate.isTrue(newVersion != null && from != null && until != null, NOTNULL);
         Validate.isTrue(from.isBefore(until), "from date must be before until date");
-        validTypes.computeIfAbsent(newVersion.getClass(),
+        T maiden = context.getMode().drawMaiden(context, newVersion);
+        validTypes.computeIfAbsent(maiden.getClass(),
                 (k) -> context.getMode().validateManagedType(context, (Class<?>) k));
-        Object id = context.getMode().drawDocumentId(newVersion);
+        Object id = context.getMode().drawDocumentId(maiden);
         BitemporalStamp stamp = BitemporalStamp.of(context.getActivity(), id, EffectivePeriod.of(from, until),
                 RecordPeriod.createActive(context));
-        DocumentJournal journal = journals.computeIfAbsent(id, (k) -> DocumentJournal.create(backbone, k));
-        // request lock für diese Document ID im backbone für diesen User! If fails
-        // return AlreadyLockedException
-        // TODO: ab hier sperren? Das komplette backbone für diese ID sperren?
-        Bitemporal newManagedBitemporal = context.getMode().snapshotMaiden(context, newVersion, stamp);
+        Bitemporal newManagedBitemporal = context.getMode().snapshotMaiden(context, maiden, stamp);
         BiConsumer<DocumentJournal, Bitemporal> updateStrategy = context.getJournalUpdateStrategyProducer()
                 .apply(context);
-        updateStrategy.accept(journal, newManagedBitemporal);
+        DocumentJournal journal = journals.computeIfAbsent(id, (k) -> DocumentJournal.create(backbone, k));
+        if (journal.lockAcquired()) {
+            updateStrategy.accept(journal, newManagedBitemporal);
+        } else {
+            throw new ConcurrentModificationException("the journal for id=" + id.toString() + " is locked - try again later");
+        }
+        journal.unlock();
         updateLog.add(new UpdateLogRecord(journal.getLastInsert(), newManagedBitemporal,
                 updateStrategy instanceof UpdateCaseAware ? ((UpdateCaseAware) updateStrategy).getActualCase() : null,
                 context.getUser()));
@@ -83,7 +89,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     @Override
     public List<T> retrieve(Query<T> query) {
         Validate.isTrue(query != null, NOTNULL);
-        return doRetrieve(() -> (List<T>) backbone.retrieve(query).stream()
+        return doRetrieveList(() -> (List<T>) backbone.retrieve(query).stream()
                 .map(o -> context.getMode().copyManagedBitemporal(context, (Bitemporal) o))
                 .collect(Collectors.toList()));
     }
@@ -92,7 +98,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     @Override
     public List<T> retrieve(Query<T> query, QueryOptions options) {
         Validate.isTrue(query != null && options != null, NOTNULL);
-        return doRetrieve(() -> (List<T>) backbone.retrieve(query, options).stream()
+        return doRetrieveList(() -> (List<T>) backbone.retrieve(query, options).stream()
                 .map(o -> context.getMode().copyManagedBitemporal(context, (Bitemporal) o))
                 .collect(Collectors.toList()));
     }
@@ -182,7 +188,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
                         .collect(Collectors.toCollection(ConcurrentIndexedCollection::new)), id);
     }
 
-    private List<T> doRetrieve(Supplier<List<T>> retrieveOperation) {
+    private List<T> doRetrieveList(Supplier<List<T>> retrieveOperation) {
         try {
             return retrieveOperation.get();
         } catch (Exception e) {
@@ -196,6 +202,28 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     
     public enum DumpMode {
         CLEARCOLLECTION, READONLY;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Optional<T> retrieveOne(Query<T> query) {
+        try {
+            T object = (T)context.getMode().copyManagedBitemporal(context, (Bitemporal)backbone.retrieve(query).uniqueResult());
+            return Optional.of(object);
+        } catch (NoSuchObjectException e) {
+            return Optional.empty();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Optional<T> retrieveOne(Query<T> query, QueryOptions options) {
+        try {
+            T object = (T)context.getMode().copyManagedBitemporal(context, (Bitemporal)backbone.retrieve(query, options).uniqueResult());
+            return Optional.of(object);
+        } catch (NoSuchObjectException e) {
+            return Optional.empty();
+        }
     }
 
 }

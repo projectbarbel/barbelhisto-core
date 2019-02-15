@@ -1,13 +1,11 @@
 package com.projectbarbel.histo.functions;
 
 import java.nio.charset.Charset;
-import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.googlecode.cqengine.persistence.support.serialization.PojoSerializer;
 import com.projectbarbel.histo.BarbelHistoContext;
 import com.projectbarbel.histo.BarbelMode;
@@ -18,13 +16,13 @@ public class SimpleGsonPojoSerializer implements PojoSerializer<Bitemporal> {
 
     private static final String UTF_8 = "UTF-8";
 
-    private Gson gson = new GsonBuilder().registerTypeAdapter(ZonedDateTime.class, BarbelHistoContext.ZDT_DESERIALIZER)
-            .registerTypeAdapter(ZonedDateTime.class, BarbelHistoContext.ZDT_SERIALIZER).create();
+    private Gson gson;
     private static Map<String, Class<?>> typeMap = new HashMap<>();
     private BarbelHistoContext context;
 
     public SimpleGsonPojoSerializer(BarbelHistoContext context) {
         this.context = context;
+        this.gson = context.getGson();
     }
 
     @Override

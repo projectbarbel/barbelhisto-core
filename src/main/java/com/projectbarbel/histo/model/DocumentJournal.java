@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collector;
 
 import org.apache.commons.lang3.Validate;
@@ -24,6 +25,7 @@ public final class DocumentJournal {
     private final Object id;
     private final IndexedCollection journal;
     private List<Bitemporal> lastInserts;
+    private AtomicBoolean locked = new AtomicBoolean();
     private Collector<Object, ?, ConcurrentIndexedCollection<Bitemporal>> objectToBitemporalCollection = Collector
             .of(() -> new ConcurrentIndexedCollection<Bitemporal>(), (c, e) -> c.add((Bitemporal) e), (r1, r2) -> {
                 r1.addAll(r2);
@@ -106,6 +108,14 @@ public final class DocumentJournal {
         return new JournalReader(this, BarbelHistoContext.getDefaultClock());
     }
 
+    public boolean lockAcquired() {
+        return locked.compareAndSet(false, true);
+    }
+
+    public boolean unlock() {
+        return locked.compareAndSet(true, false);
+    }
+    
     public static class JournalReader {
         private DocumentJournal journal;
 
@@ -115,10 +125,6 @@ public final class DocumentJournal {
 
         public EffectiveReader effectiveTime() {
             return new EffectiveReader(journal);
-        }
-
-        public RecordtimeReader recordTime() {
-            return new RecordtimeReader(journal);
         }
 
         @SuppressWarnings("unchecked")
@@ -182,17 +188,6 @@ public final class DocumentJournal {
                     .retrieve(BarbelQueries.effectiveBetween(journal.id, period),
                             queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM))))
                     .stream().collect(journal.objectToBitemporalCollection);
-        }
-
-    }
-
-    public static class RecordtimeReader {
-
-        @SuppressWarnings("unused")
-        private DocumentJournal journal;
-
-        public RecordtimeReader(DocumentJournal journal) {
-            this.journal = journal;
         }
 
     }

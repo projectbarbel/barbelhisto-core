@@ -34,6 +34,8 @@ public abstract class BarbelMode {
     public static BarbelMode POJO = new PojoMode();
     public static BarbelMode BITEMPORAL = new BitemporalMode();
 
+    public abstract <T> T drawMaiden(BarbelHistoContext context, T object);
+
     public abstract Bitemporal snapshotManagedBitemporal(BarbelHistoContext context, Bitemporal sourceBitemporal,
             BitemporalStamp stamp);
 
@@ -79,8 +81,9 @@ public abstract class BarbelMode {
 
         @Override
         public Bitemporal snapshotMaiden(BarbelHistoContext context, Object pojo, BitemporalStamp stamp) {
-            Validate.isTrue(!(pojo instanceof BarbelProxy), "pojo must not be instance of BarbelProxy");
             Validate.isTrue(!Enhancer.isEnhanced(pojo.getClass()), "pojo must not be CGI proxy type");
+            if (pojo instanceof BarbelProxy)
+                pojo = ((BarbelProxy)pojo).getTarget();
             Object copy = context.getPojoCopyFunction().apply(pojo);
             Object proxy = context.getPojoProxyingFunction().apply(copy, stamp);
             return (Bitemporal) proxy;
@@ -141,6 +144,12 @@ public abstract class BarbelMode {
                     "BitemporalVersion cannot be used in BarbelMode.POJO - set BarbelMode.BITEMPORAL and try again");
             Validate.isTrue(FieldUtils.getFieldsListWithAnnotation(objectType, DocumentId.class).size()==1, "don't forget to add @DocumentId to the document id attribute to the pojo you want to manage");
             return true;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public <T> T drawMaiden(BarbelHistoContext context, T object) {
+            return (object instanceof BarbelProxy) ? (T)((BarbelProxy)object).getTarget() : object;
         }
 
     }
@@ -209,6 +218,11 @@ public abstract class BarbelMode {
             Validate.isTrue(Bitemporal.class.isAssignableFrom(objectType), "don't forget to implement Bitemporal.class interface on the type you want to manage when in mode BarbelMode.BITEMPORAL");
             return true;
        }
+
+        @Override
+        public <T> T drawMaiden(BarbelHistoContext context, T object) {
+            return object;
+        }
 
     }
 

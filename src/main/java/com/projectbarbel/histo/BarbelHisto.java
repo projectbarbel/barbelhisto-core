@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import com.googlecode.cqengine.persistence.disk.DiskPersistence;
 import com.googlecode.cqengine.persistence.offheap.OffHeapPersistence;
@@ -40,6 +41,10 @@ public interface BarbelHisto<T> {
 
     List<T> retrieve(Query<T> query, QueryOptions options);
 
+    Optional<T> retrieveOne(Query<T> query);
+    
+    Optional<T> retrieveOne(Query<T> query, QueryOptions options);
+    
     DocumentJournal timeshift(Object id, LocalDateTime time);
     
     String prettyPrintJournal(Object id);
