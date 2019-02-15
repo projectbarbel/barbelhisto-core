@@ -37,29 +37,59 @@ This library enables you to store your data in a format that enables you to answ
 - pretty print function to learn about bitemporal data storage
 
 # Two minutes tutorial
-
+## Create an instance of BarbelHisto
 Create an instance of `BarbelHisto`.
 ```java
-BarbelHisto<Person> core = BarbelHistoBuilder.barbel().build();
+BarbelHisto<Employee> core = BarbelHistoBuilder.barbel().build();
 ```
 Notice that, when you're using Pojos, they need to be regular [JavaBeans](https://docs.oracle.com/javase/8/docs/technotes/guides/beans/index.html). Behind the scenes `BarbelHisto` will create proxies for Pojos and make copies to protect the state of your object.
-You're ready to store instances of `Person` to your `BarbelHisto` instance.
+
+## Store and retrieve one versions
+You're ready to store instances of `Employee` to your `BarbelHisto` instance.
 ```java
-Person person = new Person("someId", "Bruce", "Willis");
-core.save(person, LocalDate.now(), LocalDate.MAX);
+Employee employee = new Employee("somePersonelNumber", "Niklas", "Schlimm");
+core.save(employee, LocalDate.now(), LocalDate.MAX);
 ```
-In the `Person.class` you need to specify the `@DocumentId` so that `BarbelHisto`can group versions to a document.
+In the `Employee.class` you need to specify the `@DocumentId` so that `BarbelHisto`can group versions to a document.
 ```java
 @DocumentId
-private String id; 
+private String personnelNumber; 
 ```
-If you want to retrieve your `Person`, you can do that by calling `retrieveOne`on `BarbelHisto`.
+If you want to retrieve your `Employee`, you can do that by calling `retrieveOne`on `BarbelHisto`.
 ```java
-Optional<Person> retrievedPerson = core.retrieveOne(BarbelQueries.effectiveNow(person.getId()));
+Optional<Employee> effectiveNowOptional = core.retrieveOne(BarbelQueries.effectiveNow(employee.getId()));
 ```
-Notice that you need to tell `BarbelHisto` what effective date your looking for. In the query above you're looking for the `Person` version effective today. You can also ask for a specific date in the past or in the future.
+Notice that you need to tell `BarbelHisto` what effective date your looking for. In the query above you're looking for the `Employee` version effective today. You can also ask for a specific date in the past or in the future.
 ```java
-Optional<Person> retrieveEffectiveIn10Days = core.retrieveOne(BarbelQueries.effectiveAt(person.id, LocalDate.now().plusDays(10)));
+Optional<Employee> effectiveIn10DaysOptional = core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().plusDays(10)));
 ```
-That query retrieves the `Person` version effective in to days. It will return one, cause you've stored the `Person` version to be effective from now to infinite (`LocalDate.MAX'). If you retrieve the `Person` effective yesterday you'll receive an empty `Optional`.
+That query retrieves the `Employee` version effective in to days. It will return one, cause you've stored the `Employee` version to be effective from now to infinite (`LocalDate.MAX`). If you retrieve the `Employee` effective yesterday you'll receive an empty `Optional` instead.
 ```java
+Optional<Employee> effectiveYesterdayOptional = core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().minusDays(1)));
+assertFalse(effectiveYesterdayOptional.isPresent());
+```
+Let's look at the pretty print of the journal. GThat shows what `BarbelHisto` knows about your version.
+```
+|Version-ID                              |Effective-From |Effective-Until |State   |Created-By           |Created-At                                   |Inactivated-By       |Inactivated-At                               |Data                           |
+|----------------------------------------|---------------|----------------|--------|---------------------|---------------------------------------------|---------------------|---------------------------------------------|-------------------------------|
+|226ab05c-7c2d-4746-8861-18dc85a0188e    |2019-02-15     |999999999-12-31 |ACTIVE  |SYSTEM               |2019-02-15T08:46:56.495+01:00[Europe/Berlin] |NOBODY               |2199-12-31T23:59:00Z                         |EffectivePeriod [from=2019-02- |
+```
+
+## Store and retrieve two versions
+So far you know how to store pojos to `BarbelHisto`. The real power of `BarbelHisto` is, however, to store changes to your `Employee` that become effective in the future (or became effective in the past). Here is how that works.
+Let's retrieve our current employee version again.
+```java
+Optional<Employee> effectiveNowOptional = core.retrieveOne(BarbelQueries.effectiveNow(employee.getId()));
+```
+Now suppose that employee marries in 10 days, and that is supposed to become the day when the last name has to change.
+```java
+Employee effectiveEmployeeVersion = effectiveNowOptional.get();
+effectiveEmployeeVersion.setLastname("changedLastName");
+```
+And store that version into `BarbelHisto` to become effective in 10 days.
+```java
+core.save(effectiveEmployeeVersion, LocalDate.now().plusDays(10), LocalDate.MAX);
+```
+Done. `BarbelHisto` now knows aboiut that change.
+```
+```
