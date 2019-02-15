@@ -42,7 +42,7 @@ Download the [actual snapshot releases](https://github.com/projectbarbel/barbelh
 Or clone this git repository to try some of the features of `BarbelHisto`.
 
 # Two minutes tutorial
-[See this test case](https://github.com/projectbarbel/barbelhisto-core/blob/master/src/test/java/com/projectbarbel/histo/BarbelHistoCore_StdPojoUsage_Test.java) to get the complete code for this tutorial.
+[See this test case](https://github.com/projectbarbel/barbelhisto-core/blob/master/src/test/java/org/projectbarbel/histo/BarbelHistoCore_StdPojoUsage_Test.java) to get the complete code for this tutorial.
 
 ## Create an instance of BarbelHisto
 Create an instance of `BarbelHisto`.
