@@ -1,8 +1,6 @@
 package com.projectbarbel.histo;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
@@ -13,10 +11,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import com.projectbarbel.histo.model.Bitemporal;
-
-import io.github.benas.randombeans.api.EnhancedRandom;
-
 public class BarbelHistoCore_StdPojoUsage_Test {
 
     @BeforeAll
@@ -24,25 +18,6 @@ public class BarbelHistoCore_StdPojoUsage_Test {
         BarbelHistoContext.getDefaultClock().useSystemDefaultZoneClock();
     }
 
-    @Test
-    public void testSave() {
-        BarbelHisto<Employee> core = BarbelHistoBuilder.barbel().build();
-        core.save(EnhancedRandom.random(Employee.class), LocalDate.now(), LocalDate.MAX);
-    }
-    
-    @Test
-    public void testRetrieve() {
-        BarbelHisto<Employee> core = BarbelHistoBuilder.barbel().build();
-        Employee person = new Employee("someId", "Niklas", "Schlimm");
-        core.save(person, LocalDate.now(), LocalDate.MAX);
-        Optional<Employee> retrievedPerson = core.retrieveOne(BarbelQueries.effectiveNow(person.getId()));
-        assertEquals(person.getId(), retrievedPerson.get().getId());
-        Bitemporal bitemporal = (Bitemporal)retrievedPerson.get();
-        assertNotNull(bitemporal.getBitemporalStamp());
-        Optional<Employee> retrievedPersonEffectiveYesterday = core.retrieveOne(BarbelQueries.effectiveAt(person.getId(), LocalDate.now().minusDays(1)));
-        assertEquals(retrievedPersonEffectiveYesterday, Optional.empty());
-    }
-    
     @Test
     public void testSaveTwoAndViewJournal() {
         
