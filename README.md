@@ -39,6 +39,8 @@ This library enables you to store your data in a format that enables you to answ
 Download the [actual snapshot releases](https://github.com/projectbarbel/barbelhisto-core/releases). Maven will follow as soon Version 1.0 is released.
 
 # Two minutes tutorial
+[See this test case](https://github.com/projectbarbel/barbelhisto-core/blob/master/src/test/java/com/projectbarbel/histo/BarbelHistoCore_StdPojoUsage_Test.java) to get the complete code for this tutorial.
+
 ## Create an instance of BarbelHisto
 Create an instance of `BarbelHisto`.
 ```java
