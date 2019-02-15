@@ -38,6 +38,13 @@ import com.googlecode.cqengine.query.option.QueryOptions;
 import com.googlecode.cqengine.resultset.ResultSet;
 import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
 
+/**
+ * The core component of {@link BarbelHisto}.
+ * 
+ * @author Niklas Schlimm
+ *
+ * @param <T> the business object type to manage
+ */
 public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 
     public final static ThreadLocal<BarbelHistoContext> CONSTRUCTION_CONTEXT = new ThreadLocal<BarbelHistoContext>();
@@ -182,6 +189,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     @Override
     public DocumentJournal timeshift(Object id, LocalDateTime time) {
         Validate.isTrue(id != null && time!=null, NOTNULL);
+        Validate.isTrue(time.isBefore(context.getClock().now().toLocalDateTime()));
         ResultSet<T> result = backbone.retrieve(BarbelQueries.journalAt(id, time));
         return DocumentJournal
                 .create(ProcessingState.EXTERNAL, context, result.stream().map(d -> context.getMode().copyManagedBitemporal(context, (Bitemporal) d))

@@ -34,112 +34,119 @@ import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.persistence.support.serialization.PojoSerializer;
 
+/**
+ * Delivers the configuration set by {@link BarbelHistoBuilder} to the
+ * application components.
+ * 
+ * @author Niklas Schlimm
+ *
+ */
 public interface BarbelHistoContext {
 
-    public static final String SYSTEM = "SYSTEM";
-    public static final String SYSTEMACTIVITY = "SYSTEMACTIVITY";
-    public static final Systemclock CLOCK = new Systemclock();
-    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
-    
-    public static final JsonDeserializer<ZonedDateTime> ZDT_DESERIALIZER = new JsonDeserializer<ZonedDateTime>() {
-        @Override
-        public ZonedDateTime deserialize(final JsonElement json, final Type typeOfT,
-                final JsonDeserializationContext context) throws JsonParseException {
-            return DATE_FORMATTER.parse(json.getAsString(), ZonedDateTime::from);
-        }
-    };
-    
-    public static final JsonSerializer<ZonedDateTime> ZDT_SERIALIZER = new JsonSerializer<ZonedDateTime>() {
-        public JsonElement serialize(ZonedDateTime src, Type typeOfSrc, JsonSerializationContext context) {
-            return new JsonPrimitive(DATE_FORMATTER.format(src));
-        }
-    };
+	public static final String SYSTEM = "SYSTEM";
+	public static final String SYSTEMACTIVITY = "SYSTEMACTIVITY";
+	public static final Systemclock CLOCK = new Systemclock();
+	public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
 
-    static <T> Supplier<IndexedCollection<T>> getDefaultBackbone() {
-        return () -> new ConcurrentIndexedCollection<T>();
-    }
+	public static final JsonDeserializer<ZonedDateTime> ZDT_DESERIALIZER = new JsonDeserializer<ZonedDateTime>() {
+		@Override
+		public ZonedDateTime deserialize(final JsonElement json, final Type typeOfT,
+				final JsonDeserializationContext context) throws JsonParseException {
+			return DATE_FORMATTER.parse(json.getAsString(), ZonedDateTime::from);
+		}
+	};
 
-    static Function<BarbelHistoContext, PojoSerializer<Bitemporal>> getDefaultPersistenceSerializerProducer() {
-        return (c) -> new SimpleGsonPojoSerializer(BarbelHistoBuilder.barbel());
-    }
+	public static final JsonSerializer<ZonedDateTime> ZDT_SERIALIZER = new JsonSerializer<ZonedDateTime>() {
+		public JsonElement serialize(ZonedDateTime src, Type typeOfSrc, JsonSerializationContext context) {
+			return new JsonPrimitive(DATE_FORMATTER.format(src));
+		}
+	};
 
-    static Function<List<Bitemporal>, String> getDefaultPrettyPrinter() {
-        return new DefaultPrettyPrinter();
-    }
+	static <T> Supplier<IndexedCollection<T>> getDefaultBackbone() {
+		return () -> new ConcurrentIndexedCollection<T>();
+	}
 
-    static IndexedCollection<UpdateLogRecord> getDefaultUpdateLog() {
-        return new ConcurrentIndexedCollection<BarbelHistoCore.UpdateLogRecord>();
-    }
+	static Function<BarbelHistoContext, PojoSerializer<Bitemporal>> getDefaultPersistenceSerializerProducer() {
+		return (c) -> new SimpleGsonPojoSerializer(BarbelHistoBuilder.barbel());
+	}
 
-    static BarbelMode getDefaultBarbelMode() {
-        return BarbelMode.POJO;
-    }
+	static Function<List<Bitemporal>, String> getDefaultPrettyPrinter() {
+		return new DefaultPrettyPrinter();
+	}
 
-    static String getDefaultActivity() {
-        return SYSTEMACTIVITY;
-    }
+	static IndexedCollection<UpdateLogRecord> getDefaultUpdateLog() {
+		return new ConcurrentIndexedCollection<BarbelHistoCore.UpdateLogRecord>();
+	}
 
-    static LocalDate getInfiniteDate() {
-        return LocalDate.MAX;
-    }
+	static BarbelMode getDefaultBarbelMode() {
+		return BarbelMode.POJO;
+	}
 
-    static Systemclock getDefaultClock() {
-        return CLOCK;
-    }
+	static String getDefaultActivity() {
+		return SYSTEMACTIVITY;
+	}
 
-    static Supplier<Object> getDefaultDocumentIDGenerator() {
-        return new DefaultIDGenerator();
-    }
+	static LocalDate getInfiniteDate() {
+		return LocalDate.MAX;
+	}
 
-    static Supplier<Object> getDefaultVersionIDGenerator() {
-        return new DefaultIDGenerator();
-    }
+	static Systemclock getDefaultClock() {
+		return CLOCK;
+	}
 
-    static String getDefaultUser() {
-        return SYSTEM;
-    }
+	static Supplier<Object> getDefaultDocumentIDGenerator() {
+		return new DefaultIDGenerator();
+	}
 
-    static BiFunction<Object, BitemporalStamp, Object> getDefaultProxyingFunction() {
-        return new DefaultProxyingFunction();
-    }
+	static Supplier<Object> getDefaultVersionIDGenerator() {
+		return new DefaultIDGenerator();
+	}
 
-    static Gson getDefaultGson() {
-        return new GsonBuilder().registerTypeAdapter(ZonedDateTime.class, ZDT_DESERIALIZER)
-                .registerTypeAdapter(ZonedDateTime.class, ZDT_SERIALIZER).create();
-    }
+	static String getDefaultUser() {
+		return SYSTEM;
+	}
 
-    static Function<Object, Object> getDefaultCopyFunction() {
-        return new DefaultPojoCopier();
-    }
+	static BiFunction<Object, BitemporalStamp, Object> getDefaultProxyingFunction() {
+		return new DefaultProxyingFunction();
+	}
 
-    Supplier<Object> getDocumentIdGenerator();
+	static Gson getDefaultGson() {
+		return new GsonBuilder().registerTypeAdapter(ZonedDateTime.class, ZDT_DESERIALIZER)
+				.registerTypeAdapter(ZonedDateTime.class, ZDT_SERIALIZER).create();
+	}
 
-    Supplier<Object> getVersionIdGenerator();
+	static Function<Object, Object> getDefaultCopyFunction() {
+		return new DefaultPojoCopier();
+	}
 
-    <T> Supplier<IndexedCollection<T>> getBackboneSupplier();
+	Supplier<Object> getDocumentIdGenerator();
 
-    String getActivity();
+	Supplier<Object> getVersionIdGenerator();
 
-    String getUser();
+	<T> Supplier<IndexedCollection<T>> getBackboneSupplier();
 
-    Map<Object, DocumentJournal> getJournalStore();
+	String getActivity();
 
-    BiFunction<Object, BitemporalStamp, Object> getPojoProxyingFunction();
+	String getUser();
 
-    Function<Object, Object> getPojoCopyFunction();
+	Map<Object, DocumentJournal> getJournalStore();
 
-    Gson getGson();
+	BiFunction<Object, BitemporalStamp, Object> getPojoProxyingFunction();
 
-    Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> getJournalUpdateStrategyProducer();
+	Function<Object, Object> getPojoCopyFunction();
 
-    BarbelMode getMode();
+	Gson getGson();
 
-    Systemclock getClock();
+	Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> getJournalUpdateStrategyProducer();
 
-    IndexedCollection<UpdateLogRecord> getUpdateLog();
+	BarbelMode getMode();
 
-    Function<List<Bitemporal>, String> getPrettyPrinter();
-    
-    Function<BarbelHistoContext, PojoSerializer<Bitemporal>> getPersistenceSerializerProducer();
+	Systemclock getClock();
+
+	IndexedCollection<UpdateLogRecord> getUpdateLog();
+
+	Function<List<Bitemporal>, String> getPrettyPrinter();
+
+	Function<BarbelHistoContext, PojoSerializer<Bitemporal>> getPersistenceSerializerProducer();
 
 }
