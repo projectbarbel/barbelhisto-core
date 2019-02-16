@@ -49,7 +49,6 @@ Create an instance of `BarbelHisto`.
 ```java
 BarbelHisto<Employee> core = BarbelHistoBuilder.barbel().build();
 ```
-Notice that, when you're using Pojos, they need to be regular [JavaBeans](https://docs.oracle.com/javase/8/docs/technotes/guides/beans/index.html). Behind the scenes `BarbelHisto` will create proxies for Pojos and make copies to protect the state of your object.
 
 ## Store and retrieve a version
 You're ready to store instances of `Employee` to your `BarbelHisto` instance.

@@ -8,21 +8,22 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.provider.Arguments;
 import org.projectbarbel.histo.BarbelHistoCore.DumpMode;
-import org.projectbarbel.histo.functions.BarbelPojoSerializer;
 import org.projectbarbel.histo.model.Bitemporal;
+import org.projectbarbel.histo.pojos.ComplexFieldsPrivatePojoPartialContructor;
+import org.projectbarbel.histo.pojos.ComplexFieldsPrivatePojoPartialContructorWithComplexType;
+import org.projectbarbel.histo.pojos.NoPrimitivePrivatePojoPartialContructor;
+import org.projectbarbel.histo.pojos.PrimitivePrivatePojo;
+import org.projectbarbel.histo.pojos.PrimitivePrivatePojoPartialContructor;
 
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.attribute.SimpleAttribute;
 import com.googlecode.cqengine.persistence.disk.DiskPersistence;
-import com.googlecode.cqengine.persistence.support.serialization.PersistenceConfig;
 import com.googlecode.cqengine.query.option.QueryOptions;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
@@ -182,90 +183,4 @@ public class BarbelHistoCore_CQPersistence_Test {
         assertEquals(0, core.retrieve(BarbelQueries.all()).stream().count());
     }
     
-    @SuppressWarnings("unused")
-    @PersistenceConfig(serializer=BarbelPojoSerializer.class)
-    public static class PrimitivePrivatePojo {
-        @DocumentId
-        private String id;
-        private boolean someBoolean;
-        private byte somByte;
-        private short someShort;
-        private char someChar;
-        private int someInt;
-        private float someFloat;
-        private long someLong;
-        private double someDouble;
-    }
-
-    @SuppressWarnings("unused")
-    @PersistenceConfig(serializer=BarbelPojoSerializer.class)
-    public static class PrimitivePrivatePojoPartialContructor {
-        @DocumentId
-        private String id;
-        private boolean someBoolean;
-        private byte somByte;
-        private short someShort;
-        private char someChar;
-        private int someInt;
-        private float someFloat;
-        private long someLong;
-        private double someDouble;
-
-        public PrimitivePrivatePojoPartialContructor(String id, boolean someBoolean, char someChar, float someFloat,
-                double someDouble) {
-            super();
-            this.id = id;
-            this.someBoolean = someBoolean;
-            this.someChar = someChar;
-            this.someFloat = someFloat;
-            this.someDouble = someDouble;
-        }
-    }
-
-    @SuppressWarnings("unused")
-    @PersistenceConfig(serializer=BarbelPojoSerializer.class)
-    public static class NoPrimitivePrivatePojoPartialContructor {
-        @DocumentId
-        private String id;
-        private boolean someBoolean;
-        private byte somByte;
-        private short someShort;
-        private char someChar;
-        private int someInt;
-        private float someFloat;
-        private long someLong;
-        private double someDouble;
-
-        public NoPrimitivePrivatePojoPartialContructor(String id) {
-            this.id = id;
-        }
-    }
-
-    @SuppressWarnings("unused")
-    @PersistenceConfig(serializer=BarbelPojoSerializer.class)
-    public static class ComplexFieldsPrivatePojoPartialContructor {
-        @DocumentId
-        private String id;
-        private List<String> stringList;
-        private Map<String, NoPrimitivePrivatePojoPartialContructor> someMap;
-
-        public ComplexFieldsPrivatePojoPartialContructor(String id) {
-            this.id = id;
-        }
-    }
-
-    @SuppressWarnings("unused")
-    @PersistenceConfig(serializer=BarbelPojoSerializer.class)
-    public static class ComplexFieldsPrivatePojoPartialContructorWithComplexType {
-        @DocumentId
-        private String id;
-        private List<String> stringList;
-        private Map<String, NoPrimitivePrivatePojoPartialContructor> someMap;
-
-        public ComplexFieldsPrivatePojoPartialContructorWithComplexType(
-                Map<String, NoPrimitivePrivatePojoPartialContructor> someMap) {
-            this.someMap = someMap;
-        }
-    }
-
 }

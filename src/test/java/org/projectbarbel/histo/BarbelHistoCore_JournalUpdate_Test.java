@@ -18,8 +18,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.projectbarbel.histo.DocumentJournal.ProcessingState;
-import org.projectbarbel.histo.functions.DefaultJournalUpdateStrategy;
-import org.projectbarbel.histo.functions.DefaultJournalUpdateStrategy.JournalUpdateCase;
+import org.projectbarbel.histo.functions.EbeddingJournalUpdateStrategy;
+import org.projectbarbel.histo.functions.EbeddingJournalUpdateStrategy.JournalUpdateCase;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalObjectState;
 import org.projectbarbel.histo.model.BitemporalStamp;
@@ -49,7 +49,7 @@ public class BarbelHistoCore_JournalUpdate_Test {
 								LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))),
 						"someId");
 		assertThrows(IllegalArgumentException.class,
-				() -> new DefaultJournalUpdateStrategy(context).accept(journal, bitemporal));
+				() -> new EbeddingJournalUpdateStrategy(context).accept(journal, bitemporal));
 	}
 
 	// @formatter:off
@@ -141,7 +141,7 @@ public class BarbelHistoCore_JournalUpdate_Test {
 		update.setData("some data");
 		Bitemporal bitemporal = context.getMode().snapshotMaiden(context, update,
 				BitemporalStamp.createActive(context, "someId", EffectivePeriod.of(from, until)));
-		DefaultJournalUpdateStrategy updateStrategy = new DefaultJournalUpdateStrategy(context);
+		EbeddingJournalUpdateStrategy updateStrategy = new EbeddingJournalUpdateStrategy(context);
 		updateStrategy.accept(journal, bitemporal);
 		return new UpdateReturn(journal.getLastInsert(), bitemporal, updateStrategy);
 	}
@@ -169,7 +169,7 @@ public class BarbelHistoCore_JournalUpdate_Test {
 		Bitemporal bitemporal = BarbelMode.BITEMPORAL.snapshotMaiden(context, doc,
 				BitemporalStamp.createActive(context, "someId", EffectivePeriod.of(from, until)));
 
-		DefaultJournalUpdateStrategy function = new DefaultJournalUpdateStrategy(context);
+		EbeddingJournalUpdateStrategy function = new EbeddingJournalUpdateStrategy(context);
 		function.accept(journal, bitemporal);
 		List<Bitemporal> list = journal.getLastInsert();
 		return new UpdateReturn(list, bitemporal, function);
@@ -213,10 +213,10 @@ public class BarbelHistoCore_JournalUpdate_Test {
 	private static class UpdateReturn {
 		public List<Bitemporal> newVersions;
 		public Bitemporal bitemporal;
-		public DefaultJournalUpdateStrategy function;
+		public EbeddingJournalUpdateStrategy function;
 
 		public UpdateReturn(List<Bitemporal> newVersions, Bitemporal bitemporal,
-				DefaultJournalUpdateStrategy function) {
+				EbeddingJournalUpdateStrategy function) {
 			super();
 			this.newVersions = newVersions;
 			this.bitemporal = bitemporal;

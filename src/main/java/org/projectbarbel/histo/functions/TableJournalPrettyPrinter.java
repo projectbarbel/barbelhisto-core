@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.projectbarbel.histo.model.Bitemporal;
 
-public class DefaultPrettyPrinter implements Function<List<Bitemporal>, String> {
+public class TableJournalPrettyPrinter implements Function<List<Bitemporal>, String> {
 
     // @formatter:off
     public String prettyPrint(List<Bitemporal> objects, Object id, Function<Bitemporal, String> customField) {

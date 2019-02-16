@@ -35,9 +35,9 @@ import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
  * become effective <br>
  * - <b>record time</b> is when that change was recorded in the system <br>
  * <br>
- * Two {@link BarbelMode}s can be used to manage different types ob objects:
- * {@link BarbelMode#POJO} is the default mode and allows to manage Pojos
- * anotated with {@link DocumentId} on the objects primary key. An example:
+ * Two {@link BarbelMode}s can be used to manage different types of objects:
+ * {@link BarbelMode#POJO} is the default mode and allows to manage POJOs
+ * annotated with {@link DocumentId} on the objects primary key. An example:
  * 
  * <pre>
  * public class SomeBusinessPojo {
@@ -50,11 +50,11 @@ import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
  * }
  * </pre>
  * 
- * The primary key should be business oriented, i.e. personel number, contract
- * numer. Of course, using pojo mode is the easiest way forward. However, behind
- * the scenes {@link BarbelHisto} uses proxying when managing pojos to store the
+ * The primary key should be business oriented, i.e. personnel number, contract
+ * number. Of course, using POJO mode is the easiest way forward. However, behind
+ * the scenes {@link BarbelHisto} uses proxying when managing POJOs to store the
  * version data with the objects that clients save. Proxying can become
- * complicated in situations where no default contsructors are available, or
+ * complicated in situations where no default constructors are available, or
  * access to fields does not follow JavaBeans standard. For that reason there is
  * another mode called {@link BarbelMode#BITEMPORAL}. One can change the mode to
  * {@link BarbelMode#BITEMPORAL} with the
@@ -105,7 +105,7 @@ import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
  * </pre>
  * 
  * The id entered in queries is the document id of the business object. In
- * {@link BarbelMode#POJO} it is the id annotated mit {@link DocumentId} like
+ * {@link BarbelMode#POJO} it is the id annotated with {@link DocumentId} like
  * described previously. In {@link BarbelMode#BITEMPORAL} clients access the id
  * by calling
  * <code>SomeBusinessType.getBitemporalStamp().getDocumentId()</code>. <br>
@@ -117,13 +117,13 @@ import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
  * of journals and what it means to manage bitemporal data in technical terms.
  * <br>
  * <br>
- * Clients that use custim data stores like MongoDB or any other of the type
+ * Clients that use custom data stores like MongoDB or any other of the type
  * should call {@link BarbelHisto#dump(DumpMode)} after processing data with
  * {@link BarbelHisto}. To restore the journal later to continue processing
  * bitemporal data use {@link BarbelHisto#populate(Collection)}. <br>
  * <br>
  * Use {@link #timeshift(Object, LocalDateTime)} to turn back time an see how
- * document journals looked like in the past. Timeshift is one of the core
+ * document journals looked like in the past. Time shift is one of the core
  * functionalities of {@link BarbelHisto}. Clients can turn back time to see how
  * the document journals for a document Id looked like at that given time. This
  * knowledge is mission critical for many businesses. Notice that this method
@@ -143,10 +143,10 @@ import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
  * 
  * In this example three weeks ago on Jan, 9th 2019 that adress change in
  * question was not recorded to the system. If you turn back time to Jan, 9th
- * 2019 that journal returned by timeshift would only contain the effective
+ * 2019 that journal returned by time shift would only contain the effective
  * period A. These cases can get more complex obviously the more updates are
- * postet for a given document Id. Use
- * {@link BarbelHisto#prettyPrintJournal(Object)} to get more fimiliar with
+ * posted for a given document Id. Use
+ * {@link BarbelHisto#prettyPrintJournal(Object)} to get more familiar with
  * effective periods and record time. <br>
  * <br>
  * <br>

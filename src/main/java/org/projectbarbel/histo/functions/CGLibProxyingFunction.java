@@ -16,7 +16,7 @@ import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
-public class DefaultProxyingFunction implements BiFunction<Object, BitemporalStamp, Object> {
+public class CGLibProxyingFunction implements BiFunction<Object, BitemporalStamp, Object> {
 
     public static class Interceptor implements MethodInterceptor {
 

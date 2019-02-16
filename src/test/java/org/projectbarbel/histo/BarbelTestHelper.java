@@ -13,7 +13,7 @@ import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 import org.javers.common.collections.Arrays;
-import org.projectbarbel.histo.functions.DefaultIDGenerator;
+import org.projectbarbel.histo.functions.UUIDGenerator;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.DefaultDocument;
 import org.projectbarbel.histo.model.DefaultPojo;
@@ -60,7 +60,7 @@ public class BarbelTestHelper {
 
                     @Override
                     public Object get() {
-                        return new DefaultIDGenerator().get();
+                        return new UUIDGenerator().get();
                     }
                 })
           .randomize(new FieldDefinition<BitemporalStamp, Object>("documentId", Object.class,
@@ -68,7 +68,7 @@ public class BarbelTestHelper {
 
                             @Override
                             public Object get() {
-                                return new DefaultIDGenerator().get();
+                                return new UUIDGenerator().get();
                             }
                         })
                 .build().nextObject(clazz, excludedFields);

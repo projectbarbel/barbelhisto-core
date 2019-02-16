@@ -10,9 +10,9 @@ import org.projectbarbel.histo.model.DefaultPojo;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
-public class DefaultProxyingFunctionTest {
+public class CGLibProxyingFunctionTest {
 
-    private DefaultProxyingFunction proxying = new DefaultProxyingFunction();
+    private CGLibProxyingFunction proxying = new CGLibProxyingFunction();
     
     @Test
     public void testApply_setBitemporal() throws Exception {

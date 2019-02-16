@@ -17,9 +17,6 @@ import java.lang.annotation.RetentionPolicy;
  *    }
  * }
  * </pre>
- * 
- * Pojos must adhere to the JavaBeans specification. In short: they should have
- * accessor methods to all their fields and implement a default constructor.<br>
  * <br>
  * 
  * @author Niklas Schlimm

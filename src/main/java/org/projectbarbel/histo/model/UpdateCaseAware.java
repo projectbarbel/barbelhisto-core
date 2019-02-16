@@ -1,6 +1,6 @@
 package org.projectbarbel.histo.model;
 
-import org.projectbarbel.histo.functions.DefaultJournalUpdateStrategy.JournalUpdateCase;
+import org.projectbarbel.histo.functions.EbeddingJournalUpdateStrategy.JournalUpdateCase;
 
 public interface UpdateCaseAware {
     JournalUpdateCase getActualCase();

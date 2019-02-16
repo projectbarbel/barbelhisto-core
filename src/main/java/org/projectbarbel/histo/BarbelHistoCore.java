@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
 import org.projectbarbel.histo.DocumentJournal.ProcessingState;
-import org.projectbarbel.histo.functions.DefaultJournalUpdateStrategy.JournalUpdateCase;
+import org.projectbarbel.histo.functions.EbeddingJournalUpdateStrategy.JournalUpdateCase;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.EffectivePeriod;

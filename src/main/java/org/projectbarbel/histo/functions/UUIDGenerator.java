@@ -3,10 +3,10 @@ package org.projectbarbel.histo.functions;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public class DefaultIDGenerator implements Supplier<Object> {
+public class UUIDGenerator implements Supplier<Object> {
 
     public static Object generateId() {
-        return new DefaultIDGenerator().get();
+        return new UUIDGenerator().get();
     }
     
     @Override

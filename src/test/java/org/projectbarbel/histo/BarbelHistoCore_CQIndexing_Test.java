@@ -2,14 +2,11 @@ package org.projectbarbel.histo;
 
 import static com.googlecode.cqengine.query.QueryFactory.equal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,6 +14,11 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.projectbarbel.histo.BarbelHistoCore.DumpMode;
 import org.projectbarbel.histo.model.Bitemporal;
+import org.projectbarbel.histo.pojos.ComplexFieldsPrivatePojoPartialContructor;
+import org.projectbarbel.histo.pojos.ComplexFieldsPrivatePojoPartialContructorWithComplexType;
+import org.projectbarbel.histo.pojos.NoPrimitivePrivatePojoPartialContructor;
+import org.projectbarbel.histo.pojos.PrimitivePrivatePojo;
+import org.projectbarbel.histo.pojos.PrimitivePrivatePojoPartialContructor;
 
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
@@ -62,94 +64,13 @@ public class BarbelHistoCore_CQIndexing_Test {
         assertEquals(3, core.retrieve(BarbelQueries.all()).stream().count());
         Bitemporal object = (Bitemporal)core.retrieve(BarbelQueries.all()).stream().findFirst().get();
         Bitemporal byPK = (Bitemporal)core.retrieve((Query<T>) equal(VERSION_ID_PK, (String)object.getBitemporalStamp().getVersionId())).stream().findFirst().get();
-        assertNotEquals(object, byPK);
+        assertEquals(object, byPK);
         assertEquals(object.getBitemporalStamp(), byPK.getBitemporalStamp());
         assertNotSame(object.getBitemporalStamp(), byPK.getBitemporalStamp());
         Bitemporal record = (Bitemporal) core.retrieve(BarbelQueries.all()).stream().findFirst().get();
         assertNotNull(record.getBitemporalStamp().getDocumentId());
         core.dump(DumpMode.CLEARCOLLECTION);
         assertEquals(0, core.retrieve(BarbelQueries.all()).stream().count());
-    }
-
-    @SuppressWarnings("unused")
-    public static class PrimitivePrivatePojo {
-        @DocumentId
-        private String id;
-        private boolean someBoolean;
-        private byte somByte;
-        private short someShort;
-        private char someChar;
-        private int someInt;
-        private float someFloat;
-        private long someLong;
-        private double someDouble;
-    }
-
-    @SuppressWarnings("unused")
-    public static class PrimitivePrivatePojoPartialContructor {
-        @DocumentId
-        private String id;
-        private boolean someBoolean;
-        private byte somByte;
-        private short someShort;
-        private char someChar;
-        private int someInt;
-        private float someFloat;
-        private long someLong;
-        private double someDouble;
-
-        public PrimitivePrivatePojoPartialContructor(String id, boolean someBoolean, char someChar, float someFloat,
-                double someDouble) {
-            super();
-            this.id = id;
-            this.someBoolean = someBoolean;
-            this.someChar = someChar;
-            this.someFloat = someFloat;
-            this.someDouble = someDouble;
-        }
-    }
-
-    @SuppressWarnings("unused")
-    public static class NoPrimitivePrivatePojoPartialContructor {
-        @DocumentId
-        private String id;
-        private boolean someBoolean;
-        private byte somByte;
-        private short someShort;
-        private char someChar;
-        private int someInt;
-        private float someFloat;
-        private long someLong;
-        private double someDouble;
-
-        public NoPrimitivePrivatePojoPartialContructor(String id) {
-            this.id = id;
-        }
-    }
-
-    @SuppressWarnings("unused")
-    public static class ComplexFieldsPrivatePojoPartialContructor {
-        @DocumentId
-        private String id;
-        private List<String> stringList;
-        private Map<String, NoPrimitivePrivatePojoPartialContructor> someMap;
-
-        public ComplexFieldsPrivatePojoPartialContructor(String id) {
-            this.id = id;
-        }
-    }
-
-    @SuppressWarnings("unused")
-    public static class ComplexFieldsPrivatePojoPartialContructorWithComplexType {
-        @DocumentId
-        private String id;
-        private List<String> stringList;
-        private Map<String, NoPrimitivePrivatePojoPartialContructor> someMap;
-
-        public ComplexFieldsPrivatePojoPartialContructorWithComplexType(
-                Map<String, NoPrimitivePrivatePojoPartialContructor> someMap) {
-            this.someMap = someMap;
-        }
     }
 
 }

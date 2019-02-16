@@ -1,5 +1,6 @@
 package org.projectbarbel.histo;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,11 +11,11 @@ import java.util.function.Supplier;
 
 import org.apache.commons.lang3.Validate;
 import org.projectbarbel.histo.BarbelHistoCore.UpdateLogRecord;
-import org.projectbarbel.histo.functions.DefaultIDGenerator;
-import org.projectbarbel.histo.functions.DefaultJournalUpdateStrategy;
-import org.projectbarbel.histo.functions.DefaultPojoCopier;
-import org.projectbarbel.histo.functions.DefaultProxyingFunction;
+import org.projectbarbel.histo.functions.CGLibProxyingFunction;
+import org.projectbarbel.histo.functions.EbeddingJournalUpdateStrategy;
+import org.projectbarbel.histo.functions.SimpleGsonPojoCopier;
 import org.projectbarbel.histo.functions.SimpleGsonPojoSerializer;
+import org.projectbarbel.histo.functions.UUIDGenerator;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
 
@@ -55,12 +56,13 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 	private Gson gson = BarbelHistoContext.getDefaultGson();
 	private IndexedCollection<UpdateLogRecord> updateLog = BarbelHistoContext.getDefaultUpdateLog();
 	private Function<List<Bitemporal>, String> prettyPrinter = BarbelHistoContext.getDefaultPrettyPrinter();
+	private Map<String, Object> contextOptions = new HashMap<>();
 
 	// some more complex context types
 	private Function<BarbelHistoContext, PojoSerializer<Bitemporal>> persistenceSerializerProducer = BarbelHistoContext
 			.getDefaultPersistenceSerializerProducer();
 	private Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> journalUpdateStrategyProducer = (
-			context) -> new DefaultJournalUpdateStrategy(this);
+			context) -> new EbeddingJournalUpdateStrategy(this);
 
 	public static BarbelHistoBuilder barbel() {
 		BarbelHistoBuilder builder = new BarbelHistoBuilder();
@@ -71,9 +73,25 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 	}
 
 	public <T> BarbelHisto<T> build() {
-		if (pojoCopyFunction instanceof DefaultPojoCopier)
-			((DefaultPojoCopier) pojoCopyFunction).setGson(gson);
+		if (pojoCopyFunction instanceof SimpleGsonPojoCopier)
+			((SimpleGsonPojoCopier) pojoCopyFunction).setGson(gson);
 		return new BarbelHistoCore<T>(this);
+	}
+
+	public Map<String, Object> getContextOptions() {
+		return contextOptions;
+	}
+
+	/**
+	 * Allows to pass custom options to custom implementations of functions.
+	 * 
+	 * @param contextOptions the options map
+	 * @return the builder
+	 */
+	public BarbelHistoBuilder withContextOptions(Map<String, Object> contextOptions) {
+		Validate.isTrue(contextOptions != null, NONULLS);
+		this.contextOptions = contextOptions;
+		return this;
 	}
 
 	@Override
@@ -137,7 +155,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 
 	/**
 	 * Set the strategy how to update a journal. Core functionality usually not
-	 * customized by clients. Default is {@link DefaultJournalUpdateStrategy}.
+	 * customized by clients. Default is {@link EbeddingJournalUpdateStrategy}.
 	 * 
 	 * @param journalUpdateStrategy the custom strategy
 	 * @return the builder again
@@ -156,7 +174,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 
 	/**
 	 * Set a custom pojo copy function. Required if clients use specific pojos that
-	 * cannot be copied by {@link DefaultPojoCopier}.
+	 * cannot be copied by {@link SimpleGsonPojoCopier}.
 	 * 
 	 * @param pojoCopyFunction the custom copy function
 	 * @return the builder again
@@ -191,7 +209,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 
 	/**
 	 * Customize the proxying in {@link BarbelMode#POJO}. Default is
-	 * {@link DefaultProxyingFunction}. Clients may want to use more specific
+	 * {@link CGLibProxyingFunction}. Clients may want to use more specific
 	 * proxying functions with their pojos.
 	 * 
 	 * @param proxyingFunction the custom proxying function
@@ -268,7 +286,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 
 	/**
 	 * Client may want to implememt their own version id generator. Make sure it
-	 * will be unique. Default is {@link DefaultIDGenerator}.
+	 * will be unique. Default is {@link UUIDGenerator}.
 	 * 
 	 * @param versionIdGenerator the custom version id generator
 	 * @return the builder
@@ -281,7 +299,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 
 	/**
 	 * Clients can add a custom document Id generator here. Default is
-	 * {@link DefaultIDGenerator}. {@link BarbelMode#POJO} {@link BarbelHisto} will
+	 * {@link UUIDGenerator}. {@link BarbelMode#POJO} {@link BarbelHisto} will
 	 * expact the client to set the document id before saving the object.
 	 * 
 	 * @param documentIdGenerator the custom document id generator

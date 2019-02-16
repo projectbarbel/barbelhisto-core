@@ -12,11 +12,11 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.projectbarbel.histo.BarbelHistoCore.UpdateLogRecord;
-import org.projectbarbel.histo.functions.DefaultIDGenerator;
-import org.projectbarbel.histo.functions.DefaultPojoCopier;
-import org.projectbarbel.histo.functions.DefaultPrettyPrinter;
-import org.projectbarbel.histo.functions.DefaultProxyingFunction;
-import org.projectbarbel.histo.functions.SimpleGsonPojoSerializer;
+import org.projectbarbel.histo.functions.AdaptingKryoSerializer;
+import org.projectbarbel.histo.functions.CGLibProxyingFunction;
+import org.projectbarbel.histo.functions.SimpleGsonPojoCopier;
+import org.projectbarbel.histo.functions.TableJournalPrettyPrinter;
+import org.projectbarbel.histo.functions.UUIDGenerator;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.Systemclock;
@@ -67,11 +67,11 @@ public interface BarbelHistoContext {
 	}
 
 	static Function<BarbelHistoContext, PojoSerializer<Bitemporal>> getDefaultPersistenceSerializerProducer() {
-		return (c) -> new SimpleGsonPojoSerializer(BarbelHistoBuilder.barbel());
+		return (c) -> new AdaptingKryoSerializer(c);
 	}
 
 	static Function<List<Bitemporal>, String> getDefaultPrettyPrinter() {
-		return new DefaultPrettyPrinter();
+		return new TableJournalPrettyPrinter();
 	}
 
 	static IndexedCollection<UpdateLogRecord> getDefaultUpdateLog() {
@@ -95,11 +95,11 @@ public interface BarbelHistoContext {
 	}
 
 	static Supplier<Object> getDefaultDocumentIDGenerator() {
-		return new DefaultIDGenerator();
+		return new UUIDGenerator();
 	}
 
 	static Supplier<Object> getDefaultVersionIDGenerator() {
-		return new DefaultIDGenerator();
+		return new UUIDGenerator();
 	}
 
 	static String getDefaultUser() {
@@ -107,7 +107,7 @@ public interface BarbelHistoContext {
 	}
 
 	static BiFunction<Object, BitemporalStamp, Object> getDefaultProxyingFunction() {
-		return new DefaultProxyingFunction();
+		return new CGLibProxyingFunction();
 	}
 
 	static Gson getDefaultGson() {
@@ -116,7 +116,7 @@ public interface BarbelHistoContext {
 	}
 
 	static Function<Object, Object> getDefaultCopyFunction() {
-		return new DefaultPojoCopier();
+		return new SimpleGsonPojoCopier();
 	}
 
 	Supplier<Object> getDocumentIdGenerator();
@@ -146,5 +146,7 @@ public interface BarbelHistoContext {
 	Function<List<Bitemporal>, String> getPrettyPrinter();
 
 	Function<BarbelHistoContext, PojoSerializer<Bitemporal>> getPersistenceSerializerProducer();
+
+	Map<String, Object> getContextOptions();
 
 }

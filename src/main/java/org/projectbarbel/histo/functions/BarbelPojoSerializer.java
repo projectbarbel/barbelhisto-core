@@ -3,6 +3,7 @@ package org.projectbarbel.histo.functions;
 import java.util.Optional;
 
 import org.projectbarbel.histo.BarbelHistoBuilder;
+import org.projectbarbel.histo.BarbelHistoContext;
 import org.projectbarbel.histo.BarbelHistoCore;
 import org.projectbarbel.histo.model.Bitemporal;
 
@@ -19,8 +20,11 @@ public class BarbelPojoSerializer<O> implements PojoSerializer<O> {
         super();
         this.type = type;
         this.config = config;
-        this.targetSerializer = Optional.ofNullable(BarbelHistoCore.CONSTRUCTION_CONTEXT.get())
-                .orElseGet(() -> BarbelHistoBuilder.barbel()).getPersistenceSerializerProducer()
+        BarbelHistoContext constructionContext = Optional.ofNullable(BarbelHistoCore.CONSTRUCTION_CONTEXT.get())
+                .orElseGet(() -> BarbelHistoBuilder.barbel());
+        constructionContext.getContextOptions().put(AdaptingKryoSerializer.OBJECT_TYPE, type);
+        constructionContext.getContextOptions().put(AdaptingKryoSerializer.PERSISTENCE_CONFIG, config);
+        this.targetSerializer = constructionContext.getPersistenceSerializerProducer()
                 .apply(BarbelHistoCore.CONSTRUCTION_CONTEXT.get());
     }
 
