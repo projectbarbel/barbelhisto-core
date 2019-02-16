@@ -129,7 +129,7 @@ public final class DocumentJournal {
     }
 
     public JournalReader read() {
-        return new JournalReader(this, BarbelHistoContext.getDefaultClock());
+        return new JournalReader(this, BarbelHistoContext.getBarbelClock());
     }
 
     protected boolean lockAcquired() {

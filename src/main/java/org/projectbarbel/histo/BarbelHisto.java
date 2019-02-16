@@ -159,8 +159,8 @@ public interface BarbelHisto<T> {
 	/**
 	 * Save objects to {@link BarbelHisto}. Creates snapshots of state. Clients can
 	 * safely continue to work on passed instances. Thread safe, applies lock to
-	 * journals of document Ids (not the complete backbone). This allows concurrent
-	 * work on different document Ids. If clients try to update the same document
+	 * journals of document IDs (not the complete backbone). This allows concurrent
+	 * work on different document IDs. If clients try to update the same document
 	 * Id, this method throws {@link ConcurrentModificationException}.
 	 * 
 	 * @param currentVersion the object state to save
@@ -227,6 +227,9 @@ public interface BarbelHisto<T> {
 	/**
 	 * Turn back time to see how document journals looked like in the past. If
 	 * clients pass {@link LocalDateTime#now()} the actual journal is returned.
+	 * Time shift does <b>not</b> change the backbone collection of the
+	 * {@link BarbelHisto} instance, instead it returns an instance of
+	 * {@link DocumentJournal} with copies of managed {@link Bitemporal} objects. 
 	 * 
 	 * @param id   the document Id
 	 * @param time the time, must be in the past
@@ -237,7 +240,7 @@ public interface BarbelHisto<T> {
 	String prettyPrintJournal(Object id);
 
 	/**
-	 * Method for clients that use a custom data store. It's recomended to only add
+	 * Method for clients that use a custom data store. It's recommended to only add
 	 * complete journals previously created by {@link BarbelHisto}. That means only
 	 * add complete set of versions for one or more document IDs. To achieve this,
 	 * preferably use this method with version collections produced by
@@ -245,7 +248,7 @@ public interface BarbelHisto<T> {
 	 * intermediate persistence operations to custom data stores. Clients can also
 	 * use {@link BarbelQueries#all(Object)} to retrieve a complete Journal for a
 	 * single document id, or use {@link BarbelQueries#all()} to retrieve the
-	 * complete data in one Barbel Histo backbone. However, notice that
+	 * complete data in one BarbelHisto backbone. However, notice that
 	 * {@link #retrieve(Query)} does not clear the backbone. If clients try to
 	 * {@link #populate(Collection)} items already managed in the current
 	 * {@link BarbelHisto} instance they will receive errors. <br>
@@ -261,7 +264,7 @@ public interface BarbelHisto<T> {
 	 * 
 	 * @see <a href=
 	 *      "https://github.com/npgall/cqengine">https://github.com/npgall/cqengine</a>
-	 * @param bitemporals consistent list of bitemporal versions
+	 * @param bitemporals consistent list of {@link Bitemporal} versions
 	 */
 	void populate(Collection<Bitemporal> bitemporals);
 
@@ -276,9 +279,9 @@ public interface BarbelHisto<T> {
 	 * {@link BitemporalVersion} objects. In {@link BarbelMode#BITEMPORAL} clients
 	 * receive objects that implement {@link Bitemporal}. <br>
 	 * <br>
-	 * In Pojo mode (default) this method returns a collection of
+	 * In POJO mode (default) this method returns a collection of
 	 * {@link BitemporalVersion} objects. Use this collection to store the data and
-	 * to relaod {@link BarbelHisto} in the {@link #populate(Collection)}
+	 * to reload {@link BarbelHisto} in the {@link #populate(Collection)}
 	 * method.<br>
 	 * <br>
 	 * {@link BarbelHisto} is based on cqengine. There are build in on-heap
@@ -287,7 +290,7 @@ public interface BarbelHisto<T> {
 	 * 
 	 * @see <a href=
 	 *      "https://github.com/npgall/cqengine">https://github.com/npgall/cqengine</a>
-	 * @return the collection of bitemporals to store into an arbitrary data store
+	 * @return the collection of {@link Bitemporal} objects to store into an arbitrary data store
 	 */
 	Collection<Bitemporal> dump(DumpMode mode);
 

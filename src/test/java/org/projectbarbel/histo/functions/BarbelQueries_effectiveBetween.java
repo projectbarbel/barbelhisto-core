@@ -26,7 +26,7 @@ public class BarbelQueries_effectiveBetween {
     public void setUp() {
         journal = BarbelTestHelper.generateJournalOfDefaultDocuments("docid1",
                 Arrays.asList(LocalDate.of(2010, 12, 1), LocalDate.of(2017, 12, 1), LocalDate.of(2020, 1, 1)));
-        BarbelHistoContext.getDefaultClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 8, 0, 0));
+        BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 8, 0, 0));
     }
 
     @Test

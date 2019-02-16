@@ -129,8 +129,8 @@ public final class BarbelQueries {
 	@SuppressWarnings("unchecked")
 	public static <T> Query<T> effectiveNow(Object id) {
 		return (Query<T>) and(allActive(id),
-				lessThanOrEqualTo(EFFECTIVE_FROM, BarbelHistoContext.getDefaultClock().now().toLocalDate()),
-				greaterThan(EFFECTIVE_UNTIL, BarbelHistoContext.getDefaultClock().now().toLocalDate()));
+				lessThanOrEqualTo(EFFECTIVE_FROM, BarbelHistoContext.getBarbelClock().now().toLocalDate()),
+				greaterThan(EFFECTIVE_UNTIL, BarbelHistoContext.getBarbelClock().now().toLocalDate()));
 	}
 
 	/**

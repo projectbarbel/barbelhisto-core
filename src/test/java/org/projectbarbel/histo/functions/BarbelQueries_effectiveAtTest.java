@@ -26,12 +26,12 @@ public class BarbelQueries_effectiveAtTest {
     public void setUp() {
         journal = BarbelTestHelper.generateJournalOfDefaultDocuments("docid1",
                 Arrays.asList(LocalDate.of(2010, 12, 1), LocalDate.of(2017, 12, 1), LocalDate.of(2020, 1, 1)));
-        BarbelHistoContext.getDefaultClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 8, 0, 0));
+        BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 8, 0, 0));
     }
 
     @Test
     public void testApply() throws Exception {
-        ResultSet<DefaultDocument> document = journal.retrieve(BarbelQueries.effectiveAt("docid1", BarbelHistoContext.getDefaultClock().now().toLocalDate()));
+        ResultSet<DefaultDocument> document = journal.retrieve(BarbelQueries.effectiveAt("docid1", BarbelHistoContext.getBarbelClock().now().toLocalDate()));
         assertTrue(document.iterator().hasNext());
         assertEquals(document.iterator().next().getBitemporalStamp().getEffectiveTime().from(), LocalDate.of(2017, 12, 1));
     }

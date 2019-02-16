@@ -17,7 +17,6 @@ import org.projectbarbel.histo.functions.DefaultProxyingFunction;
 import org.projectbarbel.histo.functions.SimpleGsonPojoSerializer;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
-import org.projectbarbel.histo.model.Systemclock;
 
 import com.google.gson.Gson;
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
@@ -54,7 +53,6 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 	private String user = BarbelHistoContext.getDefaultUser();
 	private Map<Object, DocumentJournal> journalStore = new ConcurrentHashMap<Object, DocumentJournal>();
 	private Gson gson = BarbelHistoContext.getDefaultGson();
-	private Systemclock clock = BarbelHistoContext.getDefaultClock();
 	private IndexedCollection<UpdateLogRecord> updateLog = BarbelHistoContext.getDefaultUpdateLog();
 	private Function<List<Bitemporal>, String> prettyPrinter = BarbelHistoContext.getDefaultPrettyPrinter();
 
@@ -111,25 +109,6 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 	public BarbelHistoBuilder withUpdateLog(IndexedCollection<UpdateLogRecord> updateLog) {
 		Validate.isTrue(updateLog != null, NONULLS);
 		this.updateLog = updateLog;
-		return this;
-	}
-
-	@Override
-	public Systemclock getClock() {
-		return clock;
-	}
-
-	/**
-	 * Set a custom clock. Clients want to use this with great caution and only if
-	 * really required. Default clock in {@link BarbelHistoContext} is usually
-	 * sufficient.
-	 * 
-	 * @param clock the custom clock
-	 * @return the builder again
-	 */
-	public BarbelHistoBuilder withClock(Systemclock clock) {
-		Validate.isTrue(clock != null, NONULLS);
-		this.clock = clock;
 		return this;
 	}
 

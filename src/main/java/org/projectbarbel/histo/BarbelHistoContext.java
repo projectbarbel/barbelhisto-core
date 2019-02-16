@@ -90,7 +90,7 @@ public interface BarbelHistoContext {
 		return LocalDate.MAX;
 	}
 
-	static Systemclock getDefaultClock() {
+	static Systemclock getBarbelClock() {
 		return CLOCK;
 	}
 
@@ -140,8 +140,6 @@ public interface BarbelHistoContext {
 	Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> getJournalUpdateStrategyProducer();
 
 	BarbelMode getMode();
-
-	Systemclock getClock();
 
 	IndexedCollection<UpdateLogRecord> getUpdateLog();
 

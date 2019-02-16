@@ -21,7 +21,7 @@ public class BarbelHistoCore_Journal_Test {
     @BeforeEach
     public void setup() {
         core = BarbelHistoBuilder.barbel().build();
-        BarbelHistoContext.getDefaultClock().useFixedClockAt(LocalDate.of(2019, 2, 6).atStartOfDay());
+        BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDate.of(2019, 2, 6).atStartOfDay());
     }
 
     @Test
@@ -53,9 +53,9 @@ public class BarbelHistoCore_Journal_Test {
 
         // saving two versions
         DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
-        core.save(pojo, BarbelHistoContext.getDefaultClock().today(), LocalDate.MAX);
+        core.save(pojo, BarbelHistoContext.getBarbelClock().today(), LocalDate.MAX);
         pojo.setData("some new data");
-        core.save(pojo, BarbelHistoContext.getDefaultClock().today().plusDays(10), LocalDate.MAX);
+        core.save(pojo, BarbelHistoContext.getBarbelClock().today().plusDays(10), LocalDate.MAX);
 
         // checking complete archive
         List<DefaultPojo> all = core.retrieve(BarbelQueries.all(pojo.getDocumentId()),
@@ -66,7 +66,7 @@ public class BarbelHistoCore_Journal_Test {
         List<DefaultPojo> allInactive = core.retrieve(BarbelQueries.allInactive(pojo.getDocumentId()),
                 BarbelQueryOptions.sortAscendingByEffectiveFrom());
         assertEquals(1, allInactive.stream().count());
-        assertEquals(BarbelHistoContext.getDefaultClock().today(),
+        assertEquals(BarbelHistoContext.getBarbelClock().today(),
                 ((Bitemporal) allInactive.get(0)).getBitemporalStamp().getEffectiveTime().from());
         assertEquals(LocalDate.MAX, ((Bitemporal) allInactive.get(0)).getBitemporalStamp().getEffectiveTime().until());
 
@@ -74,11 +74,11 @@ public class BarbelHistoCore_Journal_Test {
         List<DefaultPojo> result = core.retrieve(BarbelQueries.allActive(pojo.getDocumentId()),
                 BarbelQueryOptions.sortAscendingByEffectiveFrom());
         assertEquals(2, result.stream().count());
-        assertEquals(BarbelHistoContext.getDefaultClock().today(),
+        assertEquals(BarbelHistoContext.getBarbelClock().today(),
                 ((Bitemporal) result.get(0)).getBitemporalStamp().getEffectiveTime().from());
-        assertEquals(BarbelHistoContext.getDefaultClock().today().plusDays(10),
+        assertEquals(BarbelHistoContext.getBarbelClock().today().plusDays(10),
                 ((Bitemporal) result.get(0)).getBitemporalStamp().getEffectiveTime().until());
-        assertEquals(BarbelHistoContext.getDefaultClock().today().plusDays(10),
+        assertEquals(BarbelHistoContext.getBarbelClock().today().plusDays(10),
                 ((Bitemporal) result.get(1)).getBitemporalStamp().getEffectiveTime().from());
         assertEquals(LocalDate.MAX, ((Bitemporal) result.get(1)).getBitemporalStamp().getEffectiveTime().until());
 
@@ -99,12 +99,12 @@ public class BarbelHistoCore_Journal_Test {
 
         // saving two versions
         DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
-        core.save(pojo, BarbelHistoContext.getDefaultClock().today().minusDays(100),
-                BarbelHistoContext.getDefaultClock().today().minusDays(8));
+        core.save(pojo, BarbelHistoContext.getBarbelClock().today().minusDays(100),
+                BarbelHistoContext.getBarbelClock().today().minusDays(8));
         pojo.setData("some new data");
-        core.save(pojo, BarbelHistoContext.getDefaultClock().today().minusDays(8), LocalDate.MAX);
+        core.save(pojo, BarbelHistoContext.getBarbelClock().today().minusDays(8), LocalDate.MAX);
         pojo.setData("some more data");
-        core.save(pojo, BarbelHistoContext.getDefaultClock().today().minusDays(8), LocalDate.MAX);
+        core.save(pojo, BarbelHistoContext.getBarbelClock().today().minusDays(8), LocalDate.MAX);
 
         // checking complete archive
         System.out.println(core.prettyPrintJournal(pojo.getDocumentId()));
@@ -116,7 +116,7 @@ public class BarbelHistoCore_Journal_Test {
         List<DefaultPojo> allInactive = core.retrieve(BarbelQueries.allInactive(pojo.getDocumentId()),
                 BarbelQueryOptions.sortAscendingByEffectiveFrom());
         assertEquals(1, allInactive.stream().count());
-        assertEquals(BarbelHistoContext.getDefaultClock().today().minusDays(8),
+        assertEquals(BarbelHistoContext.getBarbelClock().today().minusDays(8),
                 ((Bitemporal) allInactive.get(0)).getBitemporalStamp().getEffectiveTime().from());
         assertEquals(LocalDate.MAX, ((Bitemporal) allInactive.get(0)).getBitemporalStamp().getEffectiveTime().until());
         assertEquals("some new data", allInactive.get(0).getData());
@@ -125,15 +125,15 @@ public class BarbelHistoCore_Journal_Test {
         List<DefaultPojo> result = core.retrieve(BarbelQueries.allActive(pojo.getDocumentId()),
                 BarbelQueryOptions.sortAscendingByEffectiveFrom());
         assertEquals(3, result.stream().count());
-        assertEquals(BarbelHistoContext.getDefaultClock().today().minusDays(100),
+        assertEquals(BarbelHistoContext.getBarbelClock().today().minusDays(100),
                 ((Bitemporal) result.get(0)).getBitemporalStamp().getEffectiveTime().from());
-        assertEquals(BarbelHistoContext.getDefaultClock().today().minusDays(8),
+        assertEquals(BarbelHistoContext.getBarbelClock().today().minusDays(8),
                 ((Bitemporal) result.get(0)).getBitemporalStamp().getEffectiveTime().until());
-        assertEquals(BarbelHistoContext.getDefaultClock().today().minusDays(8),
+        assertEquals(BarbelHistoContext.getBarbelClock().today().minusDays(8),
                 ((Bitemporal) result.get(1)).getBitemporalStamp().getEffectiveTime().from());
-        assertEquals(BarbelHistoContext.getDefaultClock().today().minusDays(8),
+        assertEquals(BarbelHistoContext.getBarbelClock().today().minusDays(8),
                 ((Bitemporal) result.get(1)).getBitemporalStamp().getEffectiveTime().until());
-        assertEquals(BarbelHistoContext.getDefaultClock().today().minusDays(8),
+        assertEquals(BarbelHistoContext.getBarbelClock().today().minusDays(8),
                 ((Bitemporal) result.get(2)).getBitemporalStamp().getEffectiveTime().from());
         assertEquals(LocalDate.MAX, ((Bitemporal) result.get(2)).getBitemporalStamp().getEffectiveTime().until());
         assertEquals("some more data", result.get(2).getData());
@@ -158,10 +158,10 @@ public class BarbelHistoCore_Journal_Test {
 
         // saving two versions
         DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
-        core.save(pojo, BarbelHistoContext.getDefaultClock().today().minusDays(100),
-                BarbelHistoContext.getDefaultClock().today().minusDays(10));
+        core.save(pojo, BarbelHistoContext.getBarbelClock().today().minusDays(100),
+                BarbelHistoContext.getBarbelClock().today().minusDays(10));
         pojo.setData("some new data");
-        core.save(pojo, BarbelHistoContext.getDefaultClock().today(), LocalDate.MAX);
+        core.save(pojo, BarbelHistoContext.getBarbelClock().today(), LocalDate.MAX);
 
         // checking complete archive
         List<DefaultPojo> all = core.retrieve(BarbelQueries.all(pojo.getDocumentId()),
@@ -177,11 +177,11 @@ public class BarbelHistoCore_Journal_Test {
         List<DefaultPojo> allActive = core.retrieve(BarbelQueries.allActive(pojo.getDocumentId()),
                 BarbelQueryOptions.sortAscendingByEffectiveFrom());
         assertEquals(2, allActive.stream().count());
-        assertEquals(BarbelHistoContext.getDefaultClock().today().minusDays(100),
+        assertEquals(BarbelHistoContext.getBarbelClock().today().minusDays(100),
                 ((Bitemporal) allActive.get(0)).getBitemporalStamp().getEffectiveTime().from());
-        assertEquals(BarbelHistoContext.getDefaultClock().today().minusDays(10),
+        assertEquals(BarbelHistoContext.getBarbelClock().today().minusDays(10),
                 ((Bitemporal) allActive.get(0)).getBitemporalStamp().getEffectiveTime().until());
-        assertEquals(BarbelHistoContext.getDefaultClock().today(),
+        assertEquals(BarbelHistoContext.getBarbelClock().today(),
                 ((Bitemporal) allActive.get(1)).getBitemporalStamp().getEffectiveTime().from());
         assertEquals(LocalDate.MAX, ((Bitemporal) allActive.get(1)).getBitemporalStamp().getEffectiveTime().until());
 
@@ -193,13 +193,13 @@ public class BarbelHistoCore_Journal_Test {
 
         // yesterday non effective
         List<DefaultPojo> effectiveYesterday = core.retrieve(
-                BarbelQueries.effectiveAt(pojo.getDocumentId(), BarbelHistoContext.getDefaultClock().today().minusDays(1)),
+                BarbelQueries.effectiveAt(pojo.getDocumentId(), BarbelHistoContext.getBarbelClock().today().minusDays(1)),
                 BarbelQueryOptions.sortAscendingByEffectiveFrom());
         assertEquals(0, effectiveYesterday.size());
 
         // 14 days ago old effective
         List<DefaultPojo> effective14DaysAgo = core.retrieve(
-                BarbelQueries.effectiveAt(pojo.getDocumentId(), BarbelHistoContext.getDefaultClock().today().minusDays(14)),
+                BarbelQueries.effectiveAt(pojo.getDocumentId(), BarbelHistoContext.getBarbelClock().today().minusDays(14)),
                 BarbelQueryOptions.sortAscendingByEffectiveFrom());
         assertEquals(1, effective14DaysAgo.size());
         
@@ -219,12 +219,12 @@ public class BarbelHistoCore_Journal_Test {
         
         // saving two versions
         DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
-        core.save(pojo, BarbelHistoContext.getDefaultClock().today().minusDays(100),
-                BarbelHistoContext.getDefaultClock().today().minusDays(8));
+        core.save(pojo, BarbelHistoContext.getBarbelClock().today().minusDays(100),
+                BarbelHistoContext.getBarbelClock().today().minusDays(8));
         pojo.setData("some new data");
-        core.save(pojo, BarbelHistoContext.getDefaultClock().today().minusDays(8), LocalDate.MAX);
+        core.save(pojo, BarbelHistoContext.getBarbelClock().today().minusDays(8), LocalDate.MAX);
         pojo.setData("some more data");
-        core.save(pojo, BarbelHistoContext.getDefaultClock().today(), LocalDate.MAX);
+        core.save(pojo, BarbelHistoContext.getBarbelClock().today(), LocalDate.MAX);
 
         // checking complete archive
         System.out.println(core.prettyPrintJournal(pojo.getDocumentId()));
@@ -236,7 +236,7 @@ public class BarbelHistoCore_Journal_Test {
         List<DefaultPojo> allInactive = core.retrieve(BarbelQueries.allInactive(pojo.getDocumentId()),
                 BarbelQueryOptions.sortAscendingByEffectiveFrom());
         assertEquals(1, allInactive.stream().count());
-        assertEquals(BarbelHistoContext.getDefaultClock().today().minusDays(8),
+        assertEquals(BarbelHistoContext.getBarbelClock().today().minusDays(8),
                 ((Bitemporal) allInactive.get(0)).getBitemporalStamp().getEffectiveTime().from());
         assertEquals(LocalDate.MAX, ((Bitemporal) allInactive.get(0)).getBitemporalStamp().getEffectiveTime().until());
         assertEquals("some new data", allInactive.get(0).getData());
@@ -245,15 +245,15 @@ public class BarbelHistoCore_Journal_Test {
         List<DefaultPojo> result = core.retrieve(BarbelQueries.allActive(pojo.getDocumentId()),
                 BarbelQueryOptions.sortAscendingByEffectiveFrom());
         assertEquals(3, result.stream().count());
-        assertEquals(BarbelHistoContext.getDefaultClock().today().minusDays(100),
+        assertEquals(BarbelHistoContext.getBarbelClock().today().minusDays(100),
                 ((Bitemporal) result.get(0)).getBitemporalStamp().getEffectiveTime().from());
-        assertEquals(BarbelHistoContext.getDefaultClock().today().minusDays(8),
+        assertEquals(BarbelHistoContext.getBarbelClock().today().minusDays(8),
                 ((Bitemporal) result.get(0)).getBitemporalStamp().getEffectiveTime().until());
-        assertEquals(BarbelHistoContext.getDefaultClock().today().minusDays(8),
+        assertEquals(BarbelHistoContext.getBarbelClock().today().minusDays(8),
                 ((Bitemporal) result.get(1)).getBitemporalStamp().getEffectiveTime().from());
-        assertEquals(BarbelHistoContext.getDefaultClock().today(),
+        assertEquals(BarbelHistoContext.getBarbelClock().today(),
                 ((Bitemporal) result.get(1)).getBitemporalStamp().getEffectiveTime().until());
-        assertEquals(BarbelHistoContext.getDefaultClock().today(),
+        assertEquals(BarbelHistoContext.getBarbelClock().today(),
                 ((Bitemporal) result.get(2)).getBitemporalStamp().getEffectiveTime().from());
         assertEquals(LocalDate.MAX, ((Bitemporal) result.get(2)).getBitemporalStamp().getEffectiveTime().until());
         assertEquals("some more data", result.get(2).getData());
@@ -263,7 +263,7 @@ public class BarbelHistoCore_Journal_Test {
         DefaultPojo effecive = effectiveNow.stream().findFirst().get();
         assertEquals("some more data", effecive.getData());
 
-        List<DefaultPojo> effectiveYesterday = core.retrieve(BarbelQueries.effectiveAt(pojo.getDocumentId(), BarbelHistoContext.getDefaultClock().today().minusDays(1)),
+        List<DefaultPojo> effectiveYesterday = core.retrieve(BarbelQueries.effectiveAt(pojo.getDocumentId(), BarbelHistoContext.getBarbelClock().today().minusDays(1)),
                 BarbelQueryOptions.sortAscendingByEffectiveFrom());
         DefaultPojo effecive2 = effectiveYesterday.stream().findFirst().get();
         assertEquals("some new data", effecive2.getData());
@@ -284,14 +284,14 @@ public class BarbelHistoCore_Journal_Test {
         // saving two versions
         DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
         String originalData = pojo.getData();
-        core.save(pojo, BarbelHistoContext.getDefaultClock().today().minusDays(100),
-                BarbelHistoContext.getDefaultClock().today().minusDays(8));
+        core.save(pojo, BarbelHistoContext.getBarbelClock().today().minusDays(100),
+                BarbelHistoContext.getBarbelClock().today().minusDays(8));
         pojo.setData("2nd Period");
-        core.save(pojo, BarbelHistoContext.getDefaultClock().today().minusDays(8), BarbelHistoContext.getDefaultClock().today());
+        core.save(pojo, BarbelHistoContext.getBarbelClock().today().minusDays(8), BarbelHistoContext.getBarbelClock().today());
         pojo.setData("3rd Period");
-        core.save(pojo, BarbelHistoContext.getDefaultClock().today(), LocalDate.MAX);
+        core.save(pojo, BarbelHistoContext.getBarbelClock().today(), LocalDate.MAX);
         pojo.setData("4td interrupting Period");
-        core.save(pojo, BarbelHistoContext.getDefaultClock().today().minusDays(10), BarbelHistoContext.getDefaultClock().today().plusDays(10));
+        core.save(pojo, BarbelHistoContext.getBarbelClock().today().minusDays(10), BarbelHistoContext.getBarbelClock().today().plusDays(10));
 
         // checking complete archive
         System.out.println(core.prettyPrintJournal(pojo.getDocumentId()));
@@ -303,13 +303,13 @@ public class BarbelHistoCore_Journal_Test {
         List<DefaultPojo> allInactive = core.retrieve(BarbelQueries.allInactive(pojo.getDocumentId()),
                 BarbelQueryOptions.sortAscendingByEffectiveFrom());
         assertEquals(3, allInactive.stream().count());
-        assertEquals(BarbelHistoContext.getDefaultClock().today().minusDays(100),
+        assertEquals(BarbelHistoContext.getBarbelClock().today().minusDays(100),
                 ((Bitemporal) allInactive.get(0)).getBitemporalStamp().getEffectiveTime().from());
-        assertEquals(BarbelHistoContext.getDefaultClock().today().minusDays(8), ((Bitemporal) allInactive.get(0)).getBitemporalStamp().getEffectiveTime().until());
-        assertEquals(BarbelHistoContext.getDefaultClock().today().minusDays(8),
+        assertEquals(BarbelHistoContext.getBarbelClock().today().minusDays(8), ((Bitemporal) allInactive.get(0)).getBitemporalStamp().getEffectiveTime().until());
+        assertEquals(BarbelHistoContext.getBarbelClock().today().minusDays(8),
                 ((Bitemporal) allInactive.get(1)).getBitemporalStamp().getEffectiveTime().from());
-        assertEquals(BarbelHistoContext.getDefaultClock().today(), ((Bitemporal) allInactive.get(1)).getBitemporalStamp().getEffectiveTime().until());
-        assertEquals(BarbelHistoContext.getDefaultClock().today(),
+        assertEquals(BarbelHistoContext.getBarbelClock().today(), ((Bitemporal) allInactive.get(1)).getBitemporalStamp().getEffectiveTime().until());
+        assertEquals(BarbelHistoContext.getBarbelClock().today(),
                 ((Bitemporal) allInactive.get(2)).getBitemporalStamp().getEffectiveTime().from());
         assertEquals(LocalDate.MAX, ((Bitemporal) allInactive.get(2)).getBitemporalStamp().getEffectiveTime().until());
         assertEquals(originalData, allInactive.get(0).getData());
@@ -320,15 +320,15 @@ public class BarbelHistoCore_Journal_Test {
         List<DefaultPojo> result = core.retrieve(BarbelQueries.allActive(pojo.getDocumentId()),
                 BarbelQueryOptions.sortAscendingByEffectiveFrom());
         assertEquals(3, result.stream().count());
-        assertEquals(BarbelHistoContext.getDefaultClock().today().minusDays(100),
+        assertEquals(BarbelHistoContext.getBarbelClock().today().minusDays(100),
                 ((Bitemporal) result.get(0)).getBitemporalStamp().getEffectiveTime().from());
-        assertEquals(BarbelHistoContext.getDefaultClock().today().minusDays(10),
+        assertEquals(BarbelHistoContext.getBarbelClock().today().minusDays(10),
                 ((Bitemporal) result.get(0)).getBitemporalStamp().getEffectiveTime().until());
-        assertEquals(BarbelHistoContext.getDefaultClock().today().minusDays(10),
+        assertEquals(BarbelHistoContext.getBarbelClock().today().minusDays(10),
                 ((Bitemporal) result.get(1)).getBitemporalStamp().getEffectiveTime().from());
-        assertEquals(BarbelHistoContext.getDefaultClock().today().plusDays(10),
+        assertEquals(BarbelHistoContext.getBarbelClock().today().plusDays(10),
                 ((Bitemporal) result.get(1)).getBitemporalStamp().getEffectiveTime().until());
-        assertEquals(BarbelHistoContext.getDefaultClock().today().plusDays(10),
+        assertEquals(BarbelHistoContext.getBarbelClock().today().plusDays(10),
                 ((Bitemporal) result.get(2)).getBitemporalStamp().getEffectiveTime().from());
         assertEquals(LocalDate.MAX, ((Bitemporal) result.get(2)).getBitemporalStamp().getEffectiveTime().until());
         assertEquals(originalData, result.get(0).getData());
@@ -340,12 +340,12 @@ public class BarbelHistoCore_Journal_Test {
         DefaultPojo effectiveNowPojo = effectiveNow.stream().findFirst().get();
         assertEquals("4td interrupting Period", effectiveNowPojo.getData());
 
-        List<DefaultPojo> effective11DaysAgo = core.retrieve(BarbelQueries.effectiveAt(pojo.getDocumentId(), BarbelHistoContext.getDefaultClock().today().minusDays(11)),
+        List<DefaultPojo> effective11DaysAgo = core.retrieve(BarbelQueries.effectiveAt(pojo.getDocumentId(), BarbelHistoContext.getBarbelClock().today().minusDays(11)),
                 BarbelQueryOptions.sortAscendingByEffectiveFrom());
         DefaultPojo effective11DaysAgoPojo = effective11DaysAgo.stream().findFirst().get();
         assertEquals(originalData, effective11DaysAgoPojo.getData());
         
-        List<DefaultPojo> effectiveIn11Days = core.retrieve(BarbelQueries.effectiveAt(pojo.getDocumentId(), BarbelHistoContext.getDefaultClock().today().plusDays(11)),
+        List<DefaultPojo> effectiveIn11Days = core.retrieve(BarbelQueries.effectiveAt(pojo.getDocumentId(), BarbelHistoContext.getBarbelClock().today().plusDays(11)),
                 BarbelQueryOptions.sortAscendingByEffectiveFrom());
         DefaultPojo effectiveIn11DaysPojo = effectiveIn11Days.stream().findFirst().get();
         assertEquals("3rd Period", effectiveIn11DaysPojo.getData());

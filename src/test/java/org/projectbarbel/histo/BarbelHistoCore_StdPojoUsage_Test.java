@@ -15,7 +15,7 @@ public class BarbelHistoCore_StdPojoUsage_Test {
 
     @BeforeAll
     public static void setup() {
-        BarbelHistoContext.getDefaultClock().useSystemDefaultZoneClock();
+        BarbelHistoContext.getBarbelClock().useSystemDefaultZoneClock();
     }
 
     @Test

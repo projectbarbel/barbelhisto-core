@@ -54,7 +54,7 @@ public class DocumentJournalTest {
     @Test
     public void testUpdate() throws Exception {
         IndexedCollection<Object> coll = new ConcurrentIndexedCollection<Object>();
-        BarbelHistoContext.getDefaultClock().useFixedClockAt(LocalDateTime.of(2019, 2, 1, 8, 0));
+        BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.of(2019, 2, 1, 8, 0));
         DefaultDocument doc = DefaultDocument.builder().withData("some data")
                 .withBitemporalStamp(BitemporalStamp.createActive()).build();
         coll.add(doc);
