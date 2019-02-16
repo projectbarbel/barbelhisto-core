@@ -54,6 +54,8 @@ public abstract class BarbelMode {
 
     public abstract boolean validateManagedType(BarbelHistoContext context, Object candidate);
 
+    public abstract Class<?> getPersistenceObjectType(Class<?> objectType);
+    
     public static class PojoMode extends BarbelMode {
 
         @Override
@@ -147,6 +149,11 @@ public abstract class BarbelMode {
             return (object instanceof BarbelProxy) ? (T)((BarbelProxy)object).getTarget() : object;
         }
 
+		@Override
+		public Class<?> getPersistenceObjectType(Class<?> objectType) {
+			return BitemporalVersion.class;
+		}
+
     }
 
     public static class BitemporalMode extends BarbelMode {
@@ -218,6 +225,11 @@ public abstract class BarbelMode {
         public <T> T drawMaiden(BarbelHistoContext context, T object) {
             return object;
         }
+
+		@Override
+		public Class<?> getPersistenceObjectType(Class<?> objectType) {
+			return objectType;
+		}
 
     }
 

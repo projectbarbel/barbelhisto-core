@@ -29,7 +29,8 @@ public class AdaptingKryoSerializer implements PojoSerializer<Bitemporal> {
 		persistenceConfig = Optional.ofNullable((PersistenceConfig) context.getContextOptions().get(PERSISTENCE_CONFIG))
 				.orElseThrow(() -> new IllegalStateException("could not find persistenceConfig"));
 		@SuppressWarnings("unchecked")
-		KryoSerializer<Bitemporal> kryo = new KryoSerializer<Bitemporal>((Class<Bitemporal>) objectType,
+		KryoSerializer<Bitemporal> kryo = new KryoSerializer<Bitemporal>(
+				(Class<Bitemporal>) context.getMode().getPersistenceObjectType(objectType),
 				persistenceConfig);
 		this.targetKryo = kryo;
 		this.context = context;
