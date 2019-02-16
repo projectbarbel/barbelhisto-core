@@ -11,10 +11,10 @@ import java.util.function.Supplier;
 
 import org.apache.commons.lang3.Validate;
 import org.projectbarbel.histo.BarbelHistoCore.UpdateLogRecord;
+import org.projectbarbel.histo.functions.AdaptingKryoSerializer;
 import org.projectbarbel.histo.functions.CGLibProxyingFunction;
 import org.projectbarbel.histo.functions.EbeddingJournalUpdateStrategy;
 import org.projectbarbel.histo.functions.SimpleGsonPojoCopier;
-import org.projectbarbel.histo.functions.SimpleGsonPojoSerializer;
 import org.projectbarbel.histo.functions.UUIDGenerator;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
@@ -209,8 +209,8 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 
 	/**
 	 * Customize the proxying in {@link BarbelMode#POJO}. Default is
-	 * {@link CGLibProxyingFunction}. Clients may want to use more specific
-	 * proxying functions with their pojos.
+	 * {@link CGLibProxyingFunction}. Clients may want to use more specific proxying
+	 * functions with their pojos.
 	 * 
 	 * @param proxyingFunction the custom proxying function
 	 * @return the builder again
@@ -330,8 +330,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 	}
 
 	/**
-	 * The user stored when creating records. Adopt this to user names or the
-	 * like.
+	 * The user stored when creating records. Adopt this to user names or the like.
 	 * 
 	 * @param user the user to store in record entries
 	 * @return the builder again
@@ -354,7 +353,9 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 
 	/**
 	 * Clients may want to decide how data is serialized into persistent storage.
-	 * Default is {@link SimpleGsonPojoSerializer}.
+	 * Default is {@link AdaptingKryoSerializer}. To validate if your POJO is
+	 * serializable call
+	 * {@link AdaptingKryoSerializer#validateObjectIsRoundTripSerializable(BarbelHistoContext, Object)}.
 	 * 
 	 * @param persistenceSerializerProducer
 	 * @return the builder again

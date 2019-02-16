@@ -52,7 +52,7 @@ public abstract class BarbelMode {
     public abstract BitemporalVersion<?> fromManagedBitemporalToInternalPersistenceObject(BarbelHistoContext context,
             Bitemporal bitemporal);
 
-    public abstract boolean validateManagedType(BarbelHistoContext context, Class<?> objectType);
+    public abstract boolean validateManagedType(BarbelHistoContext context, Object candidate);
 
     public static class PojoMode extends BarbelMode {
 
@@ -134,10 +134,10 @@ public abstract class BarbelMode {
         }
 
         @Override
-        public boolean validateManagedType(BarbelHistoContext context, Class<?> objectType) {
-            Validate.isTrue(!objectType.equals(BitemporalVersion.class),
+        public boolean validateManagedType(BarbelHistoContext context, Object candidate) {
+            Validate.isTrue(!candidate.getClass().equals(BitemporalVersion.class),
                     "BitemporalVersion cannot be used in BarbelMode.POJO - set BarbelMode.BITEMPORAL and try again");
-            Validate.isTrue(FieldUtils.getFieldsListWithAnnotation(objectType, DocumentId.class).size()==1, "don't forget to add @DocumentId to the document id attribute to the pojo you want to manage");
+            Validate.isTrue(FieldUtils.getFieldsListWithAnnotation(candidate.getClass(), DocumentId.class).size()==1, "don't forget to add @DocumentId to the document id attribute to the pojo you want to manage");
             return true;
         }
 
@@ -209,8 +209,8 @@ public abstract class BarbelMode {
         }
 
         @Override
-        public boolean validateManagedType(BarbelHistoContext context, Class<?> objectType) {
-            Validate.isTrue(Bitemporal.class.isAssignableFrom(objectType), "don't forget to implement Bitemporal.class interface on the type you want to manage when in mode BarbelMode.BITEMPORAL");
+        public boolean validateManagedType(BarbelHistoContext context, Object candidate) {
+            Validate.isTrue(Bitemporal.class.isAssignableFrom(candidate.getClass()), "don't forget to implement Bitemporal.class interface on the type you want to manage when in mode BarbelMode.BITEMPORAL");
             return true;
        }
 

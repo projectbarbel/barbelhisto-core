@@ -73,7 +73,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 		Validate.isTrue(from.isBefore(until), "from date must be before until date");
 		T maiden = context.getMode().drawMaiden(context, newVersion);
 		validTypes.computeIfAbsent(maiden.getClass(),
-				(k) -> context.getMode().validateManagedType(context, (Class<?>) k));
+				(k) -> context.getMode().validateManagedType(context, maiden));
 		Object id = context.getMode().drawDocumentId(maiden);
 		BitemporalStamp stamp = BitemporalStamp.of(context.getActivity(), id, EffectivePeriod.of(from, until),
 				RecordPeriod.createActive(context));

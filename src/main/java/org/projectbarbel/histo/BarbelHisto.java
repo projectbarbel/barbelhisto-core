@@ -51,12 +51,11 @@ import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
  * </pre>
  * 
  * The primary key should be business oriented, i.e. personnel number, contract
- * number. Of course, using POJO mode is the easiest way forward. However, behind
- * the scenes {@link BarbelHisto} uses proxying when managing POJOs to store the
- * version data with the objects that clients save. Proxying can become
- * complicated in situations where no default constructors are available, or
- * access to fields does not follow JavaBeans standard. For that reason there is
- * another mode called {@link BarbelMode#BITEMPORAL}. One can change the mode to
+ * number. Of course, using POJO mode is the easiest way forward. However,
+ * behind the scenes {@link BarbelHisto} uses proxying when managing POJOs to
+ * store the version data with the objects that clients save. However, proxying
+ * can become complicated in some situations. For that reason there is another
+ * mode called {@link BarbelMode#BITEMPORAL}. One can change the mode to
  * {@link BarbelMode#BITEMPORAL} with the
  * {@link BarbelHistoBuilder#withMode(BarbelMode)} method like so:
  * 
@@ -226,10 +225,10 @@ public interface BarbelHisto<T> {
 
 	/**
 	 * Turn back time to see how document journals looked like in the past. If
-	 * clients pass {@link LocalDateTime#now()} the actual journal is returned.
-	 * Time shift does <b>not</b> change the backbone collection of the
+	 * clients pass {@link LocalDateTime#now()} the actual journal is returned. Time
+	 * shift does <b>not</b> change the backbone collection of the
 	 * {@link BarbelHisto} instance, instead it returns an instance of
-	 * {@link DocumentJournal} with copies of managed {@link Bitemporal} objects. 
+	 * {@link DocumentJournal} with copies of managed {@link Bitemporal} objects.
 	 * 
 	 * @param id   the document Id
 	 * @param time the time, must be in the past
@@ -290,7 +289,8 @@ public interface BarbelHisto<T> {
 	 * 
 	 * @see <a href=
 	 *      "https://github.com/npgall/cqengine">https://github.com/npgall/cqengine</a>
-	 * @return the collection of {@link Bitemporal} objects to store into an arbitrary data store
+	 * @return the collection of {@link Bitemporal} objects to store into an
+	 *         arbitrary data store
 	 */
 	Collection<Bitemporal> dump(DumpMode mode);
 

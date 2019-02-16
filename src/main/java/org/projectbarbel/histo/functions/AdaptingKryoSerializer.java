@@ -24,8 +24,10 @@ public class AdaptingKryoSerializer implements PojoSerializer<Bitemporal> {
 
 	public AdaptingKryoSerializer(BarbelHistoContext context) {
 		super();
-		objectType = (Class<?>) context.getContextOptions().get(OBJECT_TYPE);
-		persistenceConfig = (PersistenceConfig) context.getContextOptions().get(PERSISTENCE_CONFIG);
+		objectType = Optional.ofNullable((Class<?>) context.getContextOptions().get(OBJECT_TYPE))
+				.orElseThrow(() -> new IllegalStateException("could not find objectType"));
+		persistenceConfig = Optional.ofNullable((PersistenceConfig) context.getContextOptions().get(PERSISTENCE_CONFIG))
+				.orElseThrow(() -> new IllegalStateException("could not find persistenceConfig"));
 		@SuppressWarnings("unchecked")
 		KryoSerializer<Bitemporal> kryo = new KryoSerializer<Bitemporal>((Class<Bitemporal>) objectType,
 				persistenceConfig);
@@ -34,10 +36,10 @@ public class AdaptingKryoSerializer implements PojoSerializer<Bitemporal> {
 	}
 
 	@Override
-	public byte[] serialize(Bitemporal object) {
+	public byte[] serialize(final Bitemporal object) {
 		if (object instanceof BarbelProxy) { // change persisted type to BitemporalVersion
-			object = new BitemporalVersion<>(((Bitemporal) object).getBitemporalStamp(),
-					((BarbelProxy) object).getTarget());
+			return targetKryo.serialize(new BitemporalVersion<>(((Bitemporal) object).getBitemporalStamp(),
+					((BarbelProxy) object).getTarget()));
 		}
 		return targetKryo.serialize(object);
 	}
@@ -56,7 +58,7 @@ public class AdaptingKryoSerializer implements PojoSerializer<Bitemporal> {
 		return (Bitemporal) bitemporal;
 	}
 
-	static <O> void validateObjectIsRoundTripSerializable(BarbelHistoContext context, O candidatePojo) {
+	public static <O> boolean validateObjectIsRoundTripSerializable(BarbelHistoContext context, O candidatePojo) {
 		try {
 			context.getContextOptions().put(OBJECT_TYPE, candidatePojo.getClass());
 			context.getContextOptions().put(PERSISTENCE_CONFIG,
@@ -77,6 +79,7 @@ public class AdaptingKryoSerializer implements PojoSerializer<Bitemporal> {
 				validateHashCodeEquality(candidatePojo, ((BarbelProxy) bitemporal).getTarget());
 				validateObjectEquality(candidatePojo, ((BarbelProxy) bitemporal).getTarget());
 			}
+			return true;
 		} catch (Exception e) {
 			throw new IllegalStateException(
 					"POJO object failed round trip serialization-deserialization test, object type: "
