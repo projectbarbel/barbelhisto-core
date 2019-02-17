@@ -17,6 +17,7 @@ import java.lang.annotation.RetentionPolicy;
  *    }
  * }
  * </pre>
+ * 
  * <br>
  * 
  * @author Niklas Schlimm

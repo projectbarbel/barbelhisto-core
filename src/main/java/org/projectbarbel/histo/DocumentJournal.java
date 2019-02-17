@@ -22,8 +22,8 @@ import com.googlecode.cqengine.IndexedCollection;
  * Document Journal abstraction to work on for internal processing in
  * {@link BarbelHistoCore} and for the client. When client work on instances of
  * {@link DocumentJournal} it is essential that {@link ProcessingState} is set
- * to {@link ProcessingState#EXTERNAL}. This ensures that clients only get copies
- * of journal objects.
+ * to {@link ProcessingState#EXTERNAL}. This ensures that clients only get
+ * copies of journal objects.
  * 
  * @author niklasschlimm
  *

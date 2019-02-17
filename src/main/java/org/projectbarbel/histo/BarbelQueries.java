@@ -32,49 +32,49 @@ import com.googlecode.cqengine.query.option.QueryOptions;
  */
 public final class BarbelQueries {
 
-	public static final SimpleAttribute<Object, Object> DOCUMENT_ID = new SimpleAttribute<Object, Object>(
-			"documentId") {
-		public Object getValue(Object object, QueryOptions queryOptions) {
-			return ((Bitemporal) object).getBitemporalStamp().getDocumentId();
-		}
-	};
+    public static final SimpleAttribute<Object, Object> DOCUMENT_ID = new SimpleAttribute<Object, Object>(
+            "documentId") {
+        public Object getValue(Object object, QueryOptions queryOptions) {
+            return ((Bitemporal) object).getBitemporalStamp().getDocumentId();
+        }
+    };
 
-	public static final Attribute<Object, BitemporalObjectState> STATE = new SimpleAttribute<Object, BitemporalObjectState>(
-			"state") {
-		public BitemporalObjectState getValue(Object object, QueryOptions queryOptions) {
-			return ((Bitemporal) object).getBitemporalStamp().getRecordTime().getState();
-		}
-	};
+    public static final Attribute<Object, BitemporalObjectState> STATE = new SimpleAttribute<Object, BitemporalObjectState>(
+            "state") {
+        public BitemporalObjectState getValue(Object object, QueryOptions queryOptions) {
+            return ((Bitemporal) object).getBitemporalStamp().getRecordTime().getState();
+        }
+    };
 
-	public static final Attribute<Object, ChronoLocalDate> EFFECTIVE_FROM = new SimpleAttribute<Object, ChronoLocalDate>(
-			"effectiveFrom") {
-		public LocalDate getValue(Object object, QueryOptions queryOptions) {
-			return ((Bitemporal) object).getBitemporalStamp().getEffectiveTime().from();
-		}
-	};
+    public static final Attribute<Object, ChronoLocalDate> EFFECTIVE_FROM = new SimpleAttribute<Object, ChronoLocalDate>(
+            "effectiveFrom") {
+        public LocalDate getValue(Object object, QueryOptions queryOptions) {
+            return ((Bitemporal) object).getBitemporalStamp().getEffectiveTime().from();
+        }
+    };
 
-	public static final Attribute<Object, ChronoLocalDate> EFFECTIVE_UNTIL = new SimpleAttribute<Object, ChronoLocalDate>(
-			"effectiveUntil") {
-		public LocalDate getValue(Object object, QueryOptions queryOptions) {
-			return ((Bitemporal) object).getBitemporalStamp().getEffectiveTime().until();
-		}
-	};
+    public static final Attribute<Object, ChronoLocalDate> EFFECTIVE_UNTIL = new SimpleAttribute<Object, ChronoLocalDate>(
+            "effectiveUntil") {
+        public LocalDate getValue(Object object, QueryOptions queryOptions) {
+            return ((Bitemporal) object).getBitemporalStamp().getEffectiveTime().until();
+        }
+    };
 
-	public static final Attribute<Object, Long> CREATED_AT = new SimpleAttribute<Object, Long>("createdAt") {
-		public Long getValue(Object object, QueryOptions queryOptions) {
-			return ((Bitemporal) object).getBitemporalStamp().getRecordTime().getCreatedAt()
-					.withZoneSameInstant(ZoneId.systemDefault()).toInstant().toEpochMilli();
-		}
-	};
+    public static final Attribute<Object, Long> CREATED_AT = new SimpleAttribute<Object, Long>("createdAt") {
+        public Long getValue(Object object, QueryOptions queryOptions) {
+            return ((Bitemporal) object).getBitemporalStamp().getRecordTime().getCreatedAt()
+                    .withZoneSameInstant(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        }
+    };
 
-	public static final Attribute<Object, Long> INACTIVATED_AT = new SimpleAttribute<Object, Long>("inactivatedAt") {
-		public Long getValue(Object object, QueryOptions queryOptions) {
-			return ((Bitemporal) object).getBitemporalStamp().getRecordTime().getInactivatedAt()
-					.withZoneSameInstant(ZoneId.systemDefault()).toInstant().toEpochMilli();
-		}
-	};
+    public static final Attribute<Object, Long> INACTIVATED_AT = new SimpleAttribute<Object, Long>("inactivatedAt") {
+        public Long getValue(Object object, QueryOptions queryOptions) {
+            return ((Bitemporal) object).getBitemporalStamp().getRecordTime().getInactivatedAt()
+                    .withZoneSameInstant(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        }
+    };
 
-	//// @formatter:off
+    //// @formatter:off
 	/**
 	 * Get all versions from the backbone.
 	 * 

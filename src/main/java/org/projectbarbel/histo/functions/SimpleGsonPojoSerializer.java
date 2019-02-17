@@ -49,7 +49,7 @@ public class SimpleGsonPojoSerializer implements PojoSerializer<Bitemporal> {
             BitemporalVersion<?> bv = (BitemporalVersion<?>) object;
             Class<?> objectType = typeMap.computeIfAbsent(bv.getObjectType(), computeIfAbsent());
             Object bvobject = gson.fromJson(gson.toJsonTree(bv.getObject()).toString(), objectType);
-            if (context.getMode()==BarbelMode.POJO) 
+            if (context.getMode() == BarbelMode.POJO)
                 return (Bitemporal) context.getMode().snapshotMaiden(context, bvobject, bv.getStamp());
             else
                 return new BitemporalVersion<>(bv.getBitemporalStamp(), bvobject);
@@ -62,7 +62,8 @@ public class SimpleGsonPojoSerializer implements PojoSerializer<Bitemporal> {
             try {
                 return Class.forName(k);
             } catch (ClassNotFoundException e) {
-                throw new RuntimeException("failed with ClassNotFoundException on deserializing type from persistence", e);
+                throw new RuntimeException("failed with ClassNotFoundException on deserializing type from persistence",
+                        e);
             }
         };
     }

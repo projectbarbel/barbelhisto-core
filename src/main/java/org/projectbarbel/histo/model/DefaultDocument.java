@@ -1,18 +1,21 @@
 package org.projectbarbel.histo.model;
 
-import java.util.Objects;
-
 import javax.annotation.Generated;
+
+import org.projectbarbel.histo.DocumentId;
 
 public class DefaultDocument implements Bitemporal {
 
     private BitemporalStamp bitemporalStamp;
     private String data;
+    @DocumentId
+    private String id;
 
     @Generated("SparkTools")
     private DefaultDocument(Builder builder) {
         this.bitemporalStamp = builder.bitemporalStamp;
         this.data = builder.data;
+        this.id = builder.id;
     }
 
     public void setData(String data) {
@@ -37,6 +40,15 @@ public class DefaultDocument implements Bitemporal {
     public DefaultDocument(DefaultDocument template) {
         this.bitemporalStamp = template.getBitemporalStamp();
         this.data = template.getData();
+        this.id = template.getId();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getData() {
@@ -44,20 +56,40 @@ public class DefaultDocument implements Bitemporal {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (o == this)
-            return true;
-        if (!(o instanceof DefaultDocument)) {
-            return false;
-        }
-        DefaultDocument defaultValueObject = (DefaultDocument) o;
-        return Objects.equals(data, defaultValueObject.getData())
-                && Objects.equals(bitemporalStamp, defaultValueObject.getBitemporalStamp());
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((bitemporalStamp == null) ? 0 : bitemporalStamp.hashCode());
+        result = prime * result + ((data == null) ? 0 : data.hashCode());
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        return result;
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(bitemporalStamp, data);
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        DefaultDocument other = (DefaultDocument) obj;
+        if (bitemporalStamp == null) {
+            if (other.bitemporalStamp != null)
+                return false;
+        } else if (!bitemporalStamp.equals(other.bitemporalStamp))
+            return false;
+        if (data == null) {
+            if (other.data != null)
+                return false;
+        } else if (!data.equals(other.data))
+            return false;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
+        return true;
     }
 
     @Override
@@ -77,7 +109,6 @@ public class DefaultDocument implements Bitemporal {
 
     /**
      * Creates builder to build {@link DefaultDocument}.
-     * 
      * @return created builder
      */
     @Generated("SparkTools")
@@ -92,6 +123,7 @@ public class DefaultDocument implements Bitemporal {
     public static final class Builder {
         private BitemporalStamp bitemporalStamp;
         private String data;
+        private String id;
 
         private Builder() {
         }
@@ -103,6 +135,11 @@ public class DefaultDocument implements Bitemporal {
 
         public Builder withData(String data) {
             this.data = data;
+            return this;
+        }
+
+        public Builder withId(String id) {
+            this.id = id;
             return this;
         }
 

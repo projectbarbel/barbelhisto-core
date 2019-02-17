@@ -19,7 +19,8 @@ import com.googlecode.cqengine.IndexedCollection;
 import net.sf.cglib.proxy.Enhancer;
 
 /**
- * The two distinct {@link BarbelMode} variants. Implements the state specific behaviour.
+ * The two distinct {@link BarbelMode} variants. Implements the state specific
+ * behaviour.
  * 
  * @author Niklas Schlimm
  *
@@ -55,7 +56,7 @@ public abstract class BarbelMode {
     public abstract boolean validateManagedType(BarbelHistoContext context, Object candidate);
 
     public abstract Class<?> getPersistenceObjectType(Class<?> objectType);
-    
+
     public static class PojoMode extends BarbelMode {
 
         @Override
@@ -80,7 +81,7 @@ public abstract class BarbelMode {
         public Bitemporal snapshotMaiden(BarbelHistoContext context, Object pojo, BitemporalStamp stamp) {
             Validate.isTrue(!Enhancer.isEnhanced(pojo.getClass()), "pojo must not be CGI proxy type");
             if (pojo instanceof BarbelProxy)
-                pojo = ((BarbelProxy)pojo).getTarget();
+                pojo = ((BarbelProxy) pojo).getTarget();
             Object copy = context.getPojoCopyFunctionSupplier().get().apply(pojo);
             Object proxy = context.getPojoProxyingFunctionSupplier().get().apply(copy, stamp);
             return (Bitemporal) proxy;
@@ -102,7 +103,7 @@ public abstract class BarbelMode {
                         .map(b -> snapshotMaiden(context, ((BitemporalVersion<?>) b).getObject(),
                                 ((BitemporalVersion<?>) b).getStamp()))
                         .collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
-                return (Collection<T>)output;
+                return (Collection<T>) output;
             } catch (ClassCastException e) {
                 throw new IllegalArgumentException(
                         "Only BitemporalVersion type collection allowed. Use Mode Bitemporal if you want to use populate() with arbitrary Bitemporal objects. Or use save() to store plain Pojos to BarbelHisto.",
@@ -117,8 +118,8 @@ public abstract class BarbelMode {
 
         @Override
         public Bitemporal copyManagedBitemporal(BarbelHistoContext context, Bitemporal bitemporal) {
-            return snapshotManagedBitemporal(context, bitemporal,
-                    (BitemporalStamp) context.getPojoCopyFunctionSupplier().get().apply(bitemporal.getBitemporalStamp()));
+            return snapshotManagedBitemporal(context, bitemporal, (BitemporalStamp) context
+                    .getPojoCopyFunctionSupplier().get().apply(bitemporal.getBitemporalStamp()));
         }
 
         @Override
@@ -139,20 +140,21 @@ public abstract class BarbelMode {
         public boolean validateManagedType(BarbelHistoContext context, Object candidate) {
             Validate.isTrue(!candidate.getClass().equals(BitemporalVersion.class),
                     "BitemporalVersion cannot be used in BarbelMode.POJO - set BarbelMode.BITEMPORAL and try again");
-            Validate.isTrue(FieldUtils.getFieldsListWithAnnotation(candidate.getClass(), DocumentId.class).size()==1, "don't forget to add @DocumentId to the document id attribute to the pojo you want to manage");
+            Validate.isTrue(FieldUtils.getFieldsListWithAnnotation(candidate.getClass(), DocumentId.class).size() == 1,
+                    "don't forget to add @DocumentId to the document id attribute to the pojo you want to manage");
             return true;
         }
 
         @SuppressWarnings("unchecked")
         @Override
         public <T> T drawMaiden(BarbelHistoContext context, T object) {
-            return (object instanceof BarbelProxy) ? (T)((BarbelProxy)object).getTarget() : object;
+            return (object instanceof BarbelProxy) ? (T) ((BarbelProxy) object).getTarget() : object;
         }
 
-		@Override
-		public Class<?> getPersistenceObjectType(Class<?> objectType) {
-			return BitemporalVersion.class;
-		}
+        @Override
+        public Class<?> getPersistenceObjectType(Class<?> objectType) {
+            return BitemporalVersion.class;
+        }
 
     }
 
@@ -170,7 +172,7 @@ public abstract class BarbelMode {
 
         @Override
         public Object drawDocumentId(Object pojo) {
-            return ((Bitemporal) pojo).getBitemporalStamp().getDocumentId();
+            return getIdValue(pojo).orElseThrow(() -> new IllegalArgumentException("document id must not be null"));
         }
 
         @Override
@@ -194,7 +196,7 @@ public abstract class BarbelMode {
         @Override
         public <T> Collection<T> customPersistenceObjectsToManagedBitemporals(BarbelHistoContext context,
                 Collection<Bitemporal> bitemporals) {
-            return (Collection<T>)bitemporals.stream().map(b -> (Object) b)
+            return (Collection<T>) bitemporals.stream().map(b -> (Object) b)
                     .collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
         }
 
@@ -217,19 +219,20 @@ public abstract class BarbelMode {
 
         @Override
         public boolean validateManagedType(BarbelHistoContext context, Object candidate) {
-            Validate.isTrue(Bitemporal.class.isAssignableFrom(candidate.getClass()), "don't forget to implement Bitemporal.class interface on the type you want to manage when in mode BarbelMode.BITEMPORAL");
+            Validate.isTrue(Bitemporal.class.isAssignableFrom(candidate.getClass()),
+                    "don't forget to implement Bitemporal.class interface on the type you want to manage when in mode BarbelMode.BITEMPORAL");
             return true;
-       }
+        }
 
         @Override
         public <T> T drawMaiden(BarbelHistoContext context, T object) {
             return object;
         }
 
-		@Override
-		public Class<?> getPersistenceObjectType(Class<?> objectType) {
-			return objectType;
-		}
+        @Override
+        public Class<?> getPersistenceObjectType(Class<?> objectType) {
+            return objectType;
+        }
 
     }
 

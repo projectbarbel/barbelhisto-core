@@ -20,15 +20,15 @@ public class CGLibProxyingFunction implements BiFunction<Object, BitemporalStamp
 
     private final Enhancer enhancer;
 
-	public CGLibProxyingFunction() {
-		super();
+    public CGLibProxyingFunction() {
+        super();
         Enhancer enhancer = new Enhancer();
         enhancer.setCallback(new Interceptor());
         enhancer.setInterfaces(new Class[] { Bitemporal.class, BarbelProxy.class });
         enhancer.setUseCache(false);
-		this.enhancer = enhancer;
-	}
-    
+        this.enhancer = enhancer;
+    }
+
     public static class Interceptor implements MethodInterceptor {
 
         private BitemporalStamp sp;
@@ -87,7 +87,8 @@ public class CGLibProxyingFunction implements BiFunction<Object, BitemporalStamp
             try {
                 proxy = tryCreateComplex(template, enhancer);
             } catch (Exception e2) {
-                throw new IllegalArgumentException("failed to create CGI proxy for type: " + template.getClass() + " - maybe create default constructor?", e2);
+                throw new IllegalArgumentException("failed to create CGI proxy for type: " + template.getClass()
+                        + " - maybe create default constructor?", e2);
             }
         }
 
@@ -119,7 +120,6 @@ public class CGLibProxyingFunction implements BiFunction<Object, BitemporalStamp
     }
 
     public Enhancer getEnhancer() {
-		return enhancer;
-	}
+        return enhancer;
+    }
 }
-

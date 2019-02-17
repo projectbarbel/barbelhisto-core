@@ -30,11 +30,11 @@ public class RecordPeriod {
     public static RecordPeriod createActive(BarbelHistoContext context) {
         return builder().createdBy(context.getUser()).createdAt(BarbelHistoContext.getBarbelClock().now()).build();
     }
-    
+
     private BitemporalObjectState compileState() {
         if (inactivatedAt.equals(NOT_INACTIVATED) && inactivatedBy.equals(NOBODY))
             return BitemporalObjectState.ACTIVE;
-        else if(!inactivatedAt.equals(NOT_INACTIVATED) && !inactivatedBy.equals(NOBODY))
+        else if (!inactivatedAt.equals(NOT_INACTIVATED) && !inactivatedBy.equals(NOBODY))
             return BitemporalObjectState.INACTIVE;
         else
             throw new IllegalStateException("cannot compile state: " + toString());
@@ -53,7 +53,7 @@ public class RecordPeriod {
         this.inactivatedBy = NOBODY;
         return this;
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (o == this)

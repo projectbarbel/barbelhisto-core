@@ -7,7 +7,7 @@ public final class BitemporalVersion<T> implements Bitemporal {
     private BitemporalStamp stamp;
     private final T object;
     private final String objectType;
-    
+
     public BitemporalVersion(BitemporalStamp stamp, T object) {
         super();
         this.stamp = stamp;
@@ -19,7 +19,7 @@ public final class BitemporalVersion<T> implements Bitemporal {
     public BitemporalStamp getBitemporalStamp() {
         return stamp;
     }
-    
+
     @Override
     public void setBitemporalStamp(BitemporalStamp stamp) {
         this.stamp = stamp;
@@ -46,7 +46,6 @@ public final class BitemporalVersion<T> implements Bitemporal {
         return Objects.hash(object, objectType, stamp);
     }
 
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -67,5 +66,5 @@ public final class BitemporalVersion<T> implements Bitemporal {
     public String toString() {
         return "BitemporalVersion [stamp=" + stamp + ", object=" + object + ", objectType=" + objectType + "]";
     }
-    
+
 }

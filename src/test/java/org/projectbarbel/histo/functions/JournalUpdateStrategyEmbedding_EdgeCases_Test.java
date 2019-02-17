@@ -33,7 +33,7 @@ public class JournalUpdateStrategyEmbedding_EdgeCases_Test {
 		context = BarbelHistoBuilder.barbel().withMode(BarbelMode.POJO).withUser("testUser");
 		journal = DocumentJournal
 				.create(ProcessingState.INTERNAL, context,
-						BarbelTestHelper.generateJournalOfDefaultPojos("someId", Arrays.asList(LocalDate.of(2016, 1, 1),
+						BarbelTestHelper.generateJournalOfManagedDefaultPojos("someId", Arrays.asList(LocalDate.of(2016, 1, 1),
 								LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))),
 						"someId");
 	}

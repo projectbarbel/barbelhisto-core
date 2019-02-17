@@ -12,15 +12,15 @@ public class Systemclock {
 
     public Systemclock() {
     }
-    
+
     public ZonedDateTime now() {
         return ZonedDateTime.now(clock);
     }
-    
+
     public LocalDate today() {
         return ZonedDateTime.now(clock).toLocalDate();
     }
-    
+
     public Systemclock useFixedClockAt(LocalDateTime date) {
         clock = Clock.fixed(date.atZone(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault());
         return this;
@@ -32,5 +32,3 @@ public class Systemclock {
     }
 
 }
-
-

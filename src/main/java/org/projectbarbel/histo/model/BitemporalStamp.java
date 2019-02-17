@@ -27,12 +27,11 @@ public final class BitemporalStamp {
         return builder().withActivity(BarbelHistoContext.getDefaultActivity())
                 .withDocumentId((String) BarbelHistoContext.getDefaultDocumentIDGenerator().get())
                 .withVersionId(BarbelHistoContext.getDefaultVersionIDGenerator().get())
-                .withEffectiveTime(EffectivePeriod.of(BarbelHistoContext.getBarbelClock().today(), LocalDate.MAX)).withRecordTime(RecordPeriod.builder().build())
-                .build();
+                .withEffectiveTime(EffectivePeriod.of(BarbelHistoContext.getBarbelClock().today(), LocalDate.MAX))
+                .withRecordTime(RecordPeriod.builder().build()).build();
     }
 
-    public static BitemporalStamp createActive(BarbelHistoContext context, Object documentId,
-            EffectivePeriod period) {
+    public static BitemporalStamp createActive(BarbelHistoContext context, Object documentId, EffectivePeriod period) {
         return builder().withActivity(context.getActivity()).withDocumentId(documentId)
                 .withVersionId(context.getVersionIdGenerator().get()).withEffectiveTime(period)
                 .withRecordTime(RecordPeriod.createActive(context)).build();

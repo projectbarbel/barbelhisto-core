@@ -96,12 +96,12 @@ public class BarbelTestHelper {
         IndexedCollection<T> journal = new ConcurrentIndexedCollection<T>();
         for (int i = 0; i < effectiveDates.size(); i++) {
             journal.add((T) DefaultDocument.builder().withBitemporalStamp(createPeriod(docId, effectiveDates, i))
-                    .withData(EnhancedRandom.random(String.class)).build());
+                    .withData(EnhancedRandom.random(String.class)).withId(docId).build());
         }
         return journal;
     }
 
-    public static IndexedCollection<Object> generateJournalOfDefaultPojos(String docId,
+    public static IndexedCollection<Object> generateJournalOfManagedDefaultPojos(String docId,
             List<LocalDate> effectiveDates) {
         IndexedCollection<Object> journal = new ConcurrentIndexedCollection<Object>();
         DefaultPojo pojo = new DefaultPojo(docId, "first original");

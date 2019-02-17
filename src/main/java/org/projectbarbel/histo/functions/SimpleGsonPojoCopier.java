@@ -6,10 +6,10 @@ import org.projectbarbel.histo.BarbelHistoContext;
 
 import com.google.gson.Gson;
 
-public class SimpleGsonPojoCopier implements Function<Object, Object>{
+public class SimpleGsonPojoCopier implements Function<Object, Object> {
 
     private Gson gson = BarbelHistoContext.getDefaultGson();
-    
+
     public void setGson(Gson gson) {
         this.gson = gson;
     }

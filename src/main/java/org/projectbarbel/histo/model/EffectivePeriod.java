@@ -17,10 +17,11 @@ public final class EffectivePeriod {
     public static EffectivePeriod of(LocalDate from, LocalDate until) {
         return new EffectivePeriod(from, until);
     }
+
     public boolean isInfinite() {
-       return until.equals(BarbelHistoContext.getInfiniteDate());
+        return until.equals(BarbelHistoContext.getInfiniteDate());
     }
-    
+
     public LocalDate from() {
         return from;
     }
@@ -37,8 +38,7 @@ public final class EffectivePeriod {
             return false;
         }
         EffectivePeriod abstractValueObject = (EffectivePeriod) o;
-        return Objects.equals(from, abstractValueObject.from)
-                && Objects.equals(until, abstractValueObject.until);
+        return Objects.equals(from, abstractValueObject.from) && Objects.equals(until, abstractValueObject.until);
     }
 
     @Override

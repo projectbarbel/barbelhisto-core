@@ -41,7 +41,8 @@ public class TableJournalPrettyPrinter implements Function<List<Bitemporal>, Str
 
     @Override
     public String apply(List<Bitemporal> objectsToPrint) {
-        return prettyPrint(objectsToPrint, ((Bitemporal)objectsToPrint.get(0)).getBitemporalStamp().getDocumentId(), b -> b.toString());
+        return prettyPrint(objectsToPrint, ((Bitemporal) objectsToPrint.get(0)).getBitemporalStamp().getDocumentId(),
+                b -> b.toString());
     }
 
 }
