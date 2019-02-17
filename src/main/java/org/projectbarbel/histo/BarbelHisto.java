@@ -136,8 +136,8 @@ import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
  * <pre>
  * Today: 2019-02-01
  * Effective from   Effective Until     Created at      Adress
- * 2017-01-01       2019-02-14          2016-12-15      Barbel-Street 1   > Period A
- * 2019-02-14       Infinite            2019-01-15      Carp-Street 10    > Period B
+ * 2017-01-01       2019-02-14          2016-12-15      Barbel-Street 1    Period A
+ * 2019-02-14       Infinite            2019-01-15      Carp-Street 10     Period B
  * </pre>
  * 
  * In this example three weeks ago on Jan, 9th 2019 that adress change in

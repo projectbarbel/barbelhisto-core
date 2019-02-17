@@ -266,6 +266,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 	 * @see <a href=
 	 *      "https://github.com/npgall/cqengine">https://github.com/npgall/cqengine</a>
 	 * @param backbone the collection for the backbone
+	 * @param <T> the type to manage
 	 * @return the builder again
 	 */
 	public <T> BarbelHistoBuilder withBackboneSupplier(Supplier<IndexedCollection<T>> backbone) {
@@ -320,7 +321,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 	 * The activity stored when creating records. Adopt this to process names or the
 	 * like.
 	 * 
-	 * @param defaultActivity the activity to store in record entries
+	 * @param activity the activity to store in record entries
 	 * @return the builder again
 	 */
 	public BarbelHistoBuilder withActivity(String activity) {
@@ -357,7 +358,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 	 * serializable call
 	 * {@link AdaptingKryoSerializer#validateObjectIsRoundTripSerializable(BarbelHistoContext, Object)}.
 	 * 
-	 * @param persistenceSerializerProducer
+	 * @param persistenceSerializerProducer the producer of the serializer
 	 * @return the builder again
 	 */
 	public BarbelHistoBuilder withPersistenceSerializerProducer(
