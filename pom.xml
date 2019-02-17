@@ -197,6 +197,11 @@
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.25</version>
 		</dependency>
+		<dependency>
+			<groupId>uk.com.robust-it</groupId>
+			<artifactId>cloning</artifactId>
+			<version>1.9.12</version>
+		</dependency>
 		<!-- Test Scope libraries -->
 		<dependency>
 			<groupId>org.javers</groupId>

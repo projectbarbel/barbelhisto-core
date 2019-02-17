@@ -18,6 +18,17 @@ import net.sf.cglib.proxy.MethodProxy;
 
 public class CGLibProxyingFunction implements BiFunction<Object, BitemporalStamp, Object> {
 
+    private final Enhancer enhancer;
+
+	public CGLibProxyingFunction() {
+		super();
+        Enhancer enhancer = new Enhancer();
+        enhancer.setCallback(new Interceptor());
+        enhancer.setInterfaces(new Class[] { Bitemporal.class, BarbelProxy.class });
+        enhancer.setUseCache(false);
+		this.enhancer = enhancer;
+	}
+    
     public static class Interceptor implements MethodInterceptor {
 
         private BitemporalStamp sp;
@@ -67,12 +78,7 @@ public class CGLibProxyingFunction implements BiFunction<Object, BitemporalStamp
     @Override
     public Object apply(Object template, BitemporalStamp stamp) {
 
-        Enhancer enhancer = new Enhancer();
-
-        enhancer.setCallback(new Interceptor());
-        enhancer.setInterfaces(new Class[] { Bitemporal.class, BarbelProxy.class });
         enhancer.setSuperclass(template.getClass());
-        enhancer.setUseCache(false);
 
         Object proxy = null;
         try {
@@ -81,7 +87,7 @@ public class CGLibProxyingFunction implements BiFunction<Object, BitemporalStamp
             try {
                 proxy = tryCreateComplex(template, enhancer);
             } catch (Exception e2) {
-                throw new IllegalArgumentException("failed to create CGI proxy for type: " + template.getClass(), e2);
+                throw new IllegalArgumentException("failed to create CGI proxy for type: " + template.getClass() + " - maybe create default constructor?", e2);
             }
         }
 
@@ -104,7 +110,6 @@ public class CGLibProxyingFunction implements BiFunction<Object, BitemporalStamp
             ArrayList<Object> argumentList = new ArrayList<Object>();
             for (int i = 0; i < parameterTypes.length; i++) {
                 argumentList.add(Defaults.defaultValue(parameterTypes[i]));
-
             }
             Object[] arguments = new Object[argumentList.size()];
             argumentList.toArray(arguments);
@@ -113,4 +118,8 @@ public class CGLibProxyingFunction implements BiFunction<Object, BitemporalStamp
         throw new IllegalArgumentException("no constructor found for CGI proxying of type: " + template.getClass());
     }
 
+    public Enhancer getEnhancer() {
+		return enhancer;
+	}
 }
+

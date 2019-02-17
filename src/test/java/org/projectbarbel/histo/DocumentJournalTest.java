@@ -10,12 +10,10 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
-import org.projectbarbel.histo.BarbelHistoContext;
+import org.projectbarbel.histo.DocumentJournal.ProcessingState;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.DefaultDocument;
-import org.projectbarbel.histo.DocumentJournal;
-import org.projectbarbel.histo.DocumentJournal.ProcessingState;
 
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;

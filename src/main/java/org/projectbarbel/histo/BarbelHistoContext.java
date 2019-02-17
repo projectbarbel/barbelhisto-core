@@ -13,8 +13,8 @@ import java.util.function.Supplier;
 
 import org.projectbarbel.histo.BarbelHistoCore.UpdateLogRecord;
 import org.projectbarbel.histo.functions.AdaptingKryoSerializer;
-import org.projectbarbel.histo.functions.CGLibProxyingFunction;
-import org.projectbarbel.histo.functions.SimpleGsonPojoCopier;
+import org.projectbarbel.histo.functions.CachingCGLibProxyingFunction;
+import org.projectbarbel.histo.functions.RitsClonerCopyFunction;
 import org.projectbarbel.histo.functions.TableJournalPrettyPrinter;
 import org.projectbarbel.histo.functions.UUIDGenerator;
 import org.projectbarbel.histo.model.Bitemporal;
@@ -106,8 +106,8 @@ public interface BarbelHistoContext {
 		return SYSTEM;
 	}
 
-	static BiFunction<Object, BitemporalStamp, Object> getDefaultProxyingFunction() {
-		return new CGLibProxyingFunction();
+	static Supplier<BiFunction<Object, BitemporalStamp, Object>> getDefaultProxyingFunctionSupplier() {
+		return () -> CachingCGLibProxyingFunction.INSTANCE;
 	}
 
 	static Gson getDefaultGson() {
@@ -115,8 +115,8 @@ public interface BarbelHistoContext {
 				.registerTypeAdapter(ZonedDateTime.class, ZDT_SERIALIZER).create();
 	}
 
-	static Function<Object, Object> getDefaultCopyFunction() {
-		return new SimpleGsonPojoCopier();
+	static Supplier<Function<Object, Object>> getDefaultCopyFunctionSupplier() {
+		return () -> RitsClonerCopyFunction.INSTANCE;
 	}
 
 	Supplier<Object> getDocumentIdGenerator();
@@ -131,9 +131,9 @@ public interface BarbelHistoContext {
 
 	Map<Object, DocumentJournal> getJournalStore();
 
-	BiFunction<Object, BitemporalStamp, Object> getPojoProxyingFunction();
+	Supplier<BiFunction<Object, BitemporalStamp, Object>> getPojoProxyingFunctionSupplier();
 
-	Function<Object, Object> getPojoCopyFunction();
+	Supplier<Function<Object, Object>> getPojoCopyFunctionSupplier();
 
 	Gson getGson();
 

@@ -44,9 +44,9 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 
 	// simple context types
 	private BarbelMode mode = BarbelHistoContext.getDefaultBarbelMode();
-	private BiFunction<Object, BitemporalStamp, Object> pojoProxyingFunction = BarbelHistoContext
-			.getDefaultProxyingFunction();
-	private Function<Object, Object> pojoCopyFunction = BarbelHistoContext.getDefaultCopyFunction();
+	private Supplier<BiFunction<Object, BitemporalStamp, Object>> pojoProxyingFunctionSupplier = BarbelHistoContext
+			.getDefaultProxyingFunctionSupplier();
+	private Supplier<Function<Object, Object>> pojoCopyFunctionSupplier = BarbelHistoContext.getDefaultCopyFunctionSupplier();
 	private Supplier<Object> versionIdGenerator = BarbelHistoContext.getDefaultVersionIDGenerator();
 	private Supplier<Object> documentIdGenerator = BarbelHistoContext.getDefaultDocumentIDGenerator();
 	private Object backboneSupplier = BarbelHistoContext.getDefaultBackbone();
@@ -73,8 +73,8 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 	}
 
 	public <T> BarbelHisto<T> build() {
-		if (pojoCopyFunction instanceof SimpleGsonPojoCopier)
-			((SimpleGsonPojoCopier) pojoCopyFunction).setGson(gson);
+		if (pojoCopyFunctionSupplier instanceof SimpleGsonPojoCopier)
+			((SimpleGsonPojoCopier) pojoCopyFunctionSupplier).setGson(gson);
 		return new BarbelHistoCore<T>(this);
 	}
 
@@ -168,8 +168,8 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 	}
 
 	@Override
-	public Function<Object, Object> getPojoCopyFunction() {
-		return pojoCopyFunction;
+	public Supplier<Function<Object, Object>> getPojoCopyFunctionSupplier() {
+		return pojoCopyFunctionSupplier;
 	}
 
 	/**
@@ -179,9 +179,9 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 	 * @param pojoCopyFunction the custom copy function
 	 * @return the builder again
 	 */
-	public BarbelHistoBuilder withPojoCopyFunction(Function<Object, Object> pojoCopyFunction) {
+	public BarbelHistoBuilder withPojoCopyFunctionSupplier(Supplier<Function<Object, Object>> pojoCopyFunction) {
 		Validate.isTrue(pojoCopyFunction != null, NONULLS);
-		this.pojoCopyFunction = pojoCopyFunction;
+		this.pojoCopyFunctionSupplier = pojoCopyFunction;
 		return this;
 	}
 
@@ -203,8 +203,8 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 	}
 
 	@Override
-	public BiFunction<Object, BitemporalStamp, Object> getPojoProxyingFunction() {
-		return pojoProxyingFunction;
+	public Supplier<BiFunction<Object, BitemporalStamp, Object>> getPojoProxyingFunctionSupplier() {
+		return pojoProxyingFunctionSupplier;
 	}
 
 	/**
@@ -215,9 +215,9 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 	 * @param proxyingFunction the custom proxying function
 	 * @return the builder again
 	 */
-	public BarbelHistoBuilder withPojoProxyingFunction(BiFunction<Object, BitemporalStamp, Object> proxyingFunction) {
+	public BarbelHistoBuilder withPojoProxyingFunctionSupplier(Supplier<BiFunction<Object, BitemporalStamp, Object>> proxyingFunction) {
 		Validate.isTrue(proxyingFunction != null, NONULLS);
-		this.pojoProxyingFunction = proxyingFunction;
+		this.pojoProxyingFunctionSupplier = proxyingFunction;
 		return this;
 	}
 

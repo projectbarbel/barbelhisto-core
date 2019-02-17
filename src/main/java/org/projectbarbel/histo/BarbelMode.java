@@ -63,11 +63,11 @@ public abstract class BarbelMode {
                 BitemporalStamp stamp) {
             Validate.isTrue(pojo instanceof BarbelProxy, "pojo must be instance of BarbelProxy in BarbelMode.POJO");
             Validate.isTrue(Enhancer.isEnhanced(pojo.getClass()), "pojo must be CGI proxy type in BarbelMode.POJO");
-            Object newVersion = context.getPojoCopyFunction().apply(((BarbelProxy) pojo).getTarget());
+            Object newVersion = context.getPojoCopyFunctionSupplier().get().apply(((BarbelProxy) pojo).getTarget());
             if (newVersion instanceof Bitemporal) { // make sure target and proxy will always sync their stamps
                 ((Bitemporal) newVersion).setBitemporalStamp(stamp);
             }
-            Object newBitemporal = context.getPojoProxyingFunction().apply(newVersion, stamp);
+            Object newBitemporal = context.getPojoProxyingFunctionSupplier().get().apply(newVersion, stamp);
             return (Bitemporal) newBitemporal;
         }
 
@@ -81,8 +81,8 @@ public abstract class BarbelMode {
             Validate.isTrue(!Enhancer.isEnhanced(pojo.getClass()), "pojo must not be CGI proxy type");
             if (pojo instanceof BarbelProxy)
                 pojo = ((BarbelProxy)pojo).getTarget();
-            Object copy = context.getPojoCopyFunction().apply(pojo);
-            Object proxy = context.getPojoProxyingFunction().apply(copy, stamp);
+            Object copy = context.getPojoCopyFunctionSupplier().get().apply(pojo);
+            Object proxy = context.getPojoProxyingFunctionSupplier().get().apply(copy, stamp);
             return (Bitemporal) proxy;
         }
 
@@ -118,13 +118,13 @@ public abstract class BarbelMode {
         @Override
         public Bitemporal copyManagedBitemporal(BarbelHistoContext context, Bitemporal bitemporal) {
             return snapshotManagedBitemporal(context, bitemporal,
-                    (BitemporalStamp) context.getPojoCopyFunction().apply(bitemporal.getBitemporalStamp()));
+                    (BitemporalStamp) context.getPojoCopyFunctionSupplier().get().apply(bitemporal.getBitemporalStamp()));
         }
 
         @Override
         public Object fromInternalPersistenceObjectToManagedBitemporal(BarbelHistoContext context,
                 BitemporalVersion<?> bv) {
-            return context.getPojoProxyingFunction().apply(bv.getObject(), bv.getBitemporalStamp());
+            return context.getPojoProxyingFunctionSupplier().get().apply(bv.getObject(), bv.getBitemporalStamp());
         }
 
         @Override
@@ -163,7 +163,7 @@ public abstract class BarbelMode {
                 BitemporalStamp stamp) {
             Validate.isTrue(!(pojo instanceof BarbelProxy), "pojo must not be instance of BarbelProxy");
             Validate.isTrue(!Enhancer.isEnhanced(pojo.getClass()), "pojo must not be CGI proxy type");
-            Object newVersion = context.getPojoCopyFunction().apply(pojo);
+            Object newVersion = context.getPojoCopyFunctionSupplier().get().apply(pojo);
             ((Bitemporal) newVersion).setBitemporalStamp(stamp);
             return (Bitemporal) newVersion;
         }
@@ -179,7 +179,7 @@ public abstract class BarbelMode {
                     "must inherit interface Bitemporal.class when running bitemporal mode");
             Validate.isTrue(!(pojo instanceof BarbelProxy), "pojo must not be instance of BarbelProxy");
             Validate.isTrue(!Enhancer.isEnhanced(pojo.getClass()), "pojo must not be CGI proxy type");
-            Object copy = context.getPojoCopyFunction().apply(pojo);
+            Object copy = context.getPojoCopyFunctionSupplier().get().apply(pojo);
             ((Bitemporal) copy).setBitemporalStamp(stamp);
             return (Bitemporal) copy;
         }
@@ -200,7 +200,7 @@ public abstract class BarbelMode {
 
         @Override
         public Bitemporal copyManagedBitemporal(BarbelHistoContext context, Bitemporal bitemporal) {
-            return (Bitemporal) context.getPojoCopyFunction().apply(bitemporal);
+            return (Bitemporal) context.getPojoCopyFunctionSupplier().get().apply(bitemporal);
         }
 
         @Override
