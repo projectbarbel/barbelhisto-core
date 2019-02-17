@@ -56,11 +56,13 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 	private final Map<Object, DocumentJournal> journals;
 	private final IndexedCollection<UpdateLogRecord> updateLog;
 	private final static Map<Object, Object> validTypes = new HashMap<>();
+	private final BarbelMode mode;
 
 	@SuppressWarnings("unchecked")
 	protected BarbelHistoCore(BarbelHistoContext context) {
 		CONSTRUCTION_CONTEXT.set(context);
 		this.context = Objects.requireNonNull(context);
+		this.mode = Objects.requireNonNull(context.getMode());
 		this.backbone = Objects.requireNonNull((IndexedCollection<T>) context.getBackboneSupplier().get());
 		this.journals = Objects.requireNonNull(context.getJournalStore());
 		this.updateLog = Objects.requireNonNull(context.getUpdateLog());
@@ -71,13 +73,13 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 	public boolean save(T newVersion, LocalDate from, LocalDate until) {
 		Validate.isTrue(newVersion != null && from != null && until != null, NOTNULL);
 		Validate.isTrue(from.isBefore(until), "from date must be before until date");
-		T maiden = context.getMode().drawMaiden(context, newVersion);
+		T maiden = mode.drawMaiden(context, newVersion);
 		validTypes.computeIfAbsent(maiden.getClass(),
-				(k) -> context.getMode().validateManagedType(context, maiden));
-		Object id = context.getMode().drawDocumentId(maiden);
+				(k) -> mode.validateManagedType(context, maiden));
+		Object id = mode.drawDocumentId(maiden);
 		BitemporalStamp stamp = BitemporalStamp.of(context.getActivity(), id, EffectivePeriod.of(from, until),
 				RecordPeriod.createActive(context));
-		Bitemporal newManagedBitemporal = context.getMode().snapshotMaiden(context, maiden, stamp);
+		Bitemporal newManagedBitemporal = mode.snapshotMaiden(context, maiden, stamp);
 		BiConsumer<DocumentJournal, Bitemporal> updateStrategy = context.getJournalUpdateStrategyProducer()
 				.apply(context);
 		DocumentJournal journal = journals.computeIfAbsent(id,
@@ -100,7 +102,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 	public List<T> retrieve(Query<T> query) {
 		Validate.isTrue(query != null, NOTNULL);
 		return doRetrieveList(() -> (List<T>) backbone.retrieve(query).stream()
-				.map(o -> context.getMode().copyManagedBitemporal(context, (Bitemporal) o))
+				.map(o -> mode.copyManagedBitemporal(context, (Bitemporal) o))
 				.collect(Collectors.toList()));
 	}
 
@@ -109,7 +111,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 	public List<T> retrieve(Query<T> query, QueryOptions options) {
 		Validate.isTrue(query != null && options != null, NOTNULL);
 		return doRetrieveList(() -> (List<T>) backbone.retrieve(query, options).stream()
-				.map(o -> context.getMode().copyManagedBitemporal(context, (Bitemporal) o))
+				.map(o -> mode.copyManagedBitemporal(context, (Bitemporal) o))
 				.collect(Collectors.toList()));
 	}
 
@@ -176,14 +178,14 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 	public void populate(Collection<Bitemporal> bitemporals) {
 		Validate.isTrue(bitemporals != null, "bitemporals cannot be null");
 		Validate.validState(backbone.size() == 0, "backbone must be empty when calling populate");
-		backbone.addAll(context.getMode().customPersistenceObjectsToManagedBitemporals(context, bitemporals));
+		backbone.addAll(mode.customPersistenceObjectsToManagedBitemporals(context, bitemporals));
 	}
 
 	@Override
-	public Collection<Bitemporal> dump(DumpMode mode) {
-		Validate.isTrue(mode != null, NOTNULL);
-		Collection<Bitemporal> collection = context.getMode().managedBitemporalToCustomPersistenceObjects(backbone);
-		if (mode.equals(DumpMode.CLEARCOLLECTION))
+	public Collection<Bitemporal> dump(DumpMode dumpMode) {
+		Validate.isTrue(dumpMode != null, NOTNULL);
+		Collection<Bitemporal> collection = mode.managedBitemporalToCustomPersistenceObjects(backbone);
+		if (dumpMode.equals(DumpMode.CLEARCOLLECTION))
 			backbone.clear();
 		return collection;
 	}
@@ -197,7 +199,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 				"timeshift only allowed in the past");
 		ResultSet<T> result = backbone.retrieve(BarbelQueries.journalAt(id, time));
 		IndexedCollection<Bitemporal> copiedAndActivatedBitemporals = result.stream()
-				.map(d -> context.getMode().copyManagedBitemporal(context, (Bitemporal) d))
+				.map(d -> mode.copyManagedBitemporal(context, (Bitemporal) d))
 				.peek(d -> d.getBitemporalStamp().getRecordTime().activate())
 				.collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
 		return DocumentJournal.create(ProcessingState.EXTERNAL, context, copiedAndActivatedBitemporals, id);
@@ -223,7 +225,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 	@Override
 	public Optional<T> retrieveOne(Query<T> query) {
 		try {
-			T object = (T) context.getMode().copyManagedBitemporal(context,
+			T object = (T) mode.copyManagedBitemporal(context,
 					(Bitemporal) backbone.retrieve(query).uniqueResult());
 			return Optional.of(object);
 		} catch (NoSuchObjectException e) {
@@ -235,7 +237,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 	@Override
 	public Optional<T> retrieveOne(Query<T> query, QueryOptions options) {
 		try {
-			T object = (T) context.getMode().copyManagedBitemporal(context,
+			T object = (T) mode.copyManagedBitemporal(context,
 					(Bitemporal) backbone.retrieve(query, options).uniqueResult());
 			return Optional.of(object);
 		} catch (NoSuchObjectException e) {
