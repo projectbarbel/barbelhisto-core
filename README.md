@@ -41,9 +41,9 @@ Download the [actual snapshot releases](https://github.com/projectbarbel/barbelh
 
 Or clone this git repository to try some of the features of `BarbelHisto`.
 
-# Getting started tutorial
+# Getting started with POJOs
 [See this test case](https://github.com/projectbarbel/barbelhisto-core/blob/master/src/test/java/org/projectbarbel/histo/BarbelHistoCore_StdPojoUsage_Test.java) to get the complete code for this tutorial.
-
+> **NOTE**: in this turorial we use `BarbelHisto`s default processing mode, which is `BarbelMode.POJO`. There is another mode called `BarbelMode.BITEMPORAL` if proxying does not work out on your business classes. 
 ## Create an instance of BarbelHisto
 Create an instance of `BarbelHisto`.
 ```java
