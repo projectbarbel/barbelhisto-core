@@ -132,7 +132,7 @@ Document-ID: somePersonelNumber
 ```
 As you may recognise the journal of that employee not contains some versions of the employee. Two versions with `ACTIVE` state and one with `INACTIVE` state. The active versions are effective from today (2019-02-15) and another one effective from in 10 days, which is 2019-02-25. There is one inactivated version, the one you've stored in the beginning, effective from now until infinite. `BarbelHisto` manages two time dimensions, one reflects the effective time, and another one, redord time, reflects when a change was made. For that reason, **nothing will ever be deleted**. There are **only inserts** to `BarbelHiso` backbone collections, **never deletions**.
 ## Timeshifts 
-One of `BarbelHisto`s core functionality is doing timeshifts. With timeshifts you can look at past data as if it were still active. Let's suppose you did not make the previous updates at the same day like we just did in our turorial. Let's suppose we've created the `Employee` from our previous example on Feb 1st, 2019 and then made some changes today that should become effective in the future. The journal of such a scenario looks like this:
+One of `BarbelHisto`s core functionality is doing timeshifts. With timeshifts you can look at past data as if it were still active. Let's suppose you did not make the updates from our previous example above at the same day like we just did in our turorial. Let's suppose we've created the `Employee` from our previous example on Feb 1st, 2019 and then made some changes today (here 2019, February 18th) that should become effective in the future. The journal of such a scenario looks like this:
 ```
 Document-ID: somePersonelNumber
 
