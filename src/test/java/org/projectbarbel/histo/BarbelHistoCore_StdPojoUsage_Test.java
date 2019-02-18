@@ -1,15 +1,20 @@
 package org.projectbarbel.histo;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.projectbarbel.histo.functions.TableJournalPrettyPrinter;
+import org.projectbarbel.histo.model.Bitemporal;
+import org.projectbarbel.histo.model.BitemporalStamp;
 
 public class BarbelHistoCore_StdPojoUsage_Test {
 
@@ -37,6 +42,10 @@ public class BarbelHistoCore_StdPojoUsage_Test {
         core.save(effectiveEmployeeVersion, LocalDate.now().plusDays(10), LocalDate.MAX);
 
         effectiveNowOptional = core.retrieveOne(BarbelQueries.effectiveNow(employee.getId()));
+
+        BitemporalStamp versionData = ((Bitemporal)effectiveNowOptional.get()).getBitemporalStamp();
+        assertNotNull(versionData);
+        
         effectiveIn10DaysOptional = core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().plusDays(10)));
 
         effectiveEmployeeVersion = effectiveNowOptional.get();
@@ -47,6 +56,44 @@ public class BarbelHistoCore_StdPojoUsage_Test {
 
         System.out.println(core.prettyPrintJournal(employee.getId()));
 
+    }
+    
+    @Test
+    public void timeshift() {
+        
+        BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.of(2019, 2, 1, 0, 0));
+        
+        BarbelHisto<Employee> core = BarbelHistoBuilder.barbel().build();
+        Employee employee = new Employee("somePersonelNumber", "Niklas", "Schlimm");
+        core.save(employee, LocalDate.now(), LocalDate.MAX);
+        
+        Optional<Employee> effectiveIn10DaysOptional = core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().plusDays(10)));
+        Optional<Employee> effectiveYesterdayOptional = core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().minusDays(1)));
+        assertFalse(effectiveYesterdayOptional.isPresent());
+        
+        System.out.println(core.prettyPrintJournal(employee.getId()));
+        
+        BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.now());
+
+        Optional<Employee> effectiveNowOptional = core.retrieveOne(BarbelQueries.effectiveNow(employee.getId()));
+        Employee effectiveEmployeeVersion = effectiveNowOptional.get();
+        effectiveEmployeeVersion.setLastname("changedLastName");
+        core.save(effectiveEmployeeVersion, LocalDate.now().plusDays(10), LocalDate.MAX);
+        
+        effectiveNowOptional = core.retrieveOne(BarbelQueries.effectiveNow(employee.getId()));
+        effectiveIn10DaysOptional = core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().plusDays(10)));
+        
+        effectiveEmployeeVersion = effectiveNowOptional.get();
+        Employee effectiveIn10DaysVersion = effectiveIn10DaysOptional.get();
+        
+        assertTrue(effectiveEmployeeVersion.getLastname().equals("Schlimm"));
+        assertTrue(effectiveIn10DaysVersion.getLastname().equals("changedLastName"));
+        
+        System.out.println(core.prettyPrintJournal(employee.getId()));
+        
+        DocumentJournal journal = core.timeshift("somePersonelNumber", LocalDate.now().minusDays(1).atStartOfDay());
+        System.out.println(new TableJournalPrettyPrinter().apply(journal.list()));
+        
     }
     
     public static class Employee {
