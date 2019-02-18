@@ -20,6 +20,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.projectbarbel.histo.DocumentJournal.ProcessingState;
 import org.projectbarbel.histo.functions.EmbeddingJournalUpdateStrategy;
 import org.projectbarbel.histo.functions.EmbeddingJournalUpdateStrategy.JournalUpdateCase;
+import org.projectbarbel.histo.model.BarbelProxy;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalObjectState;
 import org.projectbarbel.histo.model.BitemporalStamp;
@@ -27,6 +28,10 @@ import org.projectbarbel.histo.model.DefaultDocument;
 import org.projectbarbel.histo.model.DefaultPojo;
 import org.projectbarbel.histo.model.EffectivePeriod;
 import org.projectbarbel.histo.model.RecordPeriod;
+
+import com.googlecode.cqengine.IndexedCollection;
+
+import io.github.benas.randombeans.api.EnhancedRandom;
 
 public class BarbelHistoCore_JournalUpdate_Test {
 
@@ -43,11 +48,10 @@ public class BarbelHistoCore_JournalUpdate_Test {
         DefaultDocument doc = new DefaultDocument();
         BarbelHistoContext context = BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL);
         Bitemporal bitemporal = BarbelMode.BITEMPORAL.snapshotMaiden(context, doc, BitemporalStamp.createActive());
-        journal = DocumentJournal
-                .create(ProcessingState.INTERNAL, context,
-                        BarbelTestHelper.generateJournalOfManagedDefaultPojos("someId", Arrays.asList(LocalDate.of(2016, 1, 1),
-                                LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))),
-                        "someId");
+        journal = DocumentJournal.create(ProcessingState.INTERNAL, context,
+                BarbelTestHelper.generateJournalOfManagedDefaultPojos("someId", Arrays.asList(LocalDate.of(2016, 1, 1),
+                        LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))),
+                "someId");
         assertThrows(IllegalArgumentException.class,
                 () -> new EmbeddingJournalUpdateStrategy(context).accept(journal, bitemporal));
     }
@@ -130,8 +134,88 @@ public class BarbelHistoCore_JournalUpdate_Test {
     }
     // @formatter:on
 
+    // @formatter:off
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> createJournalEdgeCases() {
+        
+                //  1.1.2016           1.1.2017           1.1.2018           1.1.2019
+                     //|------------------|------------------|------------------|----------> Infinite
+        
+        return Stream.of(
+            //A        |------------------|------------------|------------------|----------> Infinite
+            //U|-------|
+                Arguments.of(LocalDate.of(2015, 7, 1), LocalDate.of(2016, 1, 1), 
+                        JournalUpdateCase.STRAIGHTINSERT, 
+                        1, 
+                        Arrays.asList(LocalDate.of(2015, 7, 1), LocalDate.of(2016, 1, 1)),
+                        0, 
+                        Arrays.asList()),
+                
+                //A    |------------------|------------------|------------------|-----------------------------> Infinite
+                //U                                                                  |-------------------|
+                Arguments.of(LocalDate.of(2019, 7, 1), LocalDate.of(2019, 8, 1), 
+                        JournalUpdateCase.EMBEDDEDINTERVAL,
+                        3, 
+                        Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 7, 1), LocalDate.of(2019, 7, 1), LocalDate.of(2019, 8, 1), LocalDate.of(2019, 8, 1), LocalDate.MAX),
+                        1, 
+                        Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.MAX)),
+                //A    |------------------|------------------|------------------|----------> Infinite
+                //U                       |------------------|
+                Arguments.of(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), 
+                        JournalUpdateCase.EMBEDDEDINTERVAL,
+                        1, 
+                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1)),
+                        1, 
+                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1))),
+                //A    |------------------|------------------|------------------|----------> Infinite
+                //U                       |--------------|
+                Arguments.of(LocalDate.of(2017, 1, 1), LocalDate.of(2017, 10, 1), 
+                        JournalUpdateCase.EMBEDDEDINTERVAL,
+                        2, 
+                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2017, 10, 1), LocalDate.of(2017, 10, 1), LocalDate.of(2018, 1, 1)),
+                        1, 
+                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1))),
+                //A    |------------------|------------------|------------------|----------> Infinite
+                //U                       |-------------------------------------|
+                Arguments.of(LocalDate.of(2017, 1, 1), LocalDate.of(2019, 1, 1), 
+                        JournalUpdateCase.EMBEDDEDOVERLAY,
+                        1, 
+                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2019, 1, 1)),
+                        2, 
+                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))),
+                //A    |------------------|------------------|------------------|------------> Infinite
+                //U    |---------------------------------------------------------------------> Infinite
+                Arguments.of(LocalDate.of(2016, 1, 1), LocalDate.MAX, 
+                        JournalUpdateCase.POSTOVERLAPPING_OVERLAY,
+                        1, 
+                        Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.MAX),
+                        4, 
+                        Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1),LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 1), LocalDate.MAX)));
+    }
+
+    // @formatter:on
+    // @formatter:off
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> createJournalDebugCases() {
+        
+        //  1.1.2016           1.1.2017           1.1.2018           1.1.2019
+        //|------------------|------------------|------------------|----------> Infinite
+        
+        return Stream.of(
+                //A    |------------------|------------------|------------------|----------> Infinite
+                //U                       |------------------|
+                Arguments.of(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), 
+                        JournalUpdateCase.EMBEDDEDINTERVAL,
+                        1, 
+                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1)),
+                        1, 
+                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1))));
+        
+    }
+    // @formatter:on
+
     @ParameterizedTest
-    @MethodSource("createJournalUpdateCases")
+    @MethodSource({ "createJournalUpdateCases", "createJournalEdgeCases" })
     public void testCoreSave_Pojo(LocalDate updateFrom, LocalDate updateUntil, JournalUpdateCase updateCase,
             int countOfNewVersions, List<LocalDate> activeEffective, int inactiveCount,
             List<LocalDate> inactiveEffective) throws Exception {
@@ -146,6 +230,8 @@ public class BarbelHistoCore_JournalUpdate_Test {
         update.setData("some data");
         core.save(update, updateFrom, updateUntil);
         journal = ((BarbelHistoCore<DefaultPojo>) core).getDocumentJournal("someId");
+        if (updateCase.equals(JournalUpdateCase.EMBEDDEDINTERVAL))
+            System.out.println(core.prettyPrintJournal("someId"));
         assertEquals(countOfNewVersions, ((BarbelHistoCore<DefaultPojo>) core).getLastUpdate().newVersions.size());
         assertEquals(updateCase, ((BarbelHistoCore<DefaultPojo>) core).getLastUpdate().updateCase);
         assertNewVersions(((BarbelHistoCore<DefaultPojo>) core).getLastUpdate().requestedUpdate,
@@ -154,7 +240,7 @@ public class BarbelHistoCore_JournalUpdate_Test {
     }
 
     @ParameterizedTest
-    @MethodSource("createJournalUpdateCases")
+    @MethodSource({ "createJournalUpdateCases", "createJournalEdgeCases" })
     public void testCoreSave_Bitemporal(LocalDate updateFrom, LocalDate updateUntil, JournalUpdateCase updateCase,
             int countOfNewVersions, List<LocalDate> activeEffective, int inactiveCount,
             List<LocalDate> inactiveEffective) throws Exception {
@@ -175,19 +261,18 @@ public class BarbelHistoCore_JournalUpdate_Test {
                 ((BarbelHistoCore<DefaultDocument>) core).getLastUpdate().newVersions, activeEffective);
         assertInactivatedVersions(inactiveCount, inactiveEffective);
     }
-    
+
     @ParameterizedTest
-    @MethodSource("createJournalUpdateCases")
+    @MethodSource({ "createJournalUpdateCases", "createJournalEdgeCases" })
     public void testFunctionAccept_Pojo(LocalDate updateFrom, LocalDate updateUntil, JournalUpdateCase updateCase,
             int countOfNewVersions, List<LocalDate> activeEffective, int inactiveCount,
             List<LocalDate> inactiveEffective) throws Exception {
         BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 10, 0));
         context = BarbelHistoBuilder.barbel().withMode(BarbelMode.POJO).withUser("testUser");
-        journal = DocumentJournal
-                .create(ProcessingState.INTERNAL, context,
-                        BarbelTestHelper.generateJournalOfManagedDefaultPojos("someId", Arrays.asList(LocalDate.of(2016, 1, 1),
-                                LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))),
-                        "someId");
+        journal = DocumentJournal.create(ProcessingState.INTERNAL, context,
+                BarbelTestHelper.generateJournalOfManagedDefaultPojos("someId", Arrays.asList(LocalDate.of(2016, 1, 1),
+                        LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))),
+                "someId");
         UpdateReturn updatReturn = performUpdate_Pojo(updateFrom, updateUntil);
         assertTrue(updatReturn.newVersions.size() == countOfNewVersions);
         assertEquals(updateCase, updatReturn.function.getActualCase());
@@ -196,7 +281,7 @@ public class BarbelHistoCore_JournalUpdate_Test {
     }
 
     @ParameterizedTest
-    @MethodSource("createJournalUpdateCases")
+    @MethodSource({ "createJournalUpdateCases", "createJournalEdgeCases" })
     public void testFunctionAccept_Bitemporal(LocalDate updateFrom, LocalDate updateUntil, JournalUpdateCase updateCase,
             int countOfNewVersions, List<LocalDate> activeEffective, int inactiveCount,
             List<LocalDate> inactiveEffective) throws Exception {
@@ -210,6 +295,27 @@ public class BarbelHistoCore_JournalUpdate_Test {
         assertTrue(updatReturn.newVersions.size() == countOfNewVersions);
         assertEquals(updateCase, updatReturn.function.getActualCase());
         assertNewVersions(updatReturn.bitemporal, updatReturn.newVersions, activeEffective);
+        assertInactivatedVersions(inactiveCount, inactiveEffective);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> void testCoreSave_Flex(BarbelMode mode, LocalDateTime today, IndexedCollection<T> existingJournal,
+            LocalDate updateFrom, LocalDate updateUntil, JournalUpdateCase updateCase, int countOfNewVersions,
+            List<LocalDate> activeEffective, int inactiveCount, List<LocalDate> inactiveEffective) throws Exception {
+        BarbelHistoContext.getBarbelClock().useFixedClockAt(today);
+        BarbelHistoContext context = BarbelHistoBuilder.barbel().withMode(mode).withUser("testUser")
+                .withBackboneSupplier(() -> existingJournal);
+        BarbelHisto<T> core = ((BarbelHistoBuilder) context).build();
+        T template = existingJournal.stream().findFirst().get();
+        T object = (T) EnhancedRandom.random(template.getClass());
+        if (template instanceof BarbelProxy)
+            object = (T) EnhancedRandom.random(((BarbelProxy) template).getTarget().getClass());
+        core.save(object, updateFrom, updateUntil);
+        journal = ((BarbelHistoCore<T>) core).getDocumentJournal("someId");
+        assertEquals(countOfNewVersions, ((BarbelHistoCore<T>) core).getLastUpdate().newVersions.size());
+        assertEquals(updateCase, ((BarbelHistoCore<T>) core).getLastUpdate().updateCase);
+        assertNewVersions(((BarbelHistoCore<T>) core).getLastUpdate().requestedUpdate,
+                ((BarbelHistoCore<T>) core).getLastUpdate().newVersions, activeEffective);
         assertInactivatedVersions(inactiveCount, inactiveEffective);
     }
 
@@ -248,34 +354,34 @@ public class BarbelHistoCore_JournalUpdate_Test {
             List<LocalDate> activeEffective) {
 
         for (int i = 0; i < newVersions.size(); i++) {
-            assertEquals(newVersions.get(i).getBitemporalStamp().getEffectiveTime().from(), activeEffective.get(i * 2));
-            assertEquals(newVersions.get(i).getBitemporalStamp().getEffectiveTime().until(),
-                    activeEffective.get(i * 2 + 1));
-            assertEquals(newVersions.get(i).getBitemporalStamp().getRecordTime().getCreatedAt(),
-                    ZonedDateTime.of(LocalDateTime.of(2019, 1, 30, 10, 0), ZoneId.systemDefault()));
+            assertEquals(activeEffective.get(i * 2), newVersions.get(i).getBitemporalStamp().getEffectiveTime().from());
+            assertEquals(activeEffective.get(i * 2 + 1),
+                    newVersions.get(i).getBitemporalStamp().getEffectiveTime().until());
+            assertEquals(ZonedDateTime.of(LocalDateTime.of(2019, 1, 30, 10, 0), ZoneId.systemDefault()),
+                    newVersions.get(i).getBitemporalStamp().getRecordTime().getCreatedAt());
             assertEquals(newVersions.get(i).getBitemporalStamp().getRecordTime().getCreatedBy(), "testUser");
-            assertEquals(newVersions.get(i).getBitemporalStamp().getRecordTime().getInactivatedAt(),
-                    RecordPeriod.NOT_INACTIVATED);
-            assertEquals(newVersions.get(i).getBitemporalStamp().getRecordTime().getInactivatedBy(),
-                    RecordPeriod.NOBODY);
-            assertEquals(newVersions.get(i).getBitemporalStamp().getRecordTime().getState(),
-                    BitemporalObjectState.ACTIVE);
+            assertEquals(RecordPeriod.NOT_INACTIVATED,
+                    newVersions.get(i).getBitemporalStamp().getRecordTime().getInactivatedAt());
+            assertEquals(RecordPeriod.NOBODY,
+                    newVersions.get(i).getBitemporalStamp().getRecordTime().getInactivatedBy());
+            assertEquals(BitemporalObjectState.ACTIVE,
+                    newVersions.get(i).getBitemporalStamp().getRecordTime().getState());
         }
 
     }
 
     private void assertInactivatedVersion(Bitemporal inactivated, LocalDate from, LocalDate until) {
 
-        assertEquals(inactivated.getBitemporalStamp().getEffectiveTime().from(), from);
-        assertEquals(inactivated.getBitemporalStamp().getEffectiveTime().until(), until);
+        assertEquals(from, inactivated.getBitemporalStamp().getEffectiveTime().from());
+        assertEquals(until, inactivated.getBitemporalStamp().getEffectiveTime().until());
 
-        assertEquals(inactivated.getBitemporalStamp().getRecordTime().getCreatedAt(),
-                ZonedDateTime.of(LocalDateTime.of(2019, 1, 30, 10, 0), ZoneId.systemDefault()));
-        assertEquals(inactivated.getBitemporalStamp().getRecordTime().getCreatedBy(), "SYSTEM");
-        assertEquals(inactivated.getBitemporalStamp().getRecordTime().getInactivatedAt(),
-                ZonedDateTime.of(LocalDateTime.of(2019, 1, 30, 10, 0), ZoneId.systemDefault()));
-        assertEquals(inactivated.getBitemporalStamp().getRecordTime().getInactivatedBy(), "testUser");
-        assertEquals(inactivated.getBitemporalStamp().getRecordTime().getState(), BitemporalObjectState.INACTIVE);
+        assertEquals(ZonedDateTime.of(LocalDateTime.of(2019, 1, 30, 10, 0), ZoneId.systemDefault()),
+                inactivated.getBitemporalStamp().getRecordTime().getCreatedAt());
+        assertEquals("SYSTEM", inactivated.getBitemporalStamp().getRecordTime().getCreatedBy());
+        assertEquals(ZonedDateTime.of(LocalDateTime.of(2019, 1, 30, 10, 0), ZoneId.systemDefault()),
+                inactivated.getBitemporalStamp().getRecordTime().getInactivatedAt());
+        assertEquals("testUser", inactivated.getBitemporalStamp().getRecordTime().getInactivatedBy());
+        assertEquals(BitemporalObjectState.INACTIVE, inactivated.getBitemporalStamp().getRecordTime().getState());
 
     }
 

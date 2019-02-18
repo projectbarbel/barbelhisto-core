@@ -3,6 +3,7 @@ package org.projectbarbel.histo;
 import static com.googlecode.cqengine.query.QueryFactory.and;
 import static com.googlecode.cqengine.query.QueryFactory.equal;
 import static com.googlecode.cqengine.query.QueryFactory.greaterThan;
+import static com.googlecode.cqengine.query.QueryFactory.lessThan;
 import static com.googlecode.cqengine.query.QueryFactory.greaterThanOrEqualTo;
 import static com.googlecode.cqengine.query.QueryFactory.lessThanOrEqualTo;
 
@@ -166,8 +167,12 @@ public final class BarbelQueries {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> Query<T> effectiveBetween(Object id, EffectivePeriod period) {
-		return (Query<T>) and(allActive(id), greaterThanOrEqualTo(EFFECTIVE_FROM, period.from()),
-				lessThanOrEqualTo(EFFECTIVE_UNTIL, period.until()));
+	    if (period.until().equals(LocalDate.MAX))
+		    return (Query<T>) and(allActive(id), greaterThanOrEqualTo(EFFECTIVE_FROM, period.from()),
+		                          lessThanOrEqualTo(EFFECTIVE_UNTIL, period.until()));
+	    else 
+	        return (Query<T>) and(allActive(id), greaterThanOrEqualTo(EFFECTIVE_FROM, period.from()),
+	                              lessThan(EFFECTIVE_UNTIL, period.until()));
 	}
 
 	/**

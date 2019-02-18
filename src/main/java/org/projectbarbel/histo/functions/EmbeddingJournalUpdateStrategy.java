@@ -1,5 +1,6 @@
 package org.projectbarbel.histo.functions;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,10 +34,12 @@ public class EmbeddingJournalUpdateStrategy implements BiConsumer<DocumentJourna
         Validate.isTrue(journal.getId().equals(update.getBitemporalStamp().getDocumentId()),
                 "update and journal must have same document id");
         Validate.isTrue(update.getBitemporalStamp().isActive(), "only active bitemporals are allowed here");
+        LocalDate rightBound = update.getBitemporalStamp().getEffectiveTime().until().equals(LocalDate.MAX)
+                ? LocalDate.MAX
+                : update.getBitemporalStamp().getEffectiveTime().until().minusDays(1);
         Optional<Bitemporal> interruptedLeftVersion = journal.read()
                 .effectiveAt(update.getBitemporalStamp().getEffectiveTime().from());
-        Optional<Bitemporal> interruptedRightVersion = journal.read()
-                .effectiveAt(update.getBitemporalStamp().getEffectiveTime().until());
+        Optional<Bitemporal> interruptedRightVersion = journal.read().effectiveAt(rightBound);
         List<Bitemporal> betweenVersions = journal.read()
                 .effectiveBetween(update.getBitemporalStamp().getEffectiveTime());
         actualCase = JournalUpdateCase.validate(interruptedLeftVersion.isPresent(), interruptedRightVersion.isPresent(),
@@ -55,7 +58,9 @@ public class EmbeddingJournalUpdateStrategy implements BiConsumer<DocumentJourna
                 BitemporalStamp.createActive(context, update.getBitemporalStamp().getDocumentId(),
                         EffectivePeriod.of(interruptedLeftVersion.getBitemporalStamp().getEffectiveTime().from(),
                                 update.getBitemporalStamp().getEffectiveTime().from())));
-        newVersions.add(newPrecedingVersion);
+        if (newPrecedingVersion.getBitemporalStamp().getEffectiveTime().from()
+                .isBefore(newPrecedingVersion.getBitemporalStamp().getEffectiveTime().until()))
+            newVersions.add(newPrecedingVersion);
     }
 
     private void processInterruptedRightVersion(final Bitemporal update, Bitemporal interruptedRightVersion) {
@@ -63,6 +68,8 @@ public class EmbeddingJournalUpdateStrategy implements BiConsumer<DocumentJourna
                 BitemporalStamp.createActive(context, update.getBitemporalStamp().getDocumentId(),
                         EffectivePeriod.of(update.getBitemporalStamp().getEffectiveTime().until(),
                                 interruptedRightVersion.getBitemporalStamp().getEffectiveTime().until())));
+        if (newSubsequentVersion.getBitemporalStamp().getEffectiveTime().from()
+                .isBefore(newSubsequentVersion.getBitemporalStamp().getEffectiveTime().until()))
         newVersions.add(newSubsequentVersion);
     }
 
