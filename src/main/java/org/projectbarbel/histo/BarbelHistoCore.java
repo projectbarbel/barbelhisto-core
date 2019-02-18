@@ -182,11 +182,18 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     public Collection<Bitemporal> dump(DumpMode dumpMode) {
         Validate.isTrue(dumpMode != null, NOTNULL);
         Collection<Bitemporal> collection = mode.managedBitemporalToCustomPersistenceObjects(backbone);
-        if (dumpMode.equals(DumpMode.CLEARCOLLECTION))
+        if (dumpMode.equals(DumpMode.CLEARCOLLECTION)) {
             backbone.clear();
+            journals.clear();
+            updateLog.clear();
+        }
         return collection;
     }
 
+    public Collection<UpdateLogRecord> getUpdateLog() {
+        return updateLog;
+    }
+    
     @Override
     public DocumentJournal timeshift(Object id, LocalDateTime time) {
         Validate.isTrue(id != null && time != null, NOTNULL);
@@ -214,6 +221,10 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
         }
     }
 
+    public int size() {
+        return backbone.size();
+    }
+    
     public enum DumpMode {
         CLEARCOLLECTION, READONLY;
     }

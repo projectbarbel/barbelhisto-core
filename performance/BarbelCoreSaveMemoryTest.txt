@@ -1,0 +1,2493 @@
+######### Barbel-Statistics #########
+inserterted 5000 in 13.56 s
+per object: 2.712 ms
+count of versions: 14946
+##### Heap utilization statistics [MB] #####
+Used Memory:5
+Free Memory:225
+Total Memory:231
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.61 s
+per object: 2.521 ms
+count of versions: 14939
+##### Heap utilization statistics [MB] #####
+Used Memory:5
+Free Memory:196
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.56 s
+per object: 2.512 ms
+count of versions: 14938
+##### Heap utilization statistics [MB] #####
+Used Memory:5
+Free Memory:196
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.01 s
+per object: 2.601 ms
+count of versions: 14941
+##### Heap utilization statistics [MB] #####
+Used Memory:6
+Free Memory:195
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.65 s
+per object: 2.529 ms
+count of versions: 14945
+##### Heap utilization statistics [MB] #####
+Used Memory:7
+Free Memory:194
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.72 s
+per object: 2.545 ms
+count of versions: 14943
+##### Heap utilization statistics [MB] #####
+Used Memory:8
+Free Memory:202
+Total Memory:210
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.81 s
+per object: 2.562 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:8
+Free Memory:193
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.78 s
+per object: 2.555 ms
+count of versions: 14947
+##### Heap utilization statistics [MB] #####
+Used Memory:8
+Free Memory:193
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.52 s
+per object: 2.503 ms
+count of versions: 14941
+##### Heap utilization statistics [MB] #####
+Used Memory:9
+Free Memory:192
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.35 s
+per object: 2.471 ms
+count of versions: 14946
+##### Heap utilization statistics [MB] #####
+Used Memory:10
+Free Memory:191
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.37 s
+per object: 2.474 ms
+count of versions: 14933
+##### Heap utilization statistics [MB] #####
+Used Memory:10
+Free Memory:199
+Total Memory:210
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.35 s
+per object: 2.469 ms
+count of versions: 14931
+##### Heap utilization statistics [MB] #####
+Used Memory:11
+Free Memory:190
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.42 s
+per object: 2.484 ms
+count of versions: 14952
+##### Heap utilization statistics [MB] #####
+Used Memory:11
+Free Memory:190
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.25 s
+per object: 2.450 ms
+count of versions: 14939
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.23 s
+per object: 2.445 ms
+count of versions: 14943
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:196
+Total Memory:209
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.35 s
+per object: 2.469 ms
+count of versions: 14937
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.27 s
+per object: 2.454 ms
+count of versions: 14947
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.24 s
+per object: 2.447 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.29 s
+per object: 2.458 ms
+count of versions: 14956
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.29 s
+per object: 2.457 ms
+count of versions: 14944
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.32 s
+per object: 2.464 ms
+count of versions: 14935
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:192
+Total Memory:205
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.39 s
+per object: 2.478 ms
+count of versions: 14946
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.05 s
+per object: 2.611 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.40 s
+per object: 2.481 ms
+count of versions: 14938
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.62 s
+per object: 2.524 ms
+count of versions: 14936
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.34 s
+per object: 2.667 ms
+count of versions: 14936
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.61 s
+per object: 2.522 ms
+count of versions: 14948
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.50 s
+per object: 2.500 ms
+count of versions: 14942
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.40 s
+per object: 2.480 ms
+count of versions: 14946
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.32 s
+per object: 2.464 ms
+count of versions: 14948
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.31 s
+per object: 2.462 ms
+count of versions: 14939
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.31 s
+per object: 2.463 ms
+count of versions: 14944
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.30 s
+per object: 2.461 ms
+count of versions: 14935
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.34 s
+per object: 2.468 ms
+count of versions: 14953
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.39 s
+per object: 2.478 ms
+count of versions: 14943
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.49 s
+per object: 2.498 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.95 s
+per object: 2.591 ms
+count of versions: 14949
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.91 s
+per object: 2.583 ms
+count of versions: 14934
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.37 s
+per object: 2.673 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.75 s
+per object: 2.749 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.26 s
+per object: 2.451 ms
+count of versions: 14925
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.49 s
+per object: 2.498 ms
+count of versions: 14937
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.35 s
+per object: 2.869 ms
+count of versions: 14949
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.91 s
+per object: 2.781 ms
+count of versions: 14933
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.56 s
+per object: 2.713 ms
+count of versions: 14935
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.54 s
+per object: 2.708 ms
+count of versions: 14935
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.81 s
+per object: 2.762 ms
+count of versions: 14938
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.53 s
+per object: 2.905 ms
+count of versions: 14942
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.66 s
+per object: 2.733 ms
+count of versions: 14950
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.45 s
+per object: 2.889 ms
+count of versions: 14941
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.25 s
+per object: 2.651 ms
+count of versions: 14946
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.94 s
+per object: 2.589 ms
+count of versions: 14948
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.52 s
+per object: 2.703 ms
+count of versions: 14947
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.90 s
+per object: 2.779 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.61 s
+per object: 2.722 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.43 s
+per object: 2.686 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.42 s
+per object: 2.684 ms
+count of versions: 14936
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.21 s
+per object: 2.842 ms
+count of versions: 14928
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.16 s
+per object: 2.832 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.71 s
+per object: 2.941 ms
+count of versions: 14947
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.19 s
+per object: 2.639 ms
+count of versions: 14944
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.77 s
+per object: 2.555 ms
+count of versions: 14950
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.29 s
+per object: 2.657 ms
+count of versions: 14952
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.86 s
+per object: 2.772 ms
+count of versions: 14938
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.61 s
+per object: 2.522 ms
+count of versions: 14953
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.79 s
+per object: 2.757 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.34 s
+per object: 2.667 ms
+count of versions: 14944
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.30 s
+per object: 2.861 ms
+count of versions: 14941
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.92 s
+per object: 2.784 ms
+count of versions: 14935
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.75 s
+per object: 2.95 ms
+count of versions: 14942
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.19 s
+per object: 2.639 ms
+count of versions: 14941
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.01 s
+per object: 2.601 ms
+count of versions: 14931
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.68 s
+per object: 2.536 ms
+count of versions: 14949
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.78 s
+per object: 2.555 ms
+count of versions: 14934
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.21 s
+per object: 2.642 ms
+count of versions: 14945
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.34 s
+per object: 2.669 ms
+count of versions: 14944
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.56 s
+per object: 2.713 ms
+count of versions: 14934
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.06 s
+per object: 2.611 ms
+count of versions: 14945
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.86 s
+per object: 2.772 ms
+count of versions: 14942
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.80 s
+per object: 2.760 ms
+count of versions: 14936
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.89 s
+per object: 2.778 ms
+count of versions: 14948
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.30 s
+per object: 2.661 ms
+count of versions: 14943
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.84 s
+per object: 2.768 ms
+count of versions: 14937
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 15.64 s
+per object: 3.128 ms
+count of versions: 14934
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.69 s
+per object: 2.738 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.37 s
+per object: 2.875 ms
+count of versions: 14937
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.61 s
+per object: 2.723 ms
+count of versions: 14936
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.77 s
+per object: 2.754 ms
+count of versions: 14945
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.03 s
+per object: 2.805 ms
+count of versions: 14934
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.25 s
+per object: 2.850 ms
+count of versions: 14946
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.20 s
+per object: 2.639 ms
+count of versions: 14936
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.62 s
+per object: 2.924 ms
+count of versions: 14951
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.92 s
+per object: 2.784 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.54 s
+per object: 2.708 ms
+count of versions: 14942
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.92 s
+per object: 2.784 ms
+count of versions: 14938
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.07 s
+per object: 2.813 ms
+count of versions: 14947
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.24 s
+per object: 2.647 ms
+count of versions: 14946
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.73 s
+per object: 2.746 ms
+count of versions: 14945
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.13 s
+per object: 2.826 ms
+count of versions: 14939
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.06 s
+per object: 2.611 ms
+count of versions: 14932
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.94 s
+per object: 2.989 ms
+count of versions: 14935
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.41 s
+per object: 2.881 ms
+count of versions: 14938
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.09 s
+per object: 2.618 ms
+count of versions: 14945
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.33 s
+per object: 2.666 ms
+count of versions: 14949
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.63 s
+per object: 2.926 ms
+count of versions: 14949
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.09 s
+per object: 2.818 ms
+count of versions: 14934
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.57 s
+per object: 2.713 ms
+count of versions: 14942
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.54 s
+per object: 2.908 ms
+count of versions: 14954
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.51 s
+per object: 2.702 ms
+count of versions: 14937
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.71 s
+per object: 2.743 ms
+count of versions: 14941
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.24 s
+per object: 2.649 ms
+count of versions: 14943
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.30 s
+per object: 2.661 ms
+count of versions: 14944
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.41 s
+per object: 2.682 ms
+count of versions: 14928
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.84 s
+per object: 2.767 ms
+count of versions: 14945
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.07 s
+per object: 2.814 ms
+count of versions: 14945
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.14 s
+per object: 2.828 ms
+count of versions: 14943
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.42 s
+per object: 2.685 ms
+count of versions: 14945
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.92 s
+per object: 2.783 ms
+count of versions: 14935
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.95 s
+per object: 2.790 ms
+count of versions: 14933
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.12 s
+per object: 2.823 ms
+count of versions: 14935
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.41 s
+per object: 2.482 ms
+count of versions: 14935
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.92 s
+per object: 2.784 ms
+count of versions: 14939
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.53 s
+per object: 2.705 ms
+count of versions: 14943
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.50 s
+per object: 2.900 ms
+count of versions: 14948
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.81 s
+per object: 2.562 ms
+count of versions: 14952
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.61 s
+per object: 2.922 ms
+count of versions: 14937
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.69 s
+per object: 2.737 ms
+count of versions: 14944
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.95 s
+per object: 2.79 ms
+count of versions: 14954
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.58 s
+per object: 2.717 ms
+count of versions: 14939
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 15.02 s
+per object: 3.005 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.50 s
+per object: 2.701 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.10 s
+per object: 2.821 ms
+count of versions: 14944
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.56 s
+per object: 2.713 ms
+count of versions: 14930
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.63 s
+per object: 2.726 ms
+count of versions: 14943
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.42 s
+per object: 2.683 ms
+count of versions: 14941
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.15 s
+per object: 2.631 ms
+count of versions: 14953
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.28 s
+per object: 2.857 ms
+count of versions: 14944
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.67 s
+per object: 2.733 ms
+count of versions: 14952
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.78 s
+per object: 2.957 ms
+count of versions: 14941
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.72 s
+per object: 2.543 ms
+count of versions: 14947
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.36 s
+per object: 2.871 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.12 s
+per object: 2.825 ms
+count of versions: 14953
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.81 s
+per object: 2.762 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.59 s
+per object: 2.917 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.61 s
+per object: 2.723 ms
+count of versions: 14934
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.21 s
+per object: 2.843 ms
+count of versions: 14952
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.77 s
+per object: 2.953 ms
+count of versions: 14943
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.56 s
+per object: 2.711 ms
+count of versions: 14942
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.69 s
+per object: 2.738 ms
+count of versions: 14939
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.58 s
+per object: 2.517 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.77 s
+per object: 2.755 ms
+count of versions: 14937
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.03 s
+per object: 2.807 ms
+count of versions: 14946
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.08 s
+per object: 2.617 ms
+count of versions: 14953
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.61 s
+per object: 2.522 ms
+count of versions: 14930
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.49 s
+per object: 2.698 ms
+count of versions: 14950
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.88 s
+per object: 2.576 ms
+count of versions: 14957
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.86 s
+per object: 2.773 ms
+count of versions: 14956
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.83 s
+per object: 2.766 ms
+count of versions: 14946
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.45 s
+per object: 2.491 ms
+count of versions: 14943
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.75 s
+per object: 2.950 ms
+count of versions: 14952
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.75 s
+per object: 2.949 ms
+count of versions: 14953
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.08 s
+per object: 2.817 ms
+count of versions: 14947
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.15 s
+per object: 2.830 ms
+count of versions: 14945
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.87 s
+per object: 2.775 ms
+count of versions: 14937
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.87 s
+per object: 2.974 ms
+count of versions: 14949
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.66 s
+per object: 2.931 ms
+count of versions: 14955
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.75 s
+per object: 2.551 ms
+count of versions: 14942
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.38 s
+per object: 2.676 ms
+count of versions: 14951
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.24 s
+per object: 2.648 ms
+count of versions: 14943
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:197
+Total Memory:210
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.75 s
+per object: 2.749 ms
+count of versions: 14942
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.68 s
+per object: 2.735 ms
+count of versions: 14944
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.94 s
+per object: 2.787 ms
+count of versions: 14949
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.48 s
+per object: 2.897 ms
+count of versions: 14952
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:204
+Total Memory:217
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.09 s
+per object: 2.819 ms
+count of versions: 14937
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.37 s
+per object: 2.674 ms
+count of versions: 14945
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.72 s
+per object: 2.544 ms
+count of versions: 14948
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.37 s
+per object: 2.474 ms
+count of versions: 14928
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.37 s
+per object: 2.474 ms
+count of versions: 14925
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.30 s
+per object: 2.460 ms
+count of versions: 14947
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.33 s
+per object: 2.467 ms
+count of versions: 14925
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.31 s
+per object: 2.463 ms
+count of versions: 14942
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.34 s
+per object: 2.468 ms
+count of versions: 14955
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.83 s
+per object: 2.766 ms
+count of versions: 14952
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.70 s
+per object: 2.540 ms
+count of versions: 14938
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.35 s
+per object: 2.470 ms
+count of versions: 14945
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.3 s
+per object: 2.46 ms
+count of versions: 14935
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.33 s
+per object: 2.466 ms
+count of versions: 14948
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.4 s
+per object: 2.48 ms
+count of versions: 14943
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.36 s
+per object: 2.471 ms
+count of versions: 14938
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.38 s
+per object: 2.475 ms
+count of versions: 14951
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.31 s
+per object: 2.462 ms
+count of versions: 14938
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.32 s
+per object: 2.465 ms
+count of versions: 14938
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.37 s
+per object: 2.474 ms
+count of versions: 14945
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.40 s
+per object: 2.480 ms
+count of versions: 14950
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.46 s
+per object: 2.491 ms
+count of versions: 14929
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.35 s
+per object: 2.469 ms
+count of versions: 14931
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.37 s
+per object: 2.475 ms
+count of versions: 14945
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.39 s
+per object: 2.479 ms
+count of versions: 14945
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.35 s
+per object: 2.469 ms
+count of versions: 14937
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.44 s
+per object: 2.488 ms
+count of versions: 14943
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.36 s
+per object: 2.472 ms
+count of versions: 14951
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.39 s
+per object: 2.478 ms
+count of versions: 14943
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.45 s
+per object: 2.490 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.37 s
+per object: 2.473 ms
+count of versions: 14937
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.39 s
+per object: 2.477 ms
+count of versions: 14946
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.39 s
+per object: 2.477 ms
+count of versions: 14946
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.40 s
+per object: 2.480 ms
+count of versions: 14943
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.59 s
+per object: 2.717 ms
+count of versions: 14946
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.46 s
+per object: 2.691 ms
+count of versions: 14929
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.18 s
+per object: 2.636 ms
+count of versions: 14933
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.90 s
+per object: 2.580 ms
+count of versions: 14928
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.71 s
+per object: 2.543 ms
+count of versions: 14942
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.64 s
+per object: 2.529 ms
+count of versions: 14947
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.94 s
+per object: 2.588 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.35 s
+per object: 2.471 ms
+count of versions: 14935
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.47 s
+per object: 2.495 ms
+count of versions: 14950
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.27 s
+per object: 2.454 ms
+count of versions: 14939
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.72 s
+per object: 2.544 ms
+count of versions: 14951
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.69 s
+per object: 2.738 ms
+count of versions: 14952
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.56 s
+per object: 2.712 ms
+count of versions: 14937
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.39 s
+per object: 2.678 ms
+count of versions: 14951
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.94 s
+per object: 2.788 ms
+count of versions: 14951
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.54 s
+per object: 2.709 ms
+count of versions: 14945
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.98 s
+per object: 2.795 ms
+count of versions: 14951
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.68 s
+per object: 2.735 ms
+count of versions: 14945
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.67 s
+per object: 2.733 ms
+count of versions: 14938
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.56 s
+per object: 2.712 ms
+count of versions: 14945
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.50 s
+per object: 2.701 ms
+count of versions: 14946
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.67 s
+per object: 2.535 ms
+count of versions: 14933
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.24 s
+per object: 2.649 ms
+count of versions: 14942
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.96 s
+per object: 2.592 ms
+count of versions: 14937
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.08 s
+per object: 2.616 ms
+count of versions: 14939
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.99 s
+per object: 2.598 ms
+count of versions: 14937
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.37 s
+per object: 2.474 ms
+count of versions: 14944
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.49 s
+per object: 2.498 ms
+count of versions: 14942
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.31 s
+per object: 2.461 ms
+count of versions: 14929
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.61 s
+per object: 2.521 ms
+count of versions: 14950
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.49 s
+per object: 2.698 ms
+count of versions: 14945
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.29 s
+per object: 2.657 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.24 s
+per object: 2.848 ms
+count of versions: 14937
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.72 s
+per object: 2.745 ms
+count of versions: 14951
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.85 s
+per object: 2.571 ms
+count of versions: 14946
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.42 s
+per object: 2.483 ms
+count of versions: 14935
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.49 s
+per object: 2.498 ms
+count of versions: 14948
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.37 s
+per object: 2.474 ms
+count of versions: 14938
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.32 s
+per object: 2.464 ms
+count of versions: 14950
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.32 s
+per object: 2.665 ms
+count of versions: 14948
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.90 s
+per object: 2.779 ms
+count of versions: 14941
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.94 s
+per object: 2.588 ms
+count of versions: 14942
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.47 s
+per object: 2.695 ms
+count of versions: 14938
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.26 s
+per object: 2.652 ms
+count of versions: 14938
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.32 s
+per object: 2.465 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.45 s
+per object: 2.490 ms
+count of versions: 14943
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.35 s
+per object: 2.470 ms
+count of versions: 14944
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.32 s
+per object: 2.464 ms
+count of versions: 14938
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.54 s
+per object: 2.708 ms
+count of versions: 14951
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.20 s
+per object: 2.639 ms
+count of versions: 14939
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.92 s
+per object: 2.583 ms
+count of versions: 14942
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.88 s
+per object: 2.575 ms
+count of versions: 14952
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 12.99 s
+per object: 2.598 ms
+count of versions: 14944
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.54 s
+per object: 2.908 ms
+count of versions: 14928
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.31 s
+per object: 2.661 ms
+count of versions: 14950
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.31 s
+per object: 2.662 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.50 s
+per object: 2.899 ms
+count of versions: 14932
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.52 s
+per object: 2.703 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.37 s
+per object: 2.874 ms
+count of versions: 14948
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.51 s
+per object: 2.702 ms
+count of versions: 14942
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.73 s
+per object: 2.946 ms
+count of versions: 14946
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 13.68 s
+per object: 2.736 ms
+count of versions: 14950
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 15.21 s
+per object: 3.041 ms
+count of versions: 14956
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.80 s
+per object: 2.960 ms
+count of versions: 14947
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.22 s
+per object: 2.844 ms
+count of versions: 14945
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.53 s
+per object: 2.906 ms
+count of versions: 14946
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.25 s
+per object: 2.850 ms
+count of versions: 14940
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.93 s
+per object: 2.986 ms
+count of versions: 14945
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 14.41 s
+per object: 2.883 ms
+count of versions: 14935
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
+######### Barbel-Statistics #########
+inserterted 5000 in 15.27 s
+per object: 3.055 ms
+count of versions: 14946
+##### Heap utilization statistics [MB] #####
+Used Memory:12
+Free Memory:189
+Total Memory:202
+Max Memory:3641
