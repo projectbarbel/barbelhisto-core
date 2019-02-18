@@ -7,7 +7,8 @@
     <artifactId>barbelhisto</artifactId>
     <version>1.0.1-SNAPSHOT</version>
     <name>BarbelHisto java library</name>
-    <description>BarbelHisto - Java library</description>
+    <url>http://www.projectbarbel.org</url>
+    <description>BarbelHisto - Java library to manage bitemporal data</description>
     <packaging>jar</packaging>
 
     <organization>
@@ -15,6 +16,7 @@
         <url>http://www.projectbarbel.org</url>
     </organization>
 
+    
     <licenses>
         <license>
             <name>MIT License</name>
