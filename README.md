@@ -1,7 +1,7 @@
 # barbelhisto
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://travis-ci.org/projectbarbel/barbelhisto-core.svg?branch=master)](https://travis-ci.org/projectbarbel/barbelhisto-core)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/cz.jirutka.rsql/rsql-parser/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/org.projectbarnel/barbelhisto)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.projectbarnel/barbelhisto/badge.svg?style=plastic)](https://maven-badges.herokuapp.com/maven-central/org.projectbarnel/barbelhisto)
 
 A lightweiht easy to use Java library to store the history of changes of domain objects in bi-temporal format. 
 
