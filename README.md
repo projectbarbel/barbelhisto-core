@@ -37,7 +37,7 @@ This library enables you to store your data in a format that enables you to answ
 - pretty print function to learn about bitemporal data storage
 
 # Get started
-Download the [actual snapshot releases](https://github.com/projectbarbel/barbelhisto-core/releases). Maven will follow as soon Version 1.0 is released.
+Download the [actual snapshot releases](https://github.com/projectbarbel/barbelhisto-core/releases). 
 
 Or clone this git repository to try some of the features of `BarbelHisto`.
 
@@ -155,4 +155,37 @@ Document-ID: somePersonelNumber
 |ab4abf42-2561-4a6e-afe7-5c8938736080    |2019-02-18     |999999999-12-31 |ACTIVE  |SYSTEM               |2019-02-01T00:00:00+01:00[Europe/Berlin]     |NOBODY               |2199-12-31T23:59:00Z                         |EffectivePeriod [from=2019-02- |
 ```
 It's exactly that journal that was active before you've made your second update. These kind of scenarios can get much more complex as you continuously change employee records or othe bitemporal data. `BarbelHisto` considerably reduces the amount of complexity for developers dealing with such requirements.
-
+# Adding persistence
+`BarbelHisto` is based on [cqengine collections](https://github.com/npgall/cqengine) so clients can use any persistence options currently available in cqengine. The default persistence of `BarbelHisto` is `OnHeapPersistence`. To change that you add a custom backbone collection. If you want to add `DiskPersistence` you'd need to define the primary key attribute as known from cqengine:
+```java
+final SimpleAttribute<PrimitivePrivatePojo, String> PRIMARY_KEY = new SimpleAttribute<PrimitivePrivatePojo, String>("documentId") {
+    public String getValue(PrimitivePrivatePojo object, QueryOptions queryOptions) {
+        return (String) ((Bitemporal)object).getBitemporalStamp().getVersionId();
+    }
+};
+```
+In the example we use a standard POJO annotated with the `@DocumentId` annotation decribed previously. The field definition returns the primary key. Then create a persistent collection with `BarbelHisto` using the known cqengine features: 
+```java
+BarbelHisto<PrimitivePrivatePojo> core = BarbelHistoBuilder.barbel() .withBackboneSupplier(()->new ConcurrentIndexedCollection<PrimitivePrivatePojo>(DiskPersistence.onPrimaryKeyInFile(PRIMARY_KEY, new File(FILENAME)))).build();
+```
+See the [cqengine documentation](https://github.com/npgall/cqengine) on all the options you can choose. 
+# Adding indexes 
+See the [cqengine documentation](https://github.com/npgall/cqengine) for adding indexes and then, again, add your custom collection as backbone collection as described previously using the `BarbelHistoBuilder` class. Here is an example of adding an indexed collection as backbone. First define the index field.
+```java
+public static final SimpleAttribute<Object, String> VERSION_ID_PK = new SimpleAttribute<Object, String>(
+        "documentId") {
+    public String getValue(Object object, QueryOptions queryOptions) {
+        return (String) ((Bitemporal)object).getBitemporalStamp().getVersionId();
+    }
+};
+```
+Then add the backbone collection to `BarbelHisto`.
+```java
+BarbelHisto<T> core = BarbelHistoBuilder.barbel().withBackboneSupplier(()->{
+                    IndexedCollection<T> backbone = new ConcurrentIndexedCollection<T>();
+                    backbone.addIndex((Index<T>) NavigableIndex.onAttribute(VERSION_ID_PK));
+                    return backbone;
+                    }).build();
+```
+# Custom features
+`BarbelHisto` offers lots of custom options so you can adopt it to the requirements of your project. See `BarbelHistoBuilder` for details.
