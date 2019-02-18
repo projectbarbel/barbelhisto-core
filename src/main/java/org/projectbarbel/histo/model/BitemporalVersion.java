@@ -2,6 +2,17 @@ package org.projectbarbel.histo.model;
 
 import java.util.Objects;
 
+import org.projectbarbel.histo.BarbelHisto;
+import org.projectbarbel.histo.BarbelMode;
+
+/**
+ * Class used by {@link BarbelHisto} in {@link BarbelMode#POJO} to persist data
+ * to persistent storage.
+ * 
+ * @author Niklas Schlimm
+ *
+ * @param <T> the business tabpe to store
+ */
 public final class BitemporalVersion<T> implements Bitemporal {
 
     private BitemporalStamp stamp;

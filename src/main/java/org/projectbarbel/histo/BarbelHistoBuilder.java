@@ -12,8 +12,10 @@ import java.util.function.Supplier;
 import org.apache.commons.lang3.Validate;
 import org.projectbarbel.histo.BarbelHistoCore.UpdateLogRecord;
 import org.projectbarbel.histo.functions.AdaptingKryoSerializer;
-import org.projectbarbel.histo.functions.CGLibProxyingFunction;
+import org.projectbarbel.histo.functions.BarbelPojoSerializer;
+import org.projectbarbel.histo.functions.CachingCGLibProxyingFunction;
 import org.projectbarbel.histo.functions.EmbeddingJournalUpdateStrategy;
+import org.projectbarbel.histo.functions.RitsClonerCopyFunction;
 import org.projectbarbel.histo.functions.SimpleGsonPojoCopier;
 import org.projectbarbel.histo.functions.UUIDGenerator;
 import org.projectbarbel.histo.model.Bitemporal;
@@ -26,6 +28,7 @@ import com.googlecode.cqengine.persistence.Persistence;
 import com.googlecode.cqengine.persistence.disk.DiskPersistence;
 import com.googlecode.cqengine.persistence.offheap.OffHeapPersistence;
 import com.googlecode.cqengine.persistence.onheap.OnHeapPersistence;
+import com.googlecode.cqengine.persistence.support.serialization.PersistenceConfig;
 import com.googlecode.cqengine.persistence.support.serialization.PojoSerializer;
 
 /**
@@ -49,7 +52,6 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     private Supplier<Function<Object, Object>> pojoCopyFunctionSupplier = BarbelHistoContext
             .getDefaultCopyFunctionSupplier();
     private Supplier<Object> versionIdGenerator = BarbelHistoContext.getDefaultVersionIDGenerator();
-    private Supplier<Object> documentIdGenerator = BarbelHistoContext.getDefaultDocumentIDGenerator();
     private Object backboneSupplier = BarbelHistoContext.getDefaultBackbone();
     private String activity = BarbelHistoContext.getDefaultActivity();
     private String user = BarbelHistoContext.getDefaultUser();
@@ -174,8 +176,8 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     /**
-     * Set a custom pojo copy function. Required if clients use specific pojos that
-     * cannot be copied by {@link SimpleGsonPojoCopier}.
+     * Set a custom POJO copy function. Required if clients use specific POJOs that
+     * cannot be copied by the default {@link RitsClonerCopyFunction}.
      * 
      * @param pojoCopyFunction the custom copy function
      * @return the builder again
@@ -210,8 +212,8 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 
     /**
      * Customize the proxying in {@link BarbelMode#POJO}. Default is
-     * {@link CGLibProxyingFunction}. Clients may want to use more specific proxying
-     * functions with their pojos.
+     * {@link CachingCGLibProxyingFunction}. Clients may want to use more specific
+     * proxying functions with their POJOs.
      * 
      * @param proxyingFunction the custom proxying function
      * @return the builder again
@@ -232,9 +234,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
      * Define the collection that stores {@link DocumentJournal} instances. Note
      * that {@link DocumentJournal} always works on the backbone collection set in
      * {@link BarbelHistoBuilder#withBackboneSupplier(Supplier)} and will never
-     * "own" data. It's possible to share this collection across multiple instances
-     * of {@link BarbelHisto} to ensure that locking is performed across these
-     * different {@link BarbelHisto} instances.
+     * "own" data.
      * 
      * @param journalStore the journal store collection
      * @return the builder again
@@ -260,10 +260,27 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
      * different persistence options here. Default ist
      * {@link ConcurrentIndexedCollection} using {@link OnHeapPersistence}. <br>
      * <br>
-     * This collection should not be shared across multiple instances of
-     * {@link BarbelHisto}. If you use persistent collections store the
+     * If clients decide to use {@link DiskPersistence} or
+     * {@link OffHeapPersistence} they need to add the {@link PersistenceConfig}
+     * annotation additionally to their business classes. <br>
+     * <br>
+     * 
+     * <pre>
+     * <code>@PersistenceConfig(serializer=BarbelPojoSerializer.class, polymorphic=true)</code>
+     * </pre>
+     * 
+     * This is always required if you not use the {@link OnHeapPersistence} and
+     * regardless of the de-facto serializer you choose in
+     * {@link #withPersistenceSerializerProducer(Function)}. The
+     * {@link BarbelPojoSerializer} will forward processing to the
+     * {@link AdaptingKryoSerializer} by default. If you define a different target
+     * serializer, {@link BarbelPojoSerializer} will be forward requests to that
+     * custom serializer.<br>
+     * <br>
+     * The backbone collection should not be shared across multiple instances of
+     * {@link BarbelHisto}. If you use persistent collections, store the
      * {@link BarbelHisto} instance as singleton bean to your application. Multiple
-     * threads are allowed access the {@link BarbelHisto} instance.
+     * threads are allowed access that {@link BarbelHisto} instance.
      * 
      * @see <a href=
      *      "https://github.com/npgall/cqengine">https://github.com/npgall/cqengine</a>
@@ -282,11 +299,6 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
         return versionIdGenerator;
     }
 
-    @Override
-    public Supplier<Object> getDocumentIdGenerator() {
-        return documentIdGenerator;
-    }
-
     /**
      * Client may want to implememt their own version id generator. Make sure it
      * will be unique. Default is {@link UUIDGenerator}.
@@ -297,20 +309,6 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     public BarbelHistoBuilder withVersionIdGenerator(Supplier<Object> versionIdGenerator) {
         Validate.isTrue(versionIdGenerator != null, NONULLS);
         this.versionIdGenerator = versionIdGenerator;
-        return this;
-    }
-
-    /**
-     * Clients can add a custom document Id generator here. Default is
-     * {@link UUIDGenerator}. {@link BarbelMode#POJO} {@link BarbelHisto} will
-     * expact the client to set the document id before saving the object.
-     * 
-     * @param documentIdGenerator the custom document id generator
-     * @return the builder
-     */
-    public BarbelHistoBuilder withDocumentIdGenerator(Supplier<Object> documentIdGenerator) {
-        Validate.isTrue(documentIdGenerator != null, NONULLS);
-        this.documentIdGenerator = documentIdGenerator;
         return this;
     }
 

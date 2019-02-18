@@ -8,6 +8,12 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.projectbarbel.histo.model.Bitemporal;
 
+/**
+ * Default pretty printer for journals.
+ * 
+ * @author Niklas Schlimm
+ *
+ */
 public class TableJournalPrettyPrinter implements Function<List<Bitemporal>, String> {
 
     // @formatter:off

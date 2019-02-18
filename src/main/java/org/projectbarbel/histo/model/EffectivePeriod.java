@@ -5,6 +5,12 @@ import java.util.Objects;
 
 import org.projectbarbel.histo.BarbelHistoContext;
 
+/**
+ * The abstraction storing the effective time for a version.
+ * 
+ * @author Niklas Schlimm
+ *
+ */
 public final class EffectivePeriod {
     private final LocalDate until;
     private final LocalDate from;

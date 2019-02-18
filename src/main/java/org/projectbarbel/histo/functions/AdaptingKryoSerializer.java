@@ -1,5 +1,6 @@
 package org.projectbarbel.histo.functions;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.projectbarbel.histo.BarbelHistoContext;
@@ -9,10 +10,24 @@ import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.BitemporalVersion;
 
+import com.googlecode.cqengine.persistence.disk.DiskPersistence;
+import com.googlecode.cqengine.persistence.offheap.OffHeapPersistence;
 import com.googlecode.cqengine.persistence.support.serialization.KryoSerializer;
 import com.googlecode.cqengine.persistence.support.serialization.PersistenceConfig;
 import com.googlecode.cqengine.persistence.support.serialization.PojoSerializer;
 
+/**
+ * Serializer that is used in case clients decide to use {@link DiskPersistence}
+ * and {@link OffHeapPersistence} on their backbone collection. Uses the
+ * original cqengine {@link KryoSerializer} but handles the case when proxies
+ * are passed for persistence. Proxies will always be persisted as
+ * {@link BitemporalVersion} instead of the dynamic class created by CGLib or
+ * any other. Notice that proxies need to implement {@link BarbelProxy} and
+ * {@link Bitemporal} so that they can be managed here.
+ * 
+ * @author Niklas Schlimm
+ *
+ */
 public class AdaptingKryoSerializer implements PojoSerializer<Bitemporal> {
 
     private final KryoSerializer<Bitemporal> targetKryo;
@@ -24,6 +39,7 @@ public class AdaptingKryoSerializer implements PojoSerializer<Bitemporal> {
 
     public AdaptingKryoSerializer(BarbelHistoContext context) {
         super();
+        this.context = Objects.requireNonNull(context, "the context must not be null");
         objectType = Optional.ofNullable((Class<?>) context.getContextOptions().get(OBJECT_TYPE))
                 .orElseThrow(() -> new IllegalStateException("could not find objectType"));
         persistenceConfig = Optional.ofNullable((PersistenceConfig) context.getContextOptions().get(PERSISTENCE_CONFIG))
@@ -32,7 +48,6 @@ public class AdaptingKryoSerializer implements PojoSerializer<Bitemporal> {
         KryoSerializer<Bitemporal> kryo = new KryoSerializer<Bitemporal>(
                 (Class<Bitemporal>) context.getMode().getPersistenceObjectType(objectType), persistenceConfig);
         this.targetKryo = kryo;
-        this.context = context;
     }
 
     @Override

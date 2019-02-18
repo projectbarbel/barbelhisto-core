@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import org.apache.commons.lang3.Validate;
+import org.projectbarbel.histo.BarbelHisto;
 import org.projectbarbel.histo.BarbelHistoContext;
 import org.projectbarbel.histo.DocumentJournal;
 import org.projectbarbel.histo.model.Bitemporal;
@@ -15,6 +16,13 @@ import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.EffectivePeriod;
 import org.projectbarbel.histo.model.UpdateCaseAware;
 
+/**
+ * The heart of {@link BarbelHisto} where the journal updates are performed
+ * according to the bitemporal data rules.
+ * 
+ * @author Niklas Schlimm
+ *
+ */
 public class EmbeddingJournalUpdateStrategy implements BiConsumer<DocumentJournal, Bitemporal>, UpdateCaseAware {
 
     private final BarbelHistoContext context;
@@ -70,7 +78,7 @@ public class EmbeddingJournalUpdateStrategy implements BiConsumer<DocumentJourna
                                 interruptedRightVersion.getBitemporalStamp().getEffectiveTime().until())));
         if (newSubsequentVersion.getBitemporalStamp().getEffectiveTime().from()
                 .isBefore(newSubsequentVersion.getBitemporalStamp().getEffectiveTime().until()))
-        newVersions.add(newSubsequentVersion);
+            newVersions.add(newSubsequentVersion);
     }
 
     public enum JournalUpdateCase {

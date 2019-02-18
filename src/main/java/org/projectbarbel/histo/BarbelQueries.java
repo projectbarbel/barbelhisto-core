@@ -24,7 +24,7 @@ import com.googlecode.cqengine.query.QueryFactory;
 import com.googlecode.cqengine.query.option.QueryOptions;
 
 /**
- * Convenience class to perform queries on {@link BarbelHisto#retrieve(Query)}
+ * Convenience methods to perform queries on {@link BarbelHisto#retrieve(Query)}
  * and the like. All queries can be combined with additional cqengine queries
  * created by {@link QueryFactory}.
  * 

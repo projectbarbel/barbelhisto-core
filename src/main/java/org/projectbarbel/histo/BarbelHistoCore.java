@@ -39,7 +39,7 @@ import com.googlecode.cqengine.resultset.ResultSet;
 import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
 
 /**
- * The core component of {@link BarbelHisto}.
+ * The core component of {@link BarbelHisto}. See {@link BarbelHisto} for details.
  * 
  * @author Niklas Schlimm
  *

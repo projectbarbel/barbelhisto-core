@@ -5,6 +5,12 @@ import java.util.Objects;
 
 import org.projectbarbel.histo.BarbelHistoContext;
 
+/**
+ * Abstraction to carry the bitemporal data for each individual version.
+ * 
+ * @author Niklas Schlimm
+ *
+ */
 public final class BitemporalStamp {
 
     protected final Object versionId;

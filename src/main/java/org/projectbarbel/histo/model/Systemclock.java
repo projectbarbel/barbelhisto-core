@@ -6,6 +6,17 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+import org.projectbarbel.histo.BarbelHisto;
+import org.projectbarbel.histo.BarbelHistoContext;
+
+/**
+ * {@link BarbelHisto}s clock implementation. Can also be used for testing. Call
+ * {@link BarbelHistoContext#getBarbelClock()} to fix time when performing
+ * specific tests.
+ * 
+ * @author Niklas Schlimm
+ *
+ */
 public class Systemclock {
 
     private Clock clock = Clock.systemDefaultZone();

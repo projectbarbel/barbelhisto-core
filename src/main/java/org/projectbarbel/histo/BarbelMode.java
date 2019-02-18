@@ -20,7 +20,7 @@ import net.sf.cglib.proxy.Enhancer;
 
 /**
  * The two distinct {@link BarbelMode} variants. Implements the state specific
- * behaviour.
+ * behavior.
  * 
  * @author Niklas Schlimm
  *

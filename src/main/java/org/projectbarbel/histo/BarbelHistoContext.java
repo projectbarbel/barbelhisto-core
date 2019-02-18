@@ -119,8 +119,6 @@ public interface BarbelHistoContext {
         return () -> RitsClonerCopyFunction.INSTANCE;
     }
 
-    Supplier<Object> getDocumentIdGenerator();
-
     Supplier<Object> getVersionIdGenerator();
 
     <T> Supplier<IndexedCollection<T>> getBackboneSupplier();

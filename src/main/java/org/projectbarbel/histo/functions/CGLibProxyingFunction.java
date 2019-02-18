@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
+import org.objenesis.Objenesis;
 import org.projectbarbel.histo.model.BarbelProxy;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
@@ -16,6 +17,12 @@ import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
+/**
+ * CGLib proxying without {@link Objenesis}.
+ * 
+ * @author Niklas Schlimm
+ *
+ */
 public class CGLibProxyingFunction implements BiFunction<Object, BitemporalStamp, Object> {
 
     private final Enhancer enhancer;

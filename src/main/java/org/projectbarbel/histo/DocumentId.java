@@ -4,8 +4,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Annotation to use in {@link BarbelMode#POJO} which is the default mode. Add
- * this to the unique Id of your business object like so:
+ * Annotation to identify the primary key of a business type. Add this to the
+ * unique Id of your business object like so:
  * 
  * <pre>
  * public class SomeBusinessPojo {
@@ -14,6 +14,9 @@ import java.lang.annotation.RetentionPolicy;
  *    ... any custom fields and methods
  *    public String getDocumentId() {
  *       return documentId;
+ *    }
+ *    public void setDocumentId(String id) {
+ *       this.documentId=id;
  *    }
  * }
  * </pre>

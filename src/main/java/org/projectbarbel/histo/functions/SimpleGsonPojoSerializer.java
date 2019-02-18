@@ -12,8 +12,19 @@ import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalVersion;
 
 import com.google.gson.Gson;
+import com.googlecode.cqengine.persistence.disk.DiskPersistence;
+import com.googlecode.cqengine.persistence.offheap.OffHeapPersistence;
+import com.googlecode.cqengine.persistence.support.serialization.KryoSerializer;
 import com.googlecode.cqengine.persistence.support.serialization.PojoSerializer;
 
+/**
+ * Serializer for {@link DiskPersistence} and {@link OffHeapPersistence} that
+ * uses Gson and does not require any of the {@link KryoSerializer}
+ * functionality.
+ * 
+ * @author Niklas Schlimm
+ *
+ */
 public class SimpleGsonPojoSerializer implements PojoSerializer<Bitemporal> {
 
     private static final String UTF_8 = "UTF-8";

@@ -7,6 +7,12 @@ import java.util.Objects;
 
 import org.projectbarbel.histo.BarbelHistoContext;
 
+/**
+ * The abstraction for storing the record time details of a version.
+ * 
+ * @author Niklas Schlimm
+ *
+ */
 public class RecordPeriod {
 
     public final static ZonedDateTime NOT_INACTIVATED = ZonedDateTime.of(LocalDateTime.of(2199, 12, 31, 23, 59),

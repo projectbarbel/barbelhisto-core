@@ -16,6 +16,12 @@ import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
+/**
+ * Proxying function that uses CGLib and {@link Objenesis}.
+ * 
+ * @author Niklas Schlimm
+ *
+ */
 public class CachingCGLibProxyingFunction implements BiFunction<Object, BitemporalStamp, Object> {
 
     private final Enhancer enhancer;

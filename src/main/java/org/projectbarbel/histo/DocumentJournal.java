@@ -106,6 +106,11 @@ public final class DocumentJournal {
         return journal.retrieve(BarbelQueries.all(id)).stream().count();
     }
 
+    /**
+     * Get the complete archive for the current document id as list.
+     * 
+     * @return the archive
+     */
     @SuppressWarnings("unchecked")
     public <T> List<T> list() {
         return (List<T>) journal
@@ -113,6 +118,11 @@ public final class DocumentJournal {
                 .stream().map(d -> processingState.expose(context, (Bitemporal) d)).collect(Collectors.toList());
     }
 
+    /**
+     * Get the complete archive for the current document id as collection.
+     * 
+     * @return the archive
+     */
     @SuppressWarnings("unchecked")
     public <T> IndexedCollection<T> collection() {
         return (IndexedCollection<T>) journal
@@ -128,6 +138,11 @@ public final class DocumentJournal {
         return id;
     }
 
+    /**
+     * Read from the journal.
+     * 
+     * @return the reader
+     */
     public JournalReader read() {
         return new JournalReader(this, BarbelHistoContext.getBarbelClock());
     }
@@ -147,6 +162,11 @@ public final class DocumentJournal {
             this.journal = journal;
         }
 
+        /**
+         * Get the versions currently active.
+         * 
+         * @return the active versions
+         */
         @SuppressWarnings("unchecked")
         public <O> List<O> activeVersions() {
             return (List<O>) journal.journal
@@ -155,6 +175,12 @@ public final class DocumentJournal {
                     .collect(Collectors.toList());
         }
 
+        /**
+         * Get the inactivated versions. Versions get inactivated when new versions are
+         * posted and there versions cross their effective periods.
+         * 
+         * @return the inactive versions
+         */
         @SuppressWarnings("unchecked")
         public <O> List<O> inactiveVersions() {
             return (List<O>) journal.journal
@@ -162,6 +188,11 @@ public final class DocumentJournal {
                     .stream().collect(Collectors.toList());
         }
 
+        /**
+         * The active version effective today. The "current" state of the object.
+         * 
+         * @return the effective version
+         */
         @SuppressWarnings("unchecked")
         public <O> Optional<O> effectiveNow() {
             return journal.journal
@@ -180,6 +211,13 @@ public final class DocumentJournal {
                     .flatMap(o -> Optional.of((Bitemporal) o));
         }
 
+        /**
+         * The active versions after the given date. If due date is set to today, the
+         * query returns all the future versions that will become effective.
+         * 
+         * @param day the due date
+         * @return the active versions
+         */
         @SuppressWarnings("unchecked")
         public <O> List<O> effectiveAfter(LocalDate day) {
             return (List<O>) journal.journal
@@ -189,6 +227,11 @@ public final class DocumentJournal {
                     .collect(Collectors.toList());
         }
 
+        /**
+         * Get the active versions effective within the given {@link EffectivePeriod}.
+         * @param period the intervall
+         * @return the active versions
+         */
         @SuppressWarnings("unchecked")
         public <O> List<O> effectiveBetween(EffectivePeriod period) {
             return (List<O>) journal.journal
