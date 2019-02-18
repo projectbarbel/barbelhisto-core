@@ -132,7 +132,7 @@ Document-ID: somePersonelNumber
 ```
 As you may recognise the journal of that employee not contains some versions of the employee. Two versions with `ACTIVE` state and one with `INACTIVE` state. The active versions are effective from today (2019-02-15) and another one effective from in 10 days, which is 2019-02-25. There is one inactivated version, the one you've stored in the beginning, effective from now until infinite. `BarbelHisto` manages two time dimensions, one reflects the effective time, and another one, redord time, reflects when a change was made. For that reason, **nothing will ever be deleted**. There are **only inserts** to `BarbelHiso` backbone collections, **never deletions**.
 ## Timeshifts 
-One of BarbelHistos core functionality is doing timeshifts. Let's suppose you did not make the previous updates at the same day like we just did in our turorial. Let's suppose we've created the employee on Feb 1st, 2019 and then made some changes today that should become effective in the future. The journal of such a scenario looks like this:
+One of `BarbelHisto`s core functionality is doing timeshifts. With timeshifts you can look at past data as if it were still active. Let's suppose you did not make the previous updates at the same day like we just did in our turorial. Let's suppose we've created the `Employee` from our previous example on Feb 1st, 2019 and then made some changes today that should become effective in the future. The journal of such a scenario looks like this:
 ```
 Document-ID: somePersonelNumber
 
@@ -142,7 +142,7 @@ Document-ID: somePersonelNumber
 |25b5e11c-70ce-4fc5-9b7a-ff9dd92d0dd2    |2019-02-18     |2019-02-28      |ACTIVE  |SYSTEM               |2019-02-18T11:57:24.738+01:00[Europe/Berlin] |NOBODY               |2199-12-31T23:59:00Z                         |EffectivePeriod [from=2019-02- |
 |6fc067c7-57bc-4b69-9238-e19bd2269e0b    |2019-02-28     |999999999-12-31 |ACTIVE  |SYSTEM               |2019-02-18T11:57:24.738+01:00[Europe/Berlin] |NOBODY               |2199-12-31T23:59:00Z                         |EffectivePeriod [from=2019-02- |
 ``` 
-When you want to see the journal that was active **before** you've made that second change, you just receive that journal by using `BarbelHisto`s timeshift function:
+When you want to see the journal that was active **before** you've made that second change on February 18th (see CreatedAt), you just receive that journal by using `BarbelHisto`s timeshift function:
 ```java
 DocumentJournal journal = core.timeshift("somePersonelNumber", LocalDate.of(2019,2,17)); // yesterday in our scenarion was 2019, Febuary 17th
 ```
