@@ -164,6 +164,8 @@ Document-ID: somePersonelNumber
 ```
 It's exactly that journal that was active before you've made your second update. These kind of scenarios can get much more complex as you continuously change employee records or othe bitemporal data. `BarbelHisto` considerably reduces the amount of complexity for developers dealing with such requirements.
 # Adding persistence
+In `BarbelHisto` there are two flavors of persistence, you can choose the cqengine persistence options or you choose a custom persistence.
+## cqengine built-in persistence
 `BarbelHisto` is based on [cqengine collections](https://github.com/npgall/cqengine) so clients can use any persistence options currently available in cqengine. The default persistence of `BarbelHisto` is `OnHeapPersistence`. To change that you add a custom backbone collection. If you want to add `DiskPersistence` you'd need to define the primary key attribute as known from cqengine:
 ```java
 final SimpleAttribute<PrimitivePrivatePojo, String> PRIMARY_KEY = new SimpleAttribute<PrimitivePrivatePojo, String>("documentId") {
@@ -180,6 +182,18 @@ BarbelHisto<PrimitivePrivatePojo> core = BarbelHistoBuilder.barbel() .withBackbo
                   .build();
 ```
 See the [cqengine documentation](https://github.com/npgall/cqengine) on all the options you can choose. 
+## Custom persistence
+Whe you use custom persistence then `BarbelHisto` can export the backbone version data by calling the `BarbelHisto.dump()` and `BarbelHisto.populate()` methods. Let's say you've created the data with `BarbelHisto`, then you export the data like so:
+```java
+Coillection<Bitemporal> versionData = core.dump(DumpMode.CLEARCOLLECTION);
+```
+The CLEARCOLLECTION option clears the underlying backbone. You don't want that to happen in many cases, so you can also call that method using READONLY. You can now store the version data to a data store of your choice. Make sure you import the complete journal later to restore the `BarbelHisto` instance.
+```java
+Collection<Bitemporal> versionData = // ... some custom persistence service here that draws 
+                                     //     the data from the data store!
+histo.populate(versionData);
+```
+The `BarbelHisto` instance must be empty to use populate, otherwise you receive errors.
 # Adding indexes 
 See the [cqengine documentation](https://github.com/npgall/cqengine) for adding indexes and then, again, add your custom collection as backbone collection as described previously using the `BarbelHistoBuilder` class. Here is an example of adding an indexed collection as backbone. First define the index field.
 ```java
