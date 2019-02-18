@@ -2,9 +2,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://travis-ci.org/projectbarbel/barbelhisto-core.svg?branch=master)](https://travis-ci.org/projectbarbel/barbelhisto-core)
 
-A lightweiht easy to use bullet proof Java library to store the history of changes of domain objects in bi-temporal format. 
+A lightweiht easy to use Java library to store the history of changes of domain objects in bi-temporal format. 
 
-barbelhisto tracks two time dimensions for you: **record time** is when a change to a domain object was recorded in the system (created and inactivated) and **effective time** is when this change is opposed to become effective or valid from a business viewpoint.
+`BarbelHisto` tracks two time dimensions for you: **record time** is when a change to a domain object was recorded in the system (created and inactivated) and **effective time** is when this change is opposed to become effective or valid from a business viewpoint.
 
 The library implements Martin Fowlers Temporal Pattern that can be found here: https://martinfowler.com/eaaDev/timeNarrative.html
 
@@ -27,7 +27,7 @@ This library enables you to store your data in a format that enables you to answ
 
 - bi-temporal (auditing-proof) data storage based on blazing fast [cqengine](https://github.com/npgall/cqengine) collections
 - small easy-to-use API (as simple as bi-temporal data storage can get)
-- backed by transactional, high performance colections
+- backed by transactional, high performance collections
 - works out of the box with default implementation and configuration
 - manage different time zones of client and server
 - persistence support for heap, off-heap, disk storage and custom data stores
@@ -82,7 +82,7 @@ BitemporalStamp versionData = ((Bitemporal)effectiveNowOptional.get()).getBitemp
 ```
 That `BitemporalStamp` contains the effective time and record time data for that given object.
 ## Printing pretty journals
-Let's look at a pretty print of a document journal. The pretty print shows what `BarbelHisto` knows about your employee. It prints out the version data of each object in a table format. 
+Let's look at a pretty print of a document journal. The pretty print shows what `BarbelHisto` knows about your data. It prints out the version data of each object in a table format. 
 ```java
 System.out.println(core.prettyPrintJournal(employee.getId()));
 ```
