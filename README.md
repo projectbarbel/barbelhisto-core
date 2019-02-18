@@ -41,7 +41,7 @@ Download the [actual snapshot releases](https://github.com/projectbarbel/barbelh
 
 Or clone this git repository to try some of the features of `BarbelHisto`.
 
-# Two minutes tutorial
+# Getting started tutorial
 [See this test case](https://github.com/projectbarbel/barbelhisto-core/blob/master/src/test/java/org/projectbarbel/histo/BarbelHistoCore_StdPojoUsage_Test.java) to get the complete code for this tutorial.
 
 ## Create an instance of BarbelHisto
@@ -74,7 +74,15 @@ That query retrieves the `Employee` version effective in ten days. It will retur
 Optional<Employee> effectiveYesterdayOptional = core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().minusDays(1)));
 assertFalse(effectiveYesterdayOptional.isPresent());
 ```
-Let's look at the pretty print of the journal. The pretty print shows what `BarbelHisto` knows about your employee.
+## Accessing bitemporal version metadata
+Whenever you receive data from `BarbelHisto` with `retrieve`-methods all the objects carry a `BitemporalStamp` as version stamp. This stamp contains all the version data for that object. You can receive that as follows:
+```java
+Optional effectiveNowOptional = core.retrieveOne(BarbelQueries.effectiveNow(employee.getId()));
+BitemporalStamp versionData = ((Bitemporal)effectiveNowOptional.get()).getBitemporalStamp();
+```
+That `BitemporalStamp` contains the effective time and record time data for that given object.
+## Printing pretty journals
+Let's look at a pretty print of a document journal. The pretty print shows what `BarbelHisto` knows about your employee. It prints out the version data of each object in a table format. 
 ```java
 System.out.println(core.prettyPrintJournal(employee.getId()));
 ```
@@ -89,7 +97,7 @@ Document-ID: somePersonelNumber
 |----------------------------------------|---------------|----------------|--------|---------------------|---------------------------------------------|---------------------|---------------------------------------------|-------------------------------|
 |226ab05c-7c2d-4746-8861-18dc85a0188e    |2019-02-15     |999999999-12-31 |ACTIVE  |SYSTEM               |2019-02-15T08:46:56.495+01:00[Europe/Berlin] |NOBODY               |2199-12-31T23:59:00Z                         |EffectivePeriod [from=2019-02- |
 ```
-
+You can change the pretty printer and write your own. Look into `TableJournalPrettyPrinter` to see how to write an individual printer. You can register that printer with `BarbelHistoBuilder`.
 ## Store and retrieve two versions
 So far you know how to store POJOs to `BarbelHisto`. The real power of `BarbelHisto` is, however, to store changes to your `Employee` that become effective in the future (or became effective in the past). Here is how that works.
 Let's retrieve our current employee version again.
@@ -164,9 +172,12 @@ final SimpleAttribute<PrimitivePrivatePojo, String> PRIMARY_KEY = new SimpleAttr
     }
 };
 ```
-In the example we use a standard POJO annotated with the `@DocumentId` annotation decribed previously. The field definition returns the primary key. Then create a persistent collection with `BarbelHisto` using the known cqengine features: 
+POJOs get passed as `Bitemporal` proxies, that's why you can cast them to `Bitemporal` to get access to the Version information via the `BitemporalStamp`. In the example we use a standard POJO `PrimitivePrivatePojo` annotated with the `@DocumentId` annotation decribed previously. The field definition `PRIMARY_KEY` returns the version id as primary key for the persistence index. Now, create a persistent collection with `BarbelHisto` using the standard cqengine API and `BarbelHistoBuilder`: 
 ```java
-BarbelHisto<PrimitivePrivatePojo> core = BarbelHistoBuilder.barbel() .withBackboneSupplier(()->new ConcurrentIndexedCollection<PrimitivePrivatePojo>(DiskPersistence.onPrimaryKeyInFile(PRIMARY_KEY, new File(FILENAME)))).build();
+BarbelHisto<PrimitivePrivatePojo> core = BarbelHistoBuilder.barbel() .withBackboneSupplier(
+                  ()-> new ConcurrentIndexedCollection<PrimitivePrivatePojo>(DiskPersistence.
+                       onPrimaryKeyInFile(PRIMARY_KEY, new File(FILENAME))))
+                  .build();
 ```
 See the [cqengine documentation](https://github.com/npgall/cqengine) on all the options you can choose. 
 # Adding indexes 
@@ -179,6 +190,7 @@ public static final SimpleAttribute<Object, String> VERSION_ID_PK = new SimpleAt
     }
 };
 ```
+POJOs get passed as `Bitemporal` proxies, thats why you can cast them to `Bitemporal` to get access to the Version information via the `BitemporalStamp` 
 Then add the backbone collection to `BarbelHisto`.
 ```java
 BarbelHisto<T> core = BarbelHistoBuilder.barbel().withBackboneSupplier(()->{
