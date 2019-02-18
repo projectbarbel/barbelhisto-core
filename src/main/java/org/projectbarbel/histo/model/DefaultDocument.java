@@ -1,5 +1,7 @@
 package org.projectbarbel.histo.model;
 
+import java.util.Objects;
+
 import javax.annotation.Generated;
 
 import org.projectbarbel.histo.BarbelHisto;
@@ -73,43 +75,6 @@ public class DefaultDocument implements Bitemporal {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((bitemporalStamp == null) ? 0 : bitemporalStamp.hashCode());
-        result = prime * result + ((data == null) ? 0 : data.hashCode());
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        DefaultDocument other = (DefaultDocument) obj;
-        if (bitemporalStamp == null) {
-            if (other.bitemporalStamp != null)
-                return false;
-        } else if (!bitemporalStamp.equals(other.bitemporalStamp))
-            return false;
-        if (data == null) {
-            if (other.data != null)
-                return false;
-        } else if (!data.equals(other.data))
-            return false;
-        if (id == null) {
-            if (other.id != null)
-                return false;
-        } else if (!id.equals(other.id))
-            return false;
-        return true;
-    }
-
-    @Override
     public BitemporalStamp getBitemporalStamp() {
         return bitemporalStamp;
     }
@@ -132,6 +97,24 @@ public class DefaultDocument implements Bitemporal {
     @Generated("SparkTools")
     public static Builder builder() {
         return new Builder();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, bitemporalStamp, data);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        DefaultDocument other = (DefaultDocument) obj;
+        return Objects.equals(bitemporalStamp, other.bitemporalStamp) && Objects.equals(data, other.data)
+                && Objects.equals(id, other.id);
     }
 
     /**
