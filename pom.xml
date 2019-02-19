@@ -5,7 +5,7 @@
 
     <groupId>org.projectbarbel</groupId>
     <artifactId>barbelhisto</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0-SNAPSHOT-SNAPSHOT</version>
     <name>BarbelHisto java library</name>
     <url>http://www.projectbarbel.org</url>
     <description>BarbelHisto - Java library to manage bitemporal data</description>
