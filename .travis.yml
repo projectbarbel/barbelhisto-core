@@ -1,6 +1,8 @@
 language: java
 install: true
-script: mvn clean deploy --settings .maven.xml -DskipTests=true -B -U -P release
+script: 
+- mvn clean deploy --settings .maven.xml -DskipTests=true -B -U -P release
+- mvn cobertura:cobertura
 after_success:
 - bash <(curl -s https://codecov.io/bash)
 before_install:
