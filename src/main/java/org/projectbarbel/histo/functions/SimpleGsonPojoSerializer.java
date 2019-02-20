@@ -80,8 +80,8 @@ public class SimpleGsonPojoSerializer implements PojoSerializer<Bitemporal> {
     }
 
     public static class JsonTypeWrapper {
-        public String type;
-        public String json;
+        public final String type;
+        public final String json;
 
         public JsonTypeWrapper(String type, String json) {
             super();

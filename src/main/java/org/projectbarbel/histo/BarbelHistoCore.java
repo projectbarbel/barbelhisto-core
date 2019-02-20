@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.chrono.ChronoZonedDateTime;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
@@ -71,7 +72,8 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 
     @Override
     public boolean save(T newVersion, LocalDate from, LocalDate until) {
-        Validate.isTrue(newVersion != null && from != null && until != null, NOTNULL);
+        Validate.noNullElements(Arrays.asList(newVersion, from, until), NOTNULL);
+        Validate.notNull(newVersion, NOTNULL);
         Validate.isTrue(from.isBefore(until), "from date must be before until date");
         T maiden = mode.drawMaiden(context, newVersion);
         validTypes.computeIfAbsent(maiden.getClass(), (k) -> mode.validateManagedType(context, maiden));

@@ -27,8 +27,8 @@ import net.sf.cglib.proxy.Enhancer;
  */
 public abstract class BarbelMode {
 
-    public static BarbelMode POJO = new PojoMode();
-    public static BarbelMode BITEMPORAL = new BitemporalMode();
+    public static final BarbelMode POJO = new PojoMode();
+    public static final BarbelMode BITEMPORAL = new BitemporalMode();
 
     public abstract <T> T drawMaiden(BarbelHistoContext context, T object);
 
