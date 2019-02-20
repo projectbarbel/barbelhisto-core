@@ -56,11 +56,8 @@ public class CachingCGLibProxyingFunction implements BiFunction<Object, Bitempor
             } else if (method.getName().equals("toString")) {
                 return sp.getEffectiveTime().toString() + " | " + toString();
             } else if (method.getName().equals("equals")) {
-                obj = args.length > 0 ? args[0] : null;
-                if (obj instanceof BarbelProxy)
-                    return target.equals(((BarbelProxy) obj).getTarget())
-                            && sp.equals(((Bitemporal) obj).getBitemporalStamp());
-                return target.equals(obj);
+                Object other = args.length > 0 ? args[0] : null;
+                return equals(other);
             } else if (method.getName().equals("hashCode")) {
                 return hashCode();
             } else {
@@ -76,6 +73,20 @@ public class CachingCGLibProxyingFunction implements BiFunction<Object, Bitempor
         @Override
         public int hashCode() {
             return Objects.hash(sp, target);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (!(obj instanceof BarbelProxy) || !(obj instanceof Bitemporal))
+                return false;
+            BarbelProxy otherProxy = (BarbelProxy) obj;
+            Bitemporal otherBitemporal = (Bitemporal) obj;
+            return Objects.equals(sp, otherBitemporal.getBitemporalStamp())
+                    && Objects.equals(target, otherProxy.getTarget());
         }
 
     }

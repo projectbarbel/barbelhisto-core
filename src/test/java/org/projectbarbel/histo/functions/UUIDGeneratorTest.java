@@ -20,4 +20,9 @@ public class UUIDGeneratorTest {
         assertNotEquals(id1, id2);
     }
 
+    @Test
+    public void testGenerateId() throws Exception {
+        assertNotNull(UUIDGenerator.generateId());
+    }
+
 }

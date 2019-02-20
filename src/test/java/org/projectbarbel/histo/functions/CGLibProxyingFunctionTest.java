@@ -2,8 +2,8 @@ package org.projectbarbel.histo.functions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.projectbarbel.histo.model.BarbelProxy;
@@ -54,14 +54,9 @@ public class CGLibProxyingFunctionTest {
         BitemporalStamp stamp = BitemporalStamp.createActive();
         PrimitivePrivatePojoPartialContructor proxy = (PrimitivePrivatePojoPartialContructor)proxying.apply(pojo, stamp);
         assertEquals(pojo, ((BarbelProxy)proxy).getTarget());
-        assertFalse(pojo.equals(proxy));
-        assertTrue(pojo.hashCode()!=proxy.hashCode());
-        assertNotNull(((Bitemporal)proxy).getBitemporalStamp());
-        BitemporalStamp bs = BitemporalStamp.createActive();
-        ((Bitemporal)proxy).setBitemporalStamp(bs);
-        assertEquals(bs, ((Bitemporal)proxy).getBitemporalStamp());
-        assertNotNull(proxy.toString());
         ((BarbelProxy)proxy).setTarget(new Object());
+        assertNotEquals(pojo, proxy);
+        assertNotEquals(pojo, ((BarbelProxy)proxy).getTarget());
     }
     
     @Test
@@ -79,6 +74,36 @@ public class CGLibProxyingFunctionTest {
         DefaultPojo proxy = (DefaultPojo)proxying.apply(pojo, stamp);
         assertEquals(pojo.getData(), proxy.getData());
         assertEquals(pojo.getDocumentId(), proxy.getDocumentId());
+    }
+
+    @Test
+    public void testIntercept_EqualsAndHashCode() throws Exception {
+        PrimitivePrivatePojoPartialContructor pojo = EnhancedRandom.random(PrimitivePrivatePojoPartialContructor.class);
+        BitemporalStamp stamp = BitemporalStamp.createActive();
+        PrimitivePrivatePojoPartialContructor proxy = (PrimitivePrivatePojoPartialContructor)proxying.apply(pojo, stamp);
+        assertFalse(pojo.equals(proxy));
+        assertFalse(pojo.hashCode()==proxy.hashCode());
+        assertFalse(proxy.equals(pojo));
+        assertFalse(proxy.equals(proxy));
+    }
+
+    @Test
+    public void testIntercept_getSetBitemporal() throws Exception {
+        PrimitivePrivatePojoPartialContructor pojo = EnhancedRandom.random(PrimitivePrivatePojoPartialContructor.class);
+        BitemporalStamp stamp = BitemporalStamp.createActive();
+        PrimitivePrivatePojoPartialContructor proxy = (PrimitivePrivatePojoPartialContructor)proxying.apply(pojo, stamp);
+        assertNotNull(((Bitemporal)proxy).getBitemporalStamp());
+        BitemporalStamp bs = BitemporalStamp.createActive();
+        ((Bitemporal)proxy).setBitemporalStamp(bs);
+        assertEquals(bs, ((Bitemporal)proxy).getBitemporalStamp());
+    }
+
+    @Test
+    public void testIntercept_toString() throws Exception {
+        PrimitivePrivatePojoPartialContructor pojo = EnhancedRandom.random(PrimitivePrivatePojoPartialContructor.class);
+        BitemporalStamp stamp = BitemporalStamp.createActive();
+        PrimitivePrivatePojoPartialContructor proxy = (PrimitivePrivatePojoPartialContructor)proxying.apply(pojo, stamp);
+        assertNotNull(proxy.toString());
     }
 
 }

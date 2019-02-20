@@ -1,12 +1,12 @@
 package org.projectbarbel.histo.functions;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -18,6 +18,7 @@ import org.projectbarbel.histo.BarbelTestHelper;
 import org.projectbarbel.histo.model.BarbelProxy;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
+import org.projectbarbel.histo.model.BitemporalVersion;
 import org.projectbarbel.histo.model.DefaultDocument;
 import org.projectbarbel.histo.model.DefaultPojo;
 import org.projectbarbel.histo.pojos.ComplexFieldsPrivatePojoPartialContructor;
@@ -68,10 +69,16 @@ public class AdaptingKryoSerializerTest {
         }
     };
     
-    @BeforeEach
-    public void setUp() {
+    @Test
+    public void testValidateObjectIsRoundTripSerializable_Null() throws Exception {
+        assertThrows(IllegalStateException.class, ()->AdaptingKryoSerializer.validateObjectIsRoundTripSerializable(BarbelHistoBuilder.barbel(), null));
     }
-    
+
+    @Test
+    public void testValidateObjectIsRoundTripSerializable_Bitemporal() throws Exception {
+        AdaptingKryoSerializer.validateObjectIsRoundTripSerializable(BarbelHistoBuilder.barbel(), BarbelTestHelper.random(DefaultDocument.class));
+    }
+
     @Test
     public void testSerialize() throws Exception {
         options.put(AdaptingKryoSerializer.OBJECT_TYPE, DefaultDocument.class);
@@ -103,5 +110,29 @@ public class AdaptingKryoSerializerTest {
         assertTrue(deserialized instanceof BarbelProxy);
         assertTrue(deserialized instanceof Bitemporal);
     }
+
+    @Test
+    public void testDeserialize_BitemporalVersion() throws Exception {
+        BarbelHistoContext context = BarbelHistoBuilder.barbel().withContextOptions(options).withMode(BarbelMode.BITEMPORAL);
+        BitemporalVersion<DefaultPojo> pojo = new BitemporalVersion<DefaultPojo>(BitemporalStamp.createActive(), EnhancedRandom.random(DefaultPojo.class));
+        options.put(AdaptingKryoSerializer.OBJECT_TYPE, DefaultPojo.class);
+        options.put(AdaptingKryoSerializer.PERSISTENCE_CONFIG, config);
+        AdaptingKryoSerializer serializer = new AdaptingKryoSerializer(context);
+        byte[] bytes = serializer.serialize((BitemporalVersion<DefaultPojo>)pojo);
+        @SuppressWarnings("unchecked")
+        BitemporalVersion<DefaultPojo> deserialized = (BitemporalVersion<DefaultPojo>) serializer.deserialize(bytes);
+        assertTrue(deserialized.equals(pojo));
+        assertTrue(deserialized instanceof BitemporalVersion);
+    }
+
+    @Test
+    public void testValidateObjectEquality() throws Exception {
+        assertThrows(IllegalStateException.class, ()->AdaptingKryoSerializer.validateObjectEquality(new Object(), new Object()));
+    }
 	
+    @Test
+    public void testValidateHashcodeEquality() throws Exception {
+        assertThrows(IllegalStateException.class, ()->AdaptingKryoSerializer.validateHashCodeEquality(new Object(), new Object()));
+    }
+    
 }

@@ -98,7 +98,7 @@ public class AdaptingKryoSerializer implements PojoSerializer<Bitemporal> {
         } catch (Exception e) {
             throw new IllegalStateException(
                     "POJO object failed round trip serialization-deserialization test, object type: "
-                            + candidatePojo.getClass() + ", object: " + candidatePojo,
+                            + (candidatePojo == null ? "null" : candidatePojo.getClass()) + ", object: " + candidatePojo,
                     e);
         }
     }
