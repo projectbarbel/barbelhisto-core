@@ -16,42 +16,6 @@ import org.projectbarbel.histo.BarbelTestHelper;
 public class DefaultDocumentTest {
 
 	/**
-	 * BlockTest if hashCode returns the correct values. If {@link DefaultDocument} is changed internally
-	 * and the hashCode Method is not adopted correspondingly, then this test will fail.
-	 */
-	@Test
-	public void testHashCode_isCorrect() {
-		final DefaultDocument obj = BarbelTestHelper.random(DefaultDocument.class);
-		assertEquals(obj.hashCode(), Objects.hash(getFieldsByReflection(obj)));
-	}
-
-	private Object[] getFieldsByReflection(final DefaultDocument obj) {
-		List<Object> declaredfields=Arrays.asList(obj.getClass().getSuperclass().getDeclaredFields()).stream().map(f->{
-			try {
-				f.setAccessible(true);
-				return f.get(obj);
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			}
-			return null;
-		}).collect(Collectors.toList());
-		declaredfields.addAll(Arrays.asList(obj.getClass().getDeclaredFields()).stream().map(f->{
-			try {
-				f.setAccessible(true);
-				return f.get(obj);
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			}
-			return null;
-		}).collect(Collectors.toList()));
-		return declaredfields.toArray();
-	}
-
-	/**
 	 * Same instances should return constant hash values.
 	 */
 	@Test
