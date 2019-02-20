@@ -3,8 +3,8 @@ package org.projectbarbel.histo;
 import static com.googlecode.cqengine.query.QueryFactory.and;
 import static com.googlecode.cqengine.query.QueryFactory.equal;
 import static com.googlecode.cqengine.query.QueryFactory.greaterThan;
-import static com.googlecode.cqengine.query.QueryFactory.lessThan;
 import static com.googlecode.cqengine.query.QueryFactory.greaterThanOrEqualTo;
+import static com.googlecode.cqengine.query.QueryFactory.lessThan;
 import static com.googlecode.cqengine.query.QueryFactory.lessThanOrEqualTo;
 
 import java.time.LocalDate;
@@ -139,6 +139,7 @@ public final class BarbelQueries {
 	 * {@link BarbelHisto#retrieveOne(Query)}.
 	 * 
 	 * @param id the document
+	 * @param day effective-at date
 	 * @return the unique result
 	 */
 	@SuppressWarnings("unchecked")
@@ -151,6 +152,7 @@ public final class BarbelQueries {
 	 * Valid query for {@link BarbelHisto#retrieveOne(Query)}.
 	 * 
 	 * @param id the document
+	 * @param day the effective-after date
 	 * @return the unique result
 	 */
 	@SuppressWarnings("unchecked")

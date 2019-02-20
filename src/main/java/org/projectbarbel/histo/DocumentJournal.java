@@ -36,7 +36,7 @@ public final class DocumentJournal {
         // internal processing -> return original objects
         INTERNAL((c, o) -> o), 
         // return copies to user clients
-        EXTERNAL((c, o) -> c.getMode().copyManagedBitemporal(c, (Bitemporal) o)); 
+        EXTERNAL((c, o) -> c.getMode().get().copyManagedBitemporal(c, (Bitemporal) o)); 
         // @formatter:on
         private BiFunction<BarbelHistoContext, Bitemporal, Bitemporal> exposer;
 
@@ -70,6 +70,8 @@ public final class DocumentJournal {
      * Creates the journal using the backbone as pre-created collection. This
      * collection may contain objects with other Ids.
      * 
+     * @param processingState the {@link ProcessingState}
+     * @param context the current context
      * @param backbone the collection containing the journal objects
      * @param id       document id of the document under barbel control
      * @return the {@link DocumentJournal} created

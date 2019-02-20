@@ -113,7 +113,7 @@ public class AdaptingKryoSerializerTest {
 
     @Test
     public void testDeserialize_BitemporalVersion() throws Exception {
-        BarbelHistoContext context = BarbelHistoBuilder.barbel().withContextOptions(options).withMode(BarbelMode.BITEMPORAL.get());
+        BarbelHistoContext context = BarbelHistoBuilder.barbel().withContextOptions(options).withMode(BarbelMode.BITEMPORAL);
         BitemporalVersion<DefaultPojo> pojo = new BitemporalVersion<DefaultPojo>(BitemporalStamp.createActive(), EnhancedRandom.random(DefaultPojo.class));
         options.put(AdaptingKryoSerializer.OBJECT_TYPE, DefaultPojo.class);
         options.put(AdaptingKryoSerializer.PERSISTENCE_CONFIG, config);

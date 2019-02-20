@@ -59,8 +59,8 @@ public interface BarbelHistoContext {
 		return new ConcurrentIndexedCollection<>();
 	}
 
-	static AbstractBarbelMode getDefaultBarbelMode() {
-		return BarbelMode.POJO.get();
+	static BarbelMode getDefaultBarbelMode() {
+		return BarbelMode.POJO;
 	}
 
 	static String getDefaultActivity() {
@@ -118,7 +118,7 @@ public interface BarbelHistoContext {
 
 	Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> getJournalUpdateStrategyProducer();
 
-	AbstractBarbelMode getMode();
+	BarbelMode getMode();
 
 	IndexedCollection<UpdateLogRecord> getUpdateLog();
 

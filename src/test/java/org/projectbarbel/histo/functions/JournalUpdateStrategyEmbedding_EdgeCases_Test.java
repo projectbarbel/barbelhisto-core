@@ -30,7 +30,7 @@ public class JournalUpdateStrategyEmbedding_EdgeCases_Test {
 	@BeforeEach
 	public void setUp() {
 		BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 10, 0));
-		context = BarbelHistoBuilder.barbel().withMode(BarbelMode.POJO.get()).withUser("testUser");
+		context = BarbelHistoBuilder.barbel().withMode(BarbelMode.POJO).withUser("testUser");
 		journal = DocumentJournal
 				.create(ProcessingState.INTERNAL, context,
 						BarbelTestHelper.generateJournalOfManagedDefaultPojos("someId", Arrays.asList(LocalDate.of(2016, 1, 1),

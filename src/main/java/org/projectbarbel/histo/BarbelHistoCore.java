@@ -64,7 +64,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 	protected BarbelHistoCore(BarbelHistoContext context) {
 		CONSTRUCTION_CONTEXT.set(context);
 		this.context = Objects.requireNonNull(context);
-		this.mode = Objects.requireNonNull(context.getMode());
+		this.mode = Objects.requireNonNull(context.getMode().get());
 		this.backbone = Objects.requireNonNull((IndexedCollection<T>) context.getBackboneSupplier().get());
 		this.journals = Objects.requireNonNull(context.getJournalStore());
 		this.updateLog = Objects.requireNonNull(context.getUpdateLog());

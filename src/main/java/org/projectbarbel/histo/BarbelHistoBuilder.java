@@ -46,7 +46,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     private static final String NONULLS = "null values not allowed when building barbel context";
 
     // simple context types
-    private AbstractBarbelMode mode = BarbelHistoContext.getDefaultBarbelMode();
+    private BarbelMode mode = BarbelHistoContext.getDefaultBarbelMode();
     private Supplier<BiFunction<Object, BitemporalStamp, Object>> pojoProxyingFunctionSupplier = BarbelHistoContext
             .getDefaultProxyingFunctionSupplier();
     private Supplier<Function<Object, Object>> pojoCopyFunctionSupplier = BarbelHistoContext
@@ -133,18 +133,18 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     @Override
-    public AbstractBarbelMode getMode() {
+    public BarbelMode getMode() {
         return mode;
     }
 
     /**
-     * Set the {@link AbstractBarbelMode} of this {@link BarbelHisto} instance. Default is
-     * {@link AbstractBarbelMode#POJO}. See {@link BarbelHisto} for more details on modes.
+     * Set the {@link BarbelMode} of this {@link BarbelHisto} instance. Default is
+     * {@link BarbelMode#POJO}. See {@link BarbelHisto} for more details on modes.
      * 
      * @param mode the mode
      * @return the builder again
      */
-    public BarbelHistoBuilder withMode(AbstractBarbelMode mode) {
+    public BarbelHistoBuilder withMode(BarbelMode mode) {
         Validate.isTrue(mode != null, NONULLS);
         this.mode = mode;
         return this;
@@ -210,7 +210,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     /**
-     * Customize the proxying in {@link AbstractBarbelMode#POJO}. Default is
+     * Customize the proxying in {@link BarbelMode#POJO}. Default is
      * {@link CachingCGLibProxyingFunction}. Clients may want to use more specific
      * proxying functions with their POJOs.
      * 
