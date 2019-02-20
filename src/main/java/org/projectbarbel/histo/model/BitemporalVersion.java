@@ -3,10 +3,10 @@ package org.projectbarbel.histo.model;
 import java.util.Objects;
 
 import org.projectbarbel.histo.BarbelHisto;
-import org.projectbarbel.histo.BarbelMode;
+import org.projectbarbel.histo.AbstractBarbelMode;
 
 /**
- * Class used by {@link BarbelHisto} in {@link BarbelMode#POJO} to persist data
+ * Class used by {@link BarbelHisto} in {@link AbstractBarbelMode#POJO} to persist data
  * to persistent storage.
  * 
  * @author Niklas Schlimm

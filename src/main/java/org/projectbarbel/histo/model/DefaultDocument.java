@@ -5,7 +5,7 @@ import java.util.Objects;
 import javax.annotation.Generated;
 
 import org.projectbarbel.histo.BarbelHisto;
-import org.projectbarbel.histo.BarbelMode;
+import org.projectbarbel.histo.AbstractBarbelMode;
 import org.projectbarbel.histo.DocumentId;
 import org.projectbarbel.histo.functions.BarbelPojoSerializer;
 
@@ -16,7 +16,7 @@ import com.googlecode.cqengine.persistence.support.serialization.PersistenceConf
 /**
  * A fully equipped example implementation for business classes managed by
  * {@link BarbelHisto}. Notice that the interface {@link Bitemporal} is only
- * required in {@link BarbelMode#BITEMPORAL} and the {@link PersistenceConfig}
+ * required in {@link AbstractBarbelMode#BITEMPORAL} and the {@link PersistenceConfig}
  * is only required with {@link DiskPersistence} and {@link OffHeapPersistence}.
  * 
  * @author Niklas Schlimm

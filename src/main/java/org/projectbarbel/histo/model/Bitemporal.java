@@ -1,11 +1,11 @@
 package org.projectbarbel.histo.model;
 
 import org.projectbarbel.histo.BarbelHisto;
-import org.projectbarbel.histo.BarbelMode;
+import org.projectbarbel.histo.AbstractBarbelMode;
 
 /**
  * Interface applied to all objects managed by {@link BarbelHisto}. In
- * {@link BarbelMode#BITEMPORAL} clients implement this interface on their
+ * {@link AbstractBarbelMode#BITEMPORAL} clients implement this interface on their
  * business classes. There is nothing else required other then implementing this
  * interface. This will require to add a {@link BitemporalStamp} field to the
  * business class.

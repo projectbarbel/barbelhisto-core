@@ -60,7 +60,7 @@ public class SimpleGsonPojoSerializer implements PojoSerializer<Bitemporal> {
             BitemporalVersion<?> bv = (BitemporalVersion<?>) object;
             Class<?> objectType = typeMap.computeIfAbsent(bv.getObjectType(), computeIfAbsent());
             Object bvobject = gson.fromJson(gson.toJsonTree(bv.getObject()).toString(), objectType);
-            if (context.getMode() == BarbelMode.POJO)
+            if (context.getMode() == BarbelMode.POJO.get())
                 return (Bitemporal) context.getMode().snapshotMaiden(context, bvobject, bv.getStamp());
             else
                 return new BitemporalVersion<>(bv.getBitemporalStamp(), bvobject);

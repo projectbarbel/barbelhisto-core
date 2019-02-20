@@ -65,7 +65,7 @@ public class AdaptingKryoSerializer implements PojoSerializer<Bitemporal> {
         if (bitemporal instanceof BitemporalVersion) {
             BitemporalVersion<?> bv = (BitemporalVersion<?>) bitemporal;
             Object bvobject = bv.getObject();
-            if (context.getMode() == BarbelMode.POJO)
+            if (context.getMode() == BarbelMode.POJO.get())
                 return (Bitemporal) context.getMode().snapshotMaiden(context, bvobject, bv.getStamp());
             else
                 return new BitemporalVersion<>(bv.getBitemporalStamp(), bvobject);

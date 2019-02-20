@@ -35,7 +35,7 @@ public class BarbelHistoCore_CustomPersistence_Test {
 
     @Test
     public void testPopulateBitemporal() {
-        BarbelHisto<BitemporalVersion<?>> histo = BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL).build();
+        BarbelHisto<BitemporalVersion<?>> histo = BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL.get()).build();
         List<Bitemporal> bitemporals = Arrays.asList(
                 new BitemporalVersion<>(BitemporalStamp.createActive(), EnhancedRandom.random(DefaultPojo.class)),
                 new BitemporalVersion<>(BitemporalStamp.createActive(), EnhancedRandom.random(DefaultPojo.class)));

@@ -90,7 +90,7 @@ public class AdaptingKryoSerializerTest {
 
     @Test
     public void testSerialize_Proxy() throws Exception {
-        DefaultPojo pojo = (DefaultPojo)BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(), EnhancedRandom.random(DefaultPojo.class), BitemporalStamp.createActive());
+        DefaultPojo pojo = (DefaultPojo)BarbelMode.POJO.get().snapshotMaiden(BarbelHistoBuilder.barbel(), EnhancedRandom.random(DefaultPojo.class), BitemporalStamp.createActive());
         options.put(AdaptingKryoSerializer.OBJECT_TYPE, DefaultPojo.class);
         options.put(AdaptingKryoSerializer.PERSISTENCE_CONFIG, config);
         AdaptingKryoSerializer serializer = new AdaptingKryoSerializer(context);
@@ -100,7 +100,7 @@ public class AdaptingKryoSerializerTest {
 
     @Test
     public void testDeserialize() throws Exception {
-        DefaultPojo pojo = (DefaultPojo)BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(), EnhancedRandom.random(DefaultPojo.class), BitemporalStamp.createActive());
+        DefaultPojo pojo = (DefaultPojo)BarbelMode.POJO.get().snapshotMaiden(BarbelHistoBuilder.barbel(), EnhancedRandom.random(DefaultPojo.class), BitemporalStamp.createActive());
         options.put(AdaptingKryoSerializer.OBJECT_TYPE, DefaultPojo.class);
         options.put(AdaptingKryoSerializer.PERSISTENCE_CONFIG, config);
         AdaptingKryoSerializer serializer = new AdaptingKryoSerializer(context);
@@ -113,7 +113,7 @@ public class AdaptingKryoSerializerTest {
 
     @Test
     public void testDeserialize_BitemporalVersion() throws Exception {
-        BarbelHistoContext context = BarbelHistoBuilder.barbel().withContextOptions(options).withMode(BarbelMode.BITEMPORAL);
+        BarbelHistoContext context = BarbelHistoBuilder.barbel().withContextOptions(options).withMode(BarbelMode.BITEMPORAL.get());
         BitemporalVersion<DefaultPojo> pojo = new BitemporalVersion<DefaultPojo>(BitemporalStamp.createActive(), EnhancedRandom.random(DefaultPojo.class));
         options.put(AdaptingKryoSerializer.OBJECT_TYPE, DefaultPojo.class);
         options.put(AdaptingKryoSerializer.PERSISTENCE_CONFIG, config);

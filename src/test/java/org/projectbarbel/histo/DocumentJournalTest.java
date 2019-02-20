@@ -56,7 +56,7 @@ public class DocumentJournalTest {
         DefaultDocument doc = DefaultDocument.builder().withData("some data")
                 .withBitemporalStamp(BitemporalStamp.createActive()).build();
         coll.add(doc);
-        DocumentJournal journal = DocumentJournal.create(ProcessingState.INTERNAL, BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL), coll, doc.getBitemporalStamp().getDocumentId());
+        DocumentJournal journal = DocumentJournal.create(ProcessingState.INTERNAL, BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL.get()), coll, doc.getBitemporalStamp().getDocumentId());
         journal.accept(Arrays.asList(doc));
         assertTrue(journal.list().size()==1);
     }
@@ -64,7 +64,7 @@ public class DocumentJournalTest {
     @Test
     public void testList() throws Exception {
         DocumentJournal journal = DocumentJournal
-                .create(ProcessingState.INTERNAL, BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL), BarbelTestHelper.generateJournalOfDefaultDocuments("#12345",
+                .create(ProcessingState.INTERNAL, BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL.get()), BarbelTestHelper.generateJournalOfDefaultDocuments("#12345",
                         Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 4, 1))), "#12345");
         assertEquals(((Bitemporal)journal.list().get(0)).getBitemporalStamp().getEffectiveTime().from(), LocalDate.of(2019, 1, 1));
     }

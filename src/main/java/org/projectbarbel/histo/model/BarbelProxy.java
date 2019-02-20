@@ -1,10 +1,10 @@
 package org.projectbarbel.histo.model;
 
-import org.projectbarbel.histo.BarbelMode;
+import org.projectbarbel.histo.AbstractBarbelMode;
 
 /**
  * The target proxy interface applied to POJOs when running in
- * {@link BarbelMode#POJO}.
+ * {@link AbstractBarbelMode#POJO}.
  * 
  * @author Niklas Schlimm
  *

@@ -57,27 +57,27 @@ import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
  * The primary key should be business oriented, i.e. personnel number, contract
  * number. <br>
  * <br>
- * Two {@link BarbelMode}s can be used to manage different types of objects:
- * {@link BarbelMode#POJO} is the default mode. Of course, using POJO mode is
+ * Two {@link AbstractBarbelMode}s can be used to manage different types of objects:
+ * {@link AbstractBarbelMode#POJO} is the default mode. Of course, using POJO mode is
  * the easiest way forward. However, behind the scenes {@link BarbelHisto} uses
  * proxying when managing POJOs to store the version data with the objects that
  * clients save. Proxying can become complicated in some situations. For that
- * reason there is another mode called {@link BarbelMode#BITEMPORAL}. One can
- * change the mode to {@link BarbelMode#BITEMPORAL} with the
- * {@link BarbelHistoBuilder#withMode(BarbelMode)} method like so:
+ * reason there is another mode called {@link AbstractBarbelMode#BITEMPORAL}. One can
+ * change the mode to {@link AbstractBarbelMode#BITEMPORAL} with the
+ * {@link BarbelHistoBuilder#withMode(AbstractBarbelMode)} method like so:
  * 
  * <pre>
  * BarbelHisto barbel = BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL).build();
  * </pre>
  * 
- * If {@link BarbelMode#BITEMPORAL} is used clients have to implement the
+ * If {@link AbstractBarbelMode#BITEMPORAL} is used clients have to implement the
  * interface {@link Bitemporal} on the type they wish to manage with
  * {@link BarbelHisto}. In this mode, there won't be any proxying magic applied
  * to objects. When clients implement the interface {@link Bitemporal} they need
  * to declare a field of type {@link BitemporalStamp} in the business object
  * type. There is nothing else required than declaring the field. Anything else
  * is managed by {@link BarbelHisto}. See {@link DefaultDocument} as an example
- * of a fully equipped business class in {@link BarbelMode#BITEMPORAL}. <br>
+ * of a fully equipped business class in {@link AbstractBarbelMode#BITEMPORAL}. <br>
  * <br>
  * In any mode clients <b>never</b> have to care about the bitemporal version
  * stamp. This is completely managed by {@link BarbelHisto}. Clients only need
@@ -238,8 +238,8 @@ public interface BarbelHisto<T> {
      * {@link #populate(Collection)} items already managed in the current
      * {@link BarbelHisto} instance they will receive errors. <br>
      * <br>
-     * In {@link BarbelMode#POJO} (default) clients have to pass a collection of
-     * {@link BitemporalVersion} objects. In {@link BarbelMode#BITEMPORAL} mode
+     * In {@link AbstractBarbelMode#POJO} (default) clients have to pass a collection of
+     * {@link BitemporalVersion} objects. In {@link AbstractBarbelMode#BITEMPORAL} mode
      * clients can add arbitrary objects that implement {@link Bitemporal}. <br>
      * <br>
      * {@link BarbelHisto} is based on cqengine. There are build in on-heap
@@ -260,8 +260,8 @@ public interface BarbelHisto<T> {
      * {@link #populate(Collection)} to re-load the stored versions back into
      * {@link BarbelHisto}.<br>
      * <br>
-     * In {@link BarbelMode#POJO} (default) clients receive a collection of
-     * {@link BitemporalVersion} objects. In {@link BarbelMode#BITEMPORAL} clients
+     * In {@link AbstractBarbelMode#POJO} (default) clients receive a collection of
+     * {@link BitemporalVersion} objects. In {@link AbstractBarbelMode#BITEMPORAL} clients
      * receive objects that implement {@link Bitemporal}. <br>
      * <br>
      * In POJO mode (default) this method returns a collection of

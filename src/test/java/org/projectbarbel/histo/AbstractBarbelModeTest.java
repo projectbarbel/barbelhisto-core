@@ -21,19 +21,19 @@ import org.projectbarbel.histo.model.DefaultPojo;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
-public class BarbelModeTest {
+public class AbstractBarbelModeTest {
 
     @Test
     public void testGetIdValue() throws Exception {
         DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
-        assertEquals(pojo.getDocumentId(), BarbelMode.getIdValue(pojo).get());
+        assertEquals(pojo.getDocumentId(), AbstractBarbelMode.getIdValue(pojo).get());
     }
 
     @Test
     public void testSnapshotManagedBitemporal() throws Exception {
-        Bitemporal managed = BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(),
+        Bitemporal managed = BarbelMode.POJO.get().snapshotMaiden(BarbelHistoBuilder.barbel(),
                 EnhancedRandom.random(DefaultPojo.class), BitemporalStamp.createActive());
-        Bitemporal bitemporal = BarbelMode.POJO.snapshotManagedBitemporal(BarbelHistoBuilder.barbel(), managed,
+        Bitemporal bitemporal = BarbelMode.POJO.get().snapshotManagedBitemporal(BarbelHistoBuilder.barbel(), managed,
                 BitemporalStamp.createActive());
         assertNotEquals(managed, bitemporal);
         assertEquals(((BarbelProxy) managed).getTarget(), ((BarbelProxy) bitemporal).getTarget());
@@ -41,11 +41,11 @@ public class BarbelModeTest {
 
     @Test
     public void testSnapshotManagedBitemporal_Bitemporal() throws Exception {
-        Bitemporal managed = BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(),
+        Bitemporal managed = BarbelMode.POJO.get().snapshotMaiden(BarbelHistoBuilder.barbel(),
                 new BitemporalVersion<DefaultPojo>(BitemporalStamp.createActive(),
                         EnhancedRandom.random(DefaultPojo.class)),
                 BitemporalStamp.createActive());
-        Bitemporal bitemporal = BarbelMode.POJO.snapshotManagedBitemporal(BarbelHistoBuilder.barbel(), managed,
+        Bitemporal bitemporal = BarbelMode.POJO.get().snapshotManagedBitemporal(BarbelHistoBuilder.barbel(), managed,
                 BitemporalStamp.createActive());
         assertNotEquals(managed, bitemporal); // stamps differ
         assertEquals(((BarbelProxy) managed).getTarget(), ((BarbelProxy) bitemporal).getTarget());
@@ -53,12 +53,12 @@ public class BarbelModeTest {
 
     @Test
     public void testDrawDocumentId() throws Exception {
-        assertNotNull(BarbelMode.POJO.drawDocumentId(EnhancedRandom.random(DefaultPojo.class)));
+        assertNotNull(BarbelMode.POJO.get().drawDocumentId(EnhancedRandom.random(DefaultPojo.class)));
     }
 
     @Test
     public void testSnapshotMaiden() throws Exception {
-        Bitemporal managed = BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(),
+        Bitemporal managed = BarbelMode.POJO.get().snapshotMaiden(BarbelHistoBuilder.barbel(),
                 EnhancedRandom.random(DefaultPojo.class), BitemporalStamp.createActive());
         assertTrue(managed instanceof BarbelProxy);
         assertTrue(managed instanceof Bitemporal);
@@ -67,7 +67,7 @@ public class BarbelModeTest {
     @Test
     public void testManagedBitemporalToCustomPersistenceObjects() throws Exception {
         assertTrue(
-                BarbelMode.POJO
+                BarbelMode.POJO.get()
                         .managedBitemporalToCustomPersistenceObjects(
                                 BarbelTestHelper.generateJournalOfManagedDefaultPojos("some",
                                         Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 3, 1))))
@@ -76,7 +76,7 @@ public class BarbelModeTest {
 
     @Test
     public void testCustomPersistenceObjectsToManagedBitemporals() throws Exception {
-        assertTrue(BarbelMode.POJO.customPersistenceObjectsToManagedBitemporals(BarbelHistoBuilder.barbel(),
+        assertTrue(BarbelMode.POJO.get().customPersistenceObjectsToManagedBitemporals(BarbelHistoBuilder.barbel(),
                 Arrays.asList(BarbelTestHelper.random(BitemporalVersion.class),
                         BarbelTestHelper.random(BitemporalVersion.class)))
                 .size() == 2);
@@ -85,29 +85,29 @@ public class BarbelModeTest {
     @Test
     public void testCustomPersistenceObjectsToManagedBitemporals_Wrongtype() throws Exception {
         assertThrows(IllegalArgumentException.class,
-                () -> BarbelMode.POJO.customPersistenceObjectsToManagedBitemporals(BarbelHistoBuilder.barbel(),
+                () -> BarbelMode.POJO.get().customPersistenceObjectsToManagedBitemporals(BarbelHistoBuilder.barbel(),
                         Arrays.asList(BarbelTestHelper.random(DefaultDocument.class),
                                 BarbelTestHelper.random(DefaultDocument.class))));
     }
 
     @Test
     public void testCopyManagedBitemporal() throws Exception {
-        Bitemporal managed = BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(),
+        Bitemporal managed = BarbelMode.POJO.get().snapshotMaiden(BarbelHistoBuilder.barbel(),
                 EnhancedRandom.random(DefaultPojo.class), BitemporalStamp.createActive());
-        Bitemporal copy = BarbelMode.POJO.copyManagedBitemporal(BarbelHistoBuilder.barbel(), managed);
+        Bitemporal copy = BarbelMode.POJO.get().copyManagedBitemporal(BarbelHistoBuilder.barbel(), managed);
         assertEquals(managed, copy);
         assertNotSame(managed, copy);
     }
 
     @Test
     public void testValidateManagedType() throws Exception {
-        assertThrows(IllegalArgumentException.class, () -> BarbelMode.POJO
+        assertThrows(IllegalArgumentException.class, () -> BarbelMode.POJO.get()
                 .validateManagedType(BarbelHistoBuilder.barbel(), BarbelTestHelper.random(BitemporalVersion.class)));
     }
 
     @Test
     public void testValidateManagedType_MissingDocId() throws Exception {
-        assertThrows(IllegalArgumentException.class, () -> BarbelMode.POJO
+        assertThrows(IllegalArgumentException.class, () -> BarbelMode.POJO.get()
                 .validateManagedType(BarbelHistoBuilder.barbel(), BarbelTestHelper.random(wodocid.class)));
     }
 
@@ -119,14 +119,14 @@ public class BarbelModeTest {
     @Test
     public void testDrawMaiden_POJO() throws Exception {
         DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
-        Object maiden = BarbelMode.POJO.drawMaiden(BarbelHistoBuilder.barbel(), pojo);
+        Object maiden = BarbelMode.POJO.get().drawMaiden(BarbelHistoBuilder.barbel(), pojo);
         assertEquals(pojo, maiden);
     }
 
     @Test
     public void testDrawMaiden_POJO_Proxy() throws Exception {
-    	DefaultPojo pojo = (DefaultPojo)BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(), EnhancedRandom.random(DefaultPojo.class), BitemporalStamp.createActive());
-    	Object maiden = BarbelMode.POJO.drawMaiden(BarbelHistoBuilder.barbel(), pojo);
+    	DefaultPojo pojo = (DefaultPojo)BarbelMode.POJO.get().snapshotMaiden(BarbelHistoBuilder.barbel(), EnhancedRandom.random(DefaultPojo.class), BitemporalStamp.createActive());
+    	Object maiden = BarbelMode.POJO.get().drawMaiden(BarbelHistoBuilder.barbel(), pojo);
     	assertNotEquals(pojo, maiden);
     	assertEquals(((BarbelProxy)pojo).getTarget(), maiden);
     }
@@ -134,27 +134,27 @@ public class BarbelModeTest {
     @Test
     public void testDrawMaiden_Bizemporal() throws Exception {
         DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
-        Bitemporal managed = BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(),
+        Bitemporal managed = BarbelMode.POJO.get().snapshotMaiden(BarbelHistoBuilder.barbel(),
                 pojo, BitemporalStamp.createActive());
-        Object maiden = BarbelMode.POJO.drawMaiden(BarbelHistoBuilder.barbel(), managed);
+        Object maiden = BarbelMode.POJO.get().drawMaiden(BarbelHistoBuilder.barbel(), managed);
         assertEquals(pojo, maiden);
     }
 
     @Test
     public void testGetPersistenceObjectType() throws Exception {
-        assertEquals(BarbelMode.POJO.getPersistenceObjectType(Object.class), BitemporalVersion.class);
+        assertEquals(BarbelMode.POJO.get().getPersistenceObjectType(Object.class), BitemporalVersion.class);
     }
 
     public void testGetIdValue_Bitemporal() throws Exception {
         DefaultDocument pojo = BarbelTestHelper.random(DefaultDocument.class);
-        assertEquals(pojo.getId(), BarbelMode.getIdValue(pojo).get());
+        assertEquals(pojo.getId(), AbstractBarbelMode.getIdValue(pojo).get());
     }
 
     @Test
     public void testSnapshotManagedBitemporal_BitemporalMode() throws Exception {
-        Bitemporal managed = BarbelMode.BITEMPORAL.snapshotMaiden(BarbelHistoBuilder.barbel(),
+        Bitemporal managed = BarbelMode.BITEMPORAL.get().snapshotMaiden(BarbelHistoBuilder.barbel(),
                 EnhancedRandom.random(DefaultDocument.class), BitemporalStamp.createActive());
-        Bitemporal bitemporal = BarbelMode.BITEMPORAL.snapshotManagedBitemporal(BarbelHistoBuilder.barbel(), managed,
+        Bitemporal bitemporal = BarbelMode.BITEMPORAL.get().snapshotManagedBitemporal(BarbelHistoBuilder.barbel(), managed,
                 BitemporalStamp.createActive());
         assertNotEquals(managed, bitemporal);
         assertNotEquals(bitemporal.getBitemporalStamp(), managed.getBitemporalStamp());
@@ -162,23 +162,23 @@ public class BarbelModeTest {
 
     @Test
     public void testSnapshotManagedBitemporal_Bitemporal_BitemporalMode() throws Exception {
-        Bitemporal managed = BarbelMode.BITEMPORAL.snapshotMaiden(BarbelHistoBuilder.barbel(),
+        Bitemporal managed = BarbelMode.BITEMPORAL.get().snapshotMaiden(BarbelHistoBuilder.barbel(),
                 new BitemporalVersion<DefaultDocument>(BitemporalStamp.createActive(),
                         EnhancedRandom.random(DefaultDocument.class)),
                 BitemporalStamp.createActive());
-        Bitemporal bitemporal = BarbelMode.BITEMPORAL.snapshotManagedBitemporal(BarbelHistoBuilder.barbel(), managed,
+        Bitemporal bitemporal = BarbelMode.BITEMPORAL.get().snapshotManagedBitemporal(BarbelHistoBuilder.barbel(), managed,
                 BitemporalStamp.createActive());
         assertNotEquals(managed, bitemporal); // stamps differ
     }
 
     @Test
     public void testDrawDocumentId_BitemporalMode() throws Exception {
-        assertNotNull(BarbelMode.BITEMPORAL.drawDocumentId(EnhancedRandom.random(DefaultDocument.class)));
+        assertNotNull(BarbelMode.BITEMPORAL.get().drawDocumentId(EnhancedRandom.random(DefaultDocument.class)));
     }
 
     @Test
     public void testSnapshotMaiden_BitemporalMode() throws Exception {
-        Bitemporal managed = BarbelMode.BITEMPORAL.snapshotMaiden(BarbelHistoBuilder.barbel(),
+        Bitemporal managed = BarbelMode.BITEMPORAL.get().snapshotMaiden(BarbelHistoBuilder.barbel(),
                 EnhancedRandom.random(DefaultDocument.class), BitemporalStamp.createActive());
         assertTrue(managed instanceof Bitemporal);
     }
@@ -186,7 +186,7 @@ public class BarbelModeTest {
     @Test
     public void testManagedBitemporalToCustomPersistenceObjects_BitemporalMode() throws Exception {
         assertTrue(
-                BarbelMode.BITEMPORAL
+                BarbelMode.BITEMPORAL.get()
                         .managedBitemporalToCustomPersistenceObjects(
                                 BarbelTestHelper.generateJournalOfManagedDefaultPojos("some",
                                         Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 3, 1))))
@@ -195,7 +195,7 @@ public class BarbelModeTest {
 
     @Test
     public void testCustomPersistenceObjectsToManagedBitemporals_BitemporalMode() throws Exception {
-        assertTrue(BarbelMode.BITEMPORAL.customPersistenceObjectsToManagedBitemporals(BarbelHistoBuilder.barbel(),
+        assertTrue(BarbelMode.BITEMPORAL.get().customPersistenceObjectsToManagedBitemporals(BarbelHistoBuilder.barbel(),
                 Arrays.asList(BarbelTestHelper.random(BitemporalVersion.class),
                         BarbelTestHelper.random(BitemporalVersion.class)))
                 .size() == 2);
@@ -203,45 +203,45 @@ public class BarbelModeTest {
 
     @Test
     public void testCustomPersistenceObjectsToManagedBitemporals_Wrongtype_BitemporalMode() throws Exception {
-        assertTrue(BarbelMode.BITEMPORAL.customPersistenceObjectsToManagedBitemporals(BarbelHistoBuilder.barbel(),
+        assertTrue(BarbelMode.BITEMPORAL.get().customPersistenceObjectsToManagedBitemporals(BarbelHistoBuilder.barbel(),
                         Arrays.asList(BarbelTestHelper.random(DefaultDocument.class),
                                 BarbelTestHelper.random(DefaultDocument.class))).size()==2);
     }
 
     @Test
     public void testCopyManagedBitemporal_BitemporalMode() throws Exception {
-        Bitemporal managed = BarbelMode.BITEMPORAL.snapshotMaiden(BarbelHistoBuilder.barbel(),
+        Bitemporal managed = BarbelMode.BITEMPORAL.get().snapshotMaiden(BarbelHistoBuilder.barbel(),
                 EnhancedRandom.random(DefaultDocument.class), BitemporalStamp.createActive());
-        Bitemporal copy = BarbelMode.BITEMPORAL.copyManagedBitemporal(BarbelHistoBuilder.barbel(), managed);
+        Bitemporal copy = BarbelMode.BITEMPORAL.get().copyManagedBitemporal(BarbelHistoBuilder.barbel(), managed);
         assertEquals(managed, copy);
         assertNotSame(managed, copy);
     }
 
     @Test
     public void testValidateManagedType_BitemporalMode() throws Exception {
-        assertThrows(IllegalArgumentException.class, () -> BarbelMode.BITEMPORAL
+        assertThrows(IllegalArgumentException.class, () -> BarbelMode.BITEMPORAL.get()
                 .validateManagedType(BarbelHistoBuilder.barbel(), BarbelTestHelper.random(DefaultPojo.class)));
     }
 
     @Test
     public void testValidateManagedType_MissingDocId_BitemporalMode() throws Exception {
-        assertThrows(IllegalArgumentException.class, () -> BarbelMode.BITEMPORAL
+        assertThrows(IllegalArgumentException.class, () -> BarbelMode.BITEMPORAL.get()
                 .validateManagedType(BarbelHistoBuilder.barbel(), BarbelTestHelper.random(wodocid.class)));
     }
 
     @Test
     public void testDrawMaiden_BitemporalMode() throws Exception {
         DefaultDocument pojo = EnhancedRandom.random(DefaultDocument.class);
-        Object maiden = BarbelMode.BITEMPORAL.drawMaiden(BarbelHistoBuilder.barbel(), pojo);
+        Object maiden = BarbelMode.BITEMPORAL.get().drawMaiden(BarbelHistoBuilder.barbel(), pojo);
         assertEquals(pojo, maiden);
     }
 
     @Test
     public void testDrawMaiden_Bitemporal() throws Exception {
         DefaultDocument pojo = EnhancedRandom.random(DefaultDocument.class);
-        Bitemporal managed = BarbelMode.BITEMPORAL.snapshotMaiden(BarbelHistoBuilder.barbel(),
+        Bitemporal managed = BarbelMode.BITEMPORAL.get().snapshotMaiden(BarbelHistoBuilder.barbel(),
                 pojo, BitemporalStamp.createActive());
-        Object maiden = BarbelMode.BITEMPORAL.drawMaiden(BarbelHistoBuilder.barbel(), managed);
+        Object maiden = BarbelMode.BITEMPORAL.get().drawMaiden(BarbelHistoBuilder.barbel(), managed);
         assertNotEquals(pojo, maiden); // stamps differ
         assertEquals(managed, maiden); 
         assertSame(managed, maiden); 
@@ -249,7 +249,7 @@ public class BarbelModeTest {
 
     @Test
     public void testGetPersistenceObjectType_BitemporalMode() throws Exception {
-        assertEquals(BarbelMode.BITEMPORAL.getPersistenceObjectType(DefaultDocument.class), DefaultDocument.class);
+        assertEquals(BarbelMode.BITEMPORAL.get().getPersistenceObjectType(DefaultDocument.class), DefaultDocument.class);
     }
 
 }

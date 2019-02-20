@@ -36,7 +36,7 @@ public class SimpleGsonPojoSerializerTest {
     public void testSerialize_DefaultPojo() throws Exception {
         serializer = new SimpleGsonPojoSerializer(BarbelHistoBuilder.barbel());
         DefaultPojo initial = EnhancedRandom.random(DefaultPojo.class);
-        Bitemporal bitemporal = BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(), initial, BitemporalStamp.createActive());
+        Bitemporal bitemporal = BarbelMode.POJO.get().snapshotMaiden(BarbelHistoBuilder.barbel(), initial, BitemporalStamp.createActive());
         byte[] bytes = serializer.serialize(bitemporal);
         DefaultPojo roundtrip = (DefaultPojo)serializer.deserialize(bytes);
         assertEquals(bitemporal, roundtrip);
@@ -47,7 +47,7 @@ public class SimpleGsonPojoSerializerTest {
     public void testSerialize_SomePojo() throws Exception {
         serializer = new SimpleGsonPojoSerializer(BarbelHistoBuilder.barbel());
         SomePojo initial = EnhancedRandom.random(SomePojo.class);
-        Bitemporal bitemporal = BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(), initial, BitemporalStamp.createActive());
+        Bitemporal bitemporal = BarbelMode.POJO.get().snapshotMaiden(BarbelHistoBuilder.barbel(), initial, BitemporalStamp.createActive());
         byte[] bytes = serializer.serialize(bitemporal);
         SomePojo roundtrip = (SomePojo)serializer.deserialize(bytes);
         assertEquals(bitemporal, roundtrip);
@@ -56,7 +56,7 @@ public class SimpleGsonPojoSerializerTest {
     
     @Test
     public void testSerialize_BitemporalVersion() throws Exception {
-        serializer = new SimpleGsonPojoSerializer(BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL));
+        serializer = new SimpleGsonPojoSerializer(BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL.get()));
         BitemporalVersion<SomePojo> initial = new BitemporalVersion<SomePojo>(BitemporalStamp.createActive(), EnhancedRandom.random(SomePojo.class));
         byte[] bytes = serializer.serialize(initial);
         Bitemporal roundtrip = serializer.deserialize(bytes);

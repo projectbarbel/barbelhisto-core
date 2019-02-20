@@ -46,7 +46,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     private static final String NONULLS = "null values not allowed when building barbel context";
 
     // simple context types
-    private BarbelMode mode = BarbelHistoContext.getDefaultBarbelMode();
+    private AbstractBarbelMode mode = BarbelHistoContext.getDefaultBarbelMode();
     private Supplier<BiFunction<Object, BitemporalStamp, Object>> pojoProxyingFunctionSupplier = BarbelHistoContext
             .getDefaultProxyingFunctionSupplier();
     private Supplier<Function<Object, Object>> pojoCopyFunctionSupplier = BarbelHistoContext
@@ -55,7 +55,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     private Object backboneSupplier = BarbelHistoContext.getDefaultBackbone();
     private String activity = BarbelHistoContext.getDefaultActivity();
     private String user = BarbelHistoContext.getDefaultUser();
-    private Map<Object, DocumentJournal> journalStore = new ConcurrentHashMap<Object, DocumentJournal>();
+    private Map<Object, DocumentJournal> journalStore = new ConcurrentHashMap<>();
     private Gson gson = BarbelHistoContext.getDefaultGson();
     private IndexedCollection<UpdateLogRecord> updateLog = BarbelHistoContext.getDefaultUpdateLog();
     private Function<List<Bitemporal>, String> prettyPrinter = BarbelHistoContext.getDefaultPrettyPrinter();
@@ -64,12 +64,11 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     // some more complex context types
     private Function<BarbelHistoContext, PojoSerializer<Bitemporal>> persistenceSerializerProducer = BarbelHistoContext
             .getDefaultPersistenceSerializerProducer();
-    private Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> journalUpdateStrategyProducer = (
-            context) -> new EmbeddingJournalUpdateStrategy(this);
+    private Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> journalUpdateStrategyProducer = 
+            context -> new EmbeddingJournalUpdateStrategy(this);
 
     public static BarbelHistoBuilder barbel() {
-        BarbelHistoBuilder builder = new BarbelHistoBuilder();
-        return builder;
+        return new BarbelHistoBuilder();
     }
 
     protected BarbelHistoBuilder() {
@@ -78,7 +77,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     public <T> BarbelHisto<T> build() {
         if (pojoCopyFunctionSupplier instanceof SimpleGsonPojoCopier)
             ((SimpleGsonPojoCopier) pojoCopyFunctionSupplier).setGson(gson);
-        return new BarbelHistoCore<T>(this);
+        return new BarbelHistoCore<>(this);
     }
 
     public Map<String, Object> getContextOptions() {
@@ -134,18 +133,18 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     @Override
-    public BarbelMode getMode() {
+    public AbstractBarbelMode getMode() {
         return mode;
     }
 
     /**
-     * Set the {@link BarbelMode} of this {@link BarbelHisto} instance. Default is
-     * {@link BarbelMode#POJO}. See {@link BarbelHisto} for more details on modes.
+     * Set the {@link AbstractBarbelMode} of this {@link BarbelHisto} instance. Default is
+     * {@link AbstractBarbelMode#POJO}. See {@link BarbelHisto} for more details on modes.
      * 
      * @param mode the mode
      * @return the builder again
      */
-    public BarbelHistoBuilder withMode(BarbelMode mode) {
+    public BarbelHistoBuilder withMode(AbstractBarbelMode mode) {
         Validate.isTrue(mode != null, NONULLS);
         this.mode = mode;
         return this;
@@ -211,7 +210,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     /**
-     * Customize the proxying in {@link BarbelMode#POJO}. Default is
+     * Customize the proxying in {@link AbstractBarbelMode#POJO}. Default is
      * {@link CachingCGLibProxyingFunction}. Clients may want to use more specific
      * proxying functions with their POJOs.
      * 
