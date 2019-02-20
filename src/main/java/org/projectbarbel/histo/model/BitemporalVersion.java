@@ -13,7 +13,7 @@ import org.projectbarbel.histo.BarbelMode;
  *
  * @param <T> the business tabpe to store
  */
-public final class BitemporalVersion<T> implements Bitemporal {
+public class BitemporalVersion<T> implements Bitemporal {
 
     private BitemporalStamp stamp;
     private final T object;

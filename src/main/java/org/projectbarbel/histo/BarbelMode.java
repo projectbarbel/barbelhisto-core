@@ -47,12 +47,6 @@ public abstract class BarbelMode {
     public abstract <T> Collection<T> customPersistenceObjectsToManagedBitemporals(BarbelHistoContext context,
             Collection<Bitemporal> bitemporals);
 
-    public abstract Object fromInternalPersistenceObjectToManagedBitemporal(BarbelHistoContext context,
-            BitemporalVersion<?> bv);
-
-    public abstract BitemporalVersion<?> fromManagedBitemporalToInternalPersistenceObject(BarbelHistoContext context,
-            Bitemporal bitemporal);
-
     public abstract boolean validateManagedType(BarbelHistoContext context, Object candidate);
 
     public abstract Class<?> getPersistenceObjectType(Class<?> objectType);
@@ -65,9 +59,6 @@ public abstract class BarbelMode {
             Validate.isTrue(pojo instanceof BarbelProxy, "pojo must be instance of BarbelProxy in BarbelMode.POJO");
             Validate.isTrue(Enhancer.isEnhanced(pojo.getClass()), "pojo must be CGI proxy type in BarbelMode.POJO");
             Object newVersion = context.getPojoCopyFunctionSupplier().get().apply(((BarbelProxy) pojo).getTarget());
-            if (newVersion instanceof Bitemporal) { // make sure target and proxy will always sync their stamps
-                ((Bitemporal) newVersion).setBitemporalStamp(stamp);
-            }
             Object newBitemporal = context.getPojoProxyingFunctionSupplier().get().apply(newVersion, stamp);
             return (Bitemporal) newBitemporal;
         }
@@ -80,8 +71,6 @@ public abstract class BarbelMode {
         @Override
         public Bitemporal snapshotMaiden(BarbelHistoContext context, Object pojo, BitemporalStamp stamp) {
             Validate.isTrue(!Enhancer.isEnhanced(pojo.getClass()), "pojo must not be CGI proxy type");
-            if (pojo instanceof BarbelProxy)
-                pojo = ((BarbelProxy) pojo).getTarget();
             Object copy = context.getPojoCopyFunctionSupplier().get().apply(pojo);
             Object proxy = context.getPojoProxyingFunctionSupplier().get().apply(copy, stamp);
             return (Bitemporal) proxy;
@@ -120,20 +109,6 @@ public abstract class BarbelMode {
         public Bitemporal copyManagedBitemporal(BarbelHistoContext context, Bitemporal bitemporal) {
             return snapshotManagedBitemporal(context, bitemporal, (BitemporalStamp) context
                     .getPojoCopyFunctionSupplier().get().apply(bitemporal.getBitemporalStamp()));
-        }
-
-        @Override
-        public Object fromInternalPersistenceObjectToManagedBitemporal(BarbelHistoContext context,
-                BitemporalVersion<?> bv) {
-            return context.getPojoProxyingFunctionSupplier().get().apply(bv.getObject(), bv.getBitemporalStamp());
-        }
-
-        @Override
-        public BitemporalVersion<?> fromManagedBitemporalToInternalPersistenceObject(BarbelHistoContext context,
-                Bitemporal bitemporal) {
-            BitemporalStamp stamp = bitemporal.getBitemporalStamp();
-            Object target = ((BarbelProxy) bitemporal).getTarget();
-            return new BitemporalVersion<>(stamp, target);
         }
 
         @Override
@@ -203,18 +178,6 @@ public abstract class BarbelMode {
         @Override
         public Bitemporal copyManagedBitemporal(BarbelHistoContext context, Bitemporal bitemporal) {
             return (Bitemporal) context.getPojoCopyFunctionSupplier().get().apply(bitemporal);
-        }
-
-        @Override
-        public Object fromInternalPersistenceObjectToManagedBitemporal(BarbelHistoContext context,
-                BitemporalVersion<?> bv) {
-            return bv.getObject();
-        }
-
-        @Override
-        public BitemporalVersion<?> fromManagedBitemporalToInternalPersistenceObject(BarbelHistoContext context,
-                Bitemporal bitemporal) {
-            return new BitemporalVersion<>(bitemporal.getBitemporalStamp(), bitemporal);
         }
 
         @Override
