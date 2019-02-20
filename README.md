@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/projectbarbel/barbelhisto-core.svg?branch=master)](https://travis-ci.org/projectbarbel/barbelhisto-core)
 ![Maven Central](https://img.shields.io/maven-central/v/org.projectbarbel/barbelhisto.svg)
 ![Codecov](https://img.shields.io/codecov/c/github/projectbarbel/barbelhisto-core.svg)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=projectbarbel_barbelhisto-core&metric=alert_status)](https://sonarcloud.io/dashboard?id=projectbarbel_barbelhisto-core)
 
 A lightweiht easy to use Java library to store the history of changes of domain objects in bi-temporal format. 
 

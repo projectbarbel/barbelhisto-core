@@ -206,11 +206,6 @@ public abstract class BarbelMode {
         fields.get(0).setAccessible(true);
         try {
             return Optional.ofNullable(fields.get(0).get(currentVersion));
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException(
-                    "wrong parameters passed to field accessor when retrieving document id on class: "
-                            + currentVersion.getClass().getName(),
-                    e);
         } catch (IllegalAccessException e) {
             throw new RuntimeException("no access permission when trying to receive document id on class: "
                     + currentVersion.getClass().getName(), e);
