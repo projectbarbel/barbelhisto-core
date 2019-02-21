@@ -18,10 +18,10 @@ public class RecordPeriodTest {
 		BarbelHistoContext.getBarbelClock().useFixedClockAt(now);
 		RecordPeriod period = RecordPeriod.createActive(BarbelHistoBuilder.barbel());
 		assertEquals(period.getCreatedAt(), ZonedDateTime.of(now, ZoneId.systemDefault()));
-		assertEquals(period.getCreatedBy(), BarbelHistoBuilder.SYSTEM);
-		assertEquals(period.getInactivatedAt(), RecordPeriod.NOT_INACTIVATED);
-		assertEquals(period.getInactivatedBy(), RecordPeriod.NOBODY);
-		assertEquals(period.getState(), BitemporalObjectState.ACTIVE);
+		assertEquals(BarbelHistoBuilder.SYSTEM, period.getCreatedBy());
+		assertEquals(RecordPeriod.NOT_INACTIVATED, period.getInactivatedAt());
+		assertEquals(RecordPeriod.NOBODY, period.getInactivatedBy());
+		assertEquals(BitemporalObjectState.ACTIVE, period.getState());
 	}
 
 	@Test
