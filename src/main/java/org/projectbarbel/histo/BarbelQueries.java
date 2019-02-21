@@ -76,6 +76,7 @@ public final class BarbelQueries {
     };
 
     private BarbelQueries() {
+    	super();
 	}
     
     //// @formatter:off
