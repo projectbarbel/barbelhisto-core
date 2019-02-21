@@ -5,17 +5,14 @@ addons:
     organization: "projectbarbel" 
     token:
       secure: VXNRHUVpnrfMvX+GBSC+Z5IzwQEYsbQxcP9w9p4Goxt9ud0kDcT9NRLQK8eeqiT2zn7ruNMzAlT16SQKhqTZH5EdCTdSOo7qEkMXGEVIuSEfTDMzp8sI5EpUrFlLYcvd6f9AjfOQMOewnJ2UTOp17ca0CeV6tXhHjD1rLZ9oI4Ym6Q8IygYQJa9mL0L4o4cfWr2UvnO20uOFq7Xjz2JKOrN1EVzu5SIl7NZy95nIROZDfleEmdctzTsOyqvblqYP4iZFdrQCAkPANRix3xG1/ble4xtOiuH7x7cYkWieIC2Vqslruu3aMeZguly9BscNQeuqe/o7yEQYzqxG+662MKOr/zck356M2+5WkOyuxbyETFv37NUu2jiYefJMhYFwEUXkdX1ZOemRMIENWz+rizngTKs3xrwYA4EYmZloCeeGuKh3uDrb6Xh5lXlExiix0ubnvt+8pe30tOhWz/fcKwBzPFM2AQ1lv4hiX0Rm6hSgJtsqhe0KBHViKMZER9w+od9P8Oc1LHz5+apmt+ECdHtNClPDo3hSYsAKFeRVZOi/hbT1rXcKMXbD9934qd/19PSFZ7MqVNhstqQiJaKycqbsRF/59em7TRL137qQI2Pp2DHj/6AReo668gkeRJJM+xzEIV8qeyUj41cg5B3RSEwb/sQ0Oq9UejPRa6YBcOk=
-script: 
-- mvn clean deploy --settings .maven.xml -DskipTests=true -B -U -P release
+before_install:
+- echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
+- echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
 - mvn cobertura:cobertura
 - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
-after_success:
-- bash <(curl -s https://codecov.io/bash)
-before_install:
-    - echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import
-    - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
-install:
-    mvn --settings .maven.xml install -DskipTests=true -Dgpg.skip -Dmaven.javadoc.skip=true -B -V
+install: mvn --settings .maven.xml install -DskipTests=true -Dgpg.skip -Dmaven.javadoc.skip=true -B -V
+script: mvn clean deploy --settings .maven.xml -DskipTests=true -B -U -P release
+after_success: bash <(curl -s https://codecov.io/bash)
 before_deploy:
 - mvn help:evaluate -N -Dexpression=project.version|grep -v '\['
 - export project_version=$(mvn help:evaluate -N -Dexpression=project.version|grep -v '\[')
@@ -31,3 +28,4 @@ deploy:
     repo: projectbarbel/barbelhisto-core
     tags: true
   name: $project_version
+  
