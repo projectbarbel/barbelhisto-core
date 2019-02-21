@@ -16,6 +16,9 @@ import com.googlecode.cqengine.query.option.QueryOptions;
  */
 public class BarbelQueryOptions {
 
+	public BarbelQueryOptions() {
+	}
+	
     public static QueryOptions sortAscendingByEffectiveFrom() {
         return queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM), ascending(BarbelQueries.EFFECTIVE_UNTIL)));
     }

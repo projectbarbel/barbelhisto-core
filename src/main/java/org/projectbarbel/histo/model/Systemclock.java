@@ -21,9 +21,6 @@ public class Systemclock {
 
     private Clock clock = Clock.systemDefaultZone();
 
-    public Systemclock() {
-    }
-
     public ZonedDateTime now() {
         return ZonedDateTime.now(clock);
     }

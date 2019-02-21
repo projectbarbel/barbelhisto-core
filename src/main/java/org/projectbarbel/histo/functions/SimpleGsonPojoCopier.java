@@ -1,12 +1,12 @@
 package org.projectbarbel.histo.functions;
 
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.projectbarbel.histo.BarbelHistoContext;
 
 import com.google.gson.Gson;
 
-public class SimpleGsonPojoCopier implements Function<Object, Object> {
+public class SimpleGsonPojoCopier implements UnaryOperator<Object> {
 
     private Gson gson = BarbelHistoContext.getDefaultGson();
 
@@ -16,8 +16,7 @@ public class SimpleGsonPojoCopier implements Function<Object, Object> {
 
     @Override
     public Object apply(Object objectFrom) {
-        Object copy = gson.fromJson(gson.toJson(objectFrom), objectFrom.getClass());
-        return copy;
+        return gson.fromJson(gson.toJson(objectFrom), objectFrom.getClass());
     }
 
 }

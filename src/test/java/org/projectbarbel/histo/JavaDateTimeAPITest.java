@@ -30,16 +30,16 @@ import org.junit.jupiter.api.Test;
  */
 public class JavaDateTimeAPITest {
 
-    private ZoneId berlinTimeZone = ZoneId.of("Europe/Berlin");
-    private ZoneId utcTimeZone = ZoneId.of("Z");
+    private static final ZoneId berlinTimeZone = ZoneId.of("Europe/Berlin");
+    private static final ZoneId utcTimeZone = ZoneId.of("Z");
 
     /**
      * Understanding three different types {@link java.time.Clock}
+     * @param args 
      * 
      * @throws InterruptedException
      */
-    @Test
-    public void testClock() throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException {
         Clock wallClock = Clock.systemDefaultZone(); // a clock like yours on the wall, with your local time
         printOutDateTime(wallClock);
         Clock utcClock = Clock.systemUTC(); // reference clock
@@ -49,9 +49,9 @@ public class JavaDateTimeAPITest {
                                                                                 // countries
         printOutDateTime(internationalClock);
         ZoneId.getAvailableZoneIds().forEach(System.out::println); // all time zones
-    }
+	}
 
-    private void printOutDateTime(Clock clock) throws InterruptedException {
+    private static void printOutDateTime(Clock clock) throws InterruptedException {
         System.out.format("%50s%1s", "Time Zone: ", clock.getZone().getId() + "\n");
         LocalDateTime localdatetime = LocalDateTime.now(clock);
         System.out.format("%50s%1s", "Local Date: ", localdatetime + "\n");

@@ -8,6 +8,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 import org.projectbarbel.histo.BarbelHistoCore.UpdateLogRecord;
 import org.projectbarbel.histo.functions.AdaptingKryoSerializer;
@@ -21,9 +22,6 @@ import org.projectbarbel.histo.model.Systemclock;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializer;
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.persistence.support.serialization.PojoSerializer;
@@ -36,12 +34,6 @@ import com.googlecode.cqengine.persistence.support.serialization.PojoSerializer;
  *
  */
 public interface BarbelHistoContext {
-
-	public static final JsonDeserializer<ZonedDateTime> ZDT_DESERIALIZER = (json, from,
-			context) -> BarbelHistoBuilder.DATE_FORMATTER.parse(json.getAsString(), ZonedDateTime::from);
-
-	public static final JsonSerializer<ZonedDateTime> ZDT_SERIALIZER = (src, typeOfSrc,
-			context) -> new JsonPrimitive(BarbelHistoBuilder.DATE_FORMATTER.format(src));
 
 	static <T> Supplier<IndexedCollection<T>> getDefaultBackbone() {
 		return ConcurrentIndexedCollection::new;
@@ -92,11 +84,11 @@ public interface BarbelHistoContext {
 	}
 
 	static Gson getDefaultGson() {
-		return new GsonBuilder().registerTypeAdapter(ZonedDateTime.class, ZDT_DESERIALIZER)
-				.registerTypeAdapter(ZonedDateTime.class, ZDT_SERIALIZER).create();
+		return new GsonBuilder().registerTypeAdapter(ZonedDateTime.class, BarbelHistoBuilder.ZDT_DESERIALIZER)
+				.registerTypeAdapter(ZonedDateTime.class, BarbelHistoBuilder.ZDT_SERIALIZER).create();
 	}
 
-	static Supplier<Function<Object, Object>> getDefaultCopyFunctionSupplier() {
+	static Supplier<UnaryOperator<Object>> getDefaultCopyFunctionSupplier() {
 		return () -> RitsClonerCopyFunction.INSTANCE;
 	}
 
@@ -112,7 +104,7 @@ public interface BarbelHistoContext {
 
 	Supplier<BiFunction<Object, BitemporalStamp, Object>> getPojoProxyingFunctionSupplier();
 
-	Supplier<Function<Object, Object>> getPojoCopyFunctionSupplier();
+	Supplier<UnaryOperator<Object>> getPojoCopyFunctionSupplier();
 
 	Gson getGson();
 

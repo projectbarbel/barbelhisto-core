@@ -34,8 +34,8 @@ public class AdaptingKryoSerializer implements PojoSerializer<Bitemporal> {
     private final BarbelHistoContext context;
     private final Class<?> objectType;
     private final PersistenceConfig persistenceConfig;
-    public final static String OBJECT_TYPE = "objectType";
-    public final static String PERSISTENCE_CONFIG = "persistenceConfig";
+    public static final String OBJECT_TYPE = "objectType";
+    public static final String PERSISTENCE_CONFIG = "persistenceConfig";
 
     public AdaptingKryoSerializer(BarbelHistoContext context) {
         super();
@@ -45,7 +45,7 @@ public class AdaptingKryoSerializer implements PojoSerializer<Bitemporal> {
         persistenceConfig = Optional.ofNullable((PersistenceConfig) context.getContextOptions().get(PERSISTENCE_CONFIG))
                 .orElseThrow(() -> new IllegalStateException("could not find persistenceConfig"));
         @SuppressWarnings("unchecked")
-        KryoSerializer<Bitemporal> kryo = new KryoSerializer<Bitemporal>(
+        KryoSerializer<Bitemporal> kryo = new KryoSerializer<>(
                 (Class<Bitemporal>) context.getMode().getPersistenceObjectType(objectType), persistenceConfig);
         this.targetKryo = kryo;
     }
@@ -53,7 +53,7 @@ public class AdaptingKryoSerializer implements PojoSerializer<Bitemporal> {
     @Override
     public byte[] serialize(final Bitemporal object) {
         if (object instanceof BarbelProxy) { // change persisted type to BitemporalVersion
-            return targetKryo.serialize(new BitemporalVersion<>(((Bitemporal) object).getBitemporalStamp(),
+            return targetKryo.serialize(new BitemporalVersion<>((object).getBitemporalStamp(),
                     ((BarbelProxy) object).getTarget()));
         }
         return targetKryo.serialize(object);
@@ -66,11 +66,11 @@ public class AdaptingKryoSerializer implements PojoSerializer<Bitemporal> {
             BitemporalVersion<?> bv = (BitemporalVersion<?>) bitemporal;
             Object bvobject = bv.getObject();
             if (context.getMode() == BarbelMode.POJO)
-                return (Bitemporal) context.getMode().snapshotMaiden(context, bvobject, bv.getStamp());
+                return context.getMode().snapshotMaiden(context, bvobject, bv.getBitemporalStamp());
             else
                 return new BitemporalVersion<>(bv.getBitemporalStamp(), bvobject);
         }
-        return (Bitemporal) bitemporal;
+        return bitemporal;
     }
 
     public static <O> boolean validateObjectIsRoundTripSerializable(BarbelHistoContext context, O candidatePojo) {
@@ -111,7 +111,7 @@ public class AdaptingKryoSerializer implements PojoSerializer<Bitemporal> {
     }
 
     static void validateHashCodeEquality(Object candidate, Object deserializedPojo) {
-        if (!(deserializedPojo.hashCode() == candidate.hashCode())) {
+        if (deserializedPojo.hashCode() != candidate.hashCode()) {
             throw new IllegalStateException(
                     "The POJO's hashCode after round trip serialization differs from its original hashCode - not implemented hashCode()?");
         }

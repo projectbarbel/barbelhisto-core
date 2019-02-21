@@ -25,7 +25,7 @@ import net.sf.cglib.proxy.MethodProxy;
 public class CachingCGLibProxyingFunction implements BiFunction<Object, BitemporalStamp, Object> {
 
     private final Enhancer enhancer;
-    public final static CachingCGLibProxyingFunction INSTANCE = new CachingCGLibProxyingFunction();
+    public static final CachingCGLibProxyingFunction INSTANCE = new CachingCGLibProxyingFunction();
     private final Objenesis objenesis = new ObjenesisStd();
 
     private CachingCGLibProxyingFunction() {
@@ -43,7 +43,7 @@ public class CachingCGLibProxyingFunction implements BiFunction<Object, Bitempor
             if (method.getName().equals("getBitemporalStamp")) {
                 return sp;
             } else if (method.getName().equals("setBitemporalStamp")) {
-                sp = args.length > 0 ? (BitemporalStamp) args[0] : null;
+                sp = (BitemporalStamp)getArgument(args);
                 if (target instanceof Bitemporal) { // if target is bitemporal sync bitemporal stamps
                     ((Bitemporal) target).setBitemporalStamp(sp);
                 }
@@ -51,12 +51,12 @@ public class CachingCGLibProxyingFunction implements BiFunction<Object, Bitempor
             } else if (method.getName().equals("getTarget")) {
                 return target;
             } else if (method.getName().equals("setTarget")) {
-                this.target = args.length > 0 ? args[0] : null;
+                this.target = getArgument(args);
                 return null;
             } else if (method.getName().equals("toString")) {
                 return sp.getEffectiveTime().toString() + " | " + toString();
             } else if (method.getName().equals("equals")) {
-                Object other = args.length > 0 ? args[0] : null;
+                Object other = getArgument(args);
                 return equals(other);
             } else if (method.getName().equals("hashCode")) {
                 return hashCode();
@@ -64,6 +64,10 @@ public class CachingCGLibProxyingFunction implements BiFunction<Object, Bitempor
                 return proxy.invoke(target, args);
             }
         }
+
+		private Object getArgument(Object[] args) {
+			return args.length > 0 ? args[0] : null;
+		}
 
         @Override
         public String toString() {

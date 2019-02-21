@@ -133,10 +133,9 @@ public class EmbeddingJournalUpdateStrategy implements BiConsumer<DocumentJourna
                 boolean interruptedEqual, boolean betweenVersions) {
             byte pattern = asByte(
                     new boolean[] { interruptedFrom, interruptedUntil, interruptedEqual, betweenVersions });
-            JournalUpdateCase validCase = Arrays.asList(JournalUpdateCase.values()).stream()
+            return Arrays.asList(JournalUpdateCase.values()).stream()
                     .filter(c -> pattern == c.getPattern()).findFirst().orElseThrow(() -> new IllegalStateException(
                             "unknown case for journal update: " + Byte.toString(pattern)));
-            return validCase;
         }
 
         private byte getPattern() {

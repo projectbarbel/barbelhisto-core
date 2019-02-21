@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.EffectivePeriod;
-import org.projectbarbel.histo.model.Systemclock;
 
 import com.googlecode.cqengine.IndexedCollection;
 
@@ -81,8 +80,7 @@ public final class DocumentJournal {
         Validate.notNull(backbone, "new document list must not be null when creating new journal");
         Validate.notNull(id, "must specify document id for this collection");
         Validate.notNull(context, "must specify context for this journal");
-        DocumentJournal newjournal = new DocumentJournal(processingState, context, backbone, id);
-        return newjournal;
+        return new DocumentJournal(processingState, context, backbone, id);
     }
 
     @SuppressWarnings("unchecked")
@@ -146,7 +144,7 @@ public final class DocumentJournal {
      * @return the reader
      */
     public JournalReader read() {
-        return new JournalReader(this, BarbelHistoContext.getBarbelClock());
+        return new JournalReader(this);
     }
 
     protected boolean lockAcquired() {
@@ -160,7 +158,7 @@ public final class DocumentJournal {
     public static class JournalReader {
         private DocumentJournal journal;
 
-        private JournalReader(DocumentJournal journal, Systemclock clock) {
+        private JournalReader(DocumentJournal journal) {
             this.journal = journal;
         }
 

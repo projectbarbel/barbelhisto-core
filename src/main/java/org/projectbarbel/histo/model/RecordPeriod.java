@@ -15,9 +15,9 @@ import org.projectbarbel.histo.BarbelHistoContext;
  */
 public class RecordPeriod {
 
-    public final static ZonedDateTime NOT_INACTIVATED = ZonedDateTime.of(LocalDateTime.of(2199, 12, 31, 23, 59),
+    public static final ZonedDateTime NOT_INACTIVATED = ZonedDateTime.of(LocalDateTime.of(2199, 12, 31, 23, 59),
             ZoneId.of("Z"));
-    public final static String NOBODY = "NOBODY";
+    public static final String NOBODY = "NOBODY";
 
     private final ZonedDateTime createdAt;
     private final String createdBy;

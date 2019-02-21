@@ -1,12 +1,12 @@
 package org.projectbarbel.histo.functions;
 
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import com.rits.cloning.Cloner;
 
-public class RitsClonerCopyFunction implements Function<Object, Object> {
+public class RitsClonerCopyFunction implements UnaryOperator<Object> {
 
-    public final static RitsClonerCopyFunction INSTANCE = new RitsClonerCopyFunction();
+    public static final RitsClonerCopyFunction INSTANCE = new RitsClonerCopyFunction();
     private Cloner cloner = new Cloner();
 
     @Override

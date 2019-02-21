@@ -21,7 +21,7 @@ public enum BarbelMode implements BarbelModeProcessor {
 		public Bitemporal snapshotManagedBitemporal(BarbelHistoContext context, Bitemporal pojo,
 				BitemporalStamp stamp) {
 			Validate.isTrue(pojo instanceof BarbelProxy, "pojo must be instance of BarbelProxy in BarbelMode.POJO");
-			Validate.isTrue(Enhancer.isEnhanced(pojo.getClass()), "pojo must be CGI proxy type in BarbelMode.POJO");
+			Validate.isTrue(Enhancer.isEnhanced(pojo.getClass()), "pojo must be CGLib proxy type in BarbelMode.POJO");
 			Object newVersion = context.getPojoCopyFunctionSupplier().get().apply(((BarbelProxy) pojo).getTarget());
 			Object newBitemporal = context.getPojoProxyingFunctionSupplier().get().apply(newVersion, stamp);
 			return (Bitemporal) newBitemporal;
@@ -34,7 +34,7 @@ public enum BarbelMode implements BarbelModeProcessor {
 
 		@Override
 		public Bitemporal snapshotMaiden(BarbelHistoContext context, Object pojo, BitemporalStamp stamp) {
-			Validate.isTrue(!Enhancer.isEnhanced(pojo.getClass()), "pojo must not be CGI proxy type");
+			Validate.isTrue(!Enhancer.isEnhanced(pojo.getClass()), CGLIB_TYPE_REQUIRED);
 			Object copy = context.getPojoCopyFunctionSupplier().get().apply(pojo);
 			Object proxy = context.getPojoProxyingFunctionSupplier().get().apply(copy, stamp);
 			return (Bitemporal) proxy;
@@ -54,7 +54,7 @@ public enum BarbelMode implements BarbelModeProcessor {
 			try {
 				IndexedCollection<Object> output = bitemporals.stream()
 						.map(b -> snapshotMaiden(context, ((BitemporalVersion<?>) b).getObject(),
-								((BitemporalVersion<?>) b).getStamp()))
+								((BitemporalVersion<?>) b).getBitemporalStamp()))
 						.collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
 				return (Collection<T>) output;
 			} catch (ClassCastException e) {
@@ -102,7 +102,7 @@ public enum BarbelMode implements BarbelModeProcessor {
 		public Bitemporal snapshotManagedBitemporal(BarbelHistoContext context, Bitemporal pojo,
 				BitemporalStamp stamp) {
 			Validate.isTrue(!(pojo instanceof BarbelProxy), "pojo must not be instance of BarbelProxy");
-			Validate.isTrue(!Enhancer.isEnhanced(pojo.getClass()), "pojo must not be CGI proxy type");
+			Validate.isTrue(!Enhancer.isEnhanced(pojo.getClass()), CGLIB_TYPE_REQUIRED);
 			Object newVersion = context.getPojoCopyFunctionSupplier().get().apply(pojo);
 			((Bitemporal) newVersion).setBitemporalStamp(stamp);
 			return (Bitemporal) newVersion;
@@ -118,7 +118,7 @@ public enum BarbelMode implements BarbelModeProcessor {
 			Validate.isTrue(pojo instanceof Bitemporal,
 					"must inherit interface Bitemporal.class when running bitemporal mode");
 			Validate.isTrue(!(pojo instanceof BarbelProxy), "pojo must not be instance of BarbelProxy");
-			Validate.isTrue(!Enhancer.isEnhanced(pojo.getClass()), "pojo must not be CGI proxy type");
+			Validate.isTrue(!Enhancer.isEnhanced(pojo.getClass()), CGLIB_TYPE_REQUIRED);
 			Object copy = context.getPojoCopyFunctionSupplier().get().apply(pojo);
 			((Bitemporal) copy).setBitemporalStamp(stamp);
 			return (Bitemporal) copy;
@@ -161,5 +161,7 @@ public enum BarbelMode implements BarbelModeProcessor {
 		}
 
 	};
+
+	private static final String CGLIB_TYPE_REQUIRED = "pojo must not be CGLib proxy type";
 
 }

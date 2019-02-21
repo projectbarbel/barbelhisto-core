@@ -75,6 +75,9 @@ public final class BarbelQueries {
         }
     };
 
+    private BarbelQueries() {
+	}
+    
     //// @formatter:off
 	/**
 	 * Get all versions from the backbone.

@@ -1,5 +1,6 @@
 package org.projectbarbel.histo;
 
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 import org.apache.commons.lang3.Validate;
 import org.projectbarbel.histo.BarbelHistoCore.UpdateLogRecord;
@@ -24,6 +26,9 @@ import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.Systemclock;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializer;
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.persistence.Persistence;
@@ -49,6 +54,11 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     public static final String SYSTEMACTIVITY = "SYSTEMACTIVITY";
     public static final Systemclock CLOCK = new Systemclock();
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
+	public static final JsonDeserializer<ZonedDateTime> ZDT_DESERIALIZER = (json, from,
+			context) -> BarbelHistoBuilder.DATE_FORMATTER.parse(json.getAsString(), ZonedDateTime::from);
+
+	public static final JsonSerializer<ZonedDateTime> ZDT_SERIALIZER = (src, typeOfSrc,
+			context) -> new JsonPrimitive(BarbelHistoBuilder.DATE_FORMATTER.format(src));
 
     private static final String NONULLS = "null values not allowed when building barbel context";
 
@@ -56,7 +66,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     private BarbelMode mode = BarbelHistoContext.getDefaultBarbelMode();
     private Supplier<BiFunction<Object, BitemporalStamp, Object>> pojoProxyingFunctionSupplier = BarbelHistoContext
             .getDefaultProxyingFunctionSupplier();
-    private Supplier<Function<Object, Object>> pojoCopyFunctionSupplier = BarbelHistoContext
+    private Supplier<UnaryOperator<Object>> pojoCopyFunctionSupplier = BarbelHistoContext
             .getDefaultCopyFunctionSupplier();
     private Supplier<Object> versionIdGenerator = BarbelHistoContext.getDefaultVersionIDGenerator();
     private Object backboneSupplier = BarbelHistoContext.getDefaultBackbone();
@@ -177,7 +187,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     @Override
-    public Supplier<Function<Object, Object>> getPojoCopyFunctionSupplier() {
+    public Supplier<UnaryOperator<Object>> getPojoCopyFunctionSupplier() {
         return pojoCopyFunctionSupplier;
     }
 
@@ -188,7 +198,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
      * @param pojoCopyFunction the custom copy function
      * @return the builder again
      */
-    public BarbelHistoBuilder withPojoCopyFunctionSupplier(Supplier<Function<Object, Object>> pojoCopyFunction) {
+    public BarbelHistoBuilder withPojoCopyFunctionSupplier(Supplier<UnaryOperator<Object>> pojoCopyFunction) {
         Validate.isTrue(pojoCopyFunction != null, NONULLS);
         this.pojoCopyFunctionSupplier = pojoCopyFunction;
         return this;

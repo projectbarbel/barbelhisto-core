@@ -38,16 +38,8 @@ public class BitemporalVersion<T> implements Bitemporal {
 		this.stamp = stamp;
 	}
 
-	public BitemporalStamp getStamp() {
-		return stamp;
-	}
-
 	public T getObject() {
 		return object;
-	}
-
-	public void setStamp(BitemporalStamp stamp) {
-		this.stamp = stamp;
 	}
 
 	public String getObjectType() {

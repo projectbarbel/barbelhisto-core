@@ -42,7 +42,7 @@ public interface BarbelModeProcessor {
 	    try {
 	        return Optional.ofNullable(fields.get(0).get(currentVersion));
 	    } catch (IllegalAccessException e) {
-	        throw new RuntimeException("no access permission when trying to receive document id on class: "
+	        throw new IllegalStateException("no access permission when trying to receive document id on class: "
 	                + currentVersion.getClass().getName(), e);
 	    }
 	}

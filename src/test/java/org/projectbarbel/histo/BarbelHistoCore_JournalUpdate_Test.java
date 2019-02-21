@@ -359,7 +359,7 @@ public class BarbelHistoCore_JournalUpdate_Test {
                     newVersions.get(i).getBitemporalStamp().getEffectiveTime().until());
             assertEquals(ZonedDateTime.of(LocalDateTime.of(2019, 1, 30, 10, 0), ZoneId.systemDefault()),
                     newVersions.get(i).getBitemporalStamp().getRecordTime().getCreatedAt());
-            assertEquals(newVersions.get(i).getBitemporalStamp().getRecordTime().getCreatedBy(), "testUser");
+            assertEquals("testUser", newVersions.get(i).getBitemporalStamp().getRecordTime().getCreatedBy());
             assertEquals(RecordPeriod.NOT_INACTIVATED,
                     newVersions.get(i).getBitemporalStamp().getRecordTime().getInactivatedAt());
             assertEquals(RecordPeriod.NOBODY,

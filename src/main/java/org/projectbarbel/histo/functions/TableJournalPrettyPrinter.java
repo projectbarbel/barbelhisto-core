@@ -18,7 +18,7 @@ public class TableJournalPrettyPrinter implements Function<List<Bitemporal>, Str
 
     // @formatter:off
     public String prettyPrint(List<Bitemporal> objects, Object id, Function<Bitemporal, String> customField) {
-        return "\n" + "Document-ID: " + (objects.size() > 0 ? id : "<empty jounral>")
+        return "\n" + "Document-ID: " + (!objects.isEmpty() ? id : "<empty jounral>")
                 + "\n\n"
                 + String.format("|%-40s|%-15s|%-16s|%-8s|%-21s|%-45s|%-21s|%-45s|%-31s|", "Version-ID", "Effective-From",
                         "Effective-Until", "State", "Created-By", "Created-At", "Inactivated-By", "Inactivated-At", "Data")
@@ -47,8 +47,8 @@ public class TableJournalPrettyPrinter implements Function<List<Bitemporal>, Str
 
     @Override
     public String apply(List<Bitemporal> objectsToPrint) {
-        return prettyPrint(objectsToPrint, ((Bitemporal) objectsToPrint.get(0)).getBitemporalStamp().getDocumentId(),
-                b -> b.toString());
+        return prettyPrint(objectsToPrint, (objectsToPrint.get(0)).getBitemporalStamp().getDocumentId(),
+                Bitemporal::toString);
     }
 
 }

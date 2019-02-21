@@ -40,7 +40,7 @@ public class BarbelPojoSerializer<O> implements PojoSerializer<O> {
         this.type = type;
         this.config = config;
         BarbelHistoContext constructionContext = Optional.ofNullable(BarbelHistoCore.CONSTRUCTION_CONTEXT.get())
-                .orElseGet(() -> BarbelHistoBuilder.barbel());
+                .orElseGet(BarbelHistoBuilder::barbel);
         constructionContext.getContextOptions().put(AdaptingKryoSerializer.OBJECT_TYPE, type);
         constructionContext.getContextOptions().put(AdaptingKryoSerializer.PERSISTENCE_CONFIG, config);
         this.targetSerializer = constructionContext.getPersistenceSerializerProducer().apply(constructionContext);

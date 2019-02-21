@@ -47,6 +47,7 @@ public class DefaultDocument implements Bitemporal {
 
     public DefaultDocument(String objectId, BitemporalStamp bitemporalStamp, String data) {
         super();
+		id = objectId;
         this.bitemporalStamp = bitemporalStamp;
         this.data = data;
     }
