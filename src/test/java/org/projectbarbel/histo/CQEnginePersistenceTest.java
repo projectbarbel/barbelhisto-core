@@ -52,13 +52,13 @@ public class CQEnginePersistenceTest {
     
     public static final SimpleAttribute<DefaultPojo, String> DOCUMENT_ID_PK_POJO = new SimpleAttribute<DefaultPojo, String>("documentId") {
         public String getValue(DefaultPojo object, QueryOptions queryOptions) {
-            return (String)BarbelMode.POJO.get().drawDocumentId(object);
+            return (String)BarbelMode.POJO.drawDocumentId(object);
         }
     };
     
     public static final SimpleAttribute<DefaultPojo, String> DOCUMENT_ID_PK_POJO_PROXY = new SimpleAttribute<DefaultPojo, String>("documentId") {
         public String getValue(DefaultPojo object, QueryOptions queryOptions) {
-            return (String)BarbelMode.POJO.get().drawDocumentId(((BarbelProxy)object).getTarget());
+            return (String)BarbelMode.POJO.drawDocumentId(((BarbelProxy)object).getTarget());
         }
     };
     
@@ -96,7 +96,7 @@ public class CQEnginePersistenceTest {
     public void pojoProxied() throws IOException {
         DiskPersistence<DefaultPojo, String> pers = DiskPersistence.onPrimaryKeyInFile(DOCUMENT_ID_PK_POJO_PROXY, new File("def.dat"));
         ConcurrentIndexedCollection<DefaultPojo> col = new ConcurrentIndexedCollection<DefaultPojo>(pers);
-        DefaultPojo memproxy = (DefaultPojo)BarbelMode.POJO.get().snapshotMaiden(BarbelHistoBuilder.barbel(), new DefaultPojo("id","some"), BitemporalStamp.createActive());
+        DefaultPojo memproxy = (DefaultPojo)BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(), new DefaultPojo("id","some"), BitemporalStamp.createActive());
         col.add(memproxy);
         DefaultPojo pojoproxy = (DefaultPojo)col.retrieve(equal(DOCUMENT_ID_PK_POJO, "id")).stream().findFirst().get();
         assertNotEquals("some",pojoproxy.getData());

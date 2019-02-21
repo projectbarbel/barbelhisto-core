@@ -38,10 +38,10 @@ import com.googlecode.cqengine.persistence.support.serialization.PojoSerializer;
 public interface BarbelHistoContext {
 
 	public static final JsonDeserializer<ZonedDateTime> ZDT_DESERIALIZER = (json, from,
-			context) -> BarbelConstants.DATE_FORMATTER.parse(json.getAsString(), ZonedDateTime::from);
+			context) -> BarbelHistoBuilder.DATE_FORMATTER.parse(json.getAsString(), ZonedDateTime::from);
 
 	public static final JsonSerializer<ZonedDateTime> ZDT_SERIALIZER = (src, typeOfSrc,
-			context) -> new JsonPrimitive(BarbelConstants.DATE_FORMATTER.format(src));
+			context) -> new JsonPrimitive(BarbelHistoBuilder.DATE_FORMATTER.format(src));
 
 	static <T> Supplier<IndexedCollection<T>> getDefaultBackbone() {
 		return ConcurrentIndexedCollection::new;
@@ -64,7 +64,7 @@ public interface BarbelHistoContext {
 	}
 
 	static String getDefaultActivity() {
-		return BarbelConstants.SYSTEMACTIVITY;
+		return BarbelHistoBuilder.SYSTEMACTIVITY;
 	}
 
 	static LocalDate getInfiniteDate() {
@@ -72,7 +72,7 @@ public interface BarbelHistoContext {
 	}
 
 	static Systemclock getBarbelClock() {
-		return BarbelConstants.CLOCK;
+		return BarbelHistoBuilder.CLOCK;
 	}
 
 	static Supplier<Object> getDefaultDocumentIDGenerator() {
@@ -84,7 +84,7 @@ public interface BarbelHistoContext {
 	}
 
 	static String getDefaultUser() {
-		return BarbelConstants.SYSTEM;
+		return BarbelHistoBuilder.SYSTEM;
 	}
 
 	static Supplier<BiFunction<Object, BitemporalStamp, Object>> getDefaultProxyingFunctionSupplier() {

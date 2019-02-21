@@ -46,7 +46,7 @@ public class AdaptingKryoSerializer implements PojoSerializer<Bitemporal> {
                 .orElseThrow(() -> new IllegalStateException("could not find persistenceConfig"));
         @SuppressWarnings("unchecked")
         KryoSerializer<Bitemporal> kryo = new KryoSerializer<Bitemporal>(
-                (Class<Bitemporal>) context.getMode().get().getPersistenceObjectType(objectType), persistenceConfig);
+                (Class<Bitemporal>) context.getMode().getPersistenceObjectType(objectType), persistenceConfig);
         this.targetKryo = kryo;
     }
 
@@ -66,7 +66,7 @@ public class AdaptingKryoSerializer implements PojoSerializer<Bitemporal> {
             BitemporalVersion<?> bv = (BitemporalVersion<?>) bitemporal;
             Object bvobject = bv.getObject();
             if (context.getMode() == BarbelMode.POJO)
-                return (Bitemporal) context.getMode().get().snapshotMaiden(context, bvobject, bv.getStamp());
+                return (Bitemporal) context.getMode().snapshotMaiden(context, bvobject, bv.getStamp());
             else
                 return new BitemporalVersion<>(bv.getBitemporalStamp(), bvobject);
         }
@@ -87,7 +87,7 @@ public class AdaptingKryoSerializer implements PojoSerializer<Bitemporal> {
                 validateHashCodeEquality(candidatePojo, bitemporal);
                 validateObjectEquality(candidatePojo, bitemporal);
             } else {
-                Bitemporal proxy = context.getMode().get().snapshotMaiden(context, candidatePojo,
+                Bitemporal proxy = context.getMode().snapshotMaiden(context, candidatePojo,
                         BitemporalStamp.createActive());
                 byte[] bytes = serializer.serialize(proxy);
                 Bitemporal bitemporal = serializer.deserialize(bytes);

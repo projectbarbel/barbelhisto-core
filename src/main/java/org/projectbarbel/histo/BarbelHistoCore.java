@@ -58,13 +58,13 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 	private final Map<Object, DocumentJournal> journals;
 	private final IndexedCollection<UpdateLogRecord> updateLog;
 	private static final Map<Object, Object> validTypes = new HashMap<>();
-	private final AbstractBarbelMode mode;
+	private final BarbelMode mode;
 
 	@SuppressWarnings("unchecked")
 	protected BarbelHistoCore(BarbelHistoContext context) {
 		CONSTRUCTION_CONTEXT.set(context);
 		this.context = Objects.requireNonNull(context);
-		this.mode = Objects.requireNonNull(context.getMode().get());
+		this.mode = Objects.requireNonNull(context.getMode());
 		this.backbone = Objects.requireNonNull((IndexedCollection<T>) context.getBackboneSupplier().get());
 		this.journals = Objects.requireNonNull(context.getJournalStore());
 		this.updateLog = Objects.requireNonNull(context.getUpdateLog());

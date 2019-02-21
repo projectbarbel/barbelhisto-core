@@ -57,7 +57,7 @@ import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
  * The primary key should be business oriented, i.e. personnel number, contract
  * number. <br>
  * <br>
- * Two {@link BarbelMode}s can be used to manage different types of objects:
+ * Two {@link BarbelModeProcessor}s can be used to manage different types of objects:
  * {@link BarbelMode#POJO} is the default mode. Of course, using POJO mode is
  * the easiest way forward. However, behind the scenes {@link BarbelHisto} uses
  * proxying when managing POJOs to store the version data with the objects that

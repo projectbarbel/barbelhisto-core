@@ -1,5 +1,6 @@
 package org.projectbarbel.histo;
 
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import org.projectbarbel.histo.functions.SimpleGsonPojoCopier;
 import org.projectbarbel.histo.functions.UUIDGenerator;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
+import org.projectbarbel.histo.model.Systemclock;
 
 import com.google.gson.Gson;
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
@@ -42,6 +44,11 @@ import com.googlecode.cqengine.persistence.support.serialization.PojoSerializer;
  *
  */
 public final class BarbelHistoBuilder implements BarbelHistoContext {
+
+    public static final String SYSTEM = "SYSTEM";
+    public static final String SYSTEMACTIVITY = "SYSTEMACTIVITY";
+    public static final Systemclock CLOCK = new Systemclock();
+    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
 
     private static final String NONULLS = "null values not allowed when building barbel context";
 
@@ -138,7 +145,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     /**
-     * Set the {@link BarbelMode} of this {@link BarbelHisto} instance. Default is
+     * Set the {@link BarbelModeProcessor} of this {@link BarbelHisto} instance. Default is
      * {@link BarbelMode#POJO}. See {@link BarbelHisto} for more details on modes.
      * 
      * @param mode the mode
