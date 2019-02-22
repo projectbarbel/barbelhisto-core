@@ -11,21 +11,6 @@ A lightweiht easy to use Java library to store the history of changes of domain 
 
 The library implements Martin Fowlers Temporal Pattern that can be found here: https://martinfowler.com/eaaDev/timeNarrative.html
 
-# Who needs barbelhisto?
-
-When you use barbelhisto to store and read data you can find answers to these questions:
-
-- What changes to domain objects were stored the last two weeks?
-- When will the state of domain objects become effective?
-- What will be the effective state of my domain objects in two weeks?
-
-Even more complicated:
-  
-- Two month ago, what did we know about the state of domain objects six month ago?
-- Two month ago, what did we know about the state of domain objects in four months?
-
-This library enables you to store your data in a format that enables you to answer these questions.
-
 # Features (in development)
 
 - bi-temporal (auditing-proof) data storage based on blazing fast [cqengine](https://github.com/npgall/cqengine) collections
@@ -59,11 +44,18 @@ You're ready to store instances of `Employee` to your `BarbelHisto` instance.
 Employee employee = new Employee("somePersonelNumber", "Niklas", "Schlimm");
 core.save(employee, LocalDate.now(), LocalDate.MAX);
 ```
-In the `Employee.class` you need to specify the `@DocumentId` so that `BarbelHisto`can group versions to a document.
+In the `Employee.class` you need to specify the `@DocumentId` so that `BarbelHisto`can group versions to a document. In the `Employee.class` the `personnelNumber` is the document ID. 
 ```java
-@DocumentId
-private String personnelNumber; 
+public static class Employee {
+   @DocumentId
+   private String personnelNumber; 
+   private String firstname; 
+   private String lastname;
+   private List<Adress> adresses = new ArrayList<>();
+   ... constructor and accessor methods
+}
 ```
+The document ID must be unique for the document from a business viewpoint. An employee can be uniquely identified by his personnel number. <br>
 If you want to retrieve your current `Employee` version, you can do that by calling `retrieveOne`on `BarbelHisto`.
 ```java
 Employee effectiveEmployeeVersion = core.retrieveOne(BarbelQueries.effectiveNow(employee.getId()));
@@ -72,7 +64,7 @@ Notice that you need to tell `BarbelHisto` what effective date your looking for.
 ```java
 Employee effectiveIn10Days = core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().plusDays(10)));
 ```
-That query retrieves the `Employee` version effective in ten days. It will return one, cause you've stored the `Employee` version to be effective from now to infinite (`LocalDate.MAX`). If you retrieve the `Employee` effective yesterday you'll receive an `IllegalStateException` claiming that no value can be found. This strict treatment is to avoid `Nullpointer` somewhere later and to enforce proper treatment of such situations in your application. However, this throws an exception:
+That query retrieves the `Employee` version effective in ten days. It will return one, cause you've stored the `Employee` version to be effective from now to infinite (`LocalDate.MAX`). If you retrieve the `Employee` effective yesterday you'll receive an `IllegalStateException` claiming that no value can be found. This strict treatment is to avoid `NullPointerException` somewhere later in the process. However, this query throws an exception, cause nothing was effective yesterday:
 ```java
 Employee effectiveYesterday = core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().minusDays(1)));
 ```
@@ -99,28 +91,27 @@ Document-ID: somePersonelNumber
 |226ab05c-7c2d-4746-8861-18dc85a0188e    |2019-02-15     |999999999-12-31 |ACTIVE  |SYSTEM               |2019-02-15T08:46:56.495+01:00[Europe/Berlin] |NOBODY               |2199-12-31T23:59:00Z                         |EffectivePeriod [from=2019-02- |
 ```
 You can change the pretty printer and write your own. Look into `TableJournalPrettyPrinter` to see how to write an individual printer. You can register that printer with `BarbelHistoBuilder`.
-## Store and retrieve two versions
-So far you know how to store POJOs to `BarbelHisto`. The real power of `BarbelHisto` is, however, to store changes to your `Employee` that become effective in the future (or became effective in the past). Here is how that works.
-Let's retrieve our current employee version again.
+## Make a bitemporal update
+So far you know how to store POJOs to `BarbelHisto`. The real power of `BarbelHisto` is, however, to store changes to your `Employee` that become effective in the future (or became effective in the past). Here is how simple such an update works.
+Let's retrieve a copy of our current employee version. (**clients only ever retrieve copies!**)
 ```java
 Employee effectiveEmployeeVersion = core.retrieveOne(BarbelQueries.effectiveNow(employee.getId()));
 ```
-Now suppose that employee marries in 10 days, and that is supposed to become the day when the last name has to change.
+Now suppose that the employee marries in 10 days, and that is supposed to become the day when the last name has to change.
 ```java
 effectiveEmployeeVersion.setLastname("changedLastName");
-```
-And store that new version into `BarbelHisto` to become effective in 10 days.
-```java
 core.save(effectiveEmployeeVersion, LocalDate.now().plusDays(10), LocalDate.MAX);
 ```
-Done. `BarbelHisto` now knows about that change. If you retrieve versions now, you may become different states of the employee, since you've recorded a change in near future.
+Done. `BarbelHisto` now knows about that change, it will make a snapshot and store that internally. You could safely continue to work with your employee version and save that again later. <br>
+If you retrieve versions now, you may become different states of the employee, since you've recorded a change.
 ```java
 effectiveEmployeeVersion = core.retrieveOne(BarbelQueries.effectiveNow(employee.getId()));
 effectiveIn10Days = core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().plusDays(10)));
 assertTrue(effectiveEmployeeVersion.getLastname().equals("Schlimm"));
 assertTrue(effectiveIn10Days.getLastname().equals("changedLastName"));
 ```
-Let's also look at the pretty print of that journal now. Again call:
+The `effectiveEmployeeVersion` is that version you've stored in the beginning of this tutorial, the `effectiveIn10Days` version will be the one with the changed last name. <br>
+Let's also have a look at the pretty print of that journal now. Again call:
 ```java
 System.out.println(core.prettyPrintJournal(employee.getId()));
 ```
