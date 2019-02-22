@@ -9,10 +9,14 @@ import com.googlecode.cqengine.query.option.QueryOptions;
 
 public class DefaultPojo {
 
-    public static final SimpleAttribute<DefaultPojo, String> DOCUMENT_ID = new SimpleAttribute<DefaultPojo, String>("documentId") {
-        public String getValue(DefaultPojo object, QueryOptions queryOptions) { return object.getDocumentId(); }
-    };
-
+	public static final SimpleAttribute<DefaultPojo, String> DOCUMENT_ID = new SimpleAttribute<DefaultPojo, String>("documentId") {
+		public String getValue(DefaultPojo object, QueryOptions queryOptions) { return object.getDocumentId(); }
+	};
+	
+    @DocumentId
+    private String documentId;
+    private String data;
+    
     public DefaultPojo(String documentId, String data) {
         super();
         this.documentId = documentId;
@@ -23,10 +27,6 @@ public class DefaultPojo {
         super();
     }
 
-    @DocumentId
-    private String documentId;
-    private String data;
-    
     public String getDocumentId() {
         return documentId;
     }

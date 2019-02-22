@@ -27,7 +27,7 @@ import com.googlecode.cqengine.persistence.support.serialization.PojoSerializer;
  * 
  * @author Niklas Schlimm
  *
- * @param <O>
+ * @param <O> the stored type
  */
 public class BarbelPojoSerializer<O> implements PojoSerializer<O> {
 

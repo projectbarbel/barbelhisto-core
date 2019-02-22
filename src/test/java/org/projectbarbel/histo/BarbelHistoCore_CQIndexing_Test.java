@@ -12,7 +12,6 @@ import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.projectbarbel.histo.BarbelHistoCore.DumpMode;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.pojos.ComplexFieldsPrivatePojoPartialContructor;
 import org.projectbarbel.histo.pojos.ComplexFieldsPrivatePojoPartialContructorWithComplexType;
@@ -60,7 +59,7 @@ public class BarbelHistoCore_CQIndexing_Test {
                 })
                 .build();
         core.save(pojo, LocalDate.now(), LocalDate.MAX);
-        core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX);
+        T saved = core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX);
         assertEquals(3, core.retrieve(BarbelQueries.all()).stream().count());
         Bitemporal object = (Bitemporal)core.retrieve(BarbelQueries.all()).stream().findFirst().get();
         Bitemporal byPK = (Bitemporal)core.retrieve((Query<T>) equal(VERSION_ID_PK, (String)object.getBitemporalStamp().getVersionId())).stream().findFirst().get();
@@ -69,7 +68,7 @@ public class BarbelHistoCore_CQIndexing_Test {
         assertNotSame(object.getBitemporalStamp(), byPK.getBitemporalStamp());
         Bitemporal record = (Bitemporal) core.retrieve(BarbelQueries.all()).stream().findFirst().get();
         assertNotNull(record.getBitemporalStamp().getDocumentId());
-        core.dump(DumpMode.CLEARCOLLECTION);
+        core.unload(((Bitemporal)saved).getBitemporalStamp().getDocumentId());
         assertEquals(0, core.retrieve(BarbelQueries.all()).stream().count());
     }
 

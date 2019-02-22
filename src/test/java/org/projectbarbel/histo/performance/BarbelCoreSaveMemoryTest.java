@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.projectbarbel.histo.BarbelHisto;
 import org.projectbarbel.histo.BarbelHistoBuilder;
 import org.projectbarbel.histo.BarbelHistoCore;
-import org.projectbarbel.histo.BarbelHistoCore.DumpMode;
 import org.projectbarbel.histo.BarbelTestHelper;
 import org.projectbarbel.histo.model.DefaultPojo;
 
@@ -65,7 +64,7 @@ public class BarbelCoreSaveMemoryTest {
             .round(new MathContext(4, RoundingMode.HALF_UP)) + " ms");
             printBarbelStatitics();
             if (dump)
-                core.dump(DumpMode.CLEARCOLLECTION);
+                core.unload(id);
             printMemory();
         }
 
@@ -90,7 +89,7 @@ public class BarbelCoreSaveMemoryTest {
     @Test
     public void testMemory() throws InterruptedException, ExecutionException, TimeoutException {
         t = executor.scheduleAtFixedRate(new MyTask(core, dump, maxVersions, pojoCount), 1, 2, TimeUnit.SECONDS);
-        assertThrows(TimeoutException.class, ()->t.get(10,TimeUnit.SECONDS));
+        assertThrows(TimeoutException.class, ()->t.get(5,TimeUnit.SECONDS));
         executor.shutdownNow();
     }
     

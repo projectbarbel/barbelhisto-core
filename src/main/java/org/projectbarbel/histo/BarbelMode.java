@@ -41,8 +41,9 @@ public enum BarbelMode implements BarbelModeProcessor {
 		}
 
 		@Override
-		public <T> Collection<Bitemporal> managedBitemporalToCustomPersistenceObjects(IndexedCollection<T> objects) {
-			return objects.stream().map(
+		public <T> Collection<Bitemporal> managedBitemporalToCustomPersistenceObjects(Object id,
+				IndexedCollection<T> objects) {
+			return objects.retrieve(BarbelQueries.all(id)).stream().map(
 					o -> new BitemporalVersion<>(((Bitemporal) o).getBitemporalStamp(), ((BarbelProxy) o).getTarget()))
 					.collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
 		}
@@ -125,8 +126,8 @@ public enum BarbelMode implements BarbelModeProcessor {
 		}
 
 		@Override
-		public <T> Collection<Bitemporal> managedBitemporalToCustomPersistenceObjects(IndexedCollection<T> objects) {
-			return objects.stream().map(o -> (Bitemporal) o)
+		public <T> Collection<Bitemporal> managedBitemporalToCustomPersistenceObjects(Object id, IndexedCollection<T> objects) {
+			return objects.retrieve(BarbelQueries.all(id)).stream().map(o -> (Bitemporal) o)
 					.collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
 		}
 

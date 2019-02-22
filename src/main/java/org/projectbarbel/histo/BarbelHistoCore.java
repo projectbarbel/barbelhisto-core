@@ -13,10 +13,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -38,6 +38,7 @@ import com.googlecode.cqengine.query.Query;
 import com.googlecode.cqengine.query.option.QueryOptions;
 import com.googlecode.cqengine.resultset.ResultSet;
 import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
+import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
 
 /**
  * The core component of {@link BarbelHisto}. See {@link BarbelHisto} for
@@ -71,8 +72,9 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 		CONSTRUCTION_CONTEXT.remove();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public boolean save(T newVersion, LocalDate from, LocalDate until) {
+	public T save(T newVersion, LocalDate from, LocalDate until) {
 		Validate.noNullElements(Arrays.asList(newVersion, from, until), NOTNULL);
 		Validate.notNull(newVersion, NOTNULL);
 		Validate.isTrue(from.isBefore(until), "from date must be before until date");
@@ -96,7 +98,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 		updateLog.add(new UpdateLogRecord(journal.getLastInsert(), newManagedBitemporal,
 				updateStrategy instanceof UpdateCaseAware ? ((UpdateCaseAware) updateStrategy).getActualCase() : null,
 				context.getUser()));
-		return true;
+		return (T)mode.copyManagedBitemporal(context, newManagedBitemporal);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -175,20 +177,26 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 	}
 
 	@Override
-	public void populate(Collection<Bitemporal> bitemporals) {
+	public void load(Collection<Bitemporal> bitemporals) {
 		Validate.isTrue(bitemporals != null, "bitemporals cannot be null");
-		Validate.validState(backbone.isEmpty(), "backbone must be empty when calling populate");
+		List<Object> documentIDs = bitemporals.stream().map(b -> b.getBitemporalStamp().getDocumentId())
+				.collect(Collectors.toList());
+		for (Object documentId : documentIDs) {
+			Validate.validState(backbone.retrieve(BarbelQueries.all(documentId)).isEmpty(),
+					"backbone must not contain any versions of the passed document IDs");
+		}
 		backbone.addAll(mode.customPersistenceObjectsToManagedBitemporals(context, bitemporals));
 	}
 
 	@Override
-	public Collection<Bitemporal> dump(DumpMode dumpMode) {
-		Validate.isTrue(dumpMode != null, NOTNULL);
-		Collection<Bitemporal> collection = mode.managedBitemporalToCustomPersistenceObjects(backbone);
-		if (dumpMode.equals(DumpMode.CLEARCOLLECTION)) {
-			backbone.clear();
-			journals.clear();
-			updateLog.clear();
+	public Collection<Bitemporal> unload(Object... documentIDs) {
+		Validate.notEmpty(documentIDs, "must pass at least one documentID");
+		Validate.validState(!backbone.isEmpty(),"backbone is empty, nothing to unload");
+		Collection<Bitemporal> collection = new HashSet<>();
+		for (int i = 0; i < documentIDs.length; i++) {
+			Object id = documentIDs[i];
+			collection.addAll(mode.managedBitemporalToCustomPersistenceObjects(id, backbone));
+			backbone.removeAll(backbone.retrieve(BarbelQueries.all(id)).stream().collect(Collectors.toList()));
 		}
 		return collection;
 	}
@@ -227,30 +235,28 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 		return backbone.size();
 	}
 
-	public enum DumpMode {
-		CLEARCOLLECTION, READONLY;
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
-	public Optional<T> retrieveOne(Query<T> query) {
+	public T retrieveOne(Query<T> query) {
 		try {
-			T object = (T) mode.copyManagedBitemporal(context, (Bitemporal) backbone.retrieve(query).uniqueResult());
-			return Optional.of(object);
+			return (T) mode.copyManagedBitemporal(context, (Bitemporal) backbone.retrieve(query).uniqueResult());
+		} catch (NonUniqueObjectException e) {
+			throw new IllegalStateException("your query returned more then one result", e);
 		} catch (NoSuchObjectException e) {
-			return Optional.empty();
+			throw new IllegalStateException("your query returned no result", e);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Optional<T> retrieveOne(Query<T> query, QueryOptions options) {
+	public T retrieveOne(Query<T> query, QueryOptions options) {
 		try {
-			T object = (T) mode.copyManagedBitemporal(context,
+			return (T) mode.copyManagedBitemporal(context,
 					(Bitemporal) backbone.retrieve(query, options).uniqueResult());
-			return Optional.of(object);
+		} catch (NonUniqueObjectException e) {
+			throw new IllegalStateException("your query returned more then one result", e);
 		} catch (NoSuchObjectException e) {
-			return Optional.empty();
+			throw new IllegalStateException("your query returned no result", e);
 		}
 	}
 

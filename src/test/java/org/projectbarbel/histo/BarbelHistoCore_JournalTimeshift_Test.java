@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,7 +41,7 @@ public class BarbelHistoCore_JournalTimeshift_Test {
     @Test
     public void testSave() throws Exception {
         DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
-        assertTrue(core.save(pojo, LocalDate.now(), LocalDate.MAX));
+        assertNotNull(core.save(pojo, LocalDate.now(), LocalDate.MAX));
     }
 
     //// @formatter:off
@@ -60,7 +59,7 @@ public class BarbelHistoCore_JournalTimeshift_Test {
 
         DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
         core.save(pojo, BarbelHistoContext.getBarbelClock().today(), LocalDate.MAX);
-        Optional<DefaultPojo> saveForLater = core.retrieveOne(BarbelQueries.effectiveNow(pojo.getDocumentId()));
+        DefaultPojo saveForLater = core.retrieveOne(BarbelQueries.effectiveNow(pojo.getDocumentId()));
 
         BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDate.of(2019, 2, 10).atStartOfDay());
 
@@ -101,7 +100,7 @@ public class BarbelHistoCore_JournalTimeshift_Test {
 
         assertNotNull(timeshift.read().effectiveNow());
         assertTrue(timeshift.read().activeVersions().size() == 1);
-        assertEquals(timeshift.read().effectiveNow().get(), saveForLater.get());
+        assertEquals(timeshift.read().effectiveNow().get(), saveForLater);
 
         System.out.println(core.prettyPrintJournal(pojo.getDocumentId()));
         String backboneJournalAfterTimeShift = core.prettyPrintJournal(pojo.getDocumentId());

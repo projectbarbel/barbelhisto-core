@@ -25,7 +25,7 @@ public interface BarbelModeProcessor {
 
 	Object drawDocumentId(Object pojo);
 
-	<T> Collection<Bitemporal> managedBitemporalToCustomPersistenceObjects(IndexedCollection<T> objects);
+	<T> Collection<Bitemporal> managedBitemporalToCustomPersistenceObjects(Object id, IndexedCollection<T> objects);
 
 	<T> Collection<T> customPersistenceObjectsToManagedBitemporals(BarbelHistoContext context,
 			Collection<Bitemporal> bitemporals);

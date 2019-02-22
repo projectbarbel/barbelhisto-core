@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -24,14 +23,13 @@ public class BarbelHistoCore_DZone_Article1_Test {
 		Client client = new Client("1234", "Niklas", "Schlimm");
 		barbel.save(client, LocalDate.now(), LocalDate.MAX);
 
-		Optional<Client> effectiveNowOptional = barbel.retrieveOne(BarbelQueries.effectiveNow("1234"));
-		Client client1234 = effectiveNowOptional.get();
-		client1234.getAdresses().add(new Adress("Barbel Street 10", "Houston"));
-		barbel.save(client1234, LocalDate.of(2019, 3, 1), LocalDate.MAX);
+		Client effectiveNow = barbel.retrieveOne(BarbelQueries.effectiveNow("1234"));
+		effectiveNow.getAdresses().add(new Adress("Barbel Street 10", "Houston"));
+		barbel.save(effectiveNow, LocalDate.of(2019, 3, 1), LocalDate.MAX);
 
 		System.out.println(barbel.prettyPrintJournal("1234"));
 
-		assertNotNull(effectiveNowOptional.orElse(null)); // dummy assert to avoid warnings in Sonar Cube
+		assertNotNull(effectiveNow); // dummy assert to avoid warnings in Sonar Cube
 
 	}
 

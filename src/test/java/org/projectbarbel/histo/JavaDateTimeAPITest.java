@@ -33,12 +33,6 @@ public class JavaDateTimeAPITest {
     private static final ZoneId berlinTimeZone = ZoneId.of("Europe/Berlin");
     private static final ZoneId utcTimeZone = ZoneId.of("Z");
 
-    /**
-     * Understanding three different types {@link java.time.Clock}
-     * @param args 
-     * 
-     * @throws InterruptedException
-     */
     public static void main(String[] args) throws InterruptedException {
         Clock wallClock = Clock.systemDefaultZone(); // a clock like yours on the wall, with your local time
         printOutDateTime(wallClock);

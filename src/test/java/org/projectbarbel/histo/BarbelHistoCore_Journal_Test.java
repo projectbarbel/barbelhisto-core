@@ -2,7 +2,7 @@ package org.projectbarbel.histo;
 
 import static com.googlecode.cqengine.query.QueryFactory.and;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -36,7 +36,7 @@ public class BarbelHistoCore_Journal_Test {
     @Test
     public void testSave() throws Exception {
         DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
-        assertTrue(core.save(pojo, LocalDate.now(), LocalDate.MAX));
+        assertNotNull(core.save(pojo, LocalDate.now(), LocalDate.MAX));
     }
 
     //// @formatter:off

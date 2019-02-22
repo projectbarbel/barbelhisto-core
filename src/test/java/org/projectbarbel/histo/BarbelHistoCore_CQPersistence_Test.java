@@ -11,7 +11,6 @@ import java.time.LocalDate;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.projectbarbel.histo.BarbelHistoCore.DumpMode;
 import org.projectbarbel.histo.model.BarbelProxy;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.pojos.ComplexFieldsPrivatePojoPartialContructor;
@@ -90,7 +89,7 @@ public class BarbelHistoCore_CQPersistence_Test {
 		assertEquals(3, core.retrieve(BarbelQueries.all()).stream().count());
 		Bitemporal record = (Bitemporal) core.retrieve(BarbelQueries.all()).stream().findFirst().get();
 		assertNotNull(record.getBitemporalStamp().getDocumentId());
-		core.dump(DumpMode.CLEARCOLLECTION);
+		core.unload(pojo.id);
 		assertEquals(0, core.retrieve(BarbelQueries.all()).stream().count());
 	}
 
@@ -109,7 +108,7 @@ public class BarbelHistoCore_CQPersistence_Test {
 		pojo.someDouble = 123d;
 		core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX); // save changed double to persistence
 		BarbelProxy effectiveIn2Days = (BarbelProxy) core
-				.retrieveOne(BarbelQueries.effectiveAt(pojo.id, LocalDate.now().plusDays(2))).get();
+				.retrieveOne(BarbelQueries.effectiveAt(pojo.id, LocalDate.now().plusDays(2)));
 		assertEquals(123d, ((PrimitivePrivatePojo) effectiveIn2Days.getTarget()).someDouble);
 		// reopen to check whether change was made persistent
 		core = BarbelHistoBuilder.barbel()
@@ -117,7 +116,7 @@ public class BarbelHistoCore_CQPersistence_Test {
 						DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO, new File(FILENAME))))
 				.build();
 		effectiveIn2Days = (BarbelProxy) core
-				.retrieveOne(BarbelQueries.effectiveAt(pojo.id, LocalDate.now().plusDays(2))).get();
+				.retrieveOne(BarbelQueries.effectiveAt(pojo.id, LocalDate.now().plusDays(2)));
 		assertEquals(123d, ((PrimitivePrivatePojo) effectiveIn2Days.getTarget()).someDouble);
 	}
 
@@ -135,11 +134,11 @@ public class BarbelHistoCore_CQPersistence_Test {
 						() -> new ConcurrentIndexedCollection<PrimitivePrivatePojoPartialContructor>(DiskPersistence
 								.onPrimaryKeyInFile(VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO_PARTIAL, new File(FILENAME))))
 				.build();
-		core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX);
+		PrimitivePrivatePojoPartialContructor saved = core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX);
 		assertEquals(3, core.retrieve(BarbelQueries.all()).stream().count());
 		Bitemporal record = (Bitemporal) core.retrieve(BarbelQueries.all()).stream().findFirst().get();
 		assertNotNull(record.getBitemporalStamp().getDocumentId());
-		core.dump(DumpMode.CLEARCOLLECTION);
+		core.unload(((Bitemporal)saved).getBitemporalStamp().getDocumentId());
 		assertEquals(0, core.retrieve(BarbelQueries.all()).stream().count());
 	}
 
@@ -156,11 +155,11 @@ public class BarbelHistoCore_CQPersistence_Test {
 				() -> new ConcurrentIndexedCollection<NoPrimitivePrivatePojoPartialContructor>(DiskPersistence
 						.onPrimaryKeyInFile(VERSION_ID_PK_NO_PRIMITIVE_PRIVATE_POJO_PARTIAL, new File(FILENAME))))
 				.build();
-		core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX);
+		NoPrimitivePrivatePojoPartialContructor saved = core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX);
 		assertEquals(3, core.retrieve(BarbelQueries.all()).stream().count());
 		Bitemporal record = (Bitemporal) core.retrieve(BarbelQueries.all()).stream().findFirst().get();
 		assertNotNull(record.getBitemporalStamp().getDocumentId());
-		core.dump(DumpMode.CLEARCOLLECTION);
+		core.unload(((Bitemporal)saved).getBitemporalStamp().getDocumentId());
 		assertEquals(0, core.retrieve(BarbelQueries.all()).stream().count());
 	}
 
@@ -177,11 +176,11 @@ public class BarbelHistoCore_CQPersistence_Test {
 				() -> new ConcurrentIndexedCollection<ComplexFieldsPrivatePojoPartialContructor>(DiskPersistence
 						.onPrimaryKeyInFile(ComplexFieldsPrivatePojoPartialContructor_Field, new File(FILENAME))))
 				.build();
-		core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX);
+		ComplexFieldsPrivatePojoPartialContructor saved = core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX);
 		assertEquals(3, core.retrieve(BarbelQueries.all()).stream().count());
 		Bitemporal record = (Bitemporal) core.retrieve(BarbelQueries.all()).stream().findFirst().get();
 		assertNotNull(record.getBitemporalStamp().getDocumentId());
-		core.dump(DumpMode.CLEARCOLLECTION);
+		core.unload(((Bitemporal)saved).getBitemporalStamp().getDocumentId());
 		assertEquals(0, core.retrieve(BarbelQueries.all()).stream().count());
 	}
 
@@ -202,11 +201,11 @@ public class BarbelHistoCore_CQPersistence_Test {
 						DiskPersistence.onPrimaryKeyInFile(
 								ComplexFieldsPrivatePojoPartialContructorWithComplexType_Field, new File(FILENAME))))
 				.build();
-		core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX);
+		ComplexFieldsPrivatePojoPartialContructorWithComplexType saved = core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX);
 		assertEquals(3, core.retrieve(BarbelQueries.all()).stream().count());
 		Bitemporal record = (Bitemporal) core.retrieve(BarbelQueries.all()).stream().findFirst().get();
 		assertNotNull(record.getBitemporalStamp().getDocumentId());
-		core.dump(DumpMode.CLEARCOLLECTION);
+		core.unload(((Bitemporal)saved).getBitemporalStamp().getDocumentId());
 		assertEquals(0, core.retrieve(BarbelQueries.all()).stream().count());
 	}
 

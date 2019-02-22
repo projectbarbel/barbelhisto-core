@@ -5,9 +5,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.List;
-import java.util.Optional;
 
-import org.projectbarbel.histo.BarbelHistoCore.DumpMode;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.BitemporalVersion;
@@ -16,7 +14,6 @@ import org.projectbarbel.histo.model.DefaultDocument;
 import com.googlecode.cqengine.query.Query;
 import com.googlecode.cqengine.query.QueryFactory;
 import com.googlecode.cqengine.query.option.QueryOptions;
-import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
 
 /**
  * The main abstraction of {@link BarbelHisto} that provides the client API.
@@ -102,9 +99,9 @@ import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
  * <br>
  * <br>
  * Clients that use custom data stores like MongoDB or any other of the kind
- * should call {@link BarbelHisto#dump(DumpMode)} after processing data with
- * {@link BarbelHisto}. To restore the journal later to continue processing
- * bitemporal data use {@link BarbelHisto#populate(Collection)}. <br>
+ * should call {@link BarbelHisto#unload(Object...)} after processing data with
+ * {@link BarbelHisto}. To restore the journal later to continue bitemporal data
+ * processing use {@link BarbelHisto#load(Collection)}. <br>
  * <br>
  * Use {@link #timeshift(Object, LocalDateTime)} to turn back time an see how
  * document journals looked like in the past. Time shift is one of the core
@@ -148,12 +145,16 @@ public interface BarbelHisto<T> {
 	 * work on different document IDs. If clients try to update the same document
 	 * Id, this method throws {@link ConcurrentModificationException}.
 	 * 
+	 * The method returns a copy of the object saved including the version data. In
+	 * in {@link BarbelMode#POJO} cast the returned object to {@link Bitemporal} to
+	 * read the version data.
+	 * 
 	 * @param currentVersion the object state to save
 	 * @param from           effective date of object state
 	 * @param until          effective until of the state
-	 * @return true if successful
+	 * @return the saved object including the version data
 	 */
-	boolean save(T currentVersion, LocalDate from, LocalDate until);
+	T save(T currentVersion, LocalDate from, LocalDate until);
 
 	/**
 	 * Retrieve data from {@link BarbelHisto} using cqengine like queries. Clients
@@ -185,29 +186,29 @@ public interface BarbelHisto<T> {
 	 * Retrieve data from {@link BarbelHisto} using cqengine like queries. Clients
 	 * want to use {@link BarbelQueries} for there convenience here.
 	 * {@link BarbelQueries} can be combined with additional queries from
-	 * {@link QueryFactory}. Throws {@link NonUniqueObjectException} when query
-	 * returns more then one result.
+	 * {@link QueryFactory}. Throws {@link IllegalStateException} when query returns
+	 * more then one result or nothing.
 	 * 
 	 * @param query the client query from {@link BarbelQueries} and/or
 	 *              {@link QueryFactory}
-	 * @return the returned object as {@link Optional}
+	 * @return the returned object
 	 */
-	Optional<T> retrieveOne(Query<T> query);
+	T retrieveOne(Query<T> query);
 
 	/**
 	 * Retrieve data from {@link BarbelHisto} using cqengine like queries. Clients
 	 * want to use {@link BarbelQueries} and {@link BarbelQueryOptions} for there
 	 * convenience here. {@link BarbelQueries} can be combined with additional
-	 * queries from {@link QueryFactory}. Throws {@link NonUniqueObjectException}
-	 * when query returns more then one result.
+	 * queries from {@link QueryFactory}. Throws {@link IllegalStateException} when
+	 * query returns more then one result or nothing.
 	 * 
 	 * @param query   the client query from {@link BarbelQueries} and/or
 	 *                {@link QueryFactory}
 	 * @param options the options from {@link BarbelQueryOptions} or
 	 *                {@link QueryFactory}
-	 * @return the returned object as {@link Optional}
+	 * @return the returned object
 	 */
-	Optional<T> retrieveOne(Query<T> query, QueryOptions options);
+	T retrieveOne(Query<T> query, QueryOptions options);
 
 	/**
 	 * Turn back time to see how document journals looked like in the past. If
@@ -226,41 +227,41 @@ public interface BarbelHisto<T> {
 
 	/**
 	 * Method for clients that use a custom data store. Only add complete set of
-	 * versions for one or more document IDs.<br>
+	 * versions for one or more document IDs. Usually used in conjunction with
+	 * {@link #unload(Object...)}.<br>
 	 * <br>
 	 * In {@link BarbelMode#POJO} (default) clients have to pass a collection of
-	 * {@link BitemporalVersion} objects previously retrieved by
-	 * {@link #dump(DumpMode)} method. In {@link BarbelMode#BITEMPORAL} mode clients
-	 * can add objects that implement {@link Bitemporal}. <br>
+	 * {@link BitemporalVersion}. In {@link BarbelMode#BITEMPORAL} mode clients can
+	 * add objects that implement {@link Bitemporal}. <br>
 	 * <br>
 	 * 
 	 * @see <a href=
 	 *      "https://github.com/npgall/cqengine">https://github.com/npgall/cqengine</a>
 	 * @param bitemporals consistent list of {@link Bitemporal} versions
 	 */
-	void populate(Collection<Bitemporal> bitemporals);
+	void load(Collection<Bitemporal> bitemporals);
 
 	/**
-	 * Unloads the backbone into a collection and return that to the client. This
-	 * method is used when client uses custom data store. Clients may store this
-	 * collection to the data store of their choice. Used in conjunction with
-	 * {@link #populate(Collection)} to re-load the stored versions back into
-	 * {@link BarbelHisto}.<br>
+	 * Unloads the journal data of the given document IDs into a collection and
+	 * return that to the client. The journal data of the given document IDs will be
+	 * deleted from the backbone. This method is used when client uses custom data
+	 * store. Clients may store the returned collection to the data store of their
+	 * choice. Used in conjunction with {@link #load(Collection)} to re-load that
+	 * stored journals back into {@link BarbelHisto} to continue bitemporal
+	 * processing.<br>
 	 * <br>
 	 * In {@link BarbelMode#POJO} (default) clients receive a collection of
 	 * {@link BitemporalVersion} objects. In {@link BarbelMode#BITEMPORAL} clients
 	 * receive objects that implement {@link Bitemporal}. <br>
 	 * <br>
-	 * In POJO mode (default) this method returns a collection of
-	 * {@link BitemporalVersion} objects. <br>
 	 * 
 	 * @see <a href=
 	 *      "https://github.com/npgall/cqengine">https://github.com/npgall/cqengine</a>
-	 * @param mode the {@link DumpMode}
+	 * @param documentIDs the document IDs to unload
 	 * @return the collection of {@link Bitemporal} objects to store into an
 	 *         arbitrary data store
 	 *
 	 */
-	Collection<Bitemporal> dump(DumpMode mode);
+	Collection<Bitemporal> unload(Object... documentIDs);
 
 }

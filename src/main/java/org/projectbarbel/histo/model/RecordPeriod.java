@@ -37,6 +37,10 @@ public class RecordPeriod {
         return builder().createdBy(context.getUser()).createdAt(BarbelHistoContext.getBarbelClock().now()).build();
     }
 
+    public static RecordPeriod createActive() {
+    	return builder().createdBy(BarbelHistoContext.getDefaultUser()).createdAt(BarbelHistoContext.getBarbelClock().now()).build();
+    }
+    
     public BitemporalObjectState compileState() {
         if (inactivatedAt.equals(NOT_INACTIVATED) && inactivatedBy.equals(NOBODY))
             return BitemporalObjectState.ACTIVE;

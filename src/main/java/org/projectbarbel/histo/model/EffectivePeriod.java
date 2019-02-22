@@ -24,6 +24,10 @@ public final class EffectivePeriod {
         return new EffectivePeriod(from, until);
     }
 
+    public static EffectivePeriod nowToInfinite() {
+    	return new EffectivePeriod(BarbelHistoContext.getBarbelClock().now().toLocalDate(), LocalDate.MAX);
+    }
+    
     public boolean isInfinite() {
         return until.equals(BarbelHistoContext.getInfiniteDate());
     }
