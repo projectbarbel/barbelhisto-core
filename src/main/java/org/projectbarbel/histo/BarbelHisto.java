@@ -52,7 +52,7 @@ import com.googlecode.cqengine.query.option.QueryOptions;
  * The primary key should be business oriented, i.e. personnel number, contract
  * number. <br>
  * <br>
- * Two {@link BarbelModeProcessor}s can be used to manage different types of
+ * Two {@link BarbelMode}s can be used to manage different types of
  * objects: {@link BarbelMode#POJO} is the default mode. Of course, using POJO
  * mode is the easiest way forward. However, behind the scenes
  * {@link BarbelHisto} uses proxying when managing POJOs to store the version
@@ -122,8 +122,8 @@ import com.googlecode.cqengine.query.option.QueryOptions;
  * 2019-02-14       Infinite            2019-01-15      Carp-Street 10     Period B
  * </pre>
  * 
- * In this example three weeks ago on Jan, 9th 2019 that adress change in
- * question was not recorded to the system. If you turn back time to Jan, 9th
+ * In this example three weeks ago on January 9, 2019 that adress change in
+ * question was not recorded to the system. If you turn back time to January 9,
  * 2019 that journal returned by time shift would only contain the effective
  * period A. These cases can get more complex obviously the more updates are
  * posted for a given document Id. Use
