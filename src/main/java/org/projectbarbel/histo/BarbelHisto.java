@@ -13,8 +13,6 @@ import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.BitemporalVersion;
 import org.projectbarbel.histo.model.DefaultDocument;
 
-import com.googlecode.cqengine.persistence.disk.DiskPersistence;
-import com.googlecode.cqengine.persistence.offheap.OffHeapPersistence;
 import com.googlecode.cqengine.query.Query;
 import com.googlecode.cqengine.query.QueryFactory;
 import com.googlecode.cqengine.query.option.QueryOptions;
@@ -57,13 +55,14 @@ import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
  * The primary key should be business oriented, i.e. personnel number, contract
  * number. <br>
  * <br>
- * Two {@link BarbelModeProcessor}s can be used to manage different types of objects:
- * {@link BarbelMode#POJO} is the default mode. Of course, using POJO mode is
- * the easiest way forward. However, behind the scenes {@link BarbelHisto} uses
- * proxying when managing POJOs to store the version data with the objects that
- * clients save. Proxying can become complicated in some situations. For that
- * reason there is another mode called {@link BarbelMode#BITEMPORAL}. One can
- * change the mode to {@link BarbelMode#BITEMPORAL} with the
+ * Two {@link BarbelModeProcessor}s can be used to manage different types of
+ * objects: {@link BarbelMode#POJO} is the default mode. Of course, using POJO
+ * mode is the easiest way forward. However, behind the scenes
+ * {@link BarbelHisto} uses proxying when managing POJOs to store the version
+ * data with the objects that clients save. Proxying can become complicated in
+ * some situations. For that reason there is another mode called
+ * {@link BarbelMode#BITEMPORAL}. One can change the mode to
+ * {@link BarbelMode#BITEMPORAL} with the
  * {@link BarbelHistoBuilder#withMode(BarbelMode)} method like so:
  * 
  * <pre>
@@ -226,26 +225,13 @@ public interface BarbelHisto<T> {
 	String prettyPrintJournal(Object id);
 
 	/**
-	 * Method for clients that use a custom data store. It's recommended to only add
-	 * complete journals previously created by {@link BarbelHisto}. That means only
-	 * add complete set of versions for one or more document IDs. To achieve this,
-	 * preferably use this method with version collections produced by
-	 * {@link #dump(DumpMode)} method. That ensures consistent state with
-	 * intermediate persistence operations to custom data stores. Clients can also
-	 * use {@link BarbelQueries#all(Object)} to retrieve a complete Journal for a
-	 * single document id, or use {@link BarbelQueries#all()} to retrieve the
-	 * complete data in one BarbelHisto backbone. However, notice that
-	 * {@link #retrieve(Query)} does not clear the backbone. If clients try to
-	 * {@link #populate(Collection)} items already managed in the current
-	 * {@link BarbelHisto} instance they will receive errors. <br>
+	 * Method for clients that use a custom data store. Only add complete set of
+	 * versions for one or more document IDs.<br>
 	 * <br>
 	 * In {@link BarbelMode#POJO} (default) clients have to pass a collection of
-	 * {@link BitemporalVersion} objects. In {@link BarbelMode#BITEMPORAL} mode
-	 * clients can add arbitrary objects that implement {@link Bitemporal}. <br>
-	 * <br>
-	 * {@link BarbelHisto} is based on cqengine. There are build in on-heap
-	 * (default), off-heap and disk persistence options. See {@link DiskPersistence}
-	 * and {@link OffHeapPersistence} for details. <br>
+	 * {@link BitemporalVersion} objects previously retrieved by
+	 * {@link #dump(DumpMode)} method. In {@link BarbelMode#BITEMPORAL} mode clients
+	 * can add objects that implement {@link Bitemporal}. <br>
 	 * <br>
 	 * 
 	 * @see <a href=
@@ -266,13 +252,7 @@ public interface BarbelHisto<T> {
 	 * receive objects that implement {@link Bitemporal}. <br>
 	 * <br>
 	 * In POJO mode (default) this method returns a collection of
-	 * {@link BitemporalVersion} objects. Use this collection to store the data and
-	 * to reload {@link BarbelHisto} in the {@link #populate(Collection)}
-	 * method.<br>
-	 * <br>
-	 * {@link BarbelHisto} is based on cqengine. There are build in on-heap
-	 * (default), off-heap and disk persistence options. See {@link DiskPersistence}
-	 * and {@link OffHeapPersistence} for details. <br>
+	 * {@link BitemporalVersion} objects. <br>
 	 * 
 	 * @see <a href=
 	 *      "https://github.com/npgall/cqengine">https://github.com/npgall/cqengine</a>

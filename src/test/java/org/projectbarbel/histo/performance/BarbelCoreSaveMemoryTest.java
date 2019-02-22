@@ -90,7 +90,8 @@ public class BarbelCoreSaveMemoryTest {
     @Test
     public void testMemory() throws InterruptedException, ExecutionException, TimeoutException {
         t = executor.scheduleAtFixedRate(new MyTask(core, dump, maxVersions, pojoCount), 1, 2, TimeUnit.SECONDS);
-        assertThrows(TimeoutException.class, ()->t.get(20,TimeUnit.SECONDS));
+        assertThrows(TimeoutException.class, ()->t.get(10,TimeUnit.SECONDS));
+        executor.shutdownNow();
     }
     
 }

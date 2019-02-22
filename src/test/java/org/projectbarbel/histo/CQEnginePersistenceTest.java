@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collections;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -90,6 +91,21 @@ public class CQEnginePersistenceTest {
         col.add(new DefaultPojo("id","some"));
         assertEquals("some",((DefaultPojo)col.retrieve(equal(DOCUMENT_ID_PK_POJO, "id")).stream().findFirst().get()).getData());
         col.clear();
+    }
+    
+    @Test
+    public void pojo_update() throws IOException {
+    	DiskPersistence<DefaultPojo, String> pers = DiskPersistence.onPrimaryKeyInFile(DOCUMENT_ID_PK_POJO, new File("def.dat"));
+    	ConcurrentIndexedCollection<DefaultPojo> col1 = new ConcurrentIndexedCollection<DefaultPojo>(pers);
+    	DefaultPojo pojo = new DefaultPojo("id","some");
+    	col1.add(pojo);
+    	assertEquals("some",((DefaultPojo)col1.retrieve(equal(DOCUMENT_ID_PK_POJO, "id")).stream().findFirst().get()).getData());
+    	pojo.setData("changed");
+    	ConcurrentIndexedCollection<DefaultPojo> col2 = new ConcurrentIndexedCollection<DefaultPojo>(pers);
+    	assertNotEquals("changed",((DefaultPojo)col2.retrieve(equal(DOCUMENT_ID_PK_POJO, "id")).stream().findFirst().get()).getData());
+    	col2.update(Collections.singletonList(pojo), Collections.singletonList(pojo));
+    	ConcurrentIndexedCollection<DefaultPojo> col3 = new ConcurrentIndexedCollection<DefaultPojo>(pers);
+    	assertEquals("changed",((DefaultPojo)col3.retrieve(equal(DOCUMENT_ID_PK_POJO, "id")).stream().findFirst().get()).getData());
     }
     
     @Test

@@ -82,7 +82,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     private Function<BarbelHistoContext, PojoSerializer<Bitemporal>> persistenceSerializerProducer = BarbelHistoContext
             .getDefaultPersistenceSerializerProducer();
     private Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> journalUpdateStrategyProducer = 
-            context -> new EmbeddingJournalUpdateStrategy(this);
+            context -> new EmbeddingJournalUpdateStrategy(context);
 
     public static BarbelHistoBuilder barbel() {
         return new BarbelHistoBuilder();

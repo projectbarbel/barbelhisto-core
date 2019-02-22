@@ -3,9 +3,11 @@ package org.projectbarbel.histo.functions;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.apache.commons.lang3.Validate;
 import org.projectbarbel.histo.BarbelHisto;
@@ -55,11 +57,19 @@ public class EmbeddingJournalUpdateStrategy implements BiConsumer<DocumentJourna
         newVersions.add(update);
         interruptedLeftVersion.ifPresent(d -> processInterruptedLeftVersion(update, d));
         interruptedRightVersion.ifPresent(d -> processInterruptedRightVersion(update, d));
-        interruptedLeftVersion.ifPresent(d -> d.setBitemporalStamp(d.getBitemporalStamp().inactivatedCopy(context)));
-        interruptedRightVersion.ifPresent(d -> d.setBitemporalStamp(d.getBitemporalStamp().inactivatedCopy(context)));
-        betweenVersions.stream().forEach(d -> d.setBitemporalStamp(d.getBitemporalStamp().inactivatedCopy(context)));
-        journal.accept(newVersions);
+        interruptedLeftVersion.ifPresent(inactivate(journal));
+        interruptedRightVersion.ifPresent(inactivate(journal));
+        betweenVersions.stream().forEach(inactivate(journal));
+        journal.insert(newVersions);
     }
+
+	private Consumer<? super Bitemporal> inactivate(final DocumentJournal journal) {
+		return orginal -> {
+			Bitemporal inactivated = context.getMode().copyManagedBitemporal(context, orginal);
+			inactivated.setBitemporalStamp(inactivated.getBitemporalStamp().inactivatedCopy(context));
+			journal.replace(Collections.singletonList(orginal), Collections.singletonList(inactivated));
+		};
+	}
 
     private void processInterruptedLeftVersion(final Bitemporal update, Bitemporal interruptedLeftVersion) {
         Bitemporal newPrecedingVersion = context.getMode().snapshotManagedBitemporal(context, interruptedLeftVersion,

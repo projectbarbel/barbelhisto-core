@@ -57,7 +57,7 @@ public class DocumentJournalTest {
                 .withBitemporalStamp(BitemporalStamp.createActive()).build();
         coll.add(doc);
         DocumentJournal journal = DocumentJournal.create(ProcessingState.INTERNAL, BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL), coll, doc.getBitemporalStamp().getDocumentId());
-        journal.accept(Arrays.asList(doc));
+        journal.insert(Arrays.asList(doc));
         assertTrue(journal.list().size()==1);
     }
 

@@ -84,7 +84,7 @@ public final class DocumentJournal {
     }
 
     @SuppressWarnings("unchecked")
-    public void accept(List<Bitemporal> newVersions) {
+    public void insert(List<Bitemporal> newVersions) {
         Validate.isTrue(
                 newVersions.stream().filter(d -> !d.getBitemporalStamp().getDocumentId().equals(id)).count() == 0,
                 "new versions must match document id of journal");
@@ -96,6 +96,17 @@ public final class DocumentJournal {
         journal.addAll(newVersions);
     }
 
+    @SuppressWarnings("unchecked")
+    public void replace(List<Bitemporal> objectsToRemove, List<Bitemporal> objectsToAdd) {
+    	Validate.isTrue(
+    			objectsToRemove.stream().filter(d -> !d.getBitemporalStamp().getDocumentId().equals(id)).count() == 0,
+    			"objects must match document id of journal");
+    	Validate.isTrue(
+    			objectsToAdd.stream().filter(d -> !d.getBitemporalStamp().getDocumentId().equals(id)).count() == 0,
+    			"objects must match document id of journal");
+    	journal.update(objectsToRemove, objectsToAdd);
+    }
+    
     @Override
     public String toString() {
         return "DocumentJournal [id=" + id + ", lastInserts=" + lastInserts + ", locked=" + locked + "]";
