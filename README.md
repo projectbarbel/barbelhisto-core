@@ -64,28 +64,26 @@ In the `Employee.class` you need to specify the `@DocumentId` so that `BarbelHis
 @DocumentId
 private String personnelNumber; 
 ```
-If you want to retrieve your `Employee`, you can do that by calling `retrieveOne`on `BarbelHisto`.
+If you want to retrieve your current `Employee` version, you can do that by calling `retrieveOne`on `BarbelHisto`.
 ```java
-Optional<Employee> effectiveNowOptional = core.retrieveOne(BarbelQueries.effectiveNow(employee.getId()));
+Employee effectiveEmployeeVersion = core.retrieveOne(BarbelQueries.effectiveNow(employee.getId()));
 ```
-Notice that you need to tell `BarbelHisto` what effective date your looking for. In the query above you're looking for the `Employee` version effective today. You can also ask for a specific date in the past or in the future.
+Notice that you need to tell `BarbelHisto` what effective date your looking for. In the query above you're looking for the `Employee` version effective now (today). You can also ask for a specific date in the past or in the future.
 ```java
-Optional<Employee> effectiveIn10DaysOptional = core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().plusDays(10)));
+Employee effectiveIn10Days = core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().plusDays(10)));
 ```
-That query retrieves the `Employee` version effective in ten days. It will return one, cause you've stored the `Employee` version to be effective from now to infinite (`LocalDate.MAX`). If you retrieve the `Employee` effective yesterday you'll receive an empty `Optional` instead.
+That query retrieves the `Employee` version effective in ten days. It will return one, cause you've stored the `Employee` version to be effective from now to infinite (`LocalDate.MAX`). If you retrieve the `Employee` effective yesterday you'll receive an `IllegalStateException` claiming that no value can be found. This strict treatment is to avoid `Nullpointer` somewhere later and to enforce proper treatment of such situations in your application. However, this throws an exception:
 ```java
-Optional<Employee> effectiveYesterdayOptional = core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().minusDays(1)));
-assertFalse(effectiveYesterdayOptional.isPresent());
+Employee effectiveYesterday = core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().minusDays(1)));
 ```
 ## Accessing bitemporal version metadata
 Whenever you receive data from `BarbelHisto` with `retrieve`-methods all the objects carry a `BitemporalStamp` as version stamp. This stamp contains all the version data for that object. You can receive that as follows:
 ```java
-Optional effectiveNowOptional = core.retrieveOne(BarbelQueries.effectiveNow(employee.getId()));
-BitemporalStamp versionData = ((Bitemporal)effectiveNowOptional.get()).getBitemporalStamp();
+BitemporalStamp versionData = ((Bitemporal)effectiveEmployeeVersion).getBitemporalStamp();
 ```
 That `BitemporalStamp` contains the effective time and record time data for that given object.
 ## Printing pretty journals
-Let's look at a pretty print of a document journal. The pretty print shows what `BarbelHisto` knows about your data. It prints out the version data of each object in a table format. 
+Let's look at a pretty print of a document journal for a document ID. The pretty print shows what `BarbelHisto` knows about your data. It prints out the version data of of the given document ID in a table format. 
 ```java
 System.out.println(core.prettyPrintJournal(employee.getId()));
 ```
@@ -105,29 +103,24 @@ You can change the pretty printer and write your own. Look into `TableJournalPre
 So far you know how to store POJOs to `BarbelHisto`. The real power of `BarbelHisto` is, however, to store changes to your `Employee` that become effective in the future (or became effective in the past). Here is how that works.
 Let's retrieve our current employee version again.
 ```java
-Optional<Employee> effectiveNowOptional = core.retrieveOne(BarbelQueries.effectiveNow(employee.getId()));
+Employee effectiveEmployeeVersion = core.retrieveOne(BarbelQueries.effectiveNow(employee.getId()));
 ```
 Now suppose that employee marries in 10 days, and that is supposed to become the day when the last name has to change.
 ```java
-Employee effectiveEmployeeVersion = effectiveNowOptional.get();
 effectiveEmployeeVersion.setLastname("changedLastName");
 ```
-And store that version into `BarbelHisto` to become effective in 10 days.
+And store that new version into `BarbelHisto` to become effective in 10 days.
 ```java
 core.save(effectiveEmployeeVersion, LocalDate.now().plusDays(10), LocalDate.MAX);
 ```
 Done. `BarbelHisto` now knows about that change. If you retrieve versions now, you may become different states of the employee, since you've recorded a change in near future.
 ```java
-effectiveNowOptional = core.retrieveOne(BarbelQueries.effectiveNow(employee.getId()));
-effectiveIn10DaysOptional = core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().plusDays(10)));
-
-effectiveEmployeeVersion = effectiveNowOptional.get();
-Employee effectiveIn10DaysVersion = effectiveIn10DaysOptional.get();
-        
+effectiveEmployeeVersion = core.retrieveOne(BarbelQueries.effectiveNow(employee.getId()));
+effectiveIn10Days = core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().plusDays(10)));
 assertTrue(effectiveEmployeeVersion.getLastname().equals("Schlimm"));
-assertTrue(effectiveIn10DaysVersion.getLastname().equals("changedLastName"));
+assertTrue(effectiveIn10Days.getLastname().equals("changedLastName"));
 ```
-Let's also look at the pretty print of that journal. Again call:
+Let's also look at the pretty print of that journal now. Again call:
 ```java
 System.out.println(core.prettyPrintJournal(employee.getId()));
 ```
@@ -141,7 +134,7 @@ Document-ID: somePersonelNumber
 |c2d8a5b8-a8cf-4f19-aeb4-4ca61b4f8f70    |2019-02-15     |2019-02-25      |ACTIVE  |SYSTEM               |2019-02-15T08:46:56.541+01:00[Europe/Berlin] |NOBODY               |2199-12-31T23:59:00Z                         |EffectivePeriod [from=2019-02- |
 |c9302f79-9c7b-4b4a-b011-8bb6177278af    |2019-02-25     |999999999-12-31 |ACTIVE  |SYSTEM               |2019-02-15T08:46:56.536+01:00[Europe/Berlin] |NOBODY               |2199-12-31T23:59:00Z                         |EffectivePeriod [from=2019-02- |
 ```
-As you may recognise the journal of that employee not contains some versions of the employee. Two versions with `ACTIVE` state and one with `INACTIVE` state. The active versions are effective from today (2019-02-15) and another one effective from in 10 days, which is 2019-02-25. There is one inactivated version, the one you've stored in the beginning, effective from now until infinite. `BarbelHisto` manages two time dimensions, one reflects the effective time, and another one, redord time, reflects when a change was made. For that reason, **nothing will ever be deleted**. There are **only inserts** to `BarbelHiso` backbone collections, **never deletions**.
+As you can see the journal of that employee now contains three versions. Two versions with `ACTIVE` state and one with `INACTIVE` state. The active versions are effective from 2019-02-15 (today) and effective from 2019-02-25. There is one inactivated version, the one you've stored in the beginning of that tutorial, effective from 2019-02-15 until `LocalDate.MAX`. `BarbelHisto` manages two time dimensions, one reflects the effective time, and another one, redord time, reflects when a change was made. For that reason, **nothing will ever be deleted**. There are **only inserts** to `BarbelHiso` backbone collections, **never deletions**. 
 ## Timeshifts 
 One of `BarbelHisto`s core functionality is doing timeshifts. With timeshifts you can look at past data as if it were still active. Let's suppose you did not make the updates from our previous example above at the same day like we just did in our turorial. Let's suppose we've created the `Employee` from our previous example on Feb 1st, 2019 and then made some changes today (here 2019, February 18th) that should become effective in the future. The journal of such a scenario looks like this:
 ```
@@ -186,17 +179,17 @@ BarbelHisto<PrimitivePrivatePojo> core = BarbelHistoBuilder.barbel() .withBackbo
 ```
 See the [cqengine documentation](https://github.com/npgall/cqengine) on all the options you can choose. 
 ## Custom persistence
-Whe you use custom persistence then `BarbelHisto` can export the backbone version data by calling the `BarbelHisto.dump()` and `BarbelHisto.populate()` methods. Let's say you've created the data with `BarbelHisto`, then you export the data like so:
+Whe you use custom persistence then `BarbelHisto` can export the backbone version data of a given document ID by calling the `BarbelHisto.unload()` and `BarbelHisto.load()` methods. Let's say you've created the data with `BarbelHisto`, then you export the data like so:
 ```java
-Coillection<Bitemporal> versionData = core.dump(DumpMode.CLEARCOLLECTION);
+Collection<Bitemporal> unload = core.unload("somePersonelNumber");
 ```
-The CLEARCOLLECTION option clears the underlying backbone. You don't want that to happen in many cases, so you can also call that method using READONLY. You can now store the version data to a data store of your choice. Make sure you import the complete journal later to restore the `BarbelHisto` instance.
+Notice that an unload removes that versions from the backbone collection. You can now store the complete version data for that given document ID to a data store of your choice. Later you can `BarbelHisto.load()` that complete journal to restore the `BarbelHisto` instance if you want to process further updates for a given document ID. 
 ```java
 Collection<Bitemporal> versionData = // ... some custom persistence service here that draws 
-                                     //     the data from the data store!
-histo.populate(versionData);
+                                     //     the version data for 'somePersonelNumber' from the data store!
+core.load(versionData);
 ```
-The `BarbelHisto` instance must be empty to use populate, otherwise you receive errors.
+The `BarbelHisto` instance must not contain any of the version data for the document IDs you try to load, otherwise you receive errors. This was made to ensure consistency of the version data.
 # Adding indexes 
 See the [cqengine documentation](https://github.com/npgall/cqengine) for adding indexes and then, again, add your custom collection as backbone collection as described previously using the `BarbelHistoBuilder` class. Here is an example of adding an indexed collection as backbone. First define the index field.
 ```java
