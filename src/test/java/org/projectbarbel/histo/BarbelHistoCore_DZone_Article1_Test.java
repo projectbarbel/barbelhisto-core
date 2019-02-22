@@ -35,19 +35,19 @@ public class BarbelHistoCore_DZone_Article1_Test {
 
 	public static class Client {
 		@DocumentId
-		private String clientNumber;
+		private String clientID;
 		private String firstname;
 		private String lastname;
 		private List<Adress> adresses = new ArrayList<>();
 
 		public Client(String id, String firstname, String lastname) {
-			this.clientNumber = id;
+			this.clientID = id;
 			this.firstname = firstname;
 			this.lastname = lastname;
 		}
 
 		public String getId() {
-			return clientNumber;
+			return clientID;
 		}
 
 		public String getFirstname() {
@@ -63,7 +63,7 @@ public class BarbelHistoCore_DZone_Article1_Test {
 		}
 
 		public void setId(String id) {
-			this.clientNumber = id;
+			this.clientID = id;
 		}
 
 		public void setFirstname(String firstname) {

@@ -149,12 +149,12 @@ public interface BarbelHisto<T> {
 	 * in {@link BarbelMode#POJO} cast the returned object to {@link Bitemporal} to
 	 * read the version data.
 	 * 
-	 * @param currentVersion the object state to save
+	 * @param newVersion the object state to save
 	 * @param from           effective date of object state
 	 * @param until          effective until of the state
 	 * @return the saved object including the version data
 	 */
-	T save(T currentVersion, LocalDate from, LocalDate until);
+	T save(T newVersion, LocalDate from, LocalDate until);
 
 	/**
 	 * Retrieve data from {@link BarbelHisto} using cqengine like queries. Clients
@@ -164,7 +164,7 @@ public interface BarbelHisto<T> {
 	 * 
 	 * @param query the client query from {@link BarbelQueries} and/or
 	 *              {@link QueryFactory}
-	 * @return the returned records, maybe empty, never null
+	 * @return the copies returned, maybe empty, never null
 	 */
 	List<T> retrieve(Query<T> query);
 
@@ -178,7 +178,7 @@ public interface BarbelHisto<T> {
 	 *                {@link QueryFactory}
 	 * @param options the options from {@link BarbelQueryOptions} or
 	 *                {@link QueryFactory}
-	 * @return the result list
+	 * @return the copies returned, maybe empty, never null
 	 */
 	List<T> retrieve(Query<T> query, QueryOptions options);
 
@@ -191,7 +191,7 @@ public interface BarbelHisto<T> {
 	 * 
 	 * @param query the client query from {@link BarbelQueries} and/or
 	 *              {@link QueryFactory}
-	 * @return the returned object
+	 * @return the returned copy
 	 */
 	T retrieveOne(Query<T> query);
 
@@ -206,7 +206,7 @@ public interface BarbelHisto<T> {
 	 *                {@link QueryFactory}
 	 * @param options the options from {@link BarbelQueryOptions} or
 	 *                {@link QueryFactory}
-	 * @return the returned object
+	 * @return the returned copy
 	 */
 	T retrieveOne(Query<T> query, QueryOptions options);
 
@@ -223,6 +223,12 @@ public interface BarbelHisto<T> {
 	 */
 	DocumentJournal timeshift(Object id, LocalDateTime time);
 
+	/**
+	 * Pretty print the journal for the given document ID. 
+	 * 
+	 * @param id the document ID
+	 * @return the journal as pretty print out
+	 */
 	String prettyPrintJournal(Object id);
 
 	/**
