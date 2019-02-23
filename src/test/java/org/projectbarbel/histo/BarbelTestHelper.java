@@ -6,13 +6,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
-import org.javers.common.collections.Arrays;
 import org.projectbarbel.histo.functions.UUIDGenerator;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.DefaultDocument;

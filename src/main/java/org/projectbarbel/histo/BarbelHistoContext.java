@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -11,6 +12,7 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 import org.projectbarbel.histo.BarbelHistoCore.UpdateLogRecord;
+import org.projectbarbel.histo.event.DefaultSubscriberExceptionHandler;
 import org.projectbarbel.histo.functions.AdaptingKryoSerializer;
 import org.projectbarbel.histo.functions.CachingCGLibProxyingFunction;
 import org.projectbarbel.histo.functions.RitsClonerCopyFunction;
@@ -20,6 +22,8 @@ import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.Systemclock;
 
+import com.google.common.eventbus.AsyncEventBus;
+import com.google.common.eventbus.EventBus;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
@@ -35,7 +39,7 @@ import com.googlecode.cqengine.persistence.support.serialization.PojoSerializer;
  */
 public interface BarbelHistoContext {
 
-	static <T> Supplier<IndexedCollection<T>> getDefaultBackbone() {
+	static <T> Supplier<IndexedCollection<T>> getDefaultBackboneSupplier() {
 		return ConcurrentIndexedCollection::new;
 	}
 
@@ -92,6 +96,14 @@ public interface BarbelHistoContext {
 		return () -> RitsClonerCopyFunction.INSTANCE;
 	}
 
+	static EventBus getDefaultSynchronousEventBus() {
+		return new EventBus(new DefaultSubscriberExceptionHandler());
+	}
+
+	static AsyncEventBus getDefaultAsynchronousEventBus() {
+		return new AsyncEventBus(Executors.newFixedThreadPool(5), new DefaultSubscriberExceptionHandler());
+	}
+
 	Supplier<Object> getVersionIdGenerator();
 
 	<T> Supplier<IndexedCollection<T>> getBackboneSupplier();
@@ -119,5 +131,13 @@ public interface BarbelHistoContext {
 	Function<BarbelHistoContext, PojoSerializer<Bitemporal>> getPersistenceSerializerProducer();
 
 	Map<String, Object> getContextOptions();
+
+	AsyncEventBus getAsynchronousEventBus();
+	
+	EventBus getSynchronousEventBus();
+	
+	IndexedCollection<?> getBackbone();
+	
+	void postEvent(Object event);
 
 }

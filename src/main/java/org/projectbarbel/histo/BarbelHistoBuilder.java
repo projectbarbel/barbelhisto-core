@@ -25,6 +25,8 @@ import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.Systemclock;
 
+import com.google.common.eventbus.AsyncEventBus;
+import com.google.common.eventbus.EventBus;
 import com.google.gson.Gson;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonPrimitive;
@@ -54,11 +56,11 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     public static final String SYSTEMACTIVITY = "SYSTEMACTIVITY";
     public static final Systemclock CLOCK = new Systemclock();
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
-	public static final JsonDeserializer<ZonedDateTime> ZDT_DESERIALIZER = (json, from,
-			context) -> BarbelHistoBuilder.DATE_FORMATTER.parse(json.getAsString(), ZonedDateTime::from);
+    public static final JsonDeserializer<ZonedDateTime> ZDT_DESERIALIZER = (json, from,
+            context) -> BarbelHistoBuilder.DATE_FORMATTER.parse(json.getAsString(), ZonedDateTime::from);
 
-	public static final JsonSerializer<ZonedDateTime> ZDT_SERIALIZER = (src, typeOfSrc,
-			context) -> new JsonPrimitive(BarbelHistoBuilder.DATE_FORMATTER.format(src));
+    public static final JsonSerializer<ZonedDateTime> ZDT_SERIALIZER = (src, typeOfSrc,
+            context) -> new JsonPrimitive(BarbelHistoBuilder.DATE_FORMATTER.format(src));
 
     private static final String NONULLS = "null values not allowed when building barbel context";
 
@@ -69,7 +71,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     private Supplier<UnaryOperator<Object>> pojoCopyFunctionSupplier = BarbelHistoContext
             .getDefaultCopyFunctionSupplier();
     private Supplier<Object> versionIdGenerator = BarbelHistoContext.getDefaultVersionIDGenerator();
-    private Object backboneSupplier = BarbelHistoContext.getDefaultBackbone();
+    private Object backboneSupplier = BarbelHistoContext.getDefaultBackboneSupplier();
     private String activity = BarbelHistoContext.getDefaultActivity();
     private String user = BarbelHistoContext.getDefaultUser();
     private Map<Object, DocumentJournal> journalStore = new ConcurrentHashMap<>();
@@ -77,12 +79,14 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     private IndexedCollection<UpdateLogRecord> updateLog = BarbelHistoContext.getDefaultUpdateLog();
     private Function<List<Bitemporal>, String> prettyPrinter = BarbelHistoContext.getDefaultPrettyPrinter();
     private Map<String, Object> contextOptions = new HashMap<>();
+    private EventBus synchronousEventBus = BarbelHistoContext.getDefaultSynchronousEventBus();
+    private AsyncEventBus asynchronousEventBus = BarbelHistoContext.getDefaultAsynchronousEventBus();
+    private IndexedCollection<?> backbone;
 
     // some more complex context types
     private Function<BarbelHistoContext, PojoSerializer<Bitemporal>> persistenceSerializerProducer = BarbelHistoContext
             .getDefaultPersistenceSerializerProducer();
-    private Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> journalUpdateStrategyProducer = 
-            context -> new EmbeddingJournalUpdateStrategy(context);
+    private Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> journalUpdateStrategyProducer = EmbeddingJournalUpdateStrategy::new;
 
     public static BarbelHistoBuilder barbel() {
         return new BarbelHistoBuilder();
@@ -95,6 +99,121 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
         if (pojoCopyFunctionSupplier instanceof SimpleGsonPojoCopier)
             ((SimpleGsonPojoCopier) pojoCopyFunctionSupplier).setGson(gson);
         return new BarbelHistoCore<>(this);
+    }
+
+    public IndexedCollection<?> getBackbone() {
+        return backbone;
+    }
+
+    protected void setBackbone(IndexedCollection<?> backbone) {
+        this.backbone = backbone;
+    }
+
+    /**
+     * Post an event across the {@link BarbelHistoBuilder#synchronousEventBus} and
+     * {@link BarbelHistoBuilder#asynchronousEventBus}.
+     * 
+     * @param event the event posted
+     */
+    public void postEvent(Object event) {
+        asynchronousEventBus.post(event);
+        synchronousEventBus.post(event);
+    }
+
+    public AsyncEventBus getAsynchronousEventBus() {
+        return asynchronousEventBus;
+    }
+
+    /**
+     * Register custom Google Guava {@link AsyncEventBus} with {@link BarbelHisto}.
+     * See the package org.projectbarbel.histo.event for various events that clients
+     * can subscribe to.
+     * 
+     * @param asynchronousEventBus the {@link AsyncEventBus}
+     * @return the builder again
+     */
+    public BarbelHistoBuilder withAsynchronousEventBus(AsyncEventBus asynchronousEventBus) {
+        Validate.isTrue(asynchronousEventBus != null, NONULLS);
+        this.asynchronousEventBus = asynchronousEventBus;
+        return this;
+    }
+
+    public EventBus getSynchronousEventBus() {
+        return synchronousEventBus;
+    }
+
+    /**
+     * Register custom Google Guava synchronous {@link EventBus} with
+     * {@link BarbelHisto}. See the package org.projectbarbel.histo.event for
+     * various events that clients can subscribe to.
+     * 
+     * @param synchronousEventBus the {@link AsyncEventBus}
+     * @return the builder again
+     */
+    public BarbelHistoBuilder withSynchronousEventBus(EventBus synchronousEventBus) {
+        Validate.isTrue(synchronousEventBus != null, NONULLS);
+        this.synchronousEventBus = synchronousEventBus;
+        return this;
+    }
+
+    /**
+     * Add a synchronous event listener to the {@link EventBus}. Listeners are
+     * implemented like so:
+     * 
+     * <pre>
+     * public class MyListener {
+     *    <code>@Subscribe</code>
+     *    public void handleEvent(AquireLockEvent event) {
+     *       // handle the event
+     *    }
+     * }
+     * </pre>
+     * 
+     * Then add an instance of this class to the
+     * {@link BarbelHistoBuilder#withSynchronousEventListener(Object)} method.
+     * {@link BarbelHisto} will publish events to the handler. For events
+     * available in {@link BarbelHisto} see org.projectbarbel.histo.event. <br>
+     * <br>
+     * Notice that synchronous event listeners should be fairly quick, cause they
+     * are all executed in a row by the executing main thread. Use asynchronous
+     * event listeners if you have to perform time consuming event based procedures.
+     * 
+     * @param listener the listener to register
+     * @return the builder again
+     */
+    public BarbelHistoBuilder withSynchronousEventListener(Object listener) {
+        Validate.isTrue(listener != null, NONULLS);
+        synchronousEventBus.register(listener);
+        return this;
+    }
+
+    /**
+     * Add a synchronous event listener to the {@link AsyncEventBus}. Listeners are
+     * implemented like so:
+     * 
+     * <pre>
+     * public class MyListener {
+     *    <code>@Subscribe</code>
+     *    public void handleEvent(AquireLockEvent event) {
+     *       // handle the event
+     *    }
+     * }
+     * </pre>
+     * 
+     * <br>
+     * Then add an instance of this class to the
+     * {@link BarbelHistoBuilder#withAsynchronousEventBus(AsyncEventBus)} method.
+     * {@link BarbelHisto} will the publich the event to the handler. For events
+     * available in {@link BarbelHisto} see org.projectbarbel.histo.event. <br>
+     * <br>
+     * 
+     * @param listener the listener to register
+     * @return the builder again
+     */
+    public BarbelHistoBuilder withAsynchronousEventListener(Object listener) {
+        Validate.isTrue(listener != null, NONULLS);
+        asynchronousEventBus.register(listener);
+        return this;
     }
 
     public Map<String, Object> getContextOptions() {
@@ -155,8 +274,9 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     /**
-     * Set the {@link BarbelModeProcessor} of this {@link BarbelHisto} instance. Default is
-     * {@link BarbelMode#POJO}. See {@link BarbelHisto} for more details on modes.
+     * Set the {@link BarbelModeProcessor} of this {@link BarbelHisto} instance.
+     * Default is {@link BarbelMode#POJO}. See {@link BarbelHisto} for more details
+     * on modes.
      * 
      * @param mode the mode
      * @return the builder again

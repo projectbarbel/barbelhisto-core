@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -203,11 +202,10 @@ public class BarbelHistoCore_JournalTimeshift_Test {
 
     @Test
     public void testSave_AlwaysCopies() {
-        BarbelHistoContext.getBarbelClock().useSystemDefaultZoneClock();
         DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
         core.save(pojo, BarbelHistoContext.getBarbelClock().today().minusDays(100),
                 BarbelHistoContext.getBarbelClock().today().minusDays(8));
-        DocumentJournal shift = core.timeshift(pojo.getDocumentId(), LocalDateTime.now());
+        DocumentJournal shift = core.timeshift(pojo.getDocumentId(), LocalDate.of(2019, 2, 6).atStartOfDay());
         DefaultPojo copy = (DefaultPojo) shift.read().activeVersions().get(0);
         assertNotSame(copy, pojo);
         assertNotSame(((BarbelProxy) copy).getTarget(), pojo);

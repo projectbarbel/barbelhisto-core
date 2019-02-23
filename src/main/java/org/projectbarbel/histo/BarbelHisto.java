@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
@@ -52,14 +53,13 @@ import com.googlecode.cqengine.query.option.QueryOptions;
  * The primary key should be business oriented, i.e. personnel number, contract
  * number. <br>
  * <br>
- * Two {@link BarbelMode}s can be used to manage different types of
- * objects: {@link BarbelMode#POJO} is the default mode. Of course, using POJO
- * mode is the easiest way forward. However, behind the scenes
- * {@link BarbelHisto} uses proxying when managing POJOs to store the version
- * data with the objects that clients save. Proxying can become complicated in
- * some situations. For that reason there is another mode called
- * {@link BarbelMode#BITEMPORAL}. One can change the mode to
- * {@link BarbelMode#BITEMPORAL} with the
+ * Two {@link BarbelMode}s can be used to manage different types of objects:
+ * {@link BarbelMode#POJO} is the default mode. Of course, using POJO mode is
+ * the easiest way forward. However, behind the scenes {@link BarbelHisto} uses
+ * proxying when managing POJOs to store the version data with the objects that
+ * clients save. Proxying can become complicated in some situations. For that
+ * reason there is another mode called {@link BarbelMode#BITEMPORAL}. One can
+ * change the mode to {@link BarbelMode#BITEMPORAL} with the
  * {@link BarbelHistoBuilder#withMode(BarbelMode)} method like so:
  * 
  * <pre>
@@ -150,8 +150,8 @@ public interface BarbelHisto<T> {
 	 * read the version data.
 	 * 
 	 * @param newVersion the object state to save
-	 * @param from           effective date of object state
-	 * @param until          effective until of the state
+	 * @param from       effective date of object state
+	 * @param until      effective until of the state
 	 * @return the saved object including the version data
 	 */
 	T save(T newVersion, LocalDate from, LocalDate until);
@@ -186,8 +186,9 @@ public interface BarbelHisto<T> {
 	 * Retrieve data from {@link BarbelHisto} using cqengine like queries. Clients
 	 * want to use {@link BarbelQueries} for there convenience here.
 	 * {@link BarbelQueries} can be combined with additional queries from
-	 * {@link QueryFactory}. Throws {@link IllegalStateException} when query returns
-	 * more then one result or nothing.
+	 * {@link QueryFactory}. Throws {@link IllegalStateException} when
+	 * query returns more then one result, {@link NoSuchElementException} if nothing
+	 * was found.
 	 * 
 	 * @param query the client query from {@link BarbelQueries} and/or
 	 *              {@link QueryFactory}
@@ -200,7 +201,8 @@ public interface BarbelHisto<T> {
 	 * want to use {@link BarbelQueries} and {@link BarbelQueryOptions} for there
 	 * convenience here. {@link BarbelQueries} can be combined with additional
 	 * queries from {@link QueryFactory}. Throws {@link IllegalStateException} when
-	 * query returns more then one result or nothing.
+	 * query returns more then one result, {@link NoSuchElementException} if nothing
+	 * was found.
 	 * 
 	 * @param query   the client query from {@link BarbelQueries} and/or
 	 *                {@link QueryFactory}
@@ -224,7 +226,7 @@ public interface BarbelHisto<T> {
 	DocumentJournal timeshift(Object id, LocalDateTime time);
 
 	/**
-	 * Pretty print the journal for the given document ID. 
+	 * Pretty print the journal for the given document ID.
 	 * 
 	 * @param id the document ID
 	 * @return the journal as pretty print out

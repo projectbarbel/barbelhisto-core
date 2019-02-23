@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -39,7 +40,7 @@ public class BarbelHistoCore_StdPojoUsage_Test {
         Employee effectiveIn10Days = core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().plusDays(10)));
         
         // yesterday nothing was effective, this will throw an exception stating no value present
-        assertThrows(IllegalStateException.class, ()-> core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().minusDays(1))));
+        assertThrows(NoSuchElementException.class, ()-> core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().minusDays(1))));
         
         // access the version data
         BitemporalStamp versionData = ((Bitemporal)effectiveEmployeeVersion).getBitemporalStamp();
@@ -70,8 +71,9 @@ public class BarbelHistoCore_StdPojoUsage_Test {
         Employee effectiveEmployeeVersion = core.save(employee, LocalDate.now(), LocalDate.MAX);
         effectiveEmployeeVersion.setLastname("changedLastName");
         core.save(effectiveEmployeeVersion, LocalDate.now().plusDays(10), LocalDate.MAX);
-        Collection<Bitemporal> unload = core.unload("somePersonelNumber");
-        assertEquals(3, unload.size());
+        Collection<Bitemporal> unloadVersionData = core.unload("somePersonelNumber");
+        assertEquals(3, unloadVersionData.size());
+        core.load(unloadVersionData);
 	}
     
     @Test
@@ -84,7 +86,7 @@ public class BarbelHistoCore_StdPojoUsage_Test {
         core.save(employee, LocalDate.now(), LocalDate.MAX);
         
         Employee effectiveIn10Days = core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().plusDays(10)));
-        assertThrows(IllegalStateException.class, ()->core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().minusDays(1))));
+        assertThrows(NoSuchElementException.class, ()->core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().minusDays(1))));
         
         System.out.println(core.prettyPrintJournal(employee.getId()));
         

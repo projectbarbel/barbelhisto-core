@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
@@ -23,6 +24,9 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
 import org.projectbarbel.histo.DocumentJournal.ProcessingState;
+import org.projectbarbel.histo.event.AcquireLockEvent;
+import org.projectbarbel.histo.event.ReleaseLockEvent;
+import org.projectbarbel.histo.event.RetrieveDataEvent;
 import org.projectbarbel.histo.functions.EmbeddingJournalUpdateStrategy.JournalUpdateCase;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
@@ -67,6 +71,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 		this.context = Objects.requireNonNull(context);
 		this.mode = Objects.requireNonNull(context.getMode());
 		this.backbone = Objects.requireNonNull((IndexedCollection<T>) context.getBackboneSupplier().get());
+		((BarbelHistoBuilder) context).setBackbone(backbone);
 		this.journals = Objects.requireNonNull(context.getJournalStore());
 		this.updateLog = Objects.requireNonNull(context.getUpdateLog());
 		CONSTRUCTION_CONTEXT.remove();
@@ -81,30 +86,45 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 		T maiden = mode.drawMaiden(context, newVersion);
 		validTypes.computeIfAbsent(maiden.getClass(), k -> mode.validateManagedType(context, maiden));
 		Object id = mode.drawDocumentId(maiden);
-		BitemporalStamp stamp = BitemporalStamp.of(context.getActivity(), id, EffectivePeriod.of(from, until),
-				RecordPeriod.createActive(context));
-		Bitemporal newManagedBitemporal = mode.snapshotMaiden(context, maiden, stamp);
-		BiConsumer<DocumentJournal, Bitemporal> updateStrategy = context.getJournalUpdateStrategyProducer()
-				.apply(context);
 		DocumentJournal journal = journals.computeIfAbsent(id,
-				k -> DocumentJournal.create(ProcessingState.INTERNAL, context, backbone, k));
+				k -> DocumentJournal.create(ProcessingState.INTERNAL, context, k));
 		if (journal.lockAcquired()) {
-			updateStrategy.accept(journal, newManagedBitemporal);
+			try {
+				BitemporalStamp stamp = BitemporalStamp.of(context.getActivity(), id, EffectivePeriod.of(from, until),
+						RecordPeriod.createActive(context));
+				Bitemporal newManagedBitemporal = mode.snapshotMaiden(context, maiden, stamp);
+				BiConsumer<DocumentJournal, Bitemporal> updateStrategy = context.getJournalUpdateStrategyProducer()
+						.apply(context);
+				try {
+					AcquireLockEvent lockEvent = new AcquireLockEvent(journal);
+					context.postEvent(lockEvent);
+					if (lockEvent.succeeded()) {
+						updateStrategy.accept(journal, newManagedBitemporal);
+						updateLog.add(new UpdateLogRecord(journal.getLastInsert(), newManagedBitemporal,
+								updateStrategy instanceof UpdateCaseAware
+										? ((UpdateCaseAware) updateStrategy).getActualCase()
+										: null,
+								context.getUser()));
+						return (T) mode.copyManagedBitemporal(context, newManagedBitemporal);
+					}
+					throw new IllegalStateException("lock event failed for document id: " + journal.getId());
+				} finally {
+					context.postEvent(new ReleaseLockEvent(journal));
+				}
+			} finally {
+				journal.unlock();
+			}
 		} else {
 			throw new ConcurrentModificationException(
 					"the journal for id=" + id.toString() + " is locked - try again later");
 		}
-		journal.unlock();
-		updateLog.add(new UpdateLogRecord(journal.getLastInsert(), newManagedBitemporal,
-				updateStrategy instanceof UpdateCaseAware ? ((UpdateCaseAware) updateStrategy).getActualCase() : null,
-				context.getUser()));
-		return (T)mode.copyManagedBitemporal(context, newManagedBitemporal);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<T> retrieve(Query<T> query) {
 		Validate.isTrue(query != null, NOTNULL);
+		context.postEvent(new RetrieveDataEvent(context, query));
 		return doRetrieveList(() -> (List<T>) backbone.retrieve(query).stream()
 				.map(o -> mode.copyManagedBitemporal(context, (Bitemporal) o)).collect(Collectors.toList()));
 	}
@@ -113,6 +133,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 	@Override
 	public List<T> retrieve(Query<T> query, QueryOptions options) {
 		Validate.isTrue(query != null && options != null, NOTNULL);
+		context.postEvent(new RetrieveDataEvent(context, query));
 		return doRetrieveList(() -> (List<T>) backbone.retrieve(query, options).stream()
 				.map(o -> mode.copyManagedBitemporal(context, (Bitemporal) o)).collect(Collectors.toList()));
 	}
@@ -191,7 +212,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 	@Override
 	public Collection<Bitemporal> unload(Object... documentIDs) {
 		Validate.notEmpty(documentIDs, "must pass at least one documentID");
-		Validate.validState(!backbone.isEmpty(),"backbone is empty, nothing to unload");
+		Validate.validState(!backbone.isEmpty(), "backbone is empty, nothing to unload");
 		Collection<Bitemporal> collection = new HashSet<>();
 		for (int i = 0; i < documentIDs.length; i++) {
 			Object id = documentIDs[i];
@@ -238,25 +259,29 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public T retrieveOne(Query<T> query) {
+		Validate.notNull(query, "query mist not be null");
+		context.postEvent(new RetrieveDataEvent(context, query));
 		try {
 			return (T) mode.copyManagedBitemporal(context, (Bitemporal) backbone.retrieve(query).uniqueResult());
 		} catch (NonUniqueObjectException e) {
 			throw new IllegalStateException("your query returned more then one result", e);
 		} catch (NoSuchObjectException e) {
-			throw new IllegalStateException("your query returned no result", e);
+			throw new NoSuchElementException("your query returned no result");
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public T retrieveOne(Query<T> query, QueryOptions options) {
+		Validate.notNull(query, "query mist not be null");
+		context.postEvent(new RetrieveDataEvent(context, query));
 		try {
 			return (T) mode.copyManagedBitemporal(context,
 					(Bitemporal) backbone.retrieve(query, options).uniqueResult());
 		} catch (NonUniqueObjectException e) {
 			throw new IllegalStateException("your query returned more then one result", e);
 		} catch (NoSuchObjectException e) {
-			throw new IllegalStateException("your query returned no result", e);
+			throw new NoSuchElementException("your query returned no result");
 		}
 	}
 
