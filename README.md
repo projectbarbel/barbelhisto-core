@@ -11,7 +11,7 @@ A lightweiht easy to use Java library to store the history of changes of domain 
 
 The library implements Martin Fowlers Temporal Pattern that can be found here: https://martinfowler.com/eaaDev/timeNarrative.html
 
-# Features (in development)
+# Features
 
 - bi-temporal (auditing-proof) data storage based on blazing fast [cqengine](https://github.com/npgall/cqengine) collections
 - small easy-to-use API (as simple as bi-temporal data storage can get)
@@ -126,7 +126,7 @@ Document-ID: somePersonelNumber
 |c9302f79-9c7b-4b4a-b011-8bb6177278af    |2019-02-25     |999999999-12-31 |ACTIVE  |SYSTEM               |2019-02-15T08:46:56.536+01:00[Europe/Berlin] |NOBODY               |2199-12-31T23:59:00Z                         |EffectivePeriod [from=2019-02- |
 ```
 As you can see the journal of that employee now contains three versions. Two versions with `ACTIVE` state and one with `INACTIVE` state. The active versions are effective from 2019-02-15 (today) and effective from 2019-02-25. There is one inactivated version, the one you've stored in the beginning of that tutorial, effective from 2019-02-15 until `LocalDate.MAX`. `BarbelHisto` manages two time dimensions, one reflects the effective time, and another one, redord time, reflects when a change was made. For that reason, **nothing will ever be deleted**. There are **only inserts** to `BarbelHiso` backbone collections, **never deletions**. 
-## Timeshifts 
+# Timeshifts 
 One of `BarbelHisto`s core functionality is doing timeshifts. With timeshifts you can look at past data as if it were still active. Let's suppose you did not make the updates from our previous example above at the same day like we just did in our turorial. Let's suppose we've created the `Employee` from our previous example on Feb 1st, 2019 and then made some changes today (here 2019, February 18th) that should become effective in the future. The journal of such a scenario looks like this:
 ```
 Document-ID: somePersonelNumber
