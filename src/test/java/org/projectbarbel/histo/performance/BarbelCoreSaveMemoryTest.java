@@ -30,8 +30,10 @@ public class BarbelCoreSaveMemoryTest {
     static ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1); // no
     static ScheduledFuture<?> t;
     private int pojoCount = 50;
-    private int maxVersions = 500000;
-    private boolean dump = false;    
+    private int maxVersions = 5000;
+    private boolean dump = false;
+
+    private long timeoutInSeconds = 5;    
 
     static class MyTask implements Runnable {
 		private BarbelHisto<DefaultPojo> core;
@@ -64,7 +66,7 @@ public class BarbelCoreSaveMemoryTest {
             .round(new MathContext(4, RoundingMode.HALF_UP)) + " ms");
             printBarbelStatitics();
             if (dump)
-                core.unload(id);
+                ((BarbelHistoCore<DefaultPojo>)core).unloadAll();
             printMemory();
         }
 
@@ -89,7 +91,7 @@ public class BarbelCoreSaveMemoryTest {
     @Test
     public void testMemory() throws InterruptedException, ExecutionException, TimeoutException {
         t = executor.scheduleAtFixedRate(new MyTask(core, dump, maxVersions, pojoCount), 0, 2, TimeUnit.SECONDS);
-        assertThrows(TimeoutException.class, ()->t.get(5,TimeUnit.SECONDS));
+        assertThrows(TimeoutException.class, ()->t.get(timeoutInSeconds ,TimeUnit.SECONDS));
         executor.shutdownNow();
     }
     

@@ -45,8 +45,6 @@ import lombok.extern.slf4j.Slf4j;
  * <li>lazy load the backbone from external source depending on the data
  * requested by clients using the {@link EventType#RETRIEVEDATA} event</li>
  * </ul>
- * <br>
- * <br>
  * To make use of {@link EventType} create listener classed like so;
  * 
  * <pre>
@@ -58,7 +56,7 @@ import lombok.extern.slf4j.Slf4j;
  * }
  * </pre>
  * 
- * And then register the listeners with
+ * Then register the listeners with
  * {@link BarbelHistoBuilder#withSynchronousEventListener(Object)} or
  * {@link BarbelHistoBuilder#withAsynchronousEventListener(Object)}. <br>
  * <br>
@@ -85,6 +83,16 @@ public enum EventType implements PostableEvent {
             return new AcquireLockEvent(ACQUIRELOCK, new HashMap<>());
         }
 
+    },
+    /**
+     * Event fired when {@link BarbelHisto} is ready for execution.
+     */
+    BARBELINITIALIZED {
+        @Override
+        public HistoEvent create() {
+            return new BarbelInitializedEvent(BARBELINITIALIZED, new HashMap<>());
+        }
+        
     },
     /**
      * Event fired when a journal is created on a
@@ -177,6 +185,10 @@ public enum EventType implements PostableEvent {
         public EventType getEventType() {
             return eventType;
         }
+        
+        public Object getDocumentId() {
+            return "n/a";
+        }
 
     }
 
@@ -209,6 +221,8 @@ public enum EventType implements PostableEvent {
     }
 
     public static class InsertBitemporalEvent extends AbstractBarbelEvent {
+        
+        public static final String NEWVERSIONS = "#newVersions";
 
         public InsertBitemporalEvent(EventType eventType, Map<Object, Object> context) {
             super(eventType, context);
@@ -238,6 +252,9 @@ public enum EventType implements PostableEvent {
 
     public static class ReplaceBitemporalEvent extends AbstractBarbelEvent {
 
+        public static final String OBJECTS_REMOVED = "#objectsRemoved";
+        public static final String OBJECTS_ADDED = "#objectsAdded";
+        
         public ReplaceBitemporalEvent(EventType eventType, Map<Object, Object> context) {
             super(eventType, context);
         }
@@ -252,13 +269,11 @@ public enum EventType implements PostableEvent {
 
     public static class RetrieveDataEvent extends AbstractBarbelEvent {
 
+        public static final String QUERY = "#query";
+        public static final String BARBEL = "#core";
+
         public RetrieveDataEvent(EventType eventType, Map<Object, Object> context) {
             super(eventType, context);
-        }
-
-        @Override
-        public Object getDocumentId() {
-            return "unknown";
         }
 
     }
@@ -271,6 +286,14 @@ public enum EventType implements PostableEvent {
             log.error("an exception was thrown while executing event handler: "
                     + context.getSubscriberMethod().getDeclaringClass().getName() + "."
                     + context.getSubscriberMethod().getName(), exception);
+        }
+
+    }
+
+    public class BarbelInitializedEvent extends AbstractBarbelEvent {
+
+        public BarbelInitializedEvent(EventType eventType, Map<Object, Object> context) {
+            super(eventType, context);
         }
 
     }

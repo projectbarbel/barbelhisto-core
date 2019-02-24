@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.projectbarbel.histo.model.BarbelProxy;
 import org.projectbarbel.histo.model.Bitemporal;
@@ -73,6 +74,13 @@ public class BarbelHistoCore_CQPersistence_Test {
 		Files.delete(Paths.get(FILENAME + "-wal"));
 	}
 
+	@BeforeEach
+	public void setUp() throws IOException {
+	    Files.deleteIfExists(Paths.get(FILENAME));
+	    Files.deleteIfExists(Paths.get(FILENAME + "-shm"));
+	    Files.deleteIfExists(Paths.get(FILENAME + "-wal"));
+	}
+	
 	@Test
 	public void testSave_PrimitivePrivatePojo() throws IOException {
 		PrimitivePrivatePojo pojo = EnhancedRandom.random(PrimitivePrivatePojo.class);

@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.projectbarbel.histo.DocumentJournal.ProcessingState;
 import org.projectbarbel.histo.event.EventType;
+import org.projectbarbel.histo.event.EventType.RetrieveDataEvent;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.EffectivePeriod;
@@ -59,6 +60,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
         this.backbone = Objects.requireNonNull((IndexedCollection<T>) context.getBackboneSupplier().get());
         ((BarbelHistoBuilder) context).setBackbone(backbone);
         this.journals = Objects.requireNonNull(context.getJournalStore());
+        EventType.BARBELINITIALIZED.create().with(context).postAbroad(context);
         CONSTRUCTION_CONTEXT.remove();
     }
 
@@ -101,7 +103,8 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     @Override
     public List<T> retrieve(Query<T> query) {
         Validate.isTrue(query != null, NOTNULL);
-        EventType.RETRIEVEDATA.create().with("query", query).with(context).postAbroad(context);
+        EventType.RETRIEVEDATA.create().with(RetrieveDataEvent.QUERY, query).with(RetrieveDataEvent.BARBEL, this)
+                .postAbroad(context);
         return doRetrieveList(() -> (List<T>) backbone.retrieve(query).stream()
                 .map(o -> mode.copyManagedBitemporal(context, (Bitemporal) o)).collect(Collectors.toList()));
     }
@@ -110,7 +113,8 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     @Override
     public List<T> retrieve(Query<T> query, QueryOptions options) {
         Validate.isTrue(query != null && options != null, NOTNULL);
-        EventType.RETRIEVEDATA.create().with("query", query).with("options", options).with(context).postAbroad(context);
+        EventType.RETRIEVEDATA.create().with(RetrieveDataEvent.QUERY, query).with(RetrieveDataEvent.BARBEL, this)
+                .postAbroad(context);
         return doRetrieveList(() -> (List<T>) backbone.retrieve(query, options).stream()
                 .map(o -> mode.copyManagedBitemporal(context, (Bitemporal) o)).collect(Collectors.toList()));
     }
@@ -136,6 +140,10 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     @Override
     public void load(Collection<Bitemporal> bitemporals) {
         Validate.isTrue(bitemporals != null, "bitemporals cannot be null");
+        Validate.isTrue(bitemporals.stream().filter(b -> b.getBitemporalStamp() == null).count() == 0,
+                "BitemporalStamp must not be null");
+        Validate.isTrue(bitemporals.stream().filter(b -> b.getBitemporalStamp().getDocumentId() == null).count() == 0,
+                "document id in BitemporalStamp must not be null");
         List<Object> documentIDs = bitemporals.stream().map(b -> b.getBitemporalStamp().getDocumentId())
                 .collect(Collectors.toList());
         for (Object documentId : documentIDs) {
@@ -154,8 +162,18 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
             Object id = documentIDs[i];
             collection.addAll(mode.managedBitemporalToCustomPersistenceObjects(id, backbone));
             backbone.removeAll(backbone.retrieve(BarbelQueries.all(id)).stream().collect(Collectors.toList()));
+            journals.remove(id);
         }
         return collection;
+    }
+
+    /**
+     * Unloads the complete backbone.
+     * 
+     * @return the complete backbone versions.
+     */
+    public Collection<Bitemporal> unloadAll() {
+        return journals.keySet().stream().flatMap(k -> unload(k).stream()).collect(Collectors.toList());
     }
 
     @Override
@@ -192,7 +210,8 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     @Override
     public T retrieveOne(Query<T> query) {
         Validate.notNull(query, "query mist not be null");
-        EventType.RETRIEVEDATA.create().with("query", query).with(context).postAbroad(context);
+        EventType.RETRIEVEDATA.create().with(RetrieveDataEvent.QUERY, query).with(RetrieveDataEvent.BARBEL, this)
+                .postAbroad(context);
         try {
             return (T) mode.copyManagedBitemporal(context, (Bitemporal) backbone.retrieve(query).uniqueResult());
         } catch (NonUniqueObjectException e) {
@@ -206,7 +225,8 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     @Override
     public T retrieveOne(Query<T> query, QueryOptions options) {
         Validate.notNull(query, "query mist not be null");
-        EventType.RETRIEVEDATA.create().with("query", query).with("options", options).with(context).postAbroad(context);
+        EventType.RETRIEVEDATA.create().with(RetrieveDataEvent.QUERY, query).with(RetrieveDataEvent.BARBEL, this)
+                .postAbroad(context);
         try {
             return (T) mode.copyManagedBitemporal(context,
                     (Bitemporal) backbone.retrieve(query, options).uniqueResult());

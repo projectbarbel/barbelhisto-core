@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
 import org.projectbarbel.histo.event.EventType;
+import org.projectbarbel.histo.event.EventType.InsertBitemporalEvent;
+import org.projectbarbel.histo.event.EventType.ReplaceBitemporalEvent;
 import org.projectbarbel.histo.functions.EmbeddingJournalUpdateStrategy.JournalUpdateCase;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.DefaultPojo;
@@ -122,7 +124,7 @@ public final class DocumentJournal {
                 .isBefore(v2.getBitemporalStamp().getEffectiveTime().until()) ? -1 : 1);
         this.lastInserts.addAll(newVersions);
         try {
-           EventType.INSERTBITEMPORAL.create().with(this).with("newVersions", newVersions).postAbroad(context);
+           EventType.INSERTBITEMPORAL.create().with(this).with(InsertBitemporalEvent.NEWVERSIONS, newVersions).postAbroad(context);
            journal.addAll(newVersions);
         } catch (Exception e) {
             // undo last replacements
@@ -138,8 +140,8 @@ public final class DocumentJournal {
         Validate.isTrue(
                 objectsToAdd.stream().filter(d -> !d.getBitemporalStamp().getDocumentId().equals(id)).count() == 0,
                 "objects must match document id of journal");
-        EventType.REPLACEBITEMPORAL.create().with(journal).with("objectsToRemove", objectsToRemove)
-                .with("objectToAdd", objectsToAdd).postAbroad(context);
+        EventType.REPLACEBITEMPORAL.create().with(journal).with(ReplaceBitemporalEvent.OBJECTS_REMOVED, objectsToRemove)
+                .with(ReplaceBitemporalEvent.OBJECTS_ADDED, objectsToAdd).postAbroad(context);
         try {
             replaceInternal(objectsToRemove, objectsToAdd);
             lastReplacements.add(new Replacement(objectsToRemove, objectsToAdd));
