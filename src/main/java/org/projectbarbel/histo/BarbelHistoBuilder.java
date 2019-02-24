@@ -14,7 +14,7 @@ import java.util.function.UnaryOperator;
 
 import org.apache.commons.lang3.Validate;
 import org.projectbarbel.histo.BarbelHistoCore.UpdateLogRecord;
-import org.projectbarbel.histo.event.Events;
+import org.projectbarbel.histo.event.EventType;
 import org.projectbarbel.histo.event.HistoEvent;
 import org.projectbarbel.histo.functions.AdaptingKryoSerializer;
 import org.projectbarbel.histo.functions.BarbelPojoSerializer;
@@ -135,7 +135,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 
     /**
      * Register custom Google Guava {@link AsyncEventBus} with {@link BarbelHisto}.
-     * See {@link Events} for various events that clients can subscribe to.
+     * See {@link EventType} for various events that clients can subscribe to.
      * 
      * @param asynchronousEventBus the {@link AsyncEventBus}
      * @return the builder again
@@ -152,7 +152,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 
     /**
      * Register custom Google Guava synchronous {@link EventBus} with
-     * {@link BarbelHisto}. See {@link Events} for various events that clients can
+     * {@link BarbelHisto}. See {@link EventType} for various events that clients can
      * subscribe to.
      * 
      * @param synchronousEventBus the {@link AsyncEventBus}
@@ -180,7 +180,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
      * Then add an instance of this class to the
      * {@link BarbelHistoBuilder#withSynchronousEventListener(Object)} method.
      * {@link BarbelHisto} will publish events to the handler. For events available
-     * in {@link BarbelHisto} see {@link Events}. <br>
+     * in {@link BarbelHisto} see {@link EventType}. <br>
      * <br>
      * Notice that synchronous event listeners should be fairly quick, cause they
      * are all executed in a row by the executing main thread. Use asynchronous

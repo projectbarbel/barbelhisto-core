@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
 import org.projectbarbel.histo.DocumentJournal.ProcessingState;
-import org.projectbarbel.histo.event.Events;
+import org.projectbarbel.histo.event.EventType;
 import org.projectbarbel.histo.functions.EmbeddingJournalUpdateStrategy.JournalUpdateCase;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
@@ -94,7 +94,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
                 BiConsumer<DocumentJournal, Bitemporal> updateStrategy = context.getJournalUpdateStrategyProducer()
                         .apply(context);
                 try {
-                    Events.ACQUIRELOCK.create().with(journal).postSynchronous(context);
+                    EventType.ACQUIRELOCK.create().with(journal).postSynchronous(context);
                     updateStrategy.accept(journal, newManagedBitemporal);
                     updateLog.add(new UpdateLogRecord(journal.getLastInsert(), newManagedBitemporal,
                             updateStrategy instanceof UpdateCaseAware
@@ -103,7 +103,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
                             context.getUser()));
                     return (T) mode.copyManagedBitemporal(context, newManagedBitemporal);
                 } finally {
-                    Events.RELEASELOCK.create().with(journal).postSynchronous(context);
+                    EventType.RELEASELOCK.create().with(journal).postSynchronous(context);
                 }
             } finally {
                 journal.unlock();
@@ -118,7 +118,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     @Override
     public List<T> retrieve(Query<T> query) {
         Validate.isTrue(query != null, NOTNULL);
-        Events.RETRIEVEDATA.create().with("query", query).with(context).postAbroad(context);
+        EventType.RETRIEVEDATA.create().with("query", query).with(context).postAbroad(context);
         return doRetrieveList(() -> (List<T>) backbone.retrieve(query).stream()
                 .map(o -> mode.copyManagedBitemporal(context, (Bitemporal) o)).collect(Collectors.toList()));
     }
@@ -127,7 +127,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     @Override
     public List<T> retrieve(Query<T> query, QueryOptions options) {
         Validate.isTrue(query != null && options != null, NOTNULL);
-        Events.RETRIEVEDATA.create().with("query", query).with("options", options).with(context).postAbroad(context);
+        EventType.RETRIEVEDATA.create().with("query", query).with("options", options).with(context).postAbroad(context);
         return doRetrieveList(() -> (List<T>) backbone.retrieve(query, options).stream()
                 .map(o -> mode.copyManagedBitemporal(context, (Bitemporal) o)).collect(Collectors.toList()));
     }
@@ -254,7 +254,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     @Override
     public T retrieveOne(Query<T> query) {
         Validate.notNull(query, "query mist not be null");
-        Events.RETRIEVEDATA.create().with("query", query).with(context).postAbroad(context);
+        EventType.RETRIEVEDATA.create().with("query", query).with(context).postAbroad(context);
         try {
             return (T) mode.copyManagedBitemporal(context, (Bitemporal) backbone.retrieve(query).uniqueResult());
         } catch (NonUniqueObjectException e) {
@@ -268,7 +268,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     @Override
     public T retrieveOne(Query<T> query, QueryOptions options) {
         Validate.notNull(query, "query mist not be null");
-        Events.RETRIEVEDATA.create().with("query", query).with("options", options).with(context).postAbroad(context);
+        EventType.RETRIEVEDATA.create().with("query", query).with("options", options).with(context).postAbroad(context);
         try {
             return (T) mode.copyManagedBitemporal(context,
                     (Bitemporal) backbone.retrieve(query, options).uniqueResult());

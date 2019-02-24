@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 import org.projectbarbel.histo.BarbelHistoCore.UpdateLogRecord;
-import org.projectbarbel.histo.event.Events.DefaultSubscriberExceptionHandler;
+import org.projectbarbel.histo.event.EventType.DefaultSubscriberExceptionHandler;
 import org.projectbarbel.histo.event.HistoEvent;
 import org.projectbarbel.histo.functions.AdaptingKryoSerializer;
 import org.projectbarbel.histo.functions.CachingCGLibProxyingFunction;

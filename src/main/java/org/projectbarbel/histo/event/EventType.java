@@ -2,6 +2,7 @@ package org.projectbarbel.histo.event;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.projectbarbel.histo.BarbelHisto;
 import org.projectbarbel.histo.BarbelHistoBuilder;
@@ -21,11 +22,11 @@ import lombok.extern.slf4j.Slf4j;
  * follows:
  * 
  * <pre>
- * 1. {@link Events#INITIALIZEJOURNAL} when journal is created, only once, abroad post
- * 2. {@link Events#ACQUIRELOCK}, when {@link BarbelHisto} starts updating a document journal, synchronous post
- * 3. {@link Events#REPLACEBITEMPORAL}, when old versions are inactivated, abroad post
- * 4. {@link Events#INSERTBITEMPORAL}, when new versions are inserted, abroad post
- * 5. {@link Events#RELEASELOCK}, when {@link BarbelHisto} finishes the updating cycle, synchronous post
+ * 1. {@link EventType#INITIALIZEJOURNAL} when journal is created, only once, abroad post
+ * 2. {@link EventType#ACQUIRELOCK}, when {@link BarbelHisto} starts updating a document journal, synchronous post
+ * 3. {@link EventType#REPLACEBITEMPORAL}, when old versions are inactivated, abroad post
+ * 4. {@link EventType#INSERTBITEMPORAL}, when new versions are inserted, abroad post
+ * 5. {@link EventType#RELEASELOCK}, when {@link BarbelHisto} finishes the updating cycle, synchronous post
  * </pre>
  * 
  * The RETRIEVEDATA event is posted when clients retrieve data from
@@ -34,15 +35,15 @@ import lombok.extern.slf4j.Slf4j;
  * asynchronous and synchronous bus to catch these events.<br>
  * <br>
  * Different uses of {@link HistoEvent}s are possible. For instance clients may
- * want to:
+ * want to:<ul>
  * <li>synchronize data in external data stores with
- * {@link Events#REPLACEBITEMPORAL} and {@link Events#INSERTBITEMPORAL}</li>
+ * {@link EventType#REPLACEBITEMPORAL} and {@link EventType#INSERTBITEMPORAL}</li>
  * <li>lock journals stored in a database in complex distributed scenarios using
- * {@link Events#ACQUIRELOCK} and {@link Events#RELEASELOCK}</li>
+ * {@link EventType#ACQUIRELOCK} and {@link EventType#RELEASELOCK}</li>
  * <li>lazy load the backbone from external source depending on the data
- * requested by clients using the {@link Events#RETRIEVEDATA} event</li> <br>
- * <br>
- * To make use of {@link Events} create listener classed like so;
+ * requested by clients using the {@link EventType#RETRIEVEDATA} event</li> 
+ * </ul><br><br>
+ * To make use of {@link EventType} create listener classed like so;
  * 
  * <pre>
  * public class MyListener {
@@ -69,14 +70,14 @@ import lombok.extern.slf4j.Slf4j;
  * @author Niklas Schlimm
  *
  */
-public enum Events implements PostableEvent {
+public enum EventType implements PostableEvent {
     /**
      * Event fired when {@link BarbelHisto} acquires the lock for a journal update.
      */
     ACQUIRELOCK {
         @Override
         public HistoEvent create() {
-            return new AcquireLockEvent(new HashMap<>());
+            return new AcquireLockEvent(ACQUIRELOCK, new HashMap<>());
         }
 
     },
@@ -89,7 +90,7 @@ public enum Events implements PostableEvent {
 
         @Override
         public HistoEvent create() {
-            return new InitializeJournalEvent(new HashMap<>());
+            return new InitializeJournalEvent(INITIALIZEJOURNAL, new HashMap<>());
         }
 
     },
@@ -101,7 +102,7 @@ public enum Events implements PostableEvent {
 
         @Override
         public HistoEvent create() {
-            return new InsertBitemporalEvent(new HashMap<>());
+            return new InsertBitemporalEvent(INSERTBITEMPORAL, new HashMap<>());
         }
 
     },
@@ -113,7 +114,7 @@ public enum Events implements PostableEvent {
 
         @Override
         public HistoEvent create() {
-            return new ReleaseLockEvent(new HashMap<>());
+            return new ReleaseLockEvent(RELEASELOCK, new HashMap<>());
         }
 
     },
@@ -124,7 +125,7 @@ public enum Events implements PostableEvent {
 
         @Override
         public HistoEvent create() {
-            return new ReplaceBitemporalEvent(new HashMap<>());
+            return new ReplaceBitemporalEvent(REPLACEBITEMPORAL, new HashMap<>());
         }
 
     },
@@ -136,7 +137,7 @@ public enum Events implements PostableEvent {
 
         @Override
         public HistoEvent create() {
-            return new RetrieveDataEvent(new HashMap<>());
+            return new RetrieveDataEvent(RETRIEVEDATA, new HashMap<>());
         }
 
     };
@@ -144,9 +145,11 @@ public enum Events implements PostableEvent {
     public abstract static class AbstractBarbelEvent implements HistoEvent {
 
         protected Map<Object, Object> eventContext;
-        protected boolean failed = false;
+        private boolean failed = false;
+        private final EventType eventType;
 
-        public AbstractBarbelEvent(Map<Object, Object> context) {
+        public AbstractBarbelEvent(EventType eventType, Map<Object, Object> context) {
+            this.eventType = eventType;
             this.eventContext = context;
         }
 
@@ -163,77 +166,81 @@ public enum Events implements PostableEvent {
             return eventContext;
         }
 
+        public EventType getEventType() {
+            return eventType;
+        }
+
     }
 
     public static class AcquireLockEvent extends AbstractBarbelEvent {
 
-        public AcquireLockEvent(Map<Object, Object> context) {
-            super(context);
+        public AcquireLockEvent(EventType eventType, Map<Object, Object> context) {
+            super(eventType, context);
         }
 
         @Override
         public Object getDocumentId() {
-            return ((DocumentJournal) eventContext.get(DocumentJournal.class)).getId();
+            return Optional.ofNullable(((DocumentJournal) eventContext.get(DocumentJournal.class))).orElse(DocumentJournal.SAMPLEJOURNAL).getId();
         }
 
     }
 
     public static class InitializeJournalEvent extends AbstractBarbelEvent {
 
-        public InitializeJournalEvent(Map<Object, Object> eventContext) {
-            super(eventContext);
+        public InitializeJournalEvent(EventType eventType, Map<Object, Object> context) {
+            super(eventType, context);
         }
 
         @Override
         public Object getDocumentId() {
-            return ((DocumentJournal) eventContext.get(DocumentJournal.class)).getId();
+            return Optional.ofNullable(((DocumentJournal) eventContext.get(DocumentJournal.class))).orElse(DocumentJournal.SAMPLEJOURNAL).getId();
         }
 
     }
 
     public static class InsertBitemporalEvent extends AbstractBarbelEvent {
 
-        public InsertBitemporalEvent(Map<Object, Object> eventContext) {
-            super(eventContext);
+        public InsertBitemporalEvent(EventType eventType, Map<Object, Object> context) {
+            super(eventType, context);
         }
 
         @Override
         public Object getDocumentId() {
-            return ((DocumentJournal) eventContext.get(DocumentJournal.class)).getId();
+            return Optional.ofNullable(((DocumentJournal) eventContext.get(DocumentJournal.class))).orElse(DocumentJournal.SAMPLEJOURNAL).getId();
         }
 
     }
 
     public static class ReleaseLockEvent extends AbstractBarbelEvent {
 
-        public ReleaseLockEvent(Map<Object, Object> eventContext) {
-            super(eventContext);
+        public ReleaseLockEvent(EventType eventType, Map<Object, Object> context) {
+            super(eventType, context);
         }
 
         @Override
         public Object getDocumentId() {
-            return ((DocumentJournal) eventContext.get(DocumentJournal.class)).getId();
+            return Optional.ofNullable(((DocumentJournal) eventContext.get(DocumentJournal.class))).orElse(DocumentJournal.SAMPLEJOURNAL).getId();
         }
 
     }
 
     public static class ReplaceBitemporalEvent extends AbstractBarbelEvent {
 
-        public ReplaceBitemporalEvent(Map<Object, Object> eventContext) {
-            super(eventContext);
+        public ReplaceBitemporalEvent(EventType eventType, Map<Object, Object> context) {
+            super(eventType, context);
         }
 
         @Override
         public Object getDocumentId() {
-            return ((DocumentJournal) eventContext.get(DocumentJournal.class)).getId();
+            return Optional.ofNullable(((DocumentJournal) eventContext.get(DocumentJournal.class))).orElse(DocumentJournal.SAMPLEJOURNAL).getId();
         }
 
     }
 
     public static class RetrieveDataEvent extends AbstractBarbelEvent {
 
-        public RetrieveDataEvent(Map<Object, Object> eventContext) {
-            super(eventContext);
+        public RetrieveDataEvent(EventType eventType, Map<Object, Object> context) {
+            super(eventType, context);
         }
 
         @Override

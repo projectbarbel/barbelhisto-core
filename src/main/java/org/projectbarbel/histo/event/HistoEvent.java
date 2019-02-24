@@ -5,7 +5,7 @@ import java.util.Map;
 import org.projectbarbel.histo.BarbelHistoContext;
 
 /**
- * Interface implemented by all {@link Events}.
+ * Interface implemented by all {@link EventType}.
  * 
  * @author Niklas Schlimm
  *
@@ -24,7 +24,7 @@ public interface HistoEvent {
     default void postSynchronous(BarbelHistoContext context) {
         context.postSynchronousEvent(this);
         if (!this.succeeded())
-            throw new HistoEventFailedException("event failed " + this.getClass() + " with ID: " + this.getDocumentId(), this.getClass());
+            throw new HistoEventFailedException("event failed " + this.getClass() + " with ID: " + this.getDocumentId(), this);
     }
 
     default void postAsynchronous(BarbelHistoContext context) {
@@ -43,4 +43,6 @@ public interface HistoEvent {
     void failed();
 
     Map<Object, Object> getEventContext();
+    
+    EventType getEventType();
 }

@@ -12,10 +12,12 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
-import org.projectbarbel.histo.event.Events;
+import org.projectbarbel.histo.event.EventType;
 import org.projectbarbel.histo.model.Bitemporal;
+import org.projectbarbel.histo.model.DefaultPojo;
 import org.projectbarbel.histo.model.EffectivePeriod;
 
+import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
 
 /**
@@ -30,6 +32,9 @@ import com.googlecode.cqengine.IndexedCollection;
  */
 @SuppressWarnings("rawtypes")
 public final class DocumentJournal {
+
+    public static DocumentJournal SAMPLEJOURNAL = DocumentJournal.create(ProcessingState.EXTERNAL,
+            BarbelHistoBuilder.barbel(), new ConcurrentIndexedCollection<DefaultPojo>(), "unknown");
 
     public enum ProcessingState {
         // @formatter:off
@@ -65,7 +70,7 @@ public final class DocumentJournal {
         this.journal = backbone;
         this.id = id;
         if (ProcessingState.INTERNAL.equals(processingState))
-            Events.INITIALIZEJOURNAL.create().with(this).postAbroad(context);
+            EventType.INITIALIZEJOURNAL.create().with(this).postAbroad(context);
     }
 
     /**
@@ -108,7 +113,7 @@ public final class DocumentJournal {
         newVersions.sort((v1, v2) -> v1.getBitemporalStamp().getEffectiveTime().until()
                 .isBefore(v2.getBitemporalStamp().getEffectiveTime().until()) ? -1 : 1);
         this.lastInserts = newVersions;
-        Events.INSERTBITEMPORAL.create().with(this).with("newVersions", newVersions).postAbroad(context);
+        EventType.INSERTBITEMPORAL.create().with(this).with("newVersions", newVersions).postAbroad(context);
         journal.addAll(newVersions);
     }
 
@@ -120,7 +125,7 @@ public final class DocumentJournal {
         Validate.isTrue(
                 objectsToAdd.stream().filter(d -> !d.getBitemporalStamp().getDocumentId().equals(id)).count() == 0,
                 "objects must match document id of journal");
-        Events.REPLACEBITEMPORAL.create().with(journal).with("objectsToRemove", objectsToRemove)
+        EventType.REPLACEBITEMPORAL.create().with(journal).with("objectsToRemove", objectsToRemove)
                 .with("objectToAdd", objectsToAdd).postAbroad(context);
         journal.update(objectsToRemove, objectsToAdd);
     }

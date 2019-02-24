@@ -2,9 +2,9 @@ package org.projectbarbel.histo.event;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -15,12 +15,12 @@ import org.projectbarbel.histo.BarbelHistoBuilder;
 import org.projectbarbel.histo.BarbelHistoContext;
 import org.projectbarbel.histo.DocumentJournal;
 import org.projectbarbel.histo.DocumentJournal.ProcessingState;
-import org.projectbarbel.histo.event.Events.AcquireLockEvent;
-import org.projectbarbel.histo.event.Events.InitializeJournalEvent;
-import org.projectbarbel.histo.event.Events.InsertBitemporalEvent;
-import org.projectbarbel.histo.event.Events.ReleaseLockEvent;
-import org.projectbarbel.histo.event.Events.ReplaceBitemporalEvent;
-import org.projectbarbel.histo.event.Events.RetrieveDataEvent;
+import org.projectbarbel.histo.event.EventType.AcquireLockEvent;
+import org.projectbarbel.histo.event.EventType.InitializeJournalEvent;
+import org.projectbarbel.histo.event.EventType.InsertBitemporalEvent;
+import org.projectbarbel.histo.event.EventType.ReleaseLockEvent;
+import org.projectbarbel.histo.event.EventType.ReplaceBitemporalEvent;
+import org.projectbarbel.histo.event.EventType.RetrieveDataEvent;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -33,18 +33,18 @@ public class IndividualEventTest {
     @SuppressWarnings("unused")
     private static Stream<Arguments> createPojos() {
         return Stream.of(
-                Arguments.of(Events.ACQUIRELOCK),
-                Arguments.of(Events.INITIALIZEJOURNAL),
-                Arguments.of(Events.INSERTBITEMPORAL),
-                Arguments.of(Events.RELEASELOCK),
-                Arguments.of(Events.RETRIEVEDATA),
-                Arguments.of(Events.REPLACEBITEMPORAL)
+                Arguments.of(EventType.ACQUIRELOCK),
+                Arguments.of(EventType.INITIALIZEJOURNAL),
+                Arguments.of(EventType.INSERTBITEMPORAL),
+                Arguments.of(EventType.RELEASELOCK),
+                Arguments.of(EventType.RETRIEVEDATA),
+                Arguments.of(EventType.REPLACEBITEMPORAL)
                 );
     }
     
     @ParameterizedTest
     @MethodSource("createPojos")
-	void testSynchronous(Events event) throws Exception {
+	void testSynchronous(EventType event) throws Exception {
 		list.clear();
 		BarbelHistoContext context = BarbelHistoBuilder.barbel();
 		EventBus bus = context.getSynchronousEventBus();
@@ -57,7 +57,19 @@ public class IndividualEventTest {
 
     @ParameterizedTest
     @MethodSource("createPojos")
-    void testAsynchronous(Events event) throws Exception {
+    void testSynchronous_Failing(EventType event) throws Exception {
+        list.clear();
+        BarbelHistoContext context = BarbelHistoBuilder.barbel();
+        EventBus bus = context.getSynchronousEventBus();
+        bus.register(new ExceptionThrowingListener());
+        HistoEventFailedException exception = assertThrows(HistoEventFailedException.class, ()->event.create().with(DocumentJournal.create(ProcessingState.INTERNAL,
+                BarbelHistoBuilder.barbel(), new ConcurrentIndexedCollection<>(), "someId")).postSynchronous(context));
+        assertEquals(event, exception.getEvent().getEventType());
+    }
+    
+    @ParameterizedTest
+    @MethodSource("createPojos")
+    void testAsynchronous(EventType event) throws Exception {
         list.clear();
         BarbelHistoContext context = BarbelHistoBuilder.barbel();
         EventBus bus = context.getAsynchronousEventBus();
@@ -70,7 +82,7 @@ public class IndividualEventTest {
     
     @ParameterizedTest
     @MethodSource("createPojos")
-    void testAbroad(Events event) throws Exception {
+    void testAbroad(EventType event) throws Exception {
         list.clear();
         BarbelHistoContext context = BarbelHistoBuilder.barbel();
         EventBus bus1 = context.getAsynchronousEventBus();
@@ -84,10 +96,35 @@ public class IndividualEventTest {
     }
     
 	public static class ExceptionThrowingListener {
-		@Subscribe
-		public void handle(AcquireLockEvent initialize) throws InterruptedException {
-			throw new ConcurrentModificationException("already locked");
-		}
+        @Subscribe
+        public void handle(RetrieveDataEvent event) throws InterruptedException {
+            event.failed();
+        }
+
+        @Subscribe
+        public void handle(InitializeJournalEvent event) throws InterruptedException {
+            event.failed();
+        }
+        
+        @Subscribe
+        public void handle(InsertBitemporalEvent event) throws InterruptedException {
+            event.failed();
+        }
+
+        @Subscribe
+        public void handle(ReleaseLockEvent event) throws InterruptedException {
+            event.failed();
+        }
+
+        @Subscribe
+        public void handle(AcquireLockEvent event) throws InterruptedException {
+            event.failed();
+        }
+        
+        @Subscribe
+        public void handle(ReplaceBitemporalEvent event) throws InterruptedException {
+            event.failed();
+        }
 	}
 
 	public static class EventTestListener {
