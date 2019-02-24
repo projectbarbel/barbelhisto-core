@@ -14,6 +14,8 @@ import java.util.function.UnaryOperator;
 
 import org.apache.commons.lang3.Validate;
 import org.projectbarbel.histo.BarbelHistoCore.UpdateLogRecord;
+import org.projectbarbel.histo.event.Events;
+import org.projectbarbel.histo.event.HistoEvent;
 import org.projectbarbel.histo.functions.AdaptingKryoSerializer;
 import org.projectbarbel.histo.functions.BarbelPojoSerializer;
 import org.projectbarbel.histo.functions.CachingCGLibProxyingFunction;
@@ -110,24 +112,30 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     /**
-     * Post an event across the {@link BarbelHistoBuilder#synchronousEventBus} and
-     * {@link BarbelHistoBuilder#asynchronousEventBus}.
+     * Post an event into the {@link BarbelHistoBuilder#synchronousEventBus}. 
      * 
      * @param event the event posted
      */
-    public void postEvent(Object event) {
-        asynchronousEventBus.post(event);
+    public void postSynchronousEvent(HistoEvent event) {
         synchronousEventBus.post(event);
     }
 
+    /**
+     * Post an async event into the {@link BarbelHistoBuilder#asynchronousEventBus}. 
+     * 
+     * @param event the event posted
+     */
+    public void postAsynchronousEvent(HistoEvent event) {
+        asynchronousEventBus.post(event);
+    }
+    
     public AsyncEventBus getAsynchronousEventBus() {
         return asynchronousEventBus;
     }
 
     /**
      * Register custom Google Guava {@link AsyncEventBus} with {@link BarbelHisto}.
-     * See the package org.projectbarbel.histo.event for various events that clients
-     * can subscribe to.
+     * See {@link Events} for various events that clients can subscribe to.
      * 
      * @param asynchronousEventBus the {@link AsyncEventBus}
      * @return the builder again
@@ -144,8 +152,8 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 
     /**
      * Register custom Google Guava synchronous {@link EventBus} with
-     * {@link BarbelHisto}. See the package org.projectbarbel.histo.event for
-     * various events that clients can subscribe to.
+     * {@link BarbelHisto}. See {@link Events} for various events that clients can
+     * subscribe to.
      * 
      * @param synchronousEventBus the {@link AsyncEventBus}
      * @return the builder again
@@ -171,8 +179,8 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
      * 
      * Then add an instance of this class to the
      * {@link BarbelHistoBuilder#withSynchronousEventListener(Object)} method.
-     * {@link BarbelHisto} will publish events to the handler. For events
-     * available in {@link BarbelHisto} see org.projectbarbel.histo.event. <br>
+     * {@link BarbelHisto} will publish events to the handler. For events available
+     * in {@link BarbelHisto} see {@link Events}. <br>
      * <br>
      * Notice that synchronous event listeners should be fairly quick, cause they
      * are all executed in a row by the executing main thread. Use asynchronous
@@ -200,7 +208,6 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
      * }
      * </pre>
      * 
-     * <br>
      * Then add an instance of this class to the
      * {@link BarbelHistoBuilder#withAsynchronousEventBus(AsyncEventBus)} method.
      * {@link BarbelHisto} will the publich the event to the handler. For events

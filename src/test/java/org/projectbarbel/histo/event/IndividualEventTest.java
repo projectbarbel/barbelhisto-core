@@ -4,110 +4,85 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.List;
+import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.projectbarbel.histo.BarbelHistoBuilder;
+import org.projectbarbel.histo.BarbelHistoContext;
 import org.projectbarbel.histo.DocumentJournal;
 import org.projectbarbel.histo.DocumentJournal.ProcessingState;
-import org.projectbarbel.histo.model.DefaultDocument;
-import org.projectbarbel.histo.model.DefaultPojo;
+import org.projectbarbel.histo.event.Events.AcquireLockEvent;
+import org.projectbarbel.histo.event.Events.InitializeJournalEvent;
+import org.projectbarbel.histo.event.Events.InsertBitemporalEvent;
+import org.projectbarbel.histo.event.Events.ReleaseLockEvent;
+import org.projectbarbel.histo.event.Events.ReplaceBitemporalEvent;
+import org.projectbarbel.histo.event.Events.RetrieveDataEvent;
 
-import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
-import com.googlecode.cqengine.query.QueryFactory;
 
 public class IndividualEventTest {
 
 	private static List<Object> list = new ArrayList<Object>();
 
-	@Test
-	void testSynchronousInitialize() throws Exception {
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> createPojos() {
+        return Stream.of(
+                Arguments.of(Events.ACQUIRELOCK),
+                Arguments.of(Events.INITIALIZEJOURNAL),
+                Arguments.of(Events.INSERTBITEMPORAL),
+                Arguments.of(Events.RELEASELOCK),
+                Arguments.of(Events.RETRIEVEDATA),
+                Arguments.of(Events.REPLACEBITEMPORAL)
+                );
+    }
+    
+    @ParameterizedTest
+    @MethodSource("createPojos")
+	void testSynchronous(Events event) throws Exception {
 		list.clear();
-		EventBus bus = BarbelHistoBuilder.barbel().getSynchronousEventBus();
+		BarbelHistoContext context = BarbelHistoBuilder.barbel();
+		EventBus bus = context.getSynchronousEventBus();
 		bus.register(new EventTestListener());
-		bus.post(new InitializeJournalEvent(DocumentJournal.create(ProcessingState.INTERNAL,
-				BarbelHistoBuilder.barbel(), new ConcurrentIndexedCollection<>(), "someId")));
+		event.create().with(DocumentJournal.create(ProcessingState.INTERNAL,
+                BarbelHistoBuilder.barbel(), new ConcurrentIndexedCollection<>(), "someId")).postSynchronous(context);
+        waitForEventToComplete(1);
 		assertEquals(1, list.size());
 	}
 
-	@Test
-	void testAsynchronousInitialize() throws Exception {
-		list.clear();
-		AsyncEventBus bus = BarbelHistoBuilder.barbel().getAsynchronousEventBus();
-		EventTestListener listener = new EventTestListener();
-		bus.register(listener);
-		bus.post(new InitializeJournalEvent(DocumentJournal.create(ProcessingState.INTERNAL,
-				BarbelHistoBuilder.barbel(), new ConcurrentIndexedCollection<>(), "someId")));
-		waitForEventToComplete();
-		assertEquals(1, list.size());
-	}
-
-	@Test
-	void testSynchronousAcquire() throws Exception {
-		list.clear();
-		EventBus bus = BarbelHistoBuilder.barbel().getSynchronousEventBus();
-		bus.register(new EventTestListener());
-		bus.post(new AcquireLockEvent(DocumentJournal.create(ProcessingState.INTERNAL, BarbelHistoBuilder.barbel(),
-				new ConcurrentIndexedCollection<>(), "someId")));
-		assertEquals(1, list.size());
-	}
-
-	@Test
-	void testSynchronousAcquire_LockedAlready() throws Exception {
-		list.clear();
-		EventBus bus = BarbelHistoBuilder.barbel().getSynchronousEventBus();
-		bus.register(new ExceptionThrowingListener());
-		bus.post(new AcquireLockEvent(DocumentJournal.create(ProcessingState.INTERNAL, BarbelHistoBuilder.barbel(),
-				new ConcurrentIndexedCollection<>(), "someId")));
-		assertEquals(0, list.size());
-	}
-
-	@Test
-	void testSynchronousInsert() throws Exception {
-		list.clear();
-		EventBus bus = BarbelHistoBuilder.barbel().getSynchronousEventBus();
-		bus.register(new EventTestListener());
-		bus.post(new InsertBitemporalEvent(DocumentJournal.create(ProcessingState.INTERNAL, BarbelHistoBuilder.barbel(),
-				new ConcurrentIndexedCollection<>(), "someId"), Arrays.asList(new DefaultDocument())));
-		assertEquals(1, list.size());
-	}
-
-	@Test
-	void testSynchronousRelease() throws Exception {
-		list.clear();
-		EventBus bus = BarbelHistoBuilder.barbel().getSynchronousEventBus();
-		bus.register(new EventTestListener());
-		bus.post(new ReleaseLockEvent(DocumentJournal.create(ProcessingState.INTERNAL, BarbelHistoBuilder.barbel(),
-				new ConcurrentIndexedCollection<>(), "someId")));
-		assertEquals(1, list.size());
-	}
-
-	@Test
-	void testSynchronousReplace() throws Exception {
-		list.clear();
-		EventBus bus = BarbelHistoBuilder.barbel().getSynchronousEventBus();
-		bus.register(new EventTestListener());
-		bus.post(new ReplaceBitemporalEvent(
-				DocumentJournal.create(ProcessingState.INTERNAL, BarbelHistoBuilder.barbel(),
-						new ConcurrentIndexedCollection<>(), "someId"),
-				Arrays.asList(new DefaultDocument()), Arrays.asList(new DefaultDocument())));
-		assertEquals(1, list.size());
-	}
-
-	@Test
-	void testSynchronousRetrieve() throws Exception {
-		list.clear();
-		EventBus bus = BarbelHistoBuilder.barbel().getSynchronousEventBus();
-		bus.register(new EventTestListener());
-		bus.post(new RetrieveDataEvent(BarbelHistoBuilder.barbel(), QueryFactory.equal(DefaultPojo.DOCUMENT_ID, "string")));
-		assertEquals(1, list.size());
-	}
-	
+    @ParameterizedTest
+    @MethodSource("createPojos")
+    void testAsynchronous(Events event) throws Exception {
+        list.clear();
+        BarbelHistoContext context = BarbelHistoBuilder.barbel();
+        EventBus bus = context.getAsynchronousEventBus();
+        bus.register(new EventTestListener());
+        event.create().with(DocumentJournal.create(ProcessingState.INTERNAL,
+                BarbelHistoBuilder.barbel(), new ConcurrentIndexedCollection<>(), "someId")).postAsynchronous(context);
+        waitForEventToComplete(1);
+        assertEquals(1, list.size());
+    }
+    
+    @ParameterizedTest
+    @MethodSource("createPojos")
+    void testAbroad(Events event) throws Exception {
+        list.clear();
+        BarbelHistoContext context = BarbelHistoBuilder.barbel();
+        EventBus bus1 = context.getAsynchronousEventBus();
+        EventBus bus2 = context.getAsynchronousEventBus();
+        bus1.register(new EventTestListener());
+        bus2.register(new EventTestListener());
+        event.create().with(DocumentJournal.create(ProcessingState.INTERNAL,
+                BarbelHistoBuilder.barbel(), new ConcurrentIndexedCollection<>(), "someId")).postAbroad(context);
+        waitForEventToComplete(2);
+        assertEquals(2, list.size());
+    }
+    
 	public static class ExceptionThrowingListener {
 		@Subscribe
 		public void handle(AcquireLockEvent initialize) throws InterruptedException {
@@ -117,45 +92,45 @@ public class IndividualEventTest {
 
 	public static class EventTestListener {
 		@Subscribe
-		public void handle(RetrieveDataEvent initialize) throws InterruptedException {
-			assertNotNull(initialize.getContext());
+		public void handle(RetrieveDataEvent event) throws InterruptedException {
+			assertNotNull(event);
 			notifyCallerThread();
 		}
 
 		@Subscribe
-		public void handle(InitializeJournalEvent initialize) throws InterruptedException {
-			assertNotNull(initialize.getDocumentJournal());
+		public void handle(InitializeJournalEvent event) throws InterruptedException {
+            assertNotNull(event);
 			notifyCallerThread();
 		}
 		
 		@Subscribe
-		public void handle(InsertBitemporalEvent initialize) throws InterruptedException {
-			assertNotNull(initialize.getDocumentJournal());
+		public void handle(InsertBitemporalEvent event) throws InterruptedException {
+            assertNotNull(event);
 			notifyCallerThread();
 		}
 
 		@Subscribe
-		public void handle(ReleaseLockEvent initialize) throws InterruptedException {
-			assertNotNull(initialize.getDocumentJournal());
+		public void handle(ReleaseLockEvent event) throws InterruptedException {
+            assertNotNull(event);
 			notifyCallerThread();
 		}
 
 		@Subscribe
-		public void handle(AcquireLockEvent initialize) throws InterruptedException {
-			assertNotNull(initialize.getDocumentJournal());
+		public void handle(AcquireLockEvent event) throws InterruptedException {
+            assertNotNull(event);
 			notifyCallerThread();
 		}
 		
 		@Subscribe
-		public void handle(ReplaceBitemporalEvent initialize) throws InterruptedException {
-			assertNotNull(initialize.getDocumentJournal());
+		public void handle(ReplaceBitemporalEvent event) throws InterruptedException {
+            assertNotNull(event);
 			notifyCallerThread();
 		}
 	}
 
-	private static void waitForEventToComplete() throws InterruptedException {
+	private static void waitForEventToComplete(int syncpoint) throws InterruptedException {
 		synchronized (list) {
-			while (list.isEmpty()) {
+			while (list.size()<syncpoint) {
 				list.wait();
 			}
 		}
