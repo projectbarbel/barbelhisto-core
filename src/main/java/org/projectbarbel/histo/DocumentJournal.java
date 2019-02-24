@@ -33,7 +33,7 @@ import com.googlecode.cqengine.IndexedCollection;
 @SuppressWarnings("rawtypes")
 public final class DocumentJournal {
 
-    public static DocumentJournal SAMPLEJOURNAL = DocumentJournal.create(ProcessingState.EXTERNAL,
+    public static final DocumentJournal SAMPLEJOURNAL = DocumentJournal.create(ProcessingState.EXTERNAL,
             BarbelHistoBuilder.barbel(), new ConcurrentIndexedCollection<DefaultPojo>(), "unknown");
 
     public enum ProcessingState {
@@ -70,7 +70,8 @@ public final class DocumentJournal {
         this.journal = backbone;
         this.id = id;
         if (ProcessingState.INTERNAL.equals(processingState))
-            EventType.INITIALIZEJOURNAL.create().with(this).postAbroad(context);
+            EventType.INITIALIZEJOURNAL.create().with(DocumentJournal.create(ProcessingState.EXTERNAL, context, id))
+                    .postAbroad(context);
     }
 
     /**

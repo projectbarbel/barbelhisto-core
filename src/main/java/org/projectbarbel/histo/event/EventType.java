@@ -35,14 +35,18 @@ import lombok.extern.slf4j.Slf4j;
  * asynchronous and synchronous bus to catch these events.<br>
  * <br>
  * Different uses of {@link HistoEvent}s are possible. For instance clients may
- * want to:<ul>
+ * want to:
+ * <ul>
  * <li>synchronize data in external data stores with
- * {@link EventType#REPLACEBITEMPORAL} and {@link EventType#INSERTBITEMPORAL}</li>
+ * {@link EventType#REPLACEBITEMPORAL} and
+ * {@link EventType#INSERTBITEMPORAL}</li>
  * <li>lock journals stored in a database in complex distributed scenarios using
  * {@link EventType#ACQUIRELOCK} and {@link EventType#RELEASELOCK}</li>
  * <li>lazy load the backbone from external source depending on the data
- * requested by clients using the {@link EventType#RETRIEVEDATA} event</li> 
- * </ul><br><br>
+ * requested by clients using the {@link EventType#RETRIEVEDATA} event</li>
+ * </ul>
+ * <br>
+ * <br>
  * To make use of {@link EventType} create listener classed like so;
  * 
  * <pre>
@@ -54,7 +58,7 @@ import lombok.extern.slf4j.Slf4j;
  * }
  * </pre>
  * 
- * And the register these listeners with
+ * And then register the listeners with
  * {@link BarbelHistoBuilder#withSynchronousEventListener(Object)} or
  * {@link BarbelHistoBuilder#withAsynchronousEventListener(Object)}. <br>
  * <br>
@@ -62,9 +66,9 @@ import lombok.extern.slf4j.Slf4j;
  * processing fails. If the handler fails to handle the received synchronous
  * event, then call {@link HistoEvent#failed()}. This will stop execution and an
  * {@link HistoEventFailedException} will be thrown without continuing
- * processing. This might be useful, e.g. in situations where clients want to
- * avoid any inconsistency between the backbone collection and an external data
- * source targeted by an event. <br>
+ * processing. This could be useful in many situations, e.g. in situations where
+ * clients want to avoid any inconsistency between the backbone collection and
+ * an external data source targeted by an event. <br>
  * <br>
  * 
  * @author Niklas Schlimm
@@ -73,6 +77,7 @@ import lombok.extern.slf4j.Slf4j;
 public enum EventType implements PostableEvent {
     /**
      * Event fired when {@link BarbelHisto} acquires the lock for a journal update.
+     * Posted once for each save-operation at the beginning of the update-operation.
      */
     ACQUIRELOCK {
         @Override
@@ -84,7 +89,7 @@ public enum EventType implements PostableEvent {
     /**
      * Event fired when a journal is created on a
      * {@link BarbelHisto#save(Object, java.time.LocalDate, java.time.LocalDate)}
-     * operation.
+     * operation. Posted only once per {@link BarbelHisto} session and document id.
      */
     INITIALIZEJOURNAL {
 
@@ -96,7 +101,7 @@ public enum EventType implements PostableEvent {
     },
     /**
      * Event fired when {@link BarbelHisto} inserts new version data to a document
-     * journal for a given document ID.
+     * journal for a given document ID. Posted once for each save-operation.
      */
     INSERTBITEMPORAL {
 
@@ -108,7 +113,8 @@ public enum EventType implements PostableEvent {
     },
     /**
      * Event fired when {@link BarbelHisto} released a lock on a document journal
-     * for a given document ID in the operation.
+     * for a given document ID in the operation. Posted once for each
+     * save-operation at the end of the update-operation
      */
     RELEASELOCK {
 
@@ -119,7 +125,8 @@ public enum EventType implements PostableEvent {
 
     },
     /**
-     * Event fired when {@link BarbelHisto} inactivates versions.
+     * Event fired when {@link BarbelHisto} inactivates versions. Posted once for
+     * each save-operation.
      */
     REPLACEBITEMPORAL {
 
@@ -131,7 +138,8 @@ public enum EventType implements PostableEvent {
     },
     /**
      * Event fired when {@link BarbelHisto} performs a query on request of the
-     * client, e.g. in {@link BarbelHisto#retrieve(Query)}.
+     * client, e.g. in {@link BarbelHisto#retrieve(Query)}. Posted once for each
+     * retrieve-operation.
      */
     RETRIEVEDATA {
 
@@ -180,7 +188,8 @@ public enum EventType implements PostableEvent {
 
         @Override
         public Object getDocumentId() {
-            return Optional.ofNullable(((DocumentJournal) eventContext.get(DocumentJournal.class))).orElse(DocumentJournal.SAMPLEJOURNAL).getId();
+            return Optional.ofNullable(((DocumentJournal) eventContext.get(DocumentJournal.class)))
+                    .orElse(DocumentJournal.SAMPLEJOURNAL).getId();
         }
 
     }
@@ -193,7 +202,8 @@ public enum EventType implements PostableEvent {
 
         @Override
         public Object getDocumentId() {
-            return Optional.ofNullable(((DocumentJournal) eventContext.get(DocumentJournal.class))).orElse(DocumentJournal.SAMPLEJOURNAL).getId();
+            return Optional.ofNullable(((DocumentJournal) eventContext.get(DocumentJournal.class)))
+                    .orElse(DocumentJournal.SAMPLEJOURNAL).getId();
         }
 
     }
@@ -206,7 +216,8 @@ public enum EventType implements PostableEvent {
 
         @Override
         public Object getDocumentId() {
-            return Optional.ofNullable(((DocumentJournal) eventContext.get(DocumentJournal.class))).orElse(DocumentJournal.SAMPLEJOURNAL).getId();
+            return Optional.ofNullable(((DocumentJournal) eventContext.get(DocumentJournal.class)))
+                    .orElse(DocumentJournal.SAMPLEJOURNAL).getId();
         }
 
     }
@@ -219,7 +230,8 @@ public enum EventType implements PostableEvent {
 
         @Override
         public Object getDocumentId() {
-            return Optional.ofNullable(((DocumentJournal) eventContext.get(DocumentJournal.class))).orElse(DocumentJournal.SAMPLEJOURNAL).getId();
+            return Optional.ofNullable(((DocumentJournal) eventContext.get(DocumentJournal.class)))
+                    .orElse(DocumentJournal.SAMPLEJOURNAL).getId();
         }
 
     }
@@ -232,7 +244,8 @@ public enum EventType implements PostableEvent {
 
         @Override
         public Object getDocumentId() {
-            return Optional.ofNullable(((DocumentJournal) eventContext.get(DocumentJournal.class))).orElse(DocumentJournal.SAMPLEJOURNAL).getId();
+            return Optional.ofNullable(((DocumentJournal) eventContext.get(DocumentJournal.class)))
+                    .orElse(DocumentJournal.SAMPLEJOURNAL).getId();
         }
 
     }
