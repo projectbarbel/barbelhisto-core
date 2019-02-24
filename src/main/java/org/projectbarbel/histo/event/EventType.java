@@ -189,7 +189,7 @@ public enum EventType implements PostableEvent {
         @Override
         public Object getDocumentId() {
             return Optional.ofNullable(((DocumentJournal) eventContext.get(DocumentJournal.class)))
-                    .orElse(DocumentJournal.SAMPLEJOURNAL).getId();
+                    .orElse(DocumentJournal.EMPTYSAMPLE).getId();
         }
 
     }
@@ -203,7 +203,7 @@ public enum EventType implements PostableEvent {
         @Override
         public Object getDocumentId() {
             return Optional.ofNullable(((DocumentJournal) eventContext.get(DocumentJournal.class)))
-                    .orElse(DocumentJournal.SAMPLEJOURNAL).getId();
+                    .orElse(DocumentJournal.EMPTYSAMPLE).getId();
         }
 
     }
@@ -217,7 +217,7 @@ public enum EventType implements PostableEvent {
         @Override
         public Object getDocumentId() {
             return Optional.ofNullable(((DocumentJournal) eventContext.get(DocumentJournal.class)))
-                    .orElse(DocumentJournal.SAMPLEJOURNAL).getId();
+                    .orElse(DocumentJournal.EMPTYSAMPLE).getId();
         }
 
     }
@@ -231,7 +231,7 @@ public enum EventType implements PostableEvent {
         @Override
         public Object getDocumentId() {
             return Optional.ofNullable(((DocumentJournal) eventContext.get(DocumentJournal.class)))
-                    .orElse(DocumentJournal.SAMPLEJOURNAL).getId();
+                    .orElse(DocumentJournal.EMPTYSAMPLE).getId();
         }
 
     }
@@ -245,7 +245,7 @@ public enum EventType implements PostableEvent {
         @Override
         public Object getDocumentId() {
             return Optional.ofNullable(((DocumentJournal) eventContext.get(DocumentJournal.class)))
-                    .orElse(DocumentJournal.SAMPLEJOURNAL).getId();
+                    .orElse(DocumentJournal.EMPTYSAMPLE).getId();
         }
 
     }

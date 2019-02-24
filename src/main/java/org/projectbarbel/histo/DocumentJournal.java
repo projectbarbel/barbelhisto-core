@@ -5,8 +5,11 @@ import static com.googlecode.cqengine.query.QueryFactory.orderBy;
 import static com.googlecode.cqengine.query.QueryFactory.queryOptions;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -22,18 +25,18 @@ import com.googlecode.cqengine.IndexedCollection;
 
 /**
  * Document Journal abstraction to work on for internal processing in
- * {@link BarbelHistoCore} and for the client. When client work on instances of
+ * {@link BarbelHistoCore} and for the client. When clients work on instances of
  * {@link DocumentJournal} it is essential that {@link ProcessingState} is set
  * to {@link ProcessingState#EXTERNAL}. This ensures that clients only get
  * copies of journal objects.
  * 
- * @author niklasschlimm
+ * @author Niklas Schlimm
  *
  */
 @SuppressWarnings("rawtypes")
 public final class DocumentJournal {
 
-    public static final DocumentJournal SAMPLEJOURNAL = DocumentJournal.create(ProcessingState.EXTERNAL,
+    public static final DocumentJournal EMPTYSAMPLE = DocumentJournal.create(ProcessingState.EXTERNAL,
             BarbelHistoBuilder.barbel(), new ConcurrentIndexedCollection<DefaultPojo>(), "unknown");
 
     public enum ProcessingState {
@@ -57,10 +60,11 @@ public final class DocumentJournal {
 
     private final Object id;
     private final IndexedCollection journal;
-    private List<Bitemporal> lastInserts;
-    private AtomicBoolean locked = new AtomicBoolean();
+    private final List<Bitemporal> lastInserts = new ArrayList<>();
+    private final AtomicBoolean locked = new AtomicBoolean();
     private final BarbelHistoContext context;
     private final ProcessingState processingState;
+    private final Set<Replacement> lastReplacements = new HashSet<>();
 
     private DocumentJournal(ProcessingState processingState, BarbelHistoContext context, IndexedCollection backbone,
             Object id) {
@@ -113,12 +117,17 @@ public final class DocumentJournal {
                 .isBefore(v2.getBitemporalStamp().getEffectiveTime().from()) ? -1 : 1);
         newVersions.sort((v1, v2) -> v1.getBitemporalStamp().getEffectiveTime().until()
                 .isBefore(v2.getBitemporalStamp().getEffectiveTime().until()) ? -1 : 1);
-        this.lastInserts = newVersions;
-        EventType.INSERTBITEMPORAL.create().with(this).with("newVersions", newVersions).postAbroad(context);
-        journal.addAll(newVersions);
+        this.lastInserts.addAll(newVersions);
+        try {
+           EventType.INSERTBITEMPORAL.create().with(this).with("newVersions", newVersions).postAbroad(context);
+           journal.addAll(newVersions);
+        } catch (Exception e) {
+            // undo last replacements
+            lastReplacements.stream().forEach(r->replaceInternal(r.getObjectsAdded(), r.getObjectsRemoved()));
+            throw e;
+        }
     }
 
-    @SuppressWarnings("unchecked")
     public void replace(List<Bitemporal> objectsToRemove, List<Bitemporal> objectsToAdd) {
         Validate.isTrue(
                 objectsToRemove.stream().filter(d -> !d.getBitemporalStamp().getDocumentId().equals(id)).count() == 0,
@@ -128,6 +137,18 @@ public final class DocumentJournal {
                 "objects must match document id of journal");
         EventType.REPLACEBITEMPORAL.create().with(journal).with("objectsToRemove", objectsToRemove)
                 .with("objectToAdd", objectsToAdd).postAbroad(context);
+        try {
+            replaceInternal(objectsToRemove, objectsToAdd);
+            lastReplacements.add(new Replacement(objectsToRemove, objectsToAdd));
+         } catch (Exception e) {
+             // undo last inserts
+             lastInserts.stream().forEach(i->journal.remove(i));
+             throw e;
+         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void replaceInternal(List<Bitemporal> objectsToRemove, List<Bitemporal> objectsToAdd) {
         journal.update(objectsToRemove, objectsToAdd);
     }
 
@@ -186,12 +207,37 @@ public final class DocumentJournal {
         return new JournalReader(this);
     }
 
+    /**
+     * Acquire a lock on this journal.
+     * 
+     * @return true if lock acquired
+     */
     protected boolean lockAcquired() {
-        return locked.compareAndSet(false, true);
+        if (locked.compareAndSet(false, true)) {
+            lastInserts.clear();
+            lastReplacements.clear();
+            return true;
+        } else 
+            return false;
     }
 
     protected boolean unlock() {
         return locked.compareAndSet(true, false);
+    }
+
+    private static class Replacement {
+        private final List<Bitemporal> objectsRemoved;
+        private final List<Bitemporal> objectsAdded;
+        private Replacement(List<Bitemporal> objectsRemoved, List<Bitemporal> objectsAdded) {
+            this.objectsRemoved = objectsRemoved;
+            this.objectsAdded = objectsAdded;
+        }
+        public List<Bitemporal> getObjectsRemoved() {
+            return objectsRemoved;
+        }
+        public List<Bitemporal> getObjectsAdded() {
+            return objectsAdded;
+        }
     }
 
     public static class JournalReader {
