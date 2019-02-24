@@ -70,7 +70,7 @@ public final class DocumentJournal {
         this.journal = backbone;
         this.id = id;
         if (ProcessingState.INTERNAL.equals(processingState))
-            EventType.INITIALIZEJOURNAL.create().with(DocumentJournal.create(ProcessingState.EXTERNAL, context, id))
+            EventType.INITIALIZEJOURNAL.create().with(DocumentJournal.create(ProcessingState.EXTERNAL, context, backbone, id))
                     .postAbroad(context);
     }
 
