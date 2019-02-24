@@ -78,9 +78,6 @@ public final class DocumentJournal {
         this.context = context;
         this.journal = backbone;
         this.id = id;
-        if (ProcessingState.INTERNAL.equals(processingState))
-            EventType.INITIALIZEJOURNAL.create().with(DocumentJournal.create(ProcessingState.EXTERNAL, context, backbone, id))
-                    .postAbroad(context);
     }
 
     /**
@@ -115,6 +112,8 @@ public final class DocumentJournal {
 
     @SuppressWarnings("unchecked")
     public void insert(List<Bitemporal> newVersions) {
+        Validate.validState(ProcessingState.INTERNAL.equals(processingState),
+                "you're not allowed to use this operation");
         Validate.isTrue(
                 newVersions.stream().filter(d -> !d.getBitemporalStamp().getDocumentId().equals(id)).count() == 0,
                 "new versions must match document id of journal");
@@ -124,16 +123,19 @@ public final class DocumentJournal {
                 .isBefore(v2.getBitemporalStamp().getEffectiveTime().until()) ? -1 : 1);
         this.lastInserts.addAll(newVersions);
         try {
-           EventType.INSERTBITEMPORAL.create().with(this).with(InsertBitemporalEvent.NEWVERSIONS, newVersions).postAbroad(context);
-           journal.addAll(newVersions);
+            EventType.INSERTBITEMPORAL.create().with(this).with(InsertBitemporalEvent.NEWVERSIONS, newVersions)
+                    .postAbroad(context);
+            journal.addAll(newVersions);
         } catch (Exception e) {
             // undo last replacements
-            lastReplacements.stream().forEach(r->replaceInternal(r.getObjectsAdded(), r.getObjectsRemoved()));
+            lastReplacements.stream().forEach(r -> replaceInternal(r.getObjectsAdded(), r.getObjectsRemoved()));
             throw e;
         }
     }
 
     public void replace(List<Bitemporal> objectsToRemove, List<Bitemporal> objectsToAdd) {
+        Validate.validState(ProcessingState.INTERNAL.equals(processingState),
+                "you're not allowed to use this operation");
         Validate.isTrue(
                 objectsToRemove.stream().filter(d -> !d.getBitemporalStamp().getDocumentId().equals(id)).count() == 0,
                 "objects must match document id of journal");
@@ -145,11 +147,11 @@ public final class DocumentJournal {
         try {
             replaceInternal(objectsToRemove, objectsToAdd);
             lastReplacements.add(new Replacement(objectsToRemove, objectsToAdd));
-         } catch (Exception e) {
-             // undo last inserts
-             lastInserts.stream().forEach(i->journal.remove(i));
-             throw e;
-         }
+        } catch (Exception e) {
+            // undo last inserts
+            lastInserts.stream().forEach(i -> journal.remove(i));
+            throw e;
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -198,7 +200,7 @@ public final class DocumentJournal {
     protected Set<Replacement> getLastReplacements() {
         return lastReplacements;
     }
-    
+
     public Object getId() {
         return id;
     }
@@ -228,7 +230,7 @@ public final class DocumentJournal {
             lastUpdateCase = null;
             lastUpdateRequest = null;
             return true;
-        } else 
+        } else
             return false;
     }
 
@@ -241,6 +243,8 @@ public final class DocumentJournal {
     }
 
     public void setLastUpdateCase(JournalUpdateCase lastUpdateCase) {
+        Validate.validState(ProcessingState.INTERNAL.equals(processingState),
+                "you're not allowed to use this operation");
         this.lastUpdateCase = lastUpdateCase;
     }
 
@@ -255,13 +259,16 @@ public final class DocumentJournal {
     private static class Replacement {
         private final List<Bitemporal> objectsRemoved;
         private final List<Bitemporal> objectsAdded;
+
         private Replacement(List<Bitemporal> objectsRemoved, List<Bitemporal> objectsAdded) {
             this.objectsRemoved = objectsRemoved;
             this.objectsAdded = objectsAdded;
         }
+
         public List<Bitemporal> getObjectsRemoved() {
             return objectsRemoved;
         }
+
         public List<Bitemporal> getObjectsAdded() {
             return objectsAdded;
         }
