@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
 import org.projectbarbel.histo.event.EventType;
+import org.projectbarbel.histo.functions.EmbeddingJournalUpdateStrategy.JournalUpdateCase;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.DefaultPojo;
 import org.projectbarbel.histo.model.EffectivePeriod;
@@ -65,6 +66,8 @@ public final class DocumentJournal {
     private final BarbelHistoContext context;
     private final ProcessingState processingState;
     private final Set<Replacement> lastReplacements = new HashSet<>();
+    private JournalUpdateCase lastUpdateCase;
+    private Bitemporal lastUpdateRequest;
 
     private DocumentJournal(ProcessingState processingState, BarbelHistoContext context, IndexedCollection backbone,
             Object id) {
@@ -190,6 +193,10 @@ public final class DocumentJournal {
         return lastInserts;
     }
 
+    protected Set<Replacement> getLastReplacements() {
+        return lastReplacements;
+    }
+    
     public Object getId() {
         return id;
     }
@@ -216,6 +223,8 @@ public final class DocumentJournal {
         if (locked.compareAndSet(false, true)) {
             lastInserts.clear();
             lastReplacements.clear();
+            lastUpdateCase = null;
+            lastUpdateRequest = null;
             return true;
         } else 
             return false;
@@ -223,6 +232,22 @@ public final class DocumentJournal {
 
     protected boolean unlock() {
         return locked.compareAndSet(true, false);
+    }
+
+    public JournalUpdateCase getLastUpdateCase() {
+        return lastUpdateCase;
+    }
+
+    public void setLastUpdateCase(JournalUpdateCase lastUpdateCase) {
+        this.lastUpdateCase = lastUpdateCase;
+    }
+
+    public Bitemporal getLastUpdateRequest() {
+        return lastUpdateRequest;
+    }
+
+    protected void setLastUpdateRequest(Bitemporal lastUpdateRequest) {
+        this.lastUpdateRequest = lastUpdateRequest;
     }
 
     private static class Replacement {

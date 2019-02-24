@@ -11,7 +11,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-import org.projectbarbel.histo.BarbelHistoCore.UpdateLogRecord;
 import org.projectbarbel.histo.event.EventType.DefaultSubscriberExceptionHandler;
 import org.projectbarbel.histo.event.HistoEvent;
 import org.projectbarbel.histo.functions.AdaptingKryoSerializer;
@@ -50,10 +49,6 @@ public interface BarbelHistoContext {
 
     static Function<List<Bitemporal>, String> getDefaultPrettyPrinter() {
         return new TableJournalPrettyPrinter();
-    }
-
-    static IndexedCollection<UpdateLogRecord> getDefaultUpdateLog() {
-        return new ConcurrentIndexedCollection<>();
     }
 
     static BarbelMode getDefaultBarbelMode() {
@@ -124,8 +119,6 @@ public interface BarbelHistoContext {
     Function<BarbelHistoContext, BiConsumer<DocumentJournal, Bitemporal>> getJournalUpdateStrategyProducer();
 
     BarbelMode getMode();
-
-    IndexedCollection<UpdateLogRecord> getUpdateLog();
 
     Function<List<Bitemporal>, String> getPrettyPrinter();
 

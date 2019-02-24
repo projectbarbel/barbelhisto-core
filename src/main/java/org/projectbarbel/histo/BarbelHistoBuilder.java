@@ -13,7 +13,6 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 import org.apache.commons.lang3.Validate;
-import org.projectbarbel.histo.BarbelHistoCore.UpdateLogRecord;
 import org.projectbarbel.histo.event.EventType;
 import org.projectbarbel.histo.event.HistoEvent;
 import org.projectbarbel.histo.functions.AdaptingKryoSerializer;
@@ -78,7 +77,6 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     private String user = BarbelHistoContext.getDefaultUser();
     private Map<Object, DocumentJournal> journalStore = new ConcurrentHashMap<>();
     private Gson gson = BarbelHistoContext.getDefaultGson();
-    private IndexedCollection<UpdateLogRecord> updateLog = BarbelHistoContext.getDefaultUpdateLog();
     private Function<List<Bitemporal>, String> prettyPrinter = BarbelHistoContext.getDefaultPrettyPrinter();
     private Map<String, Object> contextOptions = new HashMap<>();
     private EventBus synchronousEventBus = BarbelHistoContext.getDefaultSynchronousEventBus();
@@ -253,25 +251,6 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     public BarbelHistoBuilder withPrettyPrinter(Function<List<Bitemporal>, String> prettyPrinter) {
         Validate.isTrue(prettyPrinter != null, NONULLS);
         this.prettyPrinter = prettyPrinter;
-        return this;
-    }
-
-    @Override
-    public IndexedCollection<UpdateLogRecord> getUpdateLog() {
-        return updateLog;
-    }
-
-    /**
-     * Register a custom update log collection, maybe persistent. See
-     * {@link Persistence} and its implementation {@link DiskPersistence} and
-     * {@link OffHeapPersistence} for options.
-     * 
-     * @param updateLog the custom log
-     * @return the builder again
-     */
-    public BarbelHistoBuilder withUpdateLog(IndexedCollection<UpdateLogRecord> updateLog) {
-        Validate.isTrue(updateLog != null, NONULLS);
-        this.updateLog = updateLog;
         return this;
     }
 

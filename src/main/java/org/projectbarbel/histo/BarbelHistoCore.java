@@ -1,14 +1,7 @@
 package org.projectbarbel.histo;
 
-import static com.googlecode.cqengine.query.QueryFactory.descending;
-import static com.googlecode.cqengine.query.QueryFactory.equal;
-import static com.googlecode.cqengine.query.QueryFactory.orderBy;
-import static com.googlecode.cqengine.query.QueryFactory.queryOptions;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.time.chrono.ChronoZonedDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
@@ -25,17 +18,13 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.projectbarbel.histo.DocumentJournal.ProcessingState;
 import org.projectbarbel.histo.event.EventType;
-import org.projectbarbel.histo.functions.EmbeddingJournalUpdateStrategy.JournalUpdateCase;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.EffectivePeriod;
 import org.projectbarbel.histo.model.RecordPeriod;
-import org.projectbarbel.histo.model.UpdateCaseAware;
 
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
-import com.googlecode.cqengine.attribute.Attribute;
-import com.googlecode.cqengine.attribute.SimpleAttribute;
 import com.googlecode.cqengine.query.Query;
 import com.googlecode.cqengine.query.option.QueryOptions;
 import com.googlecode.cqengine.resultset.ResultSet;
@@ -59,7 +48,6 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     private final BarbelHistoContext context;
     private final IndexedCollection<T> backbone;
     private final Map<Object, DocumentJournal> journals;
-    private final IndexedCollection<UpdateLogRecord> updateLog;
     private static final Map<Object, Object> validTypes = new HashMap<>();
     private final BarbelMode mode;
 
@@ -71,7 +59,6 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
         this.backbone = Objects.requireNonNull((IndexedCollection<T>) context.getBackboneSupplier().get());
         ((BarbelHistoBuilder) context).setBackbone(backbone);
         this.journals = Objects.requireNonNull(context.getJournalStore());
-        this.updateLog = Objects.requireNonNull(context.getUpdateLog());
         CONSTRUCTION_CONTEXT.remove();
     }
 
@@ -95,12 +82,8 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
                         .apply(context);
                 try {
                     EventType.ACQUIRELOCK.create().with(journal).postSynchronous(context);
+                    journal.setLastUpdateRequest(newManagedBitemporal);
                     updateStrategy.accept(journal, newManagedBitemporal);
-                    updateLog.add(new UpdateLogRecord(journal.getLastInsert(), newManagedBitemporal,
-                            updateStrategy instanceof UpdateCaseAware
-                                    ? ((UpdateCaseAware) updateStrategy).getActualCase()
-                                    : null,
-                            context.getUser()));
                     return (T) mode.copyManagedBitemporal(context, newManagedBitemporal);
                 } finally {
                     EventType.RELEASELOCK.create().with(journal).postSynchronous(context);
@@ -145,50 +128,9 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
         return context;
     }
 
-    public UpdateLogRecord getLastUpdate() {
-        return updateLog
-                .retrieve(equal(UpdateLogRecord.USER_ATTRIBUTE, context.getUser()),
-                        queryOptions(orderBy(descending(UpdateLogRecord.TIMESTAMP))))
-                .stream().findFirst()
-                .orElseThrow(() -> new IllegalStateException("not update performed by this user yet"));
-    }
-
     public DocumentJournal getDocumentJournal(Object id) {
         Validate.isTrue(id != null, NOTNULL);
         return journals.get(id);
-    }
-
-    public static class UpdateLogRecord {
-
-        public static final Attribute<UpdateLogRecord, String> USER_ATTRIBUTE = new SimpleAttribute<UpdateLogRecord, String>(
-                "user") {
-            public String getValue(UpdateLogRecord logEntry, QueryOptions queryOptions) {
-                return logEntry.user;
-            }
-        };
-
-        public static final Attribute<UpdateLogRecord, ChronoZonedDateTime<LocalDate>> TIMESTAMP = new SimpleAttribute<UpdateLogRecord, ChronoZonedDateTime<LocalDate>>(
-                "timestamp") {
-            public ZonedDateTime getValue(UpdateLogRecord logEntry, QueryOptions queryOptions) {
-                return logEntry.createdAt;
-            }
-        };
-
-        public final ZonedDateTime createdAt;
-        public final List<Bitemporal> newVersions;
-        public final Bitemporal requestedUpdate;
-        public final JournalUpdateCase updateCase;
-        public final String user;
-
-        public UpdateLogRecord(List<Bitemporal> newVersions, Bitemporal requestedUpdate, JournalUpdateCase updateCase,
-                String user) {
-            super();
-            this.newVersions = newVersions;
-            this.requestedUpdate = requestedUpdate;
-            this.updateCase = updateCase;
-            this.createdAt = ZonedDateTime.now();
-            this.user = user;
-        }
     }
 
     @Override
@@ -214,10 +156,6 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
             backbone.removeAll(backbone.retrieve(BarbelQueries.all(id)).stream().collect(Collectors.toList()));
         }
         return collection;
-    }
-
-    public Collection<UpdateLogRecord> getUpdateLog() {
-        return updateLog;
     }
 
     @Override

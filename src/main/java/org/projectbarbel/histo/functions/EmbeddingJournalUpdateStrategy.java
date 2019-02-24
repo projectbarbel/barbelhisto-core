@@ -54,6 +54,7 @@ public class EmbeddingJournalUpdateStrategy implements BiConsumer<DocumentJourna
                 .effectiveBetween(update.getBitemporalStamp().getEffectiveTime());
         actualCase = JournalUpdateCase.validate(interruptedLeftVersion.isPresent(), interruptedRightVersion.isPresent(),
                 interruptedLeftVersion.equals(interruptedRightVersion), !betweenVersions.isEmpty());
+        journal.setLastUpdateCase(actualCase);
         newVersions.add(update);
         interruptedLeftVersion.ifPresent(d -> processInterruptedLeftVersion(update, d));
         interruptedRightVersion.ifPresent(d -> processInterruptedRightVersion(update, d));

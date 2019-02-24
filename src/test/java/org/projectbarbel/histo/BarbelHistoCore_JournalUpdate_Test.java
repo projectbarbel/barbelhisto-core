@@ -60,76 +60,79 @@ public class BarbelHistoCore_JournalUpdate_Test {
     @SuppressWarnings("unused")
     private static Stream<Arguments> createJournalUpdateCases() {
 
-                //     1.1.2016       1.1.2017           1.1.2018           1.1.2019
-                //     |------------------|------------------|------------------|----------> Infinite
-                //     10:00 Uhr (now)
+        // 1.1.2016 1.1.2017 1.1.2018 1.1.2019
+        // |------------------|------------------|------------------|---------->
+        // Infinite
+        // 10:00 Uhr (now)
 
         return Stream.of(
-            //A        |------------------|------------------|------------------|----------> Infinite
-            //U|---------|
-                Arguments.of(LocalDate.of(2015, 7, 1), LocalDate.of(2016, 7, 1), 
-                        JournalUpdateCase.PREOVERLAPPING, 
-                        2, 
-                        Arrays.asList(LocalDate.of(2015, 7, 1), LocalDate.of(2016, 7, 1), LocalDate.of(2016, 7, 1), LocalDate.of(2017, 1, 1)),
-                        1, 
-                        Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1))),
-                
-                //A    |------------------|------------------|------------------|----------> Infinite
-                //U                                                                  |------------------------------------>
-                Arguments.of(LocalDate.of(2019, 1, 25), LocalDate.MAX, 
-                        JournalUpdateCase.POSTOVERLAPPING,
-                        2, 
-                        Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 25), LocalDate.of(2019, 1, 25), LocalDate.MAX),
-                        1, 
-                        Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.MAX)),
-                //A    |------------------|------------------|------------------|----------> Infinite
-                //U                                                   |------|
-                Arguments.of(LocalDate.of(2018, 7, 1), LocalDate.of(2018, 10, 1), 
-                        JournalUpdateCase.EMBEDDEDINTERVAL,
-                        3, 
-                        Arrays.asList(LocalDate.of(2018, 1, 1), LocalDate.of(2018, 7, 1), LocalDate.of(2018, 7, 1), LocalDate.of(2018, 10, 1), LocalDate.of(2018, 10, 1), LocalDate.of(2019, 1, 1)),
-                        1, 
-                        Arrays.asList(LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))),
-                //A    |------------------|------------------|------------------|----------> Infinite
-                //U                                      |--------|
-                Arguments.of(LocalDate.of(2017, 10, 1), LocalDate.of(2018, 3, 1), 
-                        JournalUpdateCase.EMBEDDEDOVERLAP,
-                        3, 
-                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2017, 10, 1), LocalDate.of(2017, 10, 1), LocalDate.of(2018, 3, 1), LocalDate.of(2018, 3, 1), LocalDate.of(2019, 1, 1)),
-                        2, 
-                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))),
-                //A    |------------------|------------------|------------------|----------> Infinite
-                //U  |--------------------------------------------------------------------->
-                Arguments.of(LocalDate.of(2015, 10, 1), LocalDate.MAX, 
-                        JournalUpdateCase.OVERLAY,
-                        1, 
-                        Arrays.asList(LocalDate.of(2015, 10, 1), LocalDate.MAX),
-                        4, 
-                        Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1),LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 1), LocalDate.MAX)),
-                //A    |------------------|------------------|------------------|----------> Infinite
-                //U           |------------------------------------|
-                Arguments.of(LocalDate.of(2016, 7, 1), LocalDate.of(2018, 7, 1), 
-                        JournalUpdateCase.EMBEDDEDOVERLAY,
-                        3, 
-                        Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2016, 7, 1), LocalDate.of(2016, 7, 1), LocalDate.of(2018, 7, 1), LocalDate.of(2018, 7, 1), LocalDate.of(2019, 1, 1)),
-                        3,
-                        Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))),
-                //A    |------------------|------------------|------------------|----------> Infinite
-                //U           --------------------------------------------|---------------->
-                Arguments.of(LocalDate.of(2018, 7, 1), LocalDate.MAX, 
-                        JournalUpdateCase.POSTOVERLAPPING_OVERLAY,
-                        2, 
-                        Arrays.asList(LocalDate.of(2018, 1, 1), LocalDate.of(2018, 7, 1), LocalDate.of(2018, 7, 1), LocalDate.MAX),
+                // A |------------------|------------------|------------------|---------->
+                // Infinite
+                // U|---------|
+                Arguments.of(LocalDate.of(2015, 7, 1), LocalDate.of(2016, 7, 1), JournalUpdateCase.PREOVERLAPPING, 2,
+                        Arrays.asList(LocalDate.of(2015, 7, 1), LocalDate.of(2016, 7, 1), LocalDate.of(2016, 7, 1),
+                                LocalDate.of(2017, 1, 1)),
+                        1, Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1))),
+
+                // A |------------------|------------------|------------------|---------->
+                // Infinite
+                // U |------------------------------------>
+                Arguments.of(LocalDate.of(2019, 1, 25), LocalDate.MAX, JournalUpdateCase.POSTOVERLAPPING, 2,
+                        Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 25), LocalDate.of(2019, 1, 25),
+                                LocalDate.MAX),
+                        1, Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.MAX)),
+                // A |------------------|------------------|------------------|---------->
+                // Infinite
+                // U |------|
+                Arguments.of(LocalDate.of(2018, 7, 1), LocalDate.of(2018, 10, 1), JournalUpdateCase.EMBEDDEDINTERVAL, 3,
+                        Arrays.asList(LocalDate.of(2018, 1, 1), LocalDate.of(2018, 7, 1), LocalDate.of(2018, 7, 1),
+                                LocalDate.of(2018, 10, 1), LocalDate.of(2018, 10, 1), LocalDate.of(2019, 1, 1)),
+                        1, Arrays.asList(LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))),
+                // A |------------------|------------------|------------------|---------->
+                // Infinite
+                // U |--------|
+                Arguments.of(LocalDate.of(2017, 10, 1), LocalDate.of(2018, 3, 1), JournalUpdateCase.EMBEDDEDOVERLAP, 3,
+                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2017, 10, 1), LocalDate.of(2017, 10, 1),
+                                LocalDate.of(2018, 3, 1), LocalDate.of(2018, 3, 1), LocalDate.of(2019, 1, 1)),
                         2,
-                        Arrays.asList(LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 1), LocalDate.MAX)),
-                //A    |------------------|------------------|------------------|----------> Infinite
-                //U  |------------------------------|
-                Arguments.of(LocalDate.of(2015, 10, 1), LocalDate.of(2017, 3, 1), 
-                        JournalUpdateCase.PREOVERLAPPING_OVERLAY,
-                        2, 
-                        Arrays.asList(LocalDate.of(2015, 10, 1), LocalDate.of(2017, 3, 1), LocalDate.of(2017, 3, 1), LocalDate.of(2018, 1, 1),LocalDate.of(2018, 3, 1), LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 1), LocalDate.MAX),
-                        2, 
-                        Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1))));
+                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2018, 1, 1),
+                                LocalDate.of(2019, 1, 1))),
+                // A |------------------|------------------|------------------|---------->
+                // Infinite
+                // U |--------------------------------------------------------------------->
+                Arguments.of(LocalDate.of(2015, 10, 1), LocalDate.MAX, JournalUpdateCase.OVERLAY, 1,
+                        Arrays.asList(LocalDate.of(2015, 10, 1), LocalDate.MAX), 4,
+                        Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2017, 1, 1),
+                                LocalDate.of(2018, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1),
+                                LocalDate.of(2019, 1, 1), LocalDate.MAX)),
+                // A |------------------|------------------|------------------|---------->
+                // Infinite
+                // U |------------------------------------|
+                Arguments.of(LocalDate.of(2016, 7, 1), LocalDate.of(2018, 7, 1), JournalUpdateCase.EMBEDDEDOVERLAY, 3,
+                        Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2016, 7, 1), LocalDate.of(2016, 7, 1),
+                                LocalDate.of(2018, 7, 1), LocalDate.of(2018, 7, 1), LocalDate.of(2019, 1, 1)),
+                        3,
+                        Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2017, 1, 1),
+                                LocalDate.of(2018, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))),
+                // A |------------------|------------------|------------------|---------->
+                // Infinite
+                // U --------------------------------------------|---------------->
+                Arguments.of(LocalDate.of(2018, 7, 1), LocalDate.MAX, JournalUpdateCase.POSTOVERLAPPING_OVERLAY, 2,
+                        Arrays.asList(LocalDate.of(2018, 1, 1), LocalDate.of(2018, 7, 1), LocalDate.of(2018, 7, 1),
+                                LocalDate.MAX),
+                        2,
+                        Arrays.asList(LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 1),
+                                LocalDate.MAX)),
+                // A |------------------|------------------|------------------|---------->
+                // Infinite
+                // U |------------------------------|
+                Arguments.of(LocalDate.of(2015, 10, 1), LocalDate.of(2017, 3, 1),
+                        JournalUpdateCase.PREOVERLAPPING_OVERLAY, 2,
+                        Arrays.asList(LocalDate.of(2015, 10, 1), LocalDate.of(2017, 3, 1), LocalDate.of(2017, 3, 1),
+                                LocalDate.of(2018, 1, 1), LocalDate.of(2018, 3, 1), LocalDate.of(2019, 1, 1),
+                                LocalDate.of(2019, 1, 1), LocalDate.MAX),
+                        2, Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2017, 1, 1),
+                                LocalDate.of(2018, 1, 1))));
 
     }
     // @formatter:on
@@ -137,80 +140,74 @@ public class BarbelHistoCore_JournalUpdate_Test {
     // @formatter:off
     @SuppressWarnings("unused")
     private static Stream<Arguments> createJournalEdgeCases() {
-        
-                //  1.1.2016           1.1.2017           1.1.2018           1.1.2019
-                     //|------------------|------------------|------------------|----------> Infinite
-        
+
+        // 1.1.2016 1.1.2017 1.1.2018 1.1.2019
+        // |------------------|------------------|------------------|---------->
+        // Infinite
+
         return Stream.of(
-            //A        |------------------|------------------|------------------|----------> Infinite
-            //U|-------|
-                Arguments.of(LocalDate.of(2015, 7, 1), LocalDate.of(2016, 1, 1), 
-                        JournalUpdateCase.STRAIGHTINSERT, 
-                        1, 
-                        Arrays.asList(LocalDate.of(2015, 7, 1), LocalDate.of(2016, 1, 1)),
-                        0, 
-                        Arrays.asList()),
-                
-                //A    |------------------|------------------|------------------|-----------------------------> Infinite
-                //U                                                                  |-------------------|
-                Arguments.of(LocalDate.of(2019, 7, 1), LocalDate.of(2019, 8, 1), 
-                        JournalUpdateCase.EMBEDDEDINTERVAL,
-                        3, 
-                        Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 7, 1), LocalDate.of(2019, 7, 1), LocalDate.of(2019, 8, 1), LocalDate.of(2019, 8, 1), LocalDate.MAX),
-                        1, 
-                        Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.MAX)),
-                //A    |------------------|------------------|------------------|----------> Infinite
-                //U                       |------------------|
-                Arguments.of(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), 
-                        JournalUpdateCase.EMBEDDEDINTERVAL,
-                        1, 
-                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1)),
-                        1, 
+                // A |------------------|------------------|------------------|---------->
+                // Infinite
+                // U|-------|
+                Arguments.of(LocalDate.of(2015, 7, 1), LocalDate.of(2016, 1, 1), JournalUpdateCase.STRAIGHTINSERT, 1,
+                        Arrays.asList(LocalDate.of(2015, 7, 1), LocalDate.of(2016, 1, 1)), 0, Arrays.asList()),
+
+                // A
+                // |------------------|------------------|------------------|----------------------------->
+                // Infinite
+                // U |-------------------|
+                Arguments.of(LocalDate.of(2019, 7, 1), LocalDate.of(2019, 8, 1), JournalUpdateCase.EMBEDDEDINTERVAL, 3,
+                        Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 7, 1), LocalDate.of(2019, 7, 1),
+                                LocalDate.of(2019, 8, 1), LocalDate.of(2019, 8, 1), LocalDate.MAX),
+                        1, Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.MAX)),
+                // A |------------------|------------------|------------------|---------->
+                // Infinite
+                // U |------------------|
+                Arguments.of(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), JournalUpdateCase.EMBEDDEDINTERVAL, 1,
+                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1)), 1,
                         Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1))),
-                //A    |------------------|------------------|------------------|----------> Infinite
-                //U                       |--------------|
-                Arguments.of(LocalDate.of(2017, 1, 1), LocalDate.of(2017, 10, 1), 
-                        JournalUpdateCase.EMBEDDEDINTERVAL,
-                        2, 
-                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2017, 10, 1), LocalDate.of(2017, 10, 1), LocalDate.of(2018, 1, 1)),
-                        1, 
-                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1))),
-                //A    |------------------|------------------|------------------|----------> Infinite
-                //U                       |-------------------------------------|
-                Arguments.of(LocalDate.of(2017, 1, 1), LocalDate.of(2019, 1, 1), 
-                        JournalUpdateCase.EMBEDDEDOVERLAY,
-                        1, 
-                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2019, 1, 1)),
-                        2, 
-                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))),
-                //A    |------------------|------------------|------------------|------------> Infinite
-                //U    |---------------------------------------------------------------------> Infinite
-                Arguments.of(LocalDate.of(2016, 1, 1), LocalDate.MAX, 
-                        JournalUpdateCase.POSTOVERLAPPING_OVERLAY,
-                        1, 
-                        Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.MAX),
-                        4, 
-                        Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1),LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 1), LocalDate.MAX)));
+                // A |------------------|------------------|------------------|---------->
+                // Infinite
+                // U |--------------|
+                Arguments.of(LocalDate.of(2017, 1, 1), LocalDate.of(2017, 10, 1), JournalUpdateCase.EMBEDDEDINTERVAL, 2,
+                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2017, 10, 1), LocalDate.of(2017, 10, 1),
+                                LocalDate.of(2018, 1, 1)),
+                        1, Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1))),
+                // A |------------------|------------------|------------------|---------->
+                // Infinite
+                // U |-------------------------------------|
+                Arguments.of(LocalDate.of(2017, 1, 1), LocalDate.of(2019, 1, 1), JournalUpdateCase.EMBEDDEDOVERLAY, 1,
+                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2019, 1, 1)), 2,
+                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2018, 1, 1),
+                                LocalDate.of(2019, 1, 1))),
+                // A |------------------|------------------|------------------|------------>
+                // Infinite
+                // U |--------------------------------------------------------------------->
+                // Infinite
+                Arguments.of(LocalDate.of(2016, 1, 1), LocalDate.MAX, JournalUpdateCase.POSTOVERLAPPING_OVERLAY, 1,
+                        Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.MAX), 4,
+                        Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2017, 1, 1),
+                                LocalDate.of(2018, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1),
+                                LocalDate.of(2019, 1, 1), LocalDate.MAX)));
     }
 
     // @formatter:on
     // @formatter:off
     @SuppressWarnings("unused")
     private static Stream<Arguments> createJournalDebugCases() {
-        
-        //  1.1.2016           1.1.2017           1.1.2018           1.1.2019
-        //|------------------|------------------|------------------|----------> Infinite
-        
+
+        // 1.1.2016 1.1.2017 1.1.2018 1.1.2019
+        // |------------------|------------------|------------------|---------->
+        // Infinite
+
         return Stream.of(
-                //A    |------------------|------------------|------------------|----------> Infinite
-                //U                       |------------------|
-                Arguments.of(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), 
-                        JournalUpdateCase.EMBEDDEDINTERVAL,
-                        1, 
-                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1)),
-                        1, 
+                // A |------------------|------------------|------------------|---------->
+                // Infinite
+                // U |------------------|
+                Arguments.of(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), JournalUpdateCase.EMBEDDEDINTERVAL, 1,
+                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1)), 1,
                         Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1))));
-        
+
     }
     // @formatter:on
 
@@ -232,10 +229,9 @@ public class BarbelHistoCore_JournalUpdate_Test {
         journal = ((BarbelHistoCore<DefaultPojo>) core).getDocumentJournal("someId");
         if (updateCase.equals(JournalUpdateCase.EMBEDDEDINTERVAL))
             System.out.println(core.prettyPrintJournal("someId"));
-        assertEquals(countOfNewVersions, ((BarbelHistoCore<DefaultPojo>) core).getLastUpdate().newVersions.size());
-        assertEquals(updateCase, ((BarbelHistoCore<DefaultPojo>) core).getLastUpdate().updateCase);
-        assertNewVersions(((BarbelHistoCore<DefaultPojo>) core).getLastUpdate().requestedUpdate,
-                ((BarbelHistoCore<DefaultPojo>) core).getLastUpdate().newVersions, activeEffective);
+        assertEquals(countOfNewVersions, journal.getLastInsert().size());
+        assertEquals(updateCase, journal.getLastUpdateCase());
+        assertNewVersions(journal.getLastUpdateRequest(), journal.getLastInsert(), activeEffective);
         assertInactivatedVersions(inactiveCount, inactiveEffective);
     }
 
@@ -255,10 +251,9 @@ public class BarbelHistoCore_JournalUpdate_Test {
         update.setId("someId");
         core.save(update, updateFrom, updateUntil);
         journal = ((BarbelHistoCore<DefaultDocument>) core).getDocumentJournal("someId");
-        assertEquals(countOfNewVersions, ((BarbelHistoCore<DefaultDocument>) core).getLastUpdate().newVersions.size());
-        assertEquals(updateCase, ((BarbelHistoCore<DefaultDocument>) core).getLastUpdate().updateCase);
-        assertNewVersions(((BarbelHistoCore<DefaultDocument>) core).getLastUpdate().requestedUpdate,
-                ((BarbelHistoCore<DefaultDocument>) core).getLastUpdate().newVersions, activeEffective);
+        assertEquals(countOfNewVersions, journal.getLastInsert().size());
+        assertEquals(updateCase, journal.getLastUpdateCase());
+        assertNewVersions(journal.getLastUpdateRequest(), journal.getLastInsert(), activeEffective);
         assertInactivatedVersions(inactiveCount, inactiveEffective);
     }
 
@@ -312,10 +307,9 @@ public class BarbelHistoCore_JournalUpdate_Test {
             object = (T) EnhancedRandom.random(((BarbelProxy) template).getTarget().getClass());
         core.save(object, updateFrom, updateUntil);
         journal = ((BarbelHistoCore<T>) core).getDocumentJournal("someId");
-        assertEquals(countOfNewVersions, ((BarbelHistoCore<T>) core).getLastUpdate().newVersions.size());
-        assertEquals(updateCase, ((BarbelHistoCore<T>) core).getLastUpdate().updateCase);
-        assertNewVersions(((BarbelHistoCore<T>) core).getLastUpdate().requestedUpdate,
-                ((BarbelHistoCore<T>) core).getLastUpdate().newVersions, activeEffective);
+        assertEquals(countOfNewVersions, journal.getLastInsert().size());
+        assertEquals(updateCase, journal.getLastUpdateCase());
+        assertNewVersions(journal.getLastUpdateRequest(), journal.getLastInsert(), activeEffective);
         assertInactivatedVersions(inactiveCount, inactiveEffective);
     }
 
