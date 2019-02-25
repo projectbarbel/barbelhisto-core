@@ -24,8 +24,8 @@ The library implements Martin Fowlers Temporal Pattern that can be found here: h
 - build-in thread safety by minimizing mutability and object locking
 - pretty print function to learn about bitemporal data storage
 
-# Get started
-Get a version on [Maven Central](https://search.maven.org/search?q=barbelhisto)
+# Get a version of BarbelHisto
+Get a version on [Maven Central](https://search.maven.org/search?q=barbelhisto).
 
 Download the [actual snapshot releases](https://github.com/projectbarbel/barbelhisto-core/releases). 
 
