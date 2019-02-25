@@ -31,7 +31,7 @@ public interface HistoEvent {
         context.postAsynchronousEvent(this);
     }
 
-    default void postAbroad(BarbelHistoContext context) {
+    default void postBothWay(BarbelHistoContext context) {
         postAsynchronous(context);
         postSynchronous(context);
     }

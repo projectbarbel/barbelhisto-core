@@ -22,17 +22,17 @@ import lombok.extern.slf4j.Slf4j;
  * follows:
  * 
  * <pre>
- * 1. {@link EventType#BARBELINITIALIZED} when {@link BarbelHisto} instance is created, only once per {@link BarbelHisto} session, abroad post
- * 2. {@link EventType#INITIALIZEJOURNAL} when journal is created, only once, abroad post
+ * 1. {@link EventType#BARBELINITIALIZED} when {@link BarbelHisto} instance is created, only once per {@link BarbelHisto} session, both way
+ * 2. {@link EventType#INITIALIZEJOURNAL} when journal is created, only once, both way
  * 3. {@link EventType#ACQUIRELOCK}, when {@link BarbelHisto} starts updating a document journal, synchronous post
- * 4. {@link EventType#REPLACEBITEMPORAL}, when versions are inactivated, abroad post
- * 5. {@link EventType#INSERTBITEMPORAL}, when new versions are inserted, abroad post
+ * 4. {@link EventType#REPLACEBITEMPORAL}, when versions are inactivated, both way
+ * 5. {@link EventType#INSERTBITEMPORAL}, when new versions are inserted, both way
  * 6. {@link EventType#RELEASELOCK}, when {@link BarbelHisto} finishes the updating cycle, synchronous post
  * </pre>
  * 
  * The {@link EventType#RETRIEVEDATA} event is posted each time when clients retrieve data from
  * {@link BarbelHisto}. <br><br>
- * "Abroad post" means that the event is published
+ * "Both way" means that the event is published
  * synchronously and asynchronously, i.e. clients can register listeners in
  * asynchronous and synchronous bus to catch these events.<br>
  * <br>

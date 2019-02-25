@@ -125,7 +125,7 @@ public final class DocumentJournal {
         this.lastInserts.addAll(newVersions);
         try {
             EventType.INSERTBITEMPORAL.create().with(this)
-                    .with(InsertBitemporalEvent.NEWVERSIONS, copyList(newVersions)).postAbroad(context);
+                    .with(InsertBitemporalEvent.NEWVERSIONS, copyList(newVersions)).postBothWay(context);
             journal.addAll(newVersions);
         } catch (Exception e) {
             // undo last replacements
@@ -146,7 +146,7 @@ public final class DocumentJournal {
         try {
             EventType.REPLACEBITEMPORAL.create().with(journal)
                     .with(ReplaceBitemporalEvent.OBJECTS_REMOVED, copyList(objectsToRemove))
-                    .with(ReplaceBitemporalEvent.OBJECTS_ADDED, copyList(objectsToAdd)).postAbroad(context);
+                    .with(ReplaceBitemporalEvent.OBJECTS_ADDED, copyList(objectsToAdd)).postBothWay(context);
             replaceInternal(objectsToRemove, objectsToAdd);
             lastReplacements.add(new Replacement(objectsToRemove, objectsToAdd));
         } catch (Exception e) {

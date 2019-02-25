@@ -90,7 +90,7 @@ public class IndividualEventTest {
         bus1.register(new EventTestListener());
         bus2.register(new EventTestListener());
         event.create().with(DocumentJournal.create(ProcessingState.INTERNAL,
-                BarbelHistoBuilder.barbel(), new ConcurrentIndexedCollection<>(), "someId")).postAbroad(context);
+                BarbelHistoBuilder.barbel(), new ConcurrentIndexedCollection<>(), "someId")).postBothWay(context);
         waitForEventToComplete(2);
         assertEquals(2, list.size());
     }
