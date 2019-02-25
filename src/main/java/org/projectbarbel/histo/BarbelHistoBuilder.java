@@ -101,8 +101,9 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
         return new BarbelHistoCore<>(this);
     }
 
-    public IndexedCollection<?> getBackbone() {
-        return backbone;
+    @SuppressWarnings("unchecked")
+    public <T> IndexedCollection<T> getBackbone() {
+        return (IndexedCollection<T>)backbone;
     }
 
     protected void setBackbone(IndexedCollection<?> backbone) {

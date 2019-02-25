@@ -13,7 +13,7 @@ package org.projectbarbel.histo.event;
 @SuppressWarnings("serial")
 public class HistoEventFailedException extends RuntimeException {
 
-    private final HistoEvent event;
+    private final transient HistoEvent event;
 
     public HistoEventFailedException(String message, Throwable cause, HistoEvent event) {
         super(message, cause);

@@ -39,6 +39,7 @@ import com.googlecode.cqengine.IndexedCollection;
 @SuppressWarnings("rawtypes")
 public final class DocumentJournal {
 
+    private static final String FORBIDDEN_OPERATION = "you're not allowed to use this operation";
     public static final DocumentJournal EMPTYSAMPLE = DocumentJournal.create(ProcessingState.EXTERNAL,
             BarbelHistoBuilder.barbel(), new ConcurrentIndexedCollection<DefaultPojo>(), "unknown");
 
@@ -113,7 +114,7 @@ public final class DocumentJournal {
     @SuppressWarnings("unchecked")
     public void insert(List<Bitemporal> newVersions) {
         Validate.validState(ProcessingState.INTERNAL.equals(processingState),
-                "you're not allowed to use this operation");
+                FORBIDDEN_OPERATION);
         Validate.isTrue(
                 newVersions.stream().filter(d -> !d.getBitemporalStamp().getDocumentId().equals(id)).count() == 0,
                 "new versions must match document id of journal");
@@ -135,7 +136,7 @@ public final class DocumentJournal {
 
     public void replace(List<Bitemporal> objectsToRemove, List<Bitemporal> objectsToAdd) {
         Validate.validState(ProcessingState.INTERNAL.equals(processingState),
-                "you're not allowed to use this operation");
+                FORBIDDEN_OPERATION);
         Validate.isTrue(
                 objectsToRemove.stream().filter(d -> !d.getBitemporalStamp().getDocumentId().equals(id)).count() == 0,
                 "objects must match document id of journal");
@@ -150,7 +151,7 @@ public final class DocumentJournal {
             lastReplacements.add(new Replacement(objectsToRemove, objectsToAdd));
         } catch (Exception e) {
             // undo last inserts
-            lastInserts.stream().forEach(i -> journal.remove(i));
+            lastInserts.stream().forEach(journal::remove);
             throw e;
         }
     }
@@ -250,7 +251,7 @@ public final class DocumentJournal {
 
     public void setLastUpdateCase(JournalUpdateCase lastUpdateCase) {
         Validate.validState(ProcessingState.INTERNAL.equals(processingState),
-                "you're not allowed to use this operation");
+                FORBIDDEN_OPERATION);
         this.lastUpdateCase = lastUpdateCase;
     }
 

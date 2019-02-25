@@ -130,7 +130,7 @@ public interface BarbelHistoContext {
 
     EventBus getSynchronousEventBus();
 
-    IndexedCollection<?> getBackbone();
+    <T> IndexedCollection<T> getBackbone();
 
     void postSynchronousEvent(HistoEvent event);
 
