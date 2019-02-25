@@ -103,7 +103,7 @@ import com.googlecode.cqengine.query.option.QueryOptions;
  * {@link BarbelHisto}. To restore the journal later to continue bitemporal data
  * processing use {@link BarbelHisto#load(Collection)}. <br>
  * <br>
- * Use {@link #timeshift(Object, LocalDateTime)} to turn back time an see how
+ * Use {@link #timeshift(Object, LocalDateTime)} to turn back time and see how
  * document journals looked like in the past. Time shift is one of the core
  * functionalities of {@link BarbelHisto}. Clients can turn back time to see how
  * the document journals for a document Id looked like at that given time. This

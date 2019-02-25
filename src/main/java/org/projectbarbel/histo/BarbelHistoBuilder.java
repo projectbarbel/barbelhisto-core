@@ -110,7 +110,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     /**
-     * Post an event into the {@link BarbelHistoBuilder#synchronousEventBus}. 
+     * Post an event into the {@link BarbelHistoBuilder#synchronousEventBus}.
      * 
      * @param event the event posted
      */
@@ -119,14 +119,14 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     /**
-     * Post an async event into the {@link BarbelHistoBuilder#asynchronousEventBus}. 
+     * Post an async event into the {@link BarbelHistoBuilder#asynchronousEventBus}.
      * 
      * @param event the event posted
      */
     public void postAsynchronousEvent(HistoEvent event) {
         asynchronousEventBus.post(event);
     }
-    
+
     public AsyncEventBus getAsynchronousEventBus() {
         return asynchronousEventBus;
     }
@@ -150,8 +150,8 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 
     /**
      * Register custom Google Guava synchronous {@link EventBus} with
-     * {@link BarbelHisto}. See {@link EventType} for various events that clients can
-     * subscribe to.
+     * {@link BarbelHisto}. See {@link EventType} for various events that clients
+     * can subscribe to.
      * 
      * @param synchronousEventBus the {@link AsyncEventBus}
      * @return the builder again
@@ -209,7 +209,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
      * Then add an instance of this class to the
      * {@link BarbelHistoBuilder#withAsynchronousEventBus(AsyncEventBus)} method.
      * {@link BarbelHisto} will the publich the event to the handler. For events
-     * available in {@link BarbelHisto} see org.projectbarbel.histo.event. <br>
+     * available in {@link BarbelHisto} see {@link EventType}. <br>
      * <br>
      * 
      * @param listener the listener to register
@@ -260,9 +260,8 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     /**
-     * Set the {@link BarbelModeProcessor} of this {@link BarbelHisto} instance.
-     * Default is {@link BarbelMode#POJO}. See {@link BarbelHisto} for more details
-     * on modes.
+     * Set the {@link BarbelMode} of this {@link BarbelHisto} instance. Default is
+     * {@link BarbelMode#POJO}. See {@link BarbelHisto} for more details on modes.
      * 
      * @param mode the mode
      * @return the builder again
@@ -383,8 +382,8 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
      * {@link ConcurrentIndexedCollection} using {@link OnHeapPersistence}. <br>
      * <br>
      * If clients decide to use {@link DiskPersistence} or
-     * {@link OffHeapPersistence} they need to add the {@link PersistenceConfig}
-     * annotation additionally to their business classes. <br>
+     * {@link OffHeapPersistence} in {@link BarbelMode#POJO} they need to add the
+     * {@link PersistenceConfig} annotation additionally to their POJO classes.
      * <br>
      * 
      * <pre>
@@ -402,7 +401,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
      * The backbone collection should not be shared across multiple instances of
      * {@link BarbelHisto}. If you use persistent collections, store the
      * {@link BarbelHisto} instance as singleton bean to your application. Multiple
-     * threads are allowed access that {@link BarbelHisto} instance.
+     * threads are allowed to access that {@link BarbelHisto} instance.
      * 
      * @see <a href=
      *      "https://github.com/npgall/cqengine">https://github.com/npgall/cqengine</a>
@@ -422,7 +421,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     /**
-     * Client may want to implememt their own version id generator. Make sure it
+     * Clients may want to implememt their own version id generator. Make sure it
      * will be unique. Default is {@link UUIDGenerator}.
      * 
      * @param versionIdGenerator the custom version id generator

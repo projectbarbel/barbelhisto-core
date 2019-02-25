@@ -12,6 +12,12 @@ import org.projectbarbel.histo.model.BitemporalStamp;
 
 import com.googlecode.cqengine.IndexedCollection;
 
+/**
+ * Interface that {@link BarbelMode}s need to implement.
+ * 
+ * @author Niklas Schlimm
+ *
+ */
 public interface BarbelModeProcessor {
 
 	<T> T drawMaiden(BarbelHistoContext context, T object);

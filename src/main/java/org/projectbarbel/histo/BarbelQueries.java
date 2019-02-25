@@ -25,7 +25,7 @@ import com.googlecode.cqengine.query.option.QueryOptions;
 
 /**
  * Convenience methods to perform queries on {@link BarbelHisto#retrieve(Query)}
- * and the like. All queries can be combined with additional cqengine queries
+ * and the like. All queries can be combined with additional CqEngine queries
  * created by {@link QueryFactory}.
  * 
  * @author Niklas Schlimm
@@ -102,8 +102,7 @@ public final class BarbelQueries {
 	}
 
 	/**
-	 * Get all active (valid) versions. These will have distinct (adjecant,
-	 * 'neighboring') effective periods.
+	 * Get all active (valid) versions. These will have distinct (non-overlapping) effective periods.
 	 * 
 	 * @param id the document id
 	 * @return the active versions
@@ -114,7 +113,7 @@ public final class BarbelQueries {
 	}
 
 	/**
-	 * Get all inactivated versions for a document id, that have been deactivated.
+	 * Get all versions for a document id, that have been inactivated.
 	 * 
 	 * @param id the document id
 	 * @return the inactivated versions
@@ -152,8 +151,7 @@ public final class BarbelQueries {
 	}
 
 	/**
-	 * Get the versions effective on or after a given day. Unique object result.
-	 * Valid query for {@link BarbelHisto#retrieveOne(Query)}.
+	 * Get the versions effective on or after a given day. 
 	 * 
 	 * @param id the document
 	 * @param day the effective-after date
@@ -183,7 +181,7 @@ public final class BarbelQueries {
 
 	/**
 	 * Get the list of active records at a given <b>record</b> time. These will have
-	 * distinct (adjecant, 'neighboring') effective periods.
+	 * distinct (non-overlapping) effective periods.
 	 * 
 	 * @param id   the document id
 	 * @param time the point in time, must be in the past
