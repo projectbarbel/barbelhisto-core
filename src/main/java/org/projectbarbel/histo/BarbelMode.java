@@ -1,10 +1,6 @@
 package org.projectbarbel.histo;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
