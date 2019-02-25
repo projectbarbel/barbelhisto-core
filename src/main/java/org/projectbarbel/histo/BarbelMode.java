@@ -1,6 +1,10 @@
 package org.projectbarbel.histo;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Validate;
@@ -50,6 +54,7 @@ public enum BarbelMode implements BarbelModeProcessor {
         @Override
         public <T> Collection<Bitemporal> managedBitemporalToCustomPersistenceObjects(Object id,
                 IndexedCollection<T> objects) {
+            // used on unload, that's why no copy is ok
             return objects.retrieve(BarbelQueries.all(id)).stream().map(
                     o -> new BitemporalVersion<>(((Bitemporal) o).getBitemporalStamp(), ((BarbelProxy) o).getTarget()))
                     .collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
@@ -101,6 +106,11 @@ public enum BarbelMode implements BarbelModeProcessor {
         @Override
         public Class<?> getPersistenceObjectType(Class<?> objectType) {
             return BitemporalVersion.class;
+        }
+
+        @Override
+        public Bitemporal managedBitemporalToCustomPersistenceObject(Bitemporal bitemporal) {
+            return new BitemporalVersion<>(bitemporal.getBitemporalStamp(), ((BarbelProxy) bitemporal).getTarget());
         }
 
     },
@@ -167,6 +177,11 @@ public enum BarbelMode implements BarbelModeProcessor {
         @Override
         public Class<?> getPersistenceObjectType(Class<?> objectType) {
             return objectType;
+        }
+
+        @Override
+        public Bitemporal managedBitemporalToCustomPersistenceObject(Bitemporal bitemporal) {
+            return bitemporal;
         }
 
     };

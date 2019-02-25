@@ -81,13 +81,13 @@ public class BarbelHistoCore_ShadowCollectionPersistence {
         @Subscribe
         public void handleReplacements(ReplaceBitemporalEvent event) {
             @SuppressWarnings("unchecked")
-            List<Bitemporal> obectsAdded = (List<Bitemporal>) event.getEventContext()
+            List<Bitemporal> objectsAdded = (List<Bitemporal>) event.getEventContext()
                     .get(ReplaceBitemporalEvent.OBJECTS_ADDED);
             @SuppressWarnings("unchecked")
-            List<Bitemporal> obectsRemoved = (List<Bitemporal>) event.getEventContext()
+            List<Bitemporal> objectsRemoved = (List<Bitemporal>) event.getEventContext()
                     .get(ReplaceBitemporalEvent.OBJECTS_REMOVED);
-            obectsAdded.stream().forEach(v -> shadow.add((DefaultDocument) v));
-            obectsRemoved.stream().forEach(v -> shadow.remove((DefaultDocument) v));
+            objectsAdded.stream().forEach(v -> shadow.add((DefaultDocument) v));
+            objectsRemoved.stream().forEach(v -> shadow.remove((DefaultDocument) v));
         }
     }
 

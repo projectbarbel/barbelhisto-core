@@ -66,9 +66,9 @@ public class EmbeddingJournalUpdateStrategy implements BiConsumer<DocumentJourna
 
 	private Consumer<? super Bitemporal> inactivate(final DocumentJournal journal) {
 		return orginal -> {
-			Bitemporal inactivated = context.getMode().copyManagedBitemporal(context, orginal);
-			inactivated.setBitemporalStamp(inactivated.getBitemporalStamp().inactivatedCopy(context));
-			journal.replace(Collections.singletonList(orginal), Collections.singletonList(inactivated));
+			Bitemporal copy = context.getMode().copyManagedBitemporal(context, orginal);
+			copy.setBitemporalStamp(copy.getBitemporalStamp().inactivatedCopy(context));
+			journal.replace(Collections.singletonList(orginal), Collections.singletonList(copy));
 		};
 	}
 
