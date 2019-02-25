@@ -32,35 +32,35 @@ public class BarbelHistoCore_CQPersistence_Test {
 	private static final String FILENAME = "test.dat";
 
 	final SimpleAttribute<PrimitivePrivatePojo, String> VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO = new SimpleAttribute<PrimitivePrivatePojo, String>(
-			"documentId") {
+			"versionId") {
 		public String getValue(PrimitivePrivatePojo object, QueryOptions queryOptions) {
 			return (String) ((Bitemporal) object).getBitemporalStamp().getVersionId();
 		}
 	};
 
 	final SimpleAttribute<PrimitivePrivatePojoPartialContructor, String> VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO_PARTIAL = new SimpleAttribute<PrimitivePrivatePojoPartialContructor, String>(
-			"documentId") {
+			"versionId") {
 		public String getValue(PrimitivePrivatePojoPartialContructor object, QueryOptions queryOptions) {
 			return (String) ((Bitemporal) object).getBitemporalStamp().getVersionId();
 		}
 	};
 
 	final SimpleAttribute<NoPrimitivePrivatePojoPartialContructor, String> VERSION_ID_PK_NO_PRIMITIVE_PRIVATE_POJO_PARTIAL = new SimpleAttribute<NoPrimitivePrivatePojoPartialContructor, String>(
-			"documentId") {
+			"versionId") {
 		public String getValue(NoPrimitivePrivatePojoPartialContructor object, QueryOptions queryOptions) {
 			return (String) ((Bitemporal) object).getBitemporalStamp().getVersionId();
 		}
 	};
 
 	final SimpleAttribute<ComplexFieldsPrivatePojoPartialContructor, String> ComplexFieldsPrivatePojoPartialContructor_Field = new SimpleAttribute<ComplexFieldsPrivatePojoPartialContructor, String>(
-			"documentId") {
+			"versionId") {
 		public String getValue(ComplexFieldsPrivatePojoPartialContructor object, QueryOptions queryOptions) {
 			return (String) ((Bitemporal) object).getBitemporalStamp().getVersionId();
 		}
 	};
 
 	final SimpleAttribute<ComplexFieldsPrivatePojoPartialContructorWithComplexType, String> ComplexFieldsPrivatePojoPartialContructorWithComplexType_Field = new SimpleAttribute<ComplexFieldsPrivatePojoPartialContructorWithComplexType, String>(
-			"documentId") {
+			"versionId") {
 		public String getValue(ComplexFieldsPrivatePojoPartialContructorWithComplexType object,
 				QueryOptions queryOptions) {
 			return (String) ((Bitemporal) object).getBitemporalStamp().getVersionId();

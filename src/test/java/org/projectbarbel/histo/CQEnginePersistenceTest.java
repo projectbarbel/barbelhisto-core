@@ -17,7 +17,7 @@ import org.projectbarbel.histo.model.BarbelProxy;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.DefaultDocument;
-import org.projectbarbel.histo.model.DefaultPojo;
+import org.projectbarbel.histo.pojos.PrimitivePrivatePojoNoPersistence;
 
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.attribute.SimpleAttribute;
@@ -33,8 +33,8 @@ public class CQEnginePersistenceTest {
         Files.deleteIfExists(Paths.get("def.dat-wal"));
     }
     
-    public static final SimpleAttribute<DefaultPojo, String> DOCUMENT_ID_PK = new SimpleAttribute<DefaultPojo, String>("documentId") {
-        public String getValue(DefaultPojo object, QueryOptions queryOptions) {
+    public static final SimpleAttribute<PrimitivePrivatePojoNoPersistence, String> DOCUMENT_ID_PK = new SimpleAttribute<PrimitivePrivatePojoNoPersistence, String>("documentId") {
+        public String getValue(PrimitivePrivatePojoNoPersistence object, QueryOptions queryOptions) {
             return (String)((Bitemporal) object).getBitemporalStamp().getDocumentId();
         }
     };
@@ -51,14 +51,14 @@ public class CQEnginePersistenceTest {
         }
     };
     
-    public static final SimpleAttribute<DefaultPojo, String> DOCUMENT_ID_PK_POJO = new SimpleAttribute<DefaultPojo, String>("documentId") {
-        public String getValue(DefaultPojo object, QueryOptions queryOptions) {
+    public static final SimpleAttribute<PrimitivePrivatePojoNoPersistence, String> DOCUMENT_ID_PK_POJO = new SimpleAttribute<PrimitivePrivatePojoNoPersistence, String>("documentId") {
+        public String getValue(PrimitivePrivatePojoNoPersistence object, QueryOptions queryOptions) {
             return (String)BarbelMode.POJO.drawDocumentId(object);
         }
     };
     
-    public static final SimpleAttribute<DefaultPojo, String> DOCUMENT_ID_PK_POJO_PROXY = new SimpleAttribute<DefaultPojo, String>("documentId") {
-        public String getValue(DefaultPojo object, QueryOptions queryOptions) {
+    public static final SimpleAttribute<PrimitivePrivatePojoNoPersistence, String> DOCUMENT_ID_PK_POJO_PROXY = new SimpleAttribute<PrimitivePrivatePojoNoPersistence, String>("documentId") {
+        public String getValue(PrimitivePrivatePojoNoPersistence object, QueryOptions queryOptions) {
             return (String)BarbelMode.POJO.drawDocumentId(((BarbelProxy)object).getTarget());
         }
     };
@@ -86,35 +86,35 @@ public class CQEnginePersistenceTest {
     
     @Test
     public void pojo() throws IOException {
-        DiskPersistence<DefaultPojo, String> pers = DiskPersistence.onPrimaryKeyInFile(DOCUMENT_ID_PK_POJO, new File("def.dat"));
-        ConcurrentIndexedCollection<DefaultPojo> col = new ConcurrentIndexedCollection<DefaultPojo>(pers);
-        col.add(new DefaultPojo("id","some"));
-        assertEquals("some",((DefaultPojo)col.retrieve(equal(DOCUMENT_ID_PK_POJO, "id")).stream().findFirst().get()).getData());
+        DiskPersistence<PrimitivePrivatePojoNoPersistence, String> pers = DiskPersistence.onPrimaryKeyInFile(DOCUMENT_ID_PK_POJO, new File("def.dat"));
+        ConcurrentIndexedCollection<PrimitivePrivatePojoNoPersistence> col = new ConcurrentIndexedCollection<PrimitivePrivatePojoNoPersistence>(pers);
+        col.add(new PrimitivePrivatePojoNoPersistence("someId"));
+        assertEquals("someId",((PrimitivePrivatePojoNoPersistence)col.retrieve(equal(DOCUMENT_ID_PK_POJO, "someId")).stream().findFirst().get()).id);
         col.clear();
     }
     
     @Test
     public void pojo_update() throws IOException {
-    	DiskPersistence<DefaultPojo, String> pers = DiskPersistence.onPrimaryKeyInFile(DOCUMENT_ID_PK_POJO, new File("def.dat"));
-    	ConcurrentIndexedCollection<DefaultPojo> col1 = new ConcurrentIndexedCollection<DefaultPojo>(pers);
-    	DefaultPojo pojo = new DefaultPojo("id","some");
+    	DiskPersistence<PrimitivePrivatePojoNoPersistence, String> pers = DiskPersistence.onPrimaryKeyInFile(DOCUMENT_ID_PK_POJO, new File("def.dat"));
+    	ConcurrentIndexedCollection<PrimitivePrivatePojoNoPersistence> col1 = new ConcurrentIndexedCollection<PrimitivePrivatePojoNoPersistence>(pers);
+    	PrimitivePrivatePojoNoPersistence pojo = new PrimitivePrivatePojoNoPersistence("id","some");
     	col1.add(pojo);
-    	assertEquals("some",((DefaultPojo)col1.retrieve(equal(DOCUMENT_ID_PK_POJO, "id")).stream().findFirst().get()).getData());
+    	assertEquals("some",((PrimitivePrivatePojoNoPersistence)col1.retrieve(equal(DOCUMENT_ID_PK_POJO, "id")).stream().findFirst().get()).getData());
     	pojo.setData("changed");
-    	ConcurrentIndexedCollection<DefaultPojo> col2 = new ConcurrentIndexedCollection<DefaultPojo>(pers);
-    	assertNotEquals("changed",((DefaultPojo)col2.retrieve(equal(DOCUMENT_ID_PK_POJO, "id")).stream().findFirst().get()).getData());
+    	ConcurrentIndexedCollection<PrimitivePrivatePojoNoPersistence> col2 = new ConcurrentIndexedCollection<PrimitivePrivatePojoNoPersistence>(pers);
+    	assertNotEquals("changed",((PrimitivePrivatePojoNoPersistence)col2.retrieve(equal(DOCUMENT_ID_PK_POJO, "id")).stream().findFirst().get()).getData());
     	col2.update(Collections.singletonList(pojo), Collections.singletonList(pojo));
-    	ConcurrentIndexedCollection<DefaultPojo> col3 = new ConcurrentIndexedCollection<DefaultPojo>(pers);
-    	assertEquals("changed",((DefaultPojo)col3.retrieve(equal(DOCUMENT_ID_PK_POJO, "id")).stream().findFirst().get()).getData());
+    	ConcurrentIndexedCollection<PrimitivePrivatePojoNoPersistence> col3 = new ConcurrentIndexedCollection<PrimitivePrivatePojoNoPersistence>(pers);
+    	assertEquals("changed",((PrimitivePrivatePojoNoPersistence)col3.retrieve(equal(DOCUMENT_ID_PK_POJO, "id")).stream().findFirst().get()).getData());
     }
     
     @Test
     public void pojoProxied() throws IOException {
-        DiskPersistence<DefaultPojo, String> pers = DiskPersistence.onPrimaryKeyInFile(DOCUMENT_ID_PK_POJO_PROXY, new File("def.dat"));
-        ConcurrentIndexedCollection<DefaultPojo> col = new ConcurrentIndexedCollection<DefaultPojo>(pers);
-        DefaultPojo memproxy = (DefaultPojo)BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(), new DefaultPojo("id","some"), BitemporalStamp.createActive());
+        DiskPersistence<PrimitivePrivatePojoNoPersistence, String> pers = DiskPersistence.onPrimaryKeyInFile(DOCUMENT_ID_PK_POJO_PROXY, new File("def.dat"));
+        ConcurrentIndexedCollection<PrimitivePrivatePojoNoPersistence> col = new ConcurrentIndexedCollection<PrimitivePrivatePojoNoPersistence>(pers);
+        PrimitivePrivatePojoNoPersistence memproxy = (PrimitivePrivatePojoNoPersistence)BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(), new PrimitivePrivatePojoNoPersistence("id","some"), BitemporalStamp.createActive());
         col.add(memproxy);
-        DefaultPojo pojoproxy = (DefaultPojo)col.retrieve(equal(DOCUMENT_ID_PK_POJO, "id")).stream().findFirst().get();
+        PrimitivePrivatePojoNoPersistence pojoproxy = (PrimitivePrivatePojoNoPersistence)col.retrieve(equal(DOCUMENT_ID_PK_POJO, "id")).stream().findFirst().get();
         assertNotEquals("some",pojoproxy.getData());
         col.clear();
     }

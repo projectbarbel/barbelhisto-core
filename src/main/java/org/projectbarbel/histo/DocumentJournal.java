@@ -123,8 +123,8 @@ public final class DocumentJournal {
                 .isBefore(v2.getBitemporalStamp().getEffectiveTime().until()) ? -1 : 1);
         this.lastInserts.addAll(newVersions);
         try {
-            EventType.INSERTBITEMPORAL.create().with(this).with(InsertBitemporalEvent.NEWVERSIONS, newVersions)
-                    .postAbroad(context);
+            EventType.INSERTBITEMPORAL.create().with(this)
+                    .with(InsertBitemporalEvent.NEWVERSIONS, copyList(newVersions)).postAbroad(context);
             journal.addAll(newVersions);
         } catch (Exception e) {
             // undo last replacements
@@ -142,9 +142,10 @@ public final class DocumentJournal {
         Validate.isTrue(
                 objectsToAdd.stream().filter(d -> !d.getBitemporalStamp().getDocumentId().equals(id)).count() == 0,
                 "objects must match document id of journal");
-        EventType.REPLACEBITEMPORAL.create().with(journal).with(ReplaceBitemporalEvent.OBJECTS_REMOVED, objectsToRemove)
-                .with(ReplaceBitemporalEvent.OBJECTS_ADDED, objectsToAdd).postAbroad(context);
         try {
+            EventType.REPLACEBITEMPORAL.create().with(journal)
+                    .with(ReplaceBitemporalEvent.OBJECTS_REMOVED, copyList(objectsToRemove))
+                    .with(ReplaceBitemporalEvent.OBJECTS_ADDED, copyList(objectsToAdd)).postAbroad(context);
             replaceInternal(objectsToRemove, objectsToAdd);
             lastReplacements.add(new Replacement(objectsToRemove, objectsToAdd));
         } catch (Exception e) {
@@ -152,6 +153,11 @@ public final class DocumentJournal {
             lastInserts.stream().forEach(i -> journal.remove(i));
             throw e;
         }
+    }
+
+    private List<Bitemporal> copyList(List<Bitemporal> objectsToRemove) {
+        return objectsToRemove.stream().map(v -> context.getMode().copyManagedBitemporal(context, v))
+                .collect(Collectors.toList());
     }
 
     @SuppressWarnings("unchecked")

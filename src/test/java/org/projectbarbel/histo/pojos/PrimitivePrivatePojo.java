@@ -1,5 +1,7 @@
 package org.projectbarbel.histo.pojos;
 
+import java.util.Objects;
+
 import org.projectbarbel.histo.DocumentId;
 import org.projectbarbel.histo.functions.BarbelPojoSerializer;
 
@@ -17,55 +19,25 @@ public class PrimitivePrivatePojo {
 	public float someFloat;
 	public long someLong;
 	public double someDouble;
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + somByte;
-		result = prime * result + (someBoolean ? 1231 : 1237);
-		result = prime * result + someChar;
-		long temp;
-		temp = Double.doubleToLongBits(someDouble);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		result = prime * result + Float.floatToIntBits(someFloat);
-		result = prime * result + someInt;
-		result = prime * result + (int) (someLong ^ (someLong >>> 32));
-		result = prime * result + someShort;
-		return result;
-	}
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		PrimitivePrivatePojo other = (PrimitivePrivatePojo) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		if (somByte != other.somByte)
-			return false;
-		if (someBoolean != other.someBoolean)
-			return false;
-		if (someChar != other.someChar)
-			return false;
-		if (Double.doubleToLongBits(someDouble) != Double.doubleToLongBits(other.someDouble))
-			return false;
-		if (Float.floatToIntBits(someFloat) != Float.floatToIntBits(other.someFloat))
-			return false;
-		if (someInt != other.someInt)
-			return false;
-		if (someLong != other.someLong)
-			return false;
-		if (someShort != other.someShort)
-			return false;
-		return true;
-	}
-
+	
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, somByte, someBoolean, someChar, someDouble, someFloat, someInt, someLong, someShort);
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        PrimitivePrivatePojo other = (PrimitivePrivatePojo) obj;
+        return Objects.equals(id, other.id) && somByte == other.somByte && someBoolean == other.someBoolean
+                && someChar == other.someChar
+                && Double.doubleToLongBits(someDouble) == Double.doubleToLongBits(other.someDouble)
+                && Float.floatToIntBits(someFloat) == Float.floatToIntBits(other.someFloat) && someInt == other.someInt
+                && someLong == other.someLong && someShort == other.someShort;
+    }
 	
 }

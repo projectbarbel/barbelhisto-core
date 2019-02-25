@@ -7,7 +7,6 @@ import javax.annotation.Generated;
 import org.projectbarbel.histo.BarbelHisto;
 import org.projectbarbel.histo.BarbelMode;
 import org.projectbarbel.histo.DocumentId;
-import org.projectbarbel.histo.functions.BarbelPojoSerializer;
 
 import com.googlecode.cqengine.persistence.disk.DiskPersistence;
 import com.googlecode.cqengine.persistence.offheap.OffHeapPersistence;
@@ -22,7 +21,6 @@ import com.googlecode.cqengine.persistence.support.serialization.PersistenceConf
  * @author Niklas Schlimm
  *
  */
-@PersistenceConfig(serializer = BarbelPojoSerializer.class, polymorphic = true)
 public class DefaultDocument implements Bitemporal {
 
     @DocumentId
@@ -30,6 +28,54 @@ public class DefaultDocument implements Bitemporal {
     private BitemporalStamp bitemporalStamp;
     private String data;
 
+    @Override
+    public BitemporalStamp getBitemporalStamp() {
+        return bitemporalStamp;
+    }
+    
+    @Override
+    public void setBitemporalStamp(BitemporalStamp stamp) {
+        this.bitemporalStamp = stamp;
+    }
+
+    public DefaultDocument() {
+        super();
+    }
+    
+    public DefaultDocument(String objectId, BitemporalStamp bitemporalStamp, String data) {
+        super();
+        id = objectId;
+        this.bitemporalStamp = bitemporalStamp;
+        this.data = data;
+    }
+    
+    public DefaultDocument(BitemporalStamp stamp, String data) {
+        this.bitemporalStamp = stamp;
+        this.data = data;
+    }
+    
+    public DefaultDocument(DefaultDocument template) {
+        this.bitemporalStamp = template.getBitemporalStamp();
+        this.data = template.getData();
+        this.id = template.getId();
+    }
+    
+    public void setData(String data) {
+        this.data = data;
+    }
+    
+    public String getId() {
+        return id;
+    }
+    
+    public void setId(String id) {
+        this.id = id;
+    }
+    
+    public String getData() {
+        return data;
+    }
+    
     @Generated("SparkTools")
     private DefaultDocument(Builder builder) {
         this.bitemporalStamp = builder.bitemporalStamp;
@@ -37,57 +83,9 @@ public class DefaultDocument implements Bitemporal {
         this.id = builder.id;
     }
 
-    public void setData(String data) {
-        this.data = data;
-    }
-
-    public DefaultDocument() {
-        super();
-    }
-
-    public DefaultDocument(String objectId, BitemporalStamp bitemporalStamp, String data) {
-        super();
-		id = objectId;
-        this.bitemporalStamp = bitemporalStamp;
-        this.data = data;
-    }
-
-    public DefaultDocument(BitemporalStamp stamp, String data) {
-        this.bitemporalStamp = stamp;
-        this.data = data;
-    }
-
-    public DefaultDocument(DefaultDocument template) {
-        this.bitemporalStamp = template.getBitemporalStamp();
-        this.data = template.getData();
-        this.id = template.getId();
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getData() {
-        return data;
-    }
-
-    @Override
-    public BitemporalStamp getBitemporalStamp() {
-        return bitemporalStamp;
-    }
-
     @Override
     public String toString() {
         return "DefaultDocument [bitemporalStamp=" + bitemporalStamp + ", data=" + data + "]";
-    }
-
-    @Override
-    public void setBitemporalStamp(BitemporalStamp stamp) {
-        this.bitemporalStamp = stamp;
     }
 
     /**

@@ -76,7 +76,7 @@ public class AdaptingKryoSerializerTest {
 
     @Test
     public void testValidateObjectIsRoundTripSerializable_Bitemporal() throws Exception {
-        AdaptingKryoSerializer.validateObjectIsRoundTripSerializable(BarbelHistoBuilder.barbel(), BarbelTestHelper.random(DefaultDocument.class));
+        AdaptingKryoSerializer.validateObjectIsRoundTripSerializable(BarbelHistoBuilder.barbel(), BarbelTestHelper.random(DefaultPojo.class));
     }
 
     @Test

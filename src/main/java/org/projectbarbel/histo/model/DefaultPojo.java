@@ -3,10 +3,13 @@ package org.projectbarbel.histo.model;
 import java.util.Objects;
 
 import org.projectbarbel.histo.DocumentId;
+import org.projectbarbel.histo.functions.BarbelPojoSerializer;
 
 import com.googlecode.cqengine.attribute.SimpleAttribute;
+import com.googlecode.cqengine.persistence.support.serialization.PersistenceConfig;
 import com.googlecode.cqengine.query.option.QueryOptions;
 
+@PersistenceConfig(serializer = BarbelPojoSerializer.class, polymorphic = true)
 public class DefaultPojo {
 
 	public static final SimpleAttribute<DefaultPojo, String> DOCUMENT_ID = new SimpleAttribute<DefaultPojo, String>("documentId") {

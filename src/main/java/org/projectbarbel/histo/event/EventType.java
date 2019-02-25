@@ -74,17 +74,6 @@ import lombok.extern.slf4j.Slf4j;
  */
 public enum EventType implements PostableEvent {
     /**
-     * Event fired when {@link BarbelHisto} acquires the lock for a journal update.
-     * Posted once for each save-operation at the beginning of the update-operation.
-     */
-    ACQUIRELOCK {
-        @Override
-        public HistoEvent create() {
-            return new AcquireLockEvent(ACQUIRELOCK, new HashMap<>());
-        }
-
-    },
-    /**
      * Event fired when {@link BarbelHisto} is ready for execution.
      */
     BARBELINITIALIZED {
@@ -100,10 +89,21 @@ public enum EventType implements PostableEvent {
      * operation. Posted only once per {@link BarbelHisto} session and document id.
      */
     INITIALIZEJOURNAL {
-
+        
         @Override
         public HistoEvent create() {
             return new InitializeJournalEvent(INITIALIZEJOURNAL, new HashMap<>());
+        }
+        
+    },
+    /**
+     * Event fired when {@link BarbelHisto} acquires the lock for a journal update.
+     * Posted once for each save-operation at the beginning of the update-operation.
+     */
+    ACQUIRELOCK {
+        @Override
+        public HistoEvent create() {
+            return new AcquireLockEvent(ACQUIRELOCK, new HashMap<>());
         }
 
     },
@@ -120,6 +120,18 @@ public enum EventType implements PostableEvent {
 
     },
     /**
+     * Event fired when {@link BarbelHisto} inactivates versions. Posted once for
+     * each save-operation.
+     */
+    REPLACEBITEMPORAL {
+        
+        @Override
+        public HistoEvent create() {
+            return new ReplaceBitemporalEvent(REPLACEBITEMPORAL, new HashMap<>());
+        }
+        
+    },
+    /**
      * Event fired when {@link BarbelHisto} released a lock on a document journal
      * for a given document ID in the operation. Posted once for each
      * save-operation at the end of the update-operation
@@ -129,18 +141,6 @@ public enum EventType implements PostableEvent {
         @Override
         public HistoEvent create() {
             return new ReleaseLockEvent(RELEASELOCK, new HashMap<>());
-        }
-
-    },
-    /**
-     * Event fired when {@link BarbelHisto} inactivates versions. Posted once for
-     * each save-operation.
-     */
-    REPLACEBITEMPORAL {
-
-        @Override
-        public HistoEvent create() {
-            return new ReplaceBitemporalEvent(REPLACEBITEMPORAL, new HashMap<>());
         }
 
     },
