@@ -230,6 +230,8 @@ public enum EventType implements PostableEvent {
 
     public static class InitializeJournalEvent extends AbstractBarbelEvent {
 
+        public static final String BARBEL = "#core";
+
         public InitializeJournalEvent(EventType eventType, Map<Object, Object> context) {
             super(eventType, context);
         }

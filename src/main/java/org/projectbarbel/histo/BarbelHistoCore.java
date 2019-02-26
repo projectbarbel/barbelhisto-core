@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.projectbarbel.histo.DocumentJournal.ProcessingState;
 import org.projectbarbel.histo.event.EventType;
+import org.projectbarbel.histo.event.EventType.InitializeJournalEvent;
 import org.projectbarbel.histo.event.EventType.RetrieveDataEvent;
 import org.projectbarbel.histo.event.EventType.UpdateFinishedEvent;
 import org.projectbarbel.histo.model.Bitemporal;
@@ -77,7 +78,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
         DocumentJournal journal = journals.computeIfAbsent(id,
                 k -> DocumentJournal.create(ProcessingState.INTERNAL, context, k));
         EventType.INITIALIZEJOURNAL.create().with(DocumentJournal.create(ProcessingState.EXTERNAL, context, id))
-                .with(this).postBothWay(context);
+                .with(InitializeJournalEvent.BARBEL, this).postBothWay(context);
         if (journal.lockAcquired()) {
             try {
                 BitemporalStamp stamp = BitemporalStamp.of(context.getActivity(), id, EffectivePeriod.of(from, until),

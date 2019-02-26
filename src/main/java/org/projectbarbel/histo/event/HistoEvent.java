@@ -12,7 +12,7 @@ import org.projectbarbel.histo.BarbelHistoContext;
  */
 public interface HistoEvent {
     default HistoEvent with(Object value) {
-        this.getEventContext().put(value.getClass().getName(), value);
+        this.getEventContext().put(value.getClass(), value);
         return this;
     }
 
