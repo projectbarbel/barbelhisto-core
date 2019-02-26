@@ -4,17 +4,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.projectbarbel.histo.DocumentJournal.Replacement;
 import org.projectbarbel.histo.event.EventType.BarbelInitializedEvent;
 import org.projectbarbel.histo.event.EventType.InitializeJournalEvent;
 import org.projectbarbel.histo.event.EventType.InsertBitemporalEvent;
 import org.projectbarbel.histo.event.EventType.ReplaceBitemporalEvent;
 import org.projectbarbel.histo.event.EventType.RetrieveDataEvent;
+import org.projectbarbel.histo.event.EventType.UpdateFinishedEvent;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.DefaultDocument;
@@ -34,7 +37,7 @@ public class BarbelHistoCore_ShadowCollectionPersistence {
     @Test
     void shadowExternalTest() throws Exception {
         BarbelHisto<DefaultDocument> barbel = BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL)
-                .withSynchronousEventListener(new ShadowCollectionListeners()).build();
+                .withSynchronousEventListener(new ShadowCollectionListener()).build();
         DefaultDocument pojo = new DefaultDocument("someId", BitemporalStamp.createActive("someId"), "some data");
         barbel.save(pojo, LocalDate.now(), LocalDate.MAX);
         assertEquals(1, shadow.size());
@@ -64,30 +67,23 @@ public class BarbelHistoCore_ShadowCollectionPersistence {
 
     }
 
-    public static class ShadowCollectionListeners {
+    public static class ShadowCollectionListener {
         @Subscribe
         public void handleInitialization(BarbelInitializedEvent event) {
             shadow = new ConcurrentIndexedCollection<>();
         }
 
         @Subscribe
-        public void handleInserts(InsertBitemporalEvent event) {
+        public void handleInserts(UpdateFinishedEvent event) {
             @SuppressWarnings("unchecked")
             List<Bitemporal> inserts = (List<Bitemporal>) event.getEventContext()
-                    .get(InsertBitemporalEvent.NEWVERSIONS);
+                    .get(UpdateFinishedEvent.NEWVERSIONS);
             inserts.stream().forEach(v -> shadow.add((DefaultDocument) v));
-        }
-
-        @Subscribe
-        public void handleReplacements(ReplaceBitemporalEvent event) {
             @SuppressWarnings("unchecked")
-            List<Bitemporal> objectsAdded = (List<Bitemporal>) event.getEventContext()
-                    .get(ReplaceBitemporalEvent.OBJECTS_ADDED);
-            @SuppressWarnings("unchecked")
-            List<Bitemporal> objectsRemoved = (List<Bitemporal>) event.getEventContext()
-                    .get(ReplaceBitemporalEvent.OBJECTS_REMOVED);
-            objectsAdded.stream().forEach(v -> shadow.add((DefaultDocument) v));
-            objectsRemoved.stream().forEach(v -> shadow.remove((DefaultDocument) v));
+            Set<Replacement> replacements = (Set<Replacement>) event.getEventContext()
+                    .get(UpdateFinishedEvent.REPLACEMENTS);
+            replacements.stream().flatMap(r->r.getObjectsAdded().stream()).forEach(v -> shadow.add((DefaultDocument) v));
+            replacements.stream().flatMap(r->r.getObjectsRemoved().stream()).forEach(v -> shadow.remove((DefaultDocument) v));
         }
     }
 
