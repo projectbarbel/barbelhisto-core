@@ -44,7 +44,7 @@ public class BarbelModeTest {
 	@Test
 	public void testSnapshotManagedBitemporal_Bitemporal() throws Exception {
 		Bitemporal managed = BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(),
-				new BitemporalVersion<DefaultPojo>(BitemporalStamp.createActive(),
+				new BitemporalVersion(BitemporalStamp.createActive(),
 						EnhancedRandom.random(DefaultPojo.class)),
 				BitemporalStamp.createActive());
 		Bitemporal bitemporal = BarbelMode.POJO.snapshotManagedBitemporal(BarbelHistoBuilder.barbel(), managed,
@@ -173,7 +173,7 @@ public class BarbelModeTest {
         DefaultPojo pojo = new DefaultPojo("id","data");
         BitemporalStamp stamp = BitemporalStamp.createActive();
         Bitemporal doc = BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(), pojo, stamp);
-        assertEquals(new BitemporalVersion<DefaultPojo>(stamp, pojo), BarbelMode.POJO.managedBitemporalToCustomPersistenceObject(doc));
+        assertEquals(new BitemporalVersion(stamp, pojo), BarbelMode.POJO.managedBitemporalToCustomPersistenceObject(doc));
     }
     
 	@Test
@@ -189,7 +189,7 @@ public class BarbelModeTest {
 	@Test
 	public void testSnapshotManagedBitemporal_Bitemporal_BitemporalMode() throws Exception {
 		Bitemporal managed = BarbelMode.BITEMPORAL.snapshotMaiden(BarbelHistoBuilder.barbel(),
-				new BitemporalVersion<DefaultDocument>(BitemporalStamp.createActive(),
+				new BitemporalVersion(BitemporalStamp.createActive(),
 						EnhancedRandom.random(DefaultDocument.class)),
 				BitemporalStamp.createActive());
 		Bitemporal bitemporal = BarbelMode.BITEMPORAL.snapshotManagedBitemporal(BarbelHistoBuilder.barbel(), managed,

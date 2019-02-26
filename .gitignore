@@ -1,3 +1,4 @@
+src/test/java/org/projectbarbel/histo/pojos/local*
 pom.xml.version*
 bin/
 .classpath

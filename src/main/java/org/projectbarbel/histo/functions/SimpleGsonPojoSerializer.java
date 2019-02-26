@@ -41,7 +41,7 @@ public class SimpleGsonPojoSerializer implements PojoSerializer<Bitemporal> {
 		if (object instanceof BarbelProxy) { // change persisted type to BitemporalVersion
 			Object target = ((BarbelProxy) object).getTarget();
 			typeMap.put(target.getClass().getName(), target.getClass());
-			object = new BitemporalVersion<>((object).getBitemporalStamp(), ((BarbelProxy) object).getTarget());
+			object = new BitemporalVersion((object).getBitemporalStamp(), ((BarbelProxy) object).getTarget());
 		}
 		JsonTypeWrapper wrap = new JsonTypeWrapper(object.getClass().getName(), gson.toJson(object));
 		return gson.toJson(wrap).getBytes(StandardCharsets.UTF_8);
@@ -53,13 +53,13 @@ public class SimpleGsonPojoSerializer implements PojoSerializer<Bitemporal> {
 		JsonTypeWrapper wrap = gson.fromJson(json, JsonTypeWrapper.class);
 		Object object = gson.fromJson(wrap.json, typeMap.computeIfAbsent(wrap.type, computeIfAbsent()));
 		if (object instanceof BitemporalVersion) {
-			BitemporalVersion<?> bv = (BitemporalVersion<?>) object;
+			BitemporalVersion bv = (BitemporalVersion) object;
 			Class<?> objectType = typeMap.computeIfAbsent(bv.getObjectType(), computeIfAbsent());
 			Object bvobject = gson.fromJson(gson.toJsonTree(bv.getObject()).toString(), objectType);
 			if (context.getMode() == BarbelMode.POJO)
 				return context.getMode().snapshotMaiden(context, bvobject, bv.getBitemporalStamp());
 			else
-				return new BitemporalVersion<>(bv.getBitemporalStamp(), bvobject);
+				return new BitemporalVersion(bv.getBitemporalStamp(), bvobject);
 		}
 		return (Bitemporal) object;
 	}

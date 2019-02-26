@@ -263,7 +263,7 @@ public final class DocumentJournal {
         this.lastUpdateRequest = lastUpdateRequest;
     }
 
-    private static class Replacement {
+    public static class Replacement {
         private final List<Bitemporal> objectsRemoved;
         private final List<Bitemporal> objectsAdded;
 

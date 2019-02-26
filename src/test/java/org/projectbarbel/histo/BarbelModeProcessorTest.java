@@ -12,7 +12,7 @@ public class BarbelModeProcessorTest {
 
     @Test
     public void getDocumentIdFieldName() throws Exception {
-        assertEquals("documentId",BarbelMode.POJO.getDocumentIdFieldName(DefaultPojo.class));
+        assertEquals("bitemporalStamp.documentId",BarbelMode.POJO.getDocumentIdFieldNameOnPersistedType(DefaultPojo.class));
     }
 
     @Test

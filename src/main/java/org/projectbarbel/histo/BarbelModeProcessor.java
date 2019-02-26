@@ -68,14 +68,7 @@ public interface BarbelModeProcessor {
                 + " - invalid candidate type: " + candidateClass.getName());
         return result.get(0);
     }
-
-	default String getDocumentIdFieldName(Class<?> candidate) {
-        List<Field> fields = FieldUtils.getFieldsListWithAnnotation(candidate, DocumentId.class);
-        Validate.isTrue(fields.size() == 1,
-                "cannot find document id - make sure exactly one field in the pojo is annotated with @DocumentId");
-        fields.get(0).setAccessible(true);
-        return fields.get(0).getName();
-    }
-    
+	
+	String getDocumentIdFieldNameOnPersistedType(Class<?> candidate);
 
 }

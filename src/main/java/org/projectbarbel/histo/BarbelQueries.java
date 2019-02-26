@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.chrono.ChronoLocalDate;
+import java.util.Iterator;
 
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalObjectState;
@@ -21,7 +22,10 @@ import com.googlecode.cqengine.attribute.Attribute;
 import com.googlecode.cqengine.attribute.SimpleAttribute;
 import com.googlecode.cqengine.query.Query;
 import com.googlecode.cqengine.query.QueryFactory;
+import com.googlecode.cqengine.query.logical.LogicalQuery;
 import com.googlecode.cqengine.query.option.QueryOptions;
+import com.googlecode.cqengine.query.simple.Equal;
+import com.googlecode.cqengine.query.simple.SimpleQuery;
 
 /**
  * Convenience methods to perform queries on {@link BarbelHisto#retrieve(Query)}
@@ -76,125 +80,143 @@ public final class BarbelQueries {
     };
 
     private BarbelQueries() {
-    	super();
-	}
-    
+        super();
+    }
+
     //// @formatter:off
-	/**
-	 * Get all versions from the backbone.
-	 * 
-	 * @return all versions stored
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> Query<T> all() {
-		return (Query<T>) QueryFactory.all(Object.class);
-	}
+    /**
+     * Get all versions from the backbone.
+     * 
+     * @return all versions stored
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Query<T> all() {
+        return (Query<T>) QueryFactory.all(Object.class);
+    }
 
-	/**
-	 * Get all versions for one document id.
-	 * 
-	 * @param id the document id
-	 * @return the versions
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> Query<T> all(Object id) {
-		return (Query<T>) equal(DOCUMENT_ID, id);
-	}
+    /**
+     * Get all versions for one document id.
+     * 
+     * @param id the document id
+     * @return the versions
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Query<T> all(Object id) {
+        return (Query<T>) equal(DOCUMENT_ID, id);
+    }
 
-	/**
-	 * Get all active (valid) versions. These will have distinct (non-overlapping) effective periods.
-	 * 
-	 * @param id the document id
-	 * @return the active versions
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> Query<T> allActive(Object id) {
-		return (Query<T>) and(all(id), equal(STATE, BitemporalObjectState.ACTIVE));
-	}
+    /**
+     * Get all active (valid) versions. These will have distinct (non-overlapping)
+     * effective periods.
+     * 
+     * @param id the document id
+     * @return the active versions
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Query<T> allActive(Object id) {
+        return (Query<T>) and(all(id), equal(STATE, BitemporalObjectState.ACTIVE));
+    }
 
-	/**
-	 * Get all versions for a document id, that have been inactivated.
-	 * 
-	 * @param id the document id
-	 * @return the inactivated versions
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> Query<T> allInactive(Object id) {
-		return (Query<T>) and(all(id), equal(STATE, BitemporalObjectState.INACTIVE));
-	}
+    @SuppressWarnings("rawtypes")
+    public static Object returnIDForQuery(Query query) {
+        if (query instanceof LogicalQuery) {
+            for (Iterator iterator = ((LogicalQuery)query).getChildQueries().iterator(); iterator.hasNext();) {
+                return returnIDForQuery((Query)iterator.next());
+            }
+        }
+        if (query instanceof SimpleQuery) {
+            if (query instanceof Equal) {
+                Equal equal = (Equal) query;
+                if (DOCUMENT_ID.equals(equal.getAttribute()))
+                    return equal.getValue();
+            }
+        }
+        return null;
+    }
 
-	/**
-	 * Get the version effective today. Unique object result. Valid query for
-	 * {@link BarbelHisto#retrieveOne(Query)}.
-	 * 
-	 * @param id the document
-	 * @return the unique result
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> Query<T> effectiveNow(Object id) {
-		return (Query<T>) and(allActive(id),
-				lessThanOrEqualTo(EFFECTIVE_FROM, BarbelHistoContext.getBarbelClock().now().toLocalDate()),
-				greaterThan(EFFECTIVE_UNTIL, BarbelHistoContext.getBarbelClock().now().toLocalDate()));
-	}
+    /**
+     * Get all versions for a document id, that have been inactivated.
+     * 
+     * @param id the document id
+     * @return the inactivated versions
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Query<T> allInactive(Object id) {
+        return (Query<T>) and(all(id), equal(STATE, BitemporalObjectState.INACTIVE));
+    }
 
-	/**
-	 * Get the version effective at given day. Unique object result. Valid query for
-	 * {@link BarbelHisto#retrieveOne(Query)}.
-	 * 
-	 * @param id the document
-	 * @param day effective-at date
-	 * @return the unique result
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> Query<T> effectiveAt(Object id, LocalDate day) {
-		return (Query<T>) and(allActive(id), lessThanOrEqualTo(EFFECTIVE_FROM, day), greaterThan(EFFECTIVE_UNTIL, day));
-	}
+    /**
+     * Get the version effective today. Unique object result. Valid query for
+     * {@link BarbelHisto#retrieveOne(Query)}.
+     * 
+     * @param id the document
+     * @return the unique result
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Query<T> effectiveNow(Object id) {
+        return (Query<T>) and(allActive(id),
+                lessThanOrEqualTo(EFFECTIVE_FROM, BarbelHistoContext.getBarbelClock().now().toLocalDate()),
+                greaterThan(EFFECTIVE_UNTIL, BarbelHistoContext.getBarbelClock().now().toLocalDate()));
+    }
 
-	/**
-	 * Get the versions effective on or after a given day. 
-	 * 
-	 * @param id the document
-	 * @param day the effective-after date
-	 * @return the unique result
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> Query<T> effectiveAfter(Object id, LocalDate day) {
-		return (Query<T>) and(allActive(id), greaterThanOrEqualTo(EFFECTIVE_FROM, day));
-	}
+    /**
+     * Get the version effective at given day. Unique object result. Valid query for
+     * {@link BarbelHisto#retrieveOne(Query)}.
+     * 
+     * @param id  the document
+     * @param day effective-at date
+     * @return the unique result
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Query<T> effectiveAt(Object id, LocalDate day) {
+        return (Query<T>) and(allActive(id), lessThanOrEqualTo(EFFECTIVE_FROM, day), greaterThan(EFFECTIVE_UNTIL, day));
+    }
 
-	/**
-	 * Get effective versions in a certain period of time.
-	 * 
-	 * @param id     the dicument id
-	 * @param period the period
-	 * @return the list of effective versions
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> Query<T> effectiveBetween(Object id, EffectivePeriod period) {
-	    if (period.until().equals(LocalDate.MAX))
-		    return (Query<T>) and(allActive(id), greaterThanOrEqualTo(EFFECTIVE_FROM, period.from()),
-		                          lessThanOrEqualTo(EFFECTIVE_UNTIL, period.until()));
-	    else 
-	        return (Query<T>) and(allActive(id), greaterThanOrEqualTo(EFFECTIVE_FROM, period.from()),
-	                              lessThan(EFFECTIVE_UNTIL, period.until()));
-	}
+    /**
+     * Get the versions effective on or after a given day.
+     * 
+     * @param id  the document
+     * @param day the effective-after date
+     * @return the unique result
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Query<T> effectiveAfter(Object id, LocalDate day) {
+        return (Query<T>) and(allActive(id), greaterThanOrEqualTo(EFFECTIVE_FROM, day));
+    }
 
-	/**
-	 * Get the list of active records at a given <b>record</b> time. These will have
-	 * distinct (non-overlapping) effective periods.
-	 * 
-	 * @param id   the document id
-	 * @param time the point in time, must be in the past
-	 * @return the list of versions active at the given time
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> Query<T> journalAt(Object id, LocalDateTime time) {
-		return (Query<T>) and(all(id),
-				lessThanOrEqualTo(CREATED_AT,
-						ZonedDateTime.of(time, ZoneId.systemDefault()).toInstant().toEpochMilli()),
-				greaterThan(INACTIVATED_AT, ZonedDateTime.of(time, ZoneId.systemDefault()).toInstant().toEpochMilli()));
-	}
+    /**
+     * Get effective versions in a certain period of time.
+     * 
+     * @param id     the dicument id
+     * @param period the period
+     * @return the list of effective versions
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Query<T> effectiveBetween(Object id, EffectivePeriod period) {
+        if (period.until().equals(LocalDate.MAX))
+            return (Query<T>) and(allActive(id), greaterThanOrEqualTo(EFFECTIVE_FROM, period.from()),
+                    lessThanOrEqualTo(EFFECTIVE_UNTIL, period.until()));
+        else
+            return (Query<T>) and(allActive(id), greaterThanOrEqualTo(EFFECTIVE_FROM, period.from()),
+                    lessThan(EFFECTIVE_UNTIL, period.until()));
+    }
 
-	// @formatter:on
+    /**
+     * Get the list of active records at a given <b>record</b> time. These will have
+     * distinct (non-overlapping) effective periods.
+     * 
+     * @param id   the document id
+     * @param time the point in time, must be in the past
+     * @return the list of versions active at the given time
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Query<T> journalAt(Object id, LocalDateTime time) {
+        return (Query<T>) and(all(id),
+                lessThanOrEqualTo(CREATED_AT,
+                        ZonedDateTime.of(time, ZoneId.systemDefault()).toInstant().toEpochMilli()),
+                greaterThan(INACTIVATED_AT, ZonedDateTime.of(time, ZoneId.systemDefault()).toInstant().toEpochMilli()));
+    }
+
+    // @formatter:on
 
 }

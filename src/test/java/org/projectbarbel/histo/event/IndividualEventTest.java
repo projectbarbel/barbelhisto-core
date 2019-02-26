@@ -21,6 +21,7 @@ import org.projectbarbel.histo.event.EventType.InsertBitemporalEvent;
 import org.projectbarbel.histo.event.EventType.ReleaseLockEvent;
 import org.projectbarbel.histo.event.EventType.ReplaceBitemporalEvent;
 import org.projectbarbel.histo.event.EventType.RetrieveDataEvent;
+import org.projectbarbel.histo.event.EventType.UpdateFinishedEvent;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -38,6 +39,7 @@ public class IndividualEventTest {
                 Arguments.of(EventType.INSERTBITEMPORAL),
                 Arguments.of(EventType.RELEASELOCK),
                 Arguments.of(EventType.RETRIEVEDATA),
+                Arguments.of(EventType.UPDATEFINISHED),
                 Arguments.of(EventType.REPLACEBITEMPORAL)
                 );
     }
@@ -98,32 +100,36 @@ public class IndividualEventTest {
 	public static class ExceptionThrowingListener {
         @Subscribe
         public void handle(RetrieveDataEvent event) throws InterruptedException {
-            event.failed();
+            event.failed(new NullPointerException());
         }
 
         @Subscribe
         public void handle(InitializeJournalEvent event) throws InterruptedException {
-            event.failed();
+            event.failed(new NullPointerException());
         }
         
         @Subscribe
         public void handle(InsertBitemporalEvent event) throws InterruptedException {
-            event.failed();
+            event.failed(new NullPointerException());
         }
 
         @Subscribe
         public void handle(ReleaseLockEvent event) throws InterruptedException {
-            event.failed();
+            event.failed(new NullPointerException());
         }
 
         @Subscribe
         public void handle(AcquireLockEvent event) throws InterruptedException {
-            event.failed();
+            event.failed(new NullPointerException());
         }
         
         @Subscribe
         public void handle(ReplaceBitemporalEvent event) throws InterruptedException {
-            event.failed();
+            event.failed(new NullPointerException());
+        }
+        @Subscribe
+        public void handle(UpdateFinishedEvent event) throws InterruptedException {
+            event.failed(new NullPointerException());
         }
 	}
 
@@ -163,6 +169,11 @@ public class IndividualEventTest {
             assertNotNull(event);
 			notifyCallerThread();
 		}
+		@Subscribe
+        public void handle(UpdateFinishedEvent event) throws InterruptedException {
+            assertNotNull(event);
+            notifyCallerThread();
+        }
 	}
 
 	private static void waitForEventToComplete(int syncpoint) throws InterruptedException {

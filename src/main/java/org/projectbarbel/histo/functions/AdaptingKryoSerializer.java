@@ -53,7 +53,7 @@ public class AdaptingKryoSerializer implements PojoSerializer<Bitemporal> {
     @Override
     public byte[] serialize(final Bitemporal object) {
         if (object instanceof BarbelProxy) { // change persisted type to BitemporalVersion
-            return targetKryo.serialize(new BitemporalVersion<>((object).getBitemporalStamp(),
+            return targetKryo.serialize(new BitemporalVersion((object).getBitemporalStamp(),
                     ((BarbelProxy) object).getTarget()));
         }
         return targetKryo.serialize(object);
@@ -63,12 +63,12 @@ public class AdaptingKryoSerializer implements PojoSerializer<Bitemporal> {
     public Bitemporal deserialize(byte[] bytes) {
         Bitemporal bitemporal = targetKryo.deserialize(bytes);
         if (bitemporal instanceof BitemporalVersion) {
-            BitemporalVersion<?> bv = (BitemporalVersion<?>) bitemporal;
+            BitemporalVersion bv = (BitemporalVersion) bitemporal;
             Object bvobject = bv.getObject();
             if (context.getMode() == BarbelMode.POJO)
                 return context.getMode().snapshotMaiden(context, bvobject, bv.getBitemporalStamp());
             else
-                return new BitemporalVersion<>(bv.getBitemporalStamp(), bvobject);
+                return new BitemporalVersion(bv.getBitemporalStamp(), bvobject);
         }
         return bitemporal;
     }

@@ -14,8 +14,8 @@ public class BitemporalVersionTest {
     public void testEquals() throws Exception {
         BitemporalStamp stamp = BitemporalStamp.createActive();
         DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
-        BitemporalVersion<DefaultPojo> version1 = new BitemporalVersion<DefaultPojo>(stamp, pojo);
-        BitemporalVersion<DefaultPojo> version2 = new BitemporalVersion<DefaultPojo>(stamp, pojo);
+        BitemporalVersion version1 = new BitemporalVersion(stamp, pojo);
+        BitemporalVersion version2 = new BitemporalVersion(stamp, pojo);
         assertTrue(version1.equals(version2));
         assertTrue(version1.equals(version1));
         assertFalse(version1.equals(null));
@@ -26,7 +26,7 @@ public class BitemporalVersionTest {
 
 	@Test
 	public void testToString() throws Exception {
-		assertNotNull(new BitemporalVersion<DefaultDocument>(BitemporalStamp.createActive(), new DefaultDocument()).toString());
+		assertNotNull(new BitemporalVersion(BitemporalStamp.createActive(), new DefaultDocument()).toString());
 	}
 
 }

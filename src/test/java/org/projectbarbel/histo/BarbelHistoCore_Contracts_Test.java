@@ -46,9 +46,9 @@ public class BarbelHistoCore_Contracts_Test {
 
     @Test
     public void testSaveBitemporalVersion() throws Exception {
-        BarbelHisto<BitemporalVersion<DefaultPojo>> core = BarbelHistoBuilder.barbel().build();
+        BarbelHisto<BitemporalVersion> core = BarbelHistoBuilder.barbel().build();
         Exception exc = assertThrows(IllegalArgumentException.class,
-                () -> core.save(new BitemporalVersion<DefaultPojo>(BitemporalStamp.createActive(), EnhancedRandom.random(DefaultPojo.class)), LocalDate.now(), LocalDate.MAX));
+                () -> core.save(new BitemporalVersion(BitemporalStamp.createActive(), EnhancedRandom.random(DefaultPojo.class)), LocalDate.now(), LocalDate.MAX));
         assertTrue(exc.getMessage().contains("BitemporalVersion cannot be used in BarbelMode.POJO"));
     }
     

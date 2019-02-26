@@ -27,14 +27,16 @@ import lombok.extern.slf4j.Slf4j;
  * 3. {@link EventType#ACQUIRELOCK}, when {@link BarbelHisto} starts updating a document journal, synchronous post
  * 4. {@link EventType#REPLACEBITEMPORAL}, when versions are inactivated, both way
  * 5. {@link EventType#INSERTBITEMPORAL}, when new versions are inserted, both way
- * 6. {@link EventType#RELEASELOCK}, when {@link BarbelHisto} finishes the updating cycle, synchronous post
+ * 6. {@link EventType#UPDATEFINISHED}, when the update operation for journal was completed, once per save operation, both way
+ * 7. {@link EventType#RELEASELOCK}, when {@link BarbelHisto} finishes the updating cycle, synchronous post
  * </pre>
  * 
- * The {@link EventType#RETRIEVEDATA} event is posted each time when clients retrieve data from
- * {@link BarbelHisto}. <br><br>
- * "Both way" means that the event is published
- * synchronously and asynchronously, i.e. clients can register listeners in
- * asynchronous and synchronous bus to catch these events.<br>
+ * The {@link EventType#RETRIEVEDATA} event is posted each time when clients
+ * retrieve data from {@link BarbelHisto}. <br>
+ * <br>
+ * "Both way" means that the event is published synchronously and
+ * asynchronously, i.e. clients can register listeners in asynchronous and
+ * synchronous bus to catch these events.<br>
  * <br>
  * Different uses of {@link HistoEvent}s are possible. For instance clients may
  * want to:
@@ -64,11 +66,11 @@ import lombok.extern.slf4j.Slf4j;
  * <br>
  * If you perform synchronous events, you can control the behavior if the event
  * processing fails. If the handler fails to handle the received synchronous
- * event, then call {@link HistoEvent#failed()}. This will stop execution and an
- * {@link HistoEventFailedException} will be thrown without continuing
- * processing. This could be useful in many situations, e.g. in situations where
- * clients want to avoid any inconsistency between the backbone collection and
- * an external data source targeted by an event. <br>
+ * event, then call {@link HistoEvent#failed(Throwable)}. This will stop
+ * execution and an {@link HistoEventFailedException} will be thrown without
+ * continuing processing. This could be useful in many situations, e.g. in
+ * situations where clients want to avoid any inconsistency between the backbone
+ * collection and an external data source targeted by an event. <br>
  * <br>
  * 
  * @author Niklas Schlimm
@@ -83,7 +85,7 @@ public enum EventType implements PostableEvent {
         public HistoEvent create() {
             return new BarbelInitializedEvent(BARBELINITIALIZED, new HashMap<>());
         }
-        
+
     },
     /**
      * Event fired when a journal is created on a
@@ -91,12 +93,12 @@ public enum EventType implements PostableEvent {
      * operation. Posted only once per {@link BarbelHisto} session and document id.
      */
     INITIALIZEJOURNAL {
-        
+
         @Override
         public HistoEvent create() {
             return new InitializeJournalEvent(INITIALIZEJOURNAL, new HashMap<>());
         }
-        
+
     },
     /**
      * Event fired when {@link BarbelHisto} acquires the lock for a journal update.
@@ -126,17 +128,29 @@ public enum EventType implements PostableEvent {
      * each save-operation.
      */
     REPLACEBITEMPORAL {
-        
+
         @Override
         public HistoEvent create() {
             return new ReplaceBitemporalEvent(REPLACEBITEMPORAL, new HashMap<>());
         }
-        
+
+    },
+    /**
+     * Event fired when {@link BarbelHisto} finished updating the document journal
+     * of a given document id. Posted once for each save-operation.
+     */
+    UPDATEFINISHED {
+
+        @Override
+        public HistoEvent create() {
+            return new UpdateFinishedEvent(UPDATEFINISHED, new HashMap<>());
+        }
+
     },
     /**
      * Event fired when {@link BarbelHisto} released a lock on a document journal
-     * for a given document ID in the operation. Posted once for each
-     * save-operation at the end of the update-operation
+     * for a given document ID in the operation. Posted once for each save-operation
+     * at the end of the update-operation
      */
     RELEASELOCK {
 
@@ -165,6 +179,11 @@ public enum EventType implements PostableEvent {
         protected Map<Object, Object> eventContext;
         private boolean failed = false;
         private final EventType eventType;
+        private Throwable rootCause;
+
+        public Throwable getRootCause() {
+            return rootCause;
+        }
 
         public AbstractBarbelEvent(EventType eventType, Map<Object, Object> context) {
             this.eventType = eventType;
@@ -175,7 +194,8 @@ public enum EventType implements PostableEvent {
             return !failed;
         }
 
-        public void failed() {
+        public void failed(Throwable e) {
+            this.rootCause = e;
             failed = true;
         }
 
@@ -187,7 +207,7 @@ public enum EventType implements PostableEvent {
         public EventType getEventType() {
             return eventType;
         }
-        
+
         public Object getDocumentId() {
             return "n/a";
         }
@@ -223,7 +243,7 @@ public enum EventType implements PostableEvent {
     }
 
     public static class InsertBitemporalEvent extends AbstractBarbelEvent {
-        
+
         public static final String NEWVERSIONS = "#newVersions";
 
         public InsertBitemporalEvent(EventType eventType, Map<Object, Object> context) {
@@ -256,7 +276,7 @@ public enum EventType implements PostableEvent {
 
         public static final String OBJECTS_REMOVED = "#objectsRemoved";
         public static final String OBJECTS_ADDED = "#objectsAdded";
-        
+
         public ReplaceBitemporalEvent(EventType eventType, Map<Object, Object> context) {
             super(eventType, context);
         }
@@ -269,10 +289,28 @@ public enum EventType implements PostableEvent {
 
     }
 
+    public static class UpdateFinishedEvent extends AbstractBarbelEvent {
+        
+        public static final String NEWVERSIONS = "#newVersions";
+        public static final String REPLACEMENTS = "#lastreplacements";
+        
+        public UpdateFinishedEvent(EventType eventType, Map<Object, Object> context) {
+            super(eventType, context);
+        }
+        
+        @Override
+        public Object getDocumentId() {
+            return Optional.ofNullable(((DocumentJournal) eventContext.get(DocumentJournal.class)))
+                    .orElse(DocumentJournal.EMPTYSAMPLE).getId();
+        }
+        
+    }
+    
     public static class RetrieveDataEvent extends AbstractBarbelEvent {
 
         public static final String QUERY = "#query";
         public static final String BARBEL = "#core";
+        public static final String QUERYOPTIONS = "#options";
 
         public RetrieveDataEvent(EventType eventType, Map<Object, Object> context) {
             super(eventType, context);

@@ -67,7 +67,7 @@ public class BarbelHistoCore_EventsFailing {
                 if (shadow.size() > 1)
                     throw new NullPointerException();
             } catch (Exception e) {
-                event.failed();
+                event.failed(e);
             }
         }
 
@@ -85,7 +85,7 @@ public class BarbelHistoCore_EventsFailing {
                 obectsAdded.stream().forEach(v -> shadow.add((DefaultDocument) v));
                 obectsRemoved.stream().forEach(v -> shadow.remove((DefaultDocument) v));
             } catch (Exception e) {
-                event.failed();
+                event.failed(e);
             }
         }
     }

@@ -57,7 +57,7 @@ public class SimpleGsonPojoSerializerTest {
     @Test
     public void testSerialize_BitemporalVersion() throws Exception {
         serializer = new SimpleGsonPojoSerializer(BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL));
-        BitemporalVersion<SomePojo> initial = new BitemporalVersion<SomePojo>(BitemporalStamp.createActive(), EnhancedRandom.random(SomePojo.class));
+        BitemporalVersion initial = new BitemporalVersion(BitemporalStamp.createActive(), EnhancedRandom.random(SomePojo.class));
         byte[] bytes = serializer.serialize(initial);
         Bitemporal roundtrip = serializer.deserialize(bytes);
         assertEquals(initial, roundtrip);

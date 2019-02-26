@@ -24,7 +24,7 @@ public interface HistoEvent {
     default void postSynchronous(BarbelHistoContext context) {
         context.postSynchronousEvent(this);
         if (!this.succeeded())
-            throw new HistoEventFailedException("event failed " + this.getClass() + " with ID: " + this.getDocumentId(), this);
+            throw new HistoEventFailedException("event failed " + this.getClass() + " with ID: " + this.getDocumentId(), this.getRootCause(), this);
     }
 
     default void postAsynchronous(BarbelHistoContext context) {
@@ -40,8 +40,10 @@ public interface HistoEvent {
 
     Object getDocumentId();
 
-    void failed();
+    void failed(Throwable e);
 
+    Throwable getRootCause();
+    
     Map<Object, Object> getEventContext();
     
     EventType getEventType();

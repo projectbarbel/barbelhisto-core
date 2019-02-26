@@ -52,7 +52,7 @@ public enum BarbelMode implements BarbelModeProcessor {
                 IndexedCollection<T> objects) {
             // used on unload, that's why no copy is ok
             return objects.retrieve(BarbelQueries.all(id)).stream().map(
-                    o -> new BitemporalVersion<>(((Bitemporal) o).getBitemporalStamp(), ((BarbelProxy) o).getTarget()))
+                    o -> new BitemporalVersion(((Bitemporal) o).getBitemporalStamp(), ((BarbelProxy) o).getTarget()))
                     .collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
         }
 
@@ -62,8 +62,8 @@ public enum BarbelMode implements BarbelModeProcessor {
                 Collection<Bitemporal> bitemporals) {
             try {
                 IndexedCollection<Object> output = bitemporals.stream()
-                        .map(b -> snapshotMaiden(context, ((BitemporalVersion<?>) b).getObject(),
-                                ((BitemporalVersion<?>) b).getBitemporalStamp()))
+                        .map(b -> snapshotMaiden(context, ((BitemporalVersion) b).getObject(),
+                                ((BitemporalVersion) b).getBitemporalStamp()))
                         .collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
                 return (Collection<T>) output;
             } catch (ClassCastException e) {
@@ -106,7 +106,12 @@ public enum BarbelMode implements BarbelModeProcessor {
 
         @Override
         public Bitemporal managedBitemporalToCustomPersistenceObject(Bitemporal bitemporal) {
-            return new BitemporalVersion<>(bitemporal.getBitemporalStamp(), ((BarbelProxy) bitemporal).getTarget());
+            return new BitemporalVersion(bitemporal.getBitemporalStamp(), ((BarbelProxy) bitemporal).getTarget());
+        }
+
+        @Override
+        public String getDocumentIdFieldNameOnPersistedType(Class<?> candidate) {
+            return getStampFieldName(BitemporalVersion.class, BitemporalStamp.class) + DOCUMENT_ID;
         }
 
     },
@@ -180,8 +185,14 @@ public enum BarbelMode implements BarbelModeProcessor {
             return bitemporal;
         }
 
+        @Override
+        public String getDocumentIdFieldNameOnPersistedType(Class<?> candidate) {
+            return getStampFieldName(candidate, BitemporalStamp.class) + DOCUMENT_ID;
+        }
+
     };
 
+    private static final String DOCUMENT_ID = ".documentId";
     private static final String CGLIB_TYPE_REQUIRED = "pojo must not be CGLib proxy type";
 
 }

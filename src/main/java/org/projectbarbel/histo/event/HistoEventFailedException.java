@@ -3,7 +3,7 @@ package org.projectbarbel.histo.event;
 /**
  * Exception thrown when synchronous {@link HistoEvent} fails. Provides access
  * to the failing event to enable specific error handling by the client. Only
- * thrown when {@link HistoEvent#failed()} is called in the listener
+ * thrown when {@link HistoEvent#failed(Throwable)} is called in the listener
  * implementation. Clients can pass back context data to their exception
  * handling by adding data to {@link HistoEvent#getEventContext()}.
  * 

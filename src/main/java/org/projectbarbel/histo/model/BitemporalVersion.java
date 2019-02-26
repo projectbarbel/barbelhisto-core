@@ -13,32 +13,34 @@ import org.projectbarbel.histo.BarbelMode;
  * 
  * @author Niklas Schlimm
  *
- * @param <T> the business tabpe to store
  */
-public class BitemporalVersion<T> implements Bitemporal {
+public class BitemporalVersion implements Bitemporal {
 
-	private BitemporalStamp stamp;
-	private final T object;
-	private final String objectType;
+	private BitemporalStamp bitemporalStamp;
+	private Object object;
+    private String objectType;
 
-	public BitemporalVersion(BitemporalStamp stamp, T object) {
+	public BitemporalVersion() {
+    }
+	
+    public BitemporalVersion(BitemporalStamp stamp, Object object) {
 		super();
-		this.stamp = stamp;
+		this.bitemporalStamp = stamp;
 		this.object = object;
 		this.objectType = object.getClass().getName();
 	}
 
 	@Override
 	public BitemporalStamp getBitemporalStamp() {
-		return stamp;
+		return bitemporalStamp;
 	}
 
 	@Override
 	public void setBitemporalStamp(BitemporalStamp stamp) {
-		this.stamp = stamp;
+		this.bitemporalStamp = stamp;
 	}
 
-	public T getObject() {
+	public Object getObject() {
 		return object;
 	}
 
@@ -46,30 +48,31 @@ public class BitemporalVersion<T> implements Bitemporal {
 		return objectType;
 	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(object, objectType, stamp);
-	}
+    public void setObject(Object object) {
+        this.object = object;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof BitemporalVersion)) {
-			return false;
-		}
-		BitemporalVersion<?> other = (BitemporalVersion<?>) obj;
-		return Objects.equals(object, other.object) && Objects.equals(objectType, other.objectType)
-				&& Objects.equals(stamp, other.stamp);
-	}
+    @Override
+    public int hashCode() {
+        return Objects.hash(object, objectType, bitemporalStamp);
+    }
 
-	@Override
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        BitemporalVersion other = (BitemporalVersion) obj;
+        return Objects.equals(object, other.object) && Objects.equals(objectType, other.objectType)
+                && Objects.equals(bitemporalStamp, other.bitemporalStamp);
+    }
+
+    @Override
 	public String toString() {
-		return "BitemporalVersion [stamp=" + stamp + ", object=" + object + ", objectType=" + objectType + "]";
+		return "BitemporalVersion [stamp=" + bitemporalStamp + ", object=" + object + ", objectType=" + objectType + "]";
 	}
 
 }
