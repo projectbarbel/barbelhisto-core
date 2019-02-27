@@ -148,8 +148,8 @@ public final class DocumentJournal {
                     .with(InactivationEvent.OBJECT_ADDED,
                             context.getMode().copyManagedBitemporal(context, inactivatedCopy))
                     .postBothWay(context);
-            replace(objectToInactivate, inactivatedCopy);
-            lastInactivations.add(new Inactivation(objectToInactivate, inactivatedCopy));
+            if (lastInactivations.add(new Inactivation(objectToInactivate, inactivatedCopy)))
+                replace(objectToInactivate, inactivatedCopy);
         } catch (Exception e) {
             // undo last inserts
             lastInserts.stream().forEach(journal::remove);
@@ -295,8 +295,10 @@ public final class DocumentJournal {
             if (!(obj instanceof Inactivation))
                 return false;
             Inactivation other = (Inactivation) obj;
-            return Objects.equals(objectAdded.getBitemporalStamp().getVersionId(), other.objectAdded.getBitemporalStamp().getVersionId())
-                    && Objects.equals(objectRemoved.getBitemporalStamp().getVersionId(), other.objectRemoved.getBitemporalStamp().getVersionId());
+            return Objects.equals(objectAdded.getBitemporalStamp().getVersionId(),
+                    other.objectAdded.getBitemporalStamp().getVersionId())
+                    && Objects.equals(objectRemoved.getBitemporalStamp().getVersionId(),
+                            other.objectRemoved.getBitemporalStamp().getVersionId());
         }
 
     }
