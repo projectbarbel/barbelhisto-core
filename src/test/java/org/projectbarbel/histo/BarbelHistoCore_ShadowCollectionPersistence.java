@@ -11,7 +11,7 @@ import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.projectbarbel.histo.DocumentJournal.Replacement;
+import org.projectbarbel.histo.DocumentJournal.Inactivation;
 import org.projectbarbel.histo.event.EventType.BarbelInitializedEvent;
 import org.projectbarbel.histo.event.EventType.InitializeJournalEvent;
 import org.projectbarbel.histo.event.EventType.RetrieveDataEvent;
@@ -76,12 +76,10 @@ public class BarbelHistoCore_ShadowCollectionPersistence {
             List<Bitemporal> inserts = (List<Bitemporal>) event.getEventContext().get(UpdateFinishedEvent.NEWVERSIONS);
             inserts.stream().forEach(v -> shadow.add((DefaultDocument) v));
             @SuppressWarnings("unchecked")
-            Set<Replacement> replacements = (Set<Replacement>) event.getEventContext()
-                    .get(UpdateFinishedEvent.REPLACEMENTS);
-            replacements.stream().flatMap(r -> r.getObjectsAdded().stream())
-                    .forEach(v -> shadow.add((DefaultDocument) v));
-            replacements.stream().flatMap(r -> r.getObjectsRemoved().stream())
-                    .forEach(v -> shadow.remove((DefaultDocument) v));
+            Set<Inactivation> inactivations = (Set<Inactivation>) event.getEventContext()
+                    .get(UpdateFinishedEvent.INACTIVATIONS);
+            inactivations.stream().map(d -> d.getObjectAdded()).forEach(v -> shadow.add((DefaultDocument) v));
+            inactivations.stream().map(d -> d.getObjectRemoved()).forEach(v -> shadow.remove((DefaultDocument) v));
         }
     }
 

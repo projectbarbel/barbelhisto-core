@@ -9,14 +9,14 @@ import java.util.function.Supplier;
  * @author Niklas Schlimm
  *
  */
-public class UUIDGenerator implements Supplier<Object> {
+public class UUIDGenerator implements Supplier<String> {
 
-    public static Object generateId() {
+    public static String generateId() {
         return new UUIDGenerator().get();
     }
 
     @Override
-    public Object get() {
+    public String get() {
         return UUID.randomUUID().toString();
     }
 

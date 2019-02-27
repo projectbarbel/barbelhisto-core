@@ -19,7 +19,7 @@ import org.projectbarbel.histo.event.EventType.AcquireLockEvent;
 import org.projectbarbel.histo.event.EventType.InitializeJournalEvent;
 import org.projectbarbel.histo.event.EventType.InsertBitemporalEvent;
 import org.projectbarbel.histo.event.EventType.ReleaseLockEvent;
-import org.projectbarbel.histo.event.EventType.ReplaceBitemporalEvent;
+import org.projectbarbel.histo.event.EventType.InactivationEvent;
 import org.projectbarbel.histo.event.EventType.RetrieveDataEvent;
 import org.projectbarbel.histo.event.EventType.UpdateFinishedEvent;
 
@@ -40,7 +40,7 @@ public class IndividualEventTest {
                 Arguments.of(EventType.RELEASELOCK),
                 Arguments.of(EventType.RETRIEVEDATA),
                 Arguments.of(EventType.UPDATEFINISHED),
-                Arguments.of(EventType.REPLACEBITEMPORAL)
+                Arguments.of(EventType.INACTIVATION)
                 );
     }
     
@@ -124,7 +124,7 @@ public class IndividualEventTest {
         }
         
         @Subscribe
-        public void handle(ReplaceBitemporalEvent event) throws InterruptedException {
+        public void handle(InactivationEvent event) throws InterruptedException {
             event.failed(new NullPointerException());
         }
         @Subscribe
@@ -165,7 +165,7 @@ public class IndividualEventTest {
 		}
 		
 		@Subscribe
-		public void handle(ReplaceBitemporalEvent event) throws InterruptedException {
+		public void handle(InactivationEvent event) throws InterruptedException {
             assertNotNull(event);
 			notifyCallerThread();
 		}

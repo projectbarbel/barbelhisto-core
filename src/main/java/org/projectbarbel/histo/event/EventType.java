@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
  * 1. {@link EventType#BARBELINITIALIZED} when {@link BarbelHisto} instance is created, only once per {@link BarbelHisto} session, both way
  * 2. {@link EventType#INITIALIZEJOURNAL} when journal is created, only once, both way
  * 3. {@link EventType#ACQUIRELOCK}, when {@link BarbelHisto} starts updating a document journal, synchronous post
- * 4. {@link EventType#REPLACEBITEMPORAL}, when versions are inactivated, both way
+ * 4. {@link EventType#INACTIVATION}, when versions are inactivated, both way
  * 5. {@link EventType#INSERTBITEMPORAL}, when new versions are inserted, both way
  * 6. {@link EventType#UPDATEFINISHED}, when the update operation for journal was completed, once per save operation, both way
  * 7. {@link EventType#RELEASELOCK}, when {@link BarbelHisto} finishes the updating cycle, synchronous post
@@ -42,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
  * want to:
  * <ul>
  * <li>synchronize data in external data stores with
- * {@link EventType#REPLACEBITEMPORAL} and
+ * {@link EventType#INACTIVATION} and
  * {@link EventType#INSERTBITEMPORAL}</li>
  * <li>lock journals stored in a database in complex distributed scenarios using
  * {@link EventType#ACQUIRELOCK} and {@link EventType#RELEASELOCK}</li>
@@ -127,11 +127,11 @@ public enum EventType implements PostableEvent {
      * Event fired when {@link BarbelHisto} inactivates versions. Posted once for
      * each save-operation.
      */
-    REPLACEBITEMPORAL {
+    INACTIVATION {
 
         @Override
         public HistoEvent create() {
-            return new ReplaceBitemporalEvent(REPLACEBITEMPORAL, new HashMap<>());
+            return new InactivationEvent(INACTIVATION, new HashMap<>());
         }
 
     },
@@ -274,12 +274,12 @@ public enum EventType implements PostableEvent {
 
     }
 
-    public static class ReplaceBitemporalEvent extends AbstractBarbelEvent {
+    public static class InactivationEvent extends AbstractBarbelEvent {
 
-        public static final String OBJECTS_REMOVED = "#objectsRemoved";
-        public static final String OBJECTS_ADDED = "#objectsAdded";
+        public static final String OBJECT_REMOVED = "#objectsRemoved";
+        public static final String OBJECT_ADDED = "#objectsAdded";
 
-        public ReplaceBitemporalEvent(EventType eventType, Map<Object, Object> context) {
+        public InactivationEvent(EventType eventType, Map<Object, Object> context) {
             super(eventType, context);
         }
 
@@ -294,7 +294,7 @@ public enum EventType implements PostableEvent {
     public static class UpdateFinishedEvent extends AbstractBarbelEvent {
         
         public static final String NEWVERSIONS = "#newVersions";
-        public static final String REPLACEMENTS = "#lastreplacements";
+        public static final String INACTIVATIONS = "#lastinactivations";
         
         public UpdateFinishedEvent(EventType eventType, Map<Object, Object> context) {
             super(eventType, context);

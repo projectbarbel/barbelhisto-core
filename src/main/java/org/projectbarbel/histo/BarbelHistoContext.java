@@ -67,11 +67,11 @@ public interface BarbelHistoContext {
         return BarbelHistoBuilder.CLOCK;
     }
 
-    static Supplier<Object> getDefaultDocumentIDGenerator() {
+    static Supplier<String> getDefaultDocumentIDGenerator() {
         return new UUIDGenerator();
     }
 
-    static Supplier<Object> getDefaultVersionIDGenerator() {
+    static Supplier<String> getDefaultVersionIDGenerator() {
         return new UUIDGenerator();
     }
 
@@ -100,7 +100,7 @@ public interface BarbelHistoContext {
         return new AsyncEventBus(Executors.newFixedThreadPool(5), new DefaultSubscriberExceptionHandler());
     }
 
-    Supplier<Object> getVersionIdGenerator();
+    Supplier<String> getVersionIdGenerator();
 
     <T> Supplier<IndexedCollection<T>> getBackboneSupplier();
 

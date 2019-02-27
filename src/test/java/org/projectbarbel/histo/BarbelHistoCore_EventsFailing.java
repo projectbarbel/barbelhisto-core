@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.projectbarbel.histo.event.EventType.BarbelInitializedEvent;
 import org.projectbarbel.histo.event.EventType.InsertBitemporalEvent;
-import org.projectbarbel.histo.event.EventType.ReplaceBitemporalEvent;
+import org.projectbarbel.histo.event.EventType.InactivationEvent;
 import org.projectbarbel.histo.event.HistoEventFailedException;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
@@ -72,18 +72,16 @@ public class BarbelHistoCore_EventsFailing {
         }
 
         @Subscribe
-        public void handleReplacements(ReplaceBitemporalEvent event) {
+        public void handleInavctivations(InactivationEvent event) {
             // Fail when one record was already inserted
             try {
                 replaceCounter++;
-                @SuppressWarnings("unchecked")
-                List<Bitemporal> obectsAdded = (List<Bitemporal>) event.getEventContext()
-                        .get(ReplaceBitemporalEvent.OBJECTS_ADDED);
-                @SuppressWarnings("unchecked")
-                List<Bitemporal> obectsRemoved = (List<Bitemporal>) event.getEventContext()
-                        .get(ReplaceBitemporalEvent.OBJECTS_REMOVED);
-                obectsAdded.stream().forEach(v -> shadow.add((DefaultDocument) v));
-                obectsRemoved.stream().forEach(v -> shadow.remove((DefaultDocument) v));
+                Bitemporal obectAdded = (Bitemporal) event.getEventContext()
+                        .get(InactivationEvent.OBJECT_ADDED);
+                Bitemporal obectRemoved = (Bitemporal) event.getEventContext()
+                        .get(InactivationEvent.OBJECT_REMOVED);
+                shadow.add((DefaultDocument) obectAdded);
+                shadow.remove((DefaultDocument) obectRemoved);
             } catch (Exception e) {
                 event.failed(e);
             }

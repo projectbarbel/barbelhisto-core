@@ -66,9 +66,8 @@ public class BarbelHistoCore_JournalUpdate_Test {
         // 10:00 Uhr (now)
 
         return Stream.of(
-                // A |------------------|------------------|------------------|---------->
-                // Infinite
-                // U|---------|
+                // A     |------------------|------------------|------------------|----------> Infinite
+                // U |---------|
                 Arguments.of(LocalDate.of(2015, 7, 1), LocalDate.of(2016, 7, 1), JournalUpdateCase.PREOVERLAPPING, 2,
                         Arrays.asList(LocalDate.of(2015, 7, 1), LocalDate.of(2016, 7, 1), LocalDate.of(2016, 7, 1),
                                 LocalDate.of(2017, 1, 1)),

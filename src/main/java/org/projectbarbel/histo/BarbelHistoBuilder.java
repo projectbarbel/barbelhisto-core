@@ -71,7 +71,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
             .getDefaultProxyingFunctionSupplier();
     private Supplier<UnaryOperator<Object>> pojoCopyFunctionSupplier = BarbelHistoContext
             .getDefaultCopyFunctionSupplier();
-    private Supplier<Object> versionIdGenerator = BarbelHistoContext.getDefaultVersionIDGenerator();
+    private Supplier<String> versionIdGenerator = BarbelHistoContext.getDefaultVersionIDGenerator();
     private Object backboneSupplier = BarbelHistoContext.getDefaultBackboneSupplier();
     private String activity = BarbelHistoContext.getDefaultActivity();
     private String user = BarbelHistoContext.getDefaultUser();
@@ -417,7 +417,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
     }
 
     @Override
-    public Supplier<Object> getVersionIdGenerator() {
+    public Supplier<String> getVersionIdGenerator() {
         return versionIdGenerator;
     }
 
@@ -428,7 +428,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
      * @param versionIdGenerator the custom version id generator
      * @return the builder
      */
-    public BarbelHistoBuilder withVersionIdGenerator(Supplier<Object> versionIdGenerator) {
+    public BarbelHistoBuilder withVersionIdGenerator(Supplier<String> versionIdGenerator) {
         Validate.isTrue(versionIdGenerator != null, NONULLS);
         this.versionIdGenerator = versionIdGenerator;
         return this;

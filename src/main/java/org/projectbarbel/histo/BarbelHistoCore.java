@@ -91,7 +91,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
                     return (T) mode.copyManagedBitemporal(context, newManagedBitemporal);
                 } finally {
                     EventType.UPDATEFINISHED.create().with(UpdateFinishedEvent.NEWVERSIONS, journal.getLastInsert())
-                            .with(UpdateFinishedEvent.REPLACEMENTS, journal.getLastReplacements()).postBothWay(context);
+                            .with(UpdateFinishedEvent.INACTIVATIONS, journal.getLastInactivations()).postBothWay(context);
                     EventType.RELEASELOCK.create().with(journal).postSynchronous(context);
                 }
             } finally {

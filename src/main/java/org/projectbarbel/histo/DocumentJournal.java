@@ -6,8 +6,10 @@ import static com.googlecode.cqengine.query.QueryFactory.queryOptions;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -17,7 +19,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.projectbarbel.histo.event.EventType;
 import org.projectbarbel.histo.event.EventType.InsertBitemporalEvent;
-import org.projectbarbel.histo.event.EventType.ReplaceBitemporalEvent;
+import org.projectbarbel.histo.event.EventType.InactivationEvent;
 import org.projectbarbel.histo.functions.EmbeddingJournalUpdateStrategy.JournalUpdateCase;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.DefaultPojo;
@@ -68,7 +70,7 @@ public final class DocumentJournal {
     private final AtomicBoolean locked = new AtomicBoolean();
     private final BarbelHistoContext context;
     private final ProcessingState processingState;
-    private final Set<Replacement> lastReplacements = new HashSet<>();
+    private final Set<Inactivation> lastInactivations = new HashSet<>();
     private JournalUpdateCase lastUpdateCase;
     private Bitemporal lastUpdateRequest;
 
@@ -113,8 +115,7 @@ public final class DocumentJournal {
 
     @SuppressWarnings("unchecked")
     public void insert(List<Bitemporal> newVersions) {
-        Validate.validState(ProcessingState.INTERNAL.equals(processingState),
-                FORBIDDEN_OPERATION);
+        Validate.validState(ProcessingState.INTERNAL.equals(processingState), FORBIDDEN_OPERATION);
         Validate.isTrue(
                 newVersions.stream().filter(d -> !d.getBitemporalStamp().getDocumentId().equals(id)).count() == 0,
                 "new versions must match document id of journal");
@@ -129,26 +130,26 @@ public final class DocumentJournal {
             journal.addAll(newVersions);
         } catch (Exception e) {
             // undo last replacements
-            lastReplacements.stream().forEach(r -> replaceInternal(r.getObjectsAdded(), r.getObjectsRemoved()));
+            lastInactivations.stream().forEach(r -> replace(r.getObjectAdded(), r.getObjectRemoved()));
             throw e;
         }
     }
 
-    public void replace(List<Bitemporal> objectsToRemove, List<Bitemporal> objectsToAdd) {
-        Validate.validState(ProcessingState.INTERNAL.equals(processingState),
-                FORBIDDEN_OPERATION);
-        Validate.isTrue(
-                objectsToRemove.stream().filter(d -> !d.getBitemporalStamp().getDocumentId().equals(id)).count() == 0,
+    public void inactivate(Bitemporal objectToInactivate, Bitemporal inactivatedCopy) {
+        Validate.validState(ProcessingState.INTERNAL.equals(processingState), FORBIDDEN_OPERATION);
+        Validate.isTrue(objectToInactivate.getBitemporalStamp().getDocumentId().equals(id),
                 "objects must match document id of journal");
-        Validate.isTrue(
-                objectsToAdd.stream().filter(d -> !d.getBitemporalStamp().getDocumentId().equals(id)).count() == 0,
+        Validate.isTrue(inactivatedCopy.getBitemporalStamp().getDocumentId().equals(id),
                 "objects must match document id of journal");
         try {
-            EventType.REPLACEBITEMPORAL.create().with(journal)
-                    .with(ReplaceBitemporalEvent.OBJECTS_REMOVED, copyList(objectsToRemove))
-                    .with(ReplaceBitemporalEvent.OBJECTS_ADDED, copyList(objectsToAdd)).postBothWay(context);
-            replaceInternal(objectsToRemove, objectsToAdd);
-            lastReplacements.add(new Replacement(objectsToRemove, objectsToAdd));
+            EventType.INACTIVATION.create().with(journal)
+                    .with(InactivationEvent.OBJECT_REMOVED,
+                            context.getMode().copyManagedBitemporal(context, objectToInactivate))
+                    .with(InactivationEvent.OBJECT_ADDED,
+                            context.getMode().copyManagedBitemporal(context, inactivatedCopy))
+                    .postBothWay(context);
+            replace(objectToInactivate, inactivatedCopy);
+            lastInactivations.add(new Inactivation(objectToInactivate, inactivatedCopy));
         } catch (Exception e) {
             // undo last inserts
             lastInserts.stream().forEach(journal::remove);
@@ -162,8 +163,8 @@ public final class DocumentJournal {
     }
 
     @SuppressWarnings("unchecked")
-    private void replaceInternal(List<Bitemporal> objectsToRemove, List<Bitemporal> objectsToAdd) {
-        journal.update(objectsToRemove, objectsToAdd);
+    private void replace(Bitemporal objectsToRemove, Bitemporal objectsToAdd) {
+        journal.update(Collections.singletonList(objectsToRemove), Collections.singletonList(objectsToAdd));
     }
 
     @Override
@@ -204,8 +205,8 @@ public final class DocumentJournal {
         return lastInserts;
     }
 
-    protected Set<Replacement> getLastReplacements() {
-        return lastReplacements;
+    protected Set<Inactivation> getLastInactivations() {
+        return lastInactivations;
     }
 
     public Object getId() {
@@ -233,7 +234,7 @@ public final class DocumentJournal {
     protected boolean lockAcquired() {
         if (locked.compareAndSet(false, true)) {
             lastInserts.clear();
-            lastReplacements.clear();
+            lastInactivations.clear();
             lastUpdateCase = null;
             lastUpdateRequest = null;
             return true;
@@ -250,8 +251,7 @@ public final class DocumentJournal {
     }
 
     public void setLastUpdateCase(JournalUpdateCase lastUpdateCase) {
-        Validate.validState(ProcessingState.INTERNAL.equals(processingState),
-                FORBIDDEN_OPERATION);
+        Validate.validState(ProcessingState.INTERNAL.equals(processingState), FORBIDDEN_OPERATION);
         this.lastUpdateCase = lastUpdateCase;
     }
 
@@ -263,22 +263,42 @@ public final class DocumentJournal {
         this.lastUpdateRequest = lastUpdateRequest;
     }
 
-    public static class Replacement {
-        private final List<Bitemporal> objectsRemoved;
-        private final List<Bitemporal> objectsAdded;
+    public static class Inactivation {
+        private final Bitemporal objectRemoved;
+        private final Bitemporal objectAdded;
 
-        private Replacement(List<Bitemporal> objectsRemoved, List<Bitemporal> objectsAdded) {
-            this.objectsRemoved = objectsRemoved;
-            this.objectsAdded = objectsAdded;
+        private Inactivation(Bitemporal objectRemoved, Bitemporal objectAdded) {
+            this.objectRemoved = objectRemoved;
+            this.objectAdded = objectAdded;
         }
 
-        public List<Bitemporal> getObjectsRemoved() {
-            return objectsRemoved;
+        public Bitemporal getObjectRemoved() {
+            return objectRemoved;
         }
 
-        public List<Bitemporal> getObjectsAdded() {
-            return objectsAdded;
+        public Bitemporal getObjectAdded() {
+            return objectAdded;
         }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(objectAdded.getBitemporalStamp().getVersionId(),
+                    objectRemoved.getBitemporalStamp().getVersionId());
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (!(obj instanceof Inactivation))
+                return false;
+            Inactivation other = (Inactivation) obj;
+            return Objects.equals(objectAdded.getBitemporalStamp().getVersionId(), other.objectAdded.getBitemporalStamp().getVersionId())
+                    && Objects.equals(objectRemoved.getBitemporalStamp().getVersionId(), other.objectRemoved.getBitemporalStamp().getVersionId());
+        }
+
     }
 
     public static class JournalReader {

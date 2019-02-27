@@ -3,7 +3,6 @@ package org.projectbarbel.histo.functions;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -69,7 +68,7 @@ public class EmbeddingJournalUpdateStrategy implements BiConsumer<DocumentJourna
         return orginal -> {
             Bitemporal copy = context.getMode().copyManagedBitemporal(context, orginal);
             copy.setBitemporalStamp(copy.getBitemporalStamp().inactivatedCopy(context));
-            journal.replace(Collections.singletonList(orginal), Collections.singletonList(copy));
+            journal.inactivate(orginal, copy);
         };
     }
 
@@ -102,36 +101,36 @@ public class EmbeddingJournalUpdateStrategy implements BiConsumer<DocumentJourna
         // U: |-------|
 
         PREOVERLAPPING(asByte(new boolean[] { false, true, false, false })),
-        // A: |---------|
+        // A:    |---------|
         // U: |-------|
 
         POSTOVERLAPPING(asByte(new boolean[] { true, false, false, false })),
         // A: |-------|
-        // U: |---------|
+        // U:    |---------|
 
         EMBEDDEDINTERVAL(asByte(new boolean[] { true, true, true, false })),
         // A: |--------------|
-        // U: |------|
+        // U:     |------|
 
         EMBEDDEDOVERLAP(asByte(new boolean[] { true, true, false, false })),
         // A: |-------|------|------|
-        // U: |-------|
+        // U:     |-------|
 
         OVERLAY(asByte(new boolean[] { false, false, true, true })),
-        // A: |------|
+        // A:     |------|
         // U: |--------------|
 
         EMBEDDEDOVERLAY(asByte(new boolean[] { true, true, false, true })),
         // A: |-------|------|------|
-        // U: |--------------|
+        // U:     |--------------|
 
         PREOVERLAPPING_OVERLAY(asByte(new boolean[] { false, true, false, true })),
-        // A: |-------|------|
+        // A:     |-------|------|
         // U: |--------------|
 
         POSTOVERLAPPING_OVERLAY(asByte(new boolean[] { true, false, false, true }));
         // A: |------|------|
-        // U: |--------------|
+        // U:    |--------------|
 
         // @formatter:on
 
