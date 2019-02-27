@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -75,10 +76,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
         T maiden = mode.drawMaiden(context, newVersion);
         validTypes.computeIfAbsent(maiden.getClass(), k -> mode.validateManagedType(context, maiden));
         Object id = mode.drawDocumentId(maiden);
-        DocumentJournal journal = journals.computeIfAbsent(id,
-                k -> DocumentJournal.create(ProcessingState.INTERNAL, context, k));
-        EventType.INITIALIZEJOURNAL.create().with(DocumentJournal.create(ProcessingState.EXTERNAL, context, id))
-                .with(InitializeJournalEvent.BARBEL, this).postBothWay(context);
+        DocumentJournal journal = journals.computeIfAbsent(id, createJournal());
         if (journal.lockAcquired()) {
             try {
                 BitemporalStamp stamp = BitemporalStamp.of(context.getActivity(), id, EffectivePeriod.of(from, until),
@@ -103,6 +101,14 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
             throw new ConcurrentModificationException(
                     "the journal for id=" + id.toString() + " is locked - try again later");
         }
+    }
+
+    private Function<Object, DocumentJournal> createJournal() {
+        return id -> {
+            EventType.INITIALIZEJOURNAL.create().with(DocumentJournal.create(ProcessingState.EXTERNAL, context, id))
+                    .with(InitializeJournalEvent.BARBEL, this).postBothWay(context);
+            return DocumentJournal.create(ProcessingState.INTERNAL, context, id);
+        };
     }
 
     @SuppressWarnings("unchecked")

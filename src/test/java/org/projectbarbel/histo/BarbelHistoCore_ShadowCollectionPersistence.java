@@ -14,8 +14,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.projectbarbel.histo.DocumentJournal.Replacement;
 import org.projectbarbel.histo.event.EventType.BarbelInitializedEvent;
 import org.projectbarbel.histo.event.EventType.InitializeJournalEvent;
-import org.projectbarbel.histo.event.EventType.InsertBitemporalEvent;
-import org.projectbarbel.histo.event.EventType.ReplaceBitemporalEvent;
 import org.projectbarbel.histo.event.EventType.RetrieveDataEvent;
 import org.projectbarbel.histo.event.EventType.UpdateFinishedEvent;
 import org.projectbarbel.histo.model.Bitemporal;
@@ -26,7 +24,6 @@ import com.google.common.eventbus.Subscribe;
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.query.Query;
-import com.googlecode.cqengine.query.simple.Equal;
 
 @TestMethodOrder(OrderAnnotation.class)
 public class BarbelHistoCore_ShadowCollectionPersistence {
@@ -76,32 +73,30 @@ public class BarbelHistoCore_ShadowCollectionPersistence {
         @Subscribe
         public void handleInserts(UpdateFinishedEvent event) {
             @SuppressWarnings("unchecked")
-            List<Bitemporal> inserts = (List<Bitemporal>) event.getEventContext()
-                    .get(UpdateFinishedEvent.NEWVERSIONS);
+            List<Bitemporal> inserts = (List<Bitemporal>) event.getEventContext().get(UpdateFinishedEvent.NEWVERSIONS);
             inserts.stream().forEach(v -> shadow.add((DefaultDocument) v));
             @SuppressWarnings("unchecked")
             Set<Replacement> replacements = (Set<Replacement>) event.getEventContext()
                     .get(UpdateFinishedEvent.REPLACEMENTS);
-            replacements.stream().flatMap(r->r.getObjectsAdded().stream()).forEach(v -> shadow.add((DefaultDocument) v));
-            replacements.stream().flatMap(r->r.getObjectsRemoved().stream()).forEach(v -> shadow.remove((DefaultDocument) v));
+            replacements.stream().flatMap(r -> r.getObjectsAdded().stream())
+                    .forEach(v -> shadow.add((DefaultDocument) v));
+            replacements.stream().flatMap(r -> r.getObjectsRemoved().stream())
+                    .forEach(v -> shadow.remove((DefaultDocument) v));
         }
     }
 
     @SuppressWarnings("unchecked")
     public static class LazyLoadingListener {
 
-        @SuppressWarnings("rawtypes")
         @Subscribe
         public void handleRetrieveData(RetrieveDataEvent event) {
             Query<DefaultDocument> query = (Query<DefaultDocument>) event.getEventContext()
                     .get(RetrieveDataEvent.QUERY);
             BarbelHisto<DefaultDocument> histo = (BarbelHisto<DefaultDocument>) event.getEventContext()
                     .get(RetrieveDataEvent.BARBEL);
-            if (query instanceof Equal) {
-                final String id = (String) ((Equal) query).getValue();
-                List<Bitemporal> docs = shadow.stream().filter(v -> v.getId().equals(id)).collect(Collectors.toList());
-                histo.load(docs);
-            }
+            final String id = (String) BarbelQueries.returnIDForQuery(query);
+            List<Bitemporal> docs = shadow.stream().filter(v -> v.getId().equals(id)).collect(Collectors.toList());
+            histo.load(docs);
         }
 
         @Subscribe

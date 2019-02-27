@@ -59,18 +59,19 @@ public class EmbeddingJournalUpdateStrategy implements BiConsumer<DocumentJourna
         interruptedLeftVersion.ifPresent(d -> processInterruptedLeftVersion(update, d));
         interruptedRightVersion.ifPresent(d -> processInterruptedRightVersion(update, d));
         interruptedLeftVersion.ifPresent(inactivate(journal));
-        interruptedRightVersion.ifPresent(inactivate(journal));
+        if (!interruptedLeftVersion.equals(interruptedRightVersion))
+            interruptedRightVersion.ifPresent(inactivate(journal));
         betweenVersions.stream().forEach(inactivate(journal));
         journal.insert(newVersions);
     }
 
-	private Consumer<? super Bitemporal> inactivate(final DocumentJournal journal) {
-		return orginal -> {
-			Bitemporal copy = context.getMode().copyManagedBitemporal(context, orginal);
-			copy.setBitemporalStamp(copy.getBitemporalStamp().inactivatedCopy(context));
-			journal.replace(Collections.singletonList(orginal), Collections.singletonList(copy));
-		};
-	}
+    private Consumer<? super Bitemporal> inactivate(final DocumentJournal journal) {
+        return orginal -> {
+            Bitemporal copy = context.getMode().copyManagedBitemporal(context, orginal);
+            copy.setBitemporalStamp(copy.getBitemporalStamp().inactivatedCopy(context));
+            journal.replace(Collections.singletonList(orginal), Collections.singletonList(copy));
+        };
+    }
 
     private void processInterruptedLeftVersion(final Bitemporal update, Bitemporal interruptedLeftVersion) {
         Bitemporal newPrecedingVersion = context.getMode().snapshotManagedBitemporal(context, interruptedLeftVersion,
@@ -96,41 +97,41 @@ public class EmbeddingJournalUpdateStrategy implements BiConsumer<DocumentJourna
 
         //// @formatter:off
 
-        STRAIGHTINSERT(asByte(new boolean[] {false, false, true, false})),
-        // A: <no record of this id>     
+        STRAIGHTINSERT(asByte(new boolean[] { false, false, true, false })),
+        // A: <no record of this id>
         // U: |-------|
-        
-        PREOVERLAPPING(asByte(new boolean[] {false, true, false, false})),   
-        // A:      |---------|
+
+        PREOVERLAPPING(asByte(new boolean[] { false, true, false, false })),
+        // A: |---------|
         // U: |-------|
-                                   
-        POSTOVERLAPPING(asByte(new boolean[] {true, false, false, false})), 
+
+        POSTOVERLAPPING(asByte(new boolean[] { true, false, false, false })),
         // A: |-------|
-        // U:      |---------|
+        // U: |---------|
 
-        EMBEDDEDINTERVAL(asByte(new boolean[] {true, true, true, false})),  
+        EMBEDDEDINTERVAL(asByte(new boolean[] { true, true, true, false })),
         // A: |--------------|
-        // U:     |------|
-        
-        EMBEDDEDOVERLAP(asByte(new boolean[] {true, true, false, false})),   
-        // A: |-------|------|------|
-        // U:     |-------|
-                                   
-        OVERLAY(asByte(new boolean[] {false, false, true, true})),    
-        // A:         |------|
-        // U:     |--------------|
-        
-        EMBEDDEDOVERLAY(asByte(new boolean[] {true, true, false, true})),    
-        // A: |-------|------|------|
-        // U:     |--------------|
+        // U: |------|
 
-        PREOVERLAPPING_OVERLAY(asByte(new boolean[] {false, true, false, true})),    
-        // A:     |-------|------|
+        EMBEDDEDOVERLAP(asByte(new boolean[] { true, true, false, false })),
+        // A: |-------|------|------|
+        // U: |-------|
+
+        OVERLAY(asByte(new boolean[] { false, false, true, true })),
+        // A: |------|
         // U: |--------------|
-        
-        POSTOVERLAPPING_OVERLAY(asByte(new boolean[] {true, false, false, true}));    
+
+        EMBEDDEDOVERLAY(asByte(new boolean[] { true, true, false, true })),
+        // A: |-------|------|------|
+        // U: |--------------|
+
+        PREOVERLAPPING_OVERLAY(asByte(new boolean[] { false, true, false, true })),
+        // A: |-------|------|
+        // U: |--------------|
+
+        POSTOVERLAPPING_OVERLAY(asByte(new boolean[] { true, false, false, true }));
         // A: |------|------|
-        // U:    |--------------|
+        // U: |--------------|
 
         // @formatter:on
 
@@ -144,8 +145,8 @@ public class EmbeddingJournalUpdateStrategy implements BiConsumer<DocumentJourna
                 boolean interruptedEqual, boolean betweenVersions) {
             byte pattern = asByte(
                     new boolean[] { interruptedFrom, interruptedUntil, interruptedEqual, betweenVersions });
-            return Arrays.asList(JournalUpdateCase.values()).stream()
-                    .filter(c -> pattern == c.getPattern()).findFirst().orElseThrow(() -> new IllegalStateException(
+            return Arrays.asList(JournalUpdateCase.values()).stream().filter(c -> pattern == c.getPattern()).findFirst()
+                    .orElseThrow(() -> new IllegalStateException(
                             "unknown case for journal update: " + Byte.toString(pattern)));
         }
 
