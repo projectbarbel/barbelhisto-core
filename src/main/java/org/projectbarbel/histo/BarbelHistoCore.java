@@ -251,4 +251,9 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
         }
     }
 
+    @Override
+    public boolean contains(Object documentId) {
+        return !backbone.retrieve(BarbelQueries.all(documentId)).isEmpty();
+    }
+
 }

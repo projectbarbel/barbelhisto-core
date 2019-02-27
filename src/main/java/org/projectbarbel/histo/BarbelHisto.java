@@ -271,5 +271,13 @@ public interface BarbelHisto<T> {
 	 *
 	 */
 	Collection<Bitemporal> unload(Object... documentIDs);
+	
+	/**
+	 * Check if {@link BarbelHisto} contains data for the given document ID.
+	 * 
+	 * @param documentId the document id to check
+	 * @return true if {@link BarbelHisto} contains data otherwise false
+	 */
+	boolean contains(Object documentId);
 
 }
