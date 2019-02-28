@@ -13,6 +13,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.chrono.ChronoLocalDate;
 import java.util.Iterator;
+import java.util.List;
 
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalObjectState;
@@ -134,6 +135,25 @@ public final class BarbelQueries {
         return null;
     }
 
+    @SuppressWarnings("rawtypes")
+    public static List<Object> returnIDsForQuery(Query query, List<Object> ids) {
+        if (query instanceof LogicalQuery) {
+            for (Iterator iterator = ((LogicalQuery)query).getChildQueries().iterator(); iterator.hasNext();) {
+                returnIDsForQuery((Query)iterator.next(), ids);
+            }
+        }
+        if (query instanceof SimpleQuery) {
+            if (query instanceof Equal) {
+                Equal equal = (Equal) query;
+                if (DOCUMENT_ID.equals(equal.getAttribute())) {
+                    ids.add(equal.getValue());
+                    return ids;
+                }
+            }
+        }
+        return ids;
+    }
+    
     /**
      * Get all versions for a document id, that have been inactivated.
      * 

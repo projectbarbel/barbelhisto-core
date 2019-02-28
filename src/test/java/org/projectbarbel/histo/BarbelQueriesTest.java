@@ -1,9 +1,11 @@
 package org.projectbarbel.histo;
 
+import static com.googlecode.cqengine.query.QueryFactory.and;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
 import org.projectbarbel.histo.model.EffectivePeriod;
@@ -20,6 +22,11 @@ public class BarbelQueriesTest {
         assertEquals("some",BarbelQueries.returnIDForQuery(BarbelQueries.effectiveBetween("some", EffectivePeriod.nowToInfinite())));
         assertEquals("some",BarbelQueries.returnIDForQuery(BarbelQueries.effectiveAt("some", LocalDate.now())));
         assertEquals("some",BarbelQueries.returnIDForQuery(BarbelQueries.journalAt("some", LocalDateTime.now())));
+    }
+
+    @Test
+    public void testReturnIDsForQuery() throws Exception {
+        assertEquals(2,BarbelQueries.returnIDsForQuery(and(BarbelQueries.allInactive("some"), BarbelQueries.allInactive("other")), new ArrayList<>()).size());
     }
 
 }
