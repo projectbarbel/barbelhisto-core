@@ -112,7 +112,7 @@ public class CQEnginePersistenceTest {
     public void pojoProxied() throws IOException {
         DiskPersistence<PrimitivePrivatePojoNoPersistence, String> pers = DiskPersistence.onPrimaryKeyInFile(DOCUMENT_ID_PK_POJO_PROXY, new File("def.dat"));
         ConcurrentIndexedCollection<PrimitivePrivatePojoNoPersistence> col = new ConcurrentIndexedCollection<PrimitivePrivatePojoNoPersistence>(pers);
-        PrimitivePrivatePojoNoPersistence memproxy = (PrimitivePrivatePojoNoPersistence)BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(), new PrimitivePrivatePojoNoPersistence("id","some"), BitemporalStamp.createActive());
+        PrimitivePrivatePojoNoPersistence memproxy = (PrimitivePrivatePojoNoPersistence)BarbelMode.POJO.snapshotMaiden(BarbelHistoTestContext.INSTANCE.apply(PrimitivePrivatePojoNoPersistence.class), new PrimitivePrivatePojoNoPersistence("id","some"), BitemporalStamp.createActive());
         col.add(memproxy);
         PrimitivePrivatePojoNoPersistence pojoproxy = (PrimitivePrivatePojoNoPersistence)col.retrieve(equal(DOCUMENT_ID_PK_POJO, "id")).stream().findFirst().get();
         assertNotEquals("some",pojoproxy.getData());

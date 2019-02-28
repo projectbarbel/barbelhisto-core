@@ -5,6 +5,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -26,6 +27,7 @@ import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.LongSerializationPolicy;
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.persistence.support.serialization.PojoSerializer;
@@ -84,7 +86,9 @@ public interface BarbelHistoContext {
     }
 
     static Gson getDefaultGson() {
-        return new GsonBuilder().registerTypeAdapter(ZonedDateTime.class, BarbelHistoBuilder.ZDT_DESERIALIZER)
+        GsonBuilder builder = new GsonBuilder();
+        builder.setLongSerializationPolicy(LongSerializationPolicy.STRING);
+        return builder.registerTypeAdapter(ZonedDateTime.class, BarbelHistoBuilder.ZDT_DESERIALIZER)
                 .registerTypeAdapter(ZonedDateTime.class, BarbelHistoBuilder.ZDT_SERIALIZER).create();
     }
 
@@ -97,7 +101,14 @@ public interface BarbelHistoContext {
     }
 
     static AsyncEventBus getDefaultAsynchronousEventBus() {
-        return new AsyncEventBus(Executors.newFixedThreadPool(5), new DefaultSubscriberExceptionHandler());
+        return new AsyncEventBus(Executors.newFixedThreadPool(4,
+        new ThreadFactory() {
+            public Thread newThread(Runnable r) {
+                Thread t = Executors.defaultThreadFactory().newThread(r);
+                t.setDaemon(true);
+                return t;
+            }
+        }), new DefaultSubscriberExceptionHandler());
     }
 
     Supplier<String> getVersionIdGenerator();

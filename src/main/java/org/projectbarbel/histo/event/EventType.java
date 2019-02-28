@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.projectbarbel.histo.BarbelHisto;
 import org.projectbarbel.histo.BarbelHistoBuilder;
+import org.projectbarbel.histo.BarbelMode;
 import org.projectbarbel.histo.DocumentJournal;
 
 import com.google.common.eventbus.SubscriberExceptionContext;
@@ -180,6 +181,15 @@ public enum EventType implements PostableEvent {
         private boolean failed = false;
         private final EventType eventType;
         private Throwable rootCause;
+        private BarbelMode mode;
+        
+        protected BarbelMode getMode() {
+            return mode;
+        }
+
+        public void setMode(BarbelMode mode) {
+            this.mode = mode;
+        }
 
         public Throwable getRootCause() {
             return rootCause;

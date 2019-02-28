@@ -34,7 +34,7 @@ public class BarbelHistoCore_Pojo_Test {
     @ParameterizedTest
     @MethodSource("createPojos")
     public <T> void testSave(T pojo) {
-        BarbelHisto<T> core = BarbelHistoBuilder.barbel().build();
+        BarbelHisto<T> core = BarbelHistoTestContext.INSTANCE.apply(pojo.getClass()).build();
         core.save(pojo, LocalDate.now(), LocalDate.MAX);
         assertEquals(1, core.retrieve(BarbelQueries.all()).stream().count());
         Bitemporal record = (Bitemporal)core.retrieve(BarbelQueries.all()).stream().findFirst().get();

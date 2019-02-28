@@ -106,7 +106,7 @@ public class BarbelTestHelper {
         IndexedCollection<Object> journal = new ConcurrentIndexedCollection<Object>();
         DefaultPojo pojo = new DefaultPojo(docId, "first original");
         for (int i = 0; i < effectiveDates.size(); i++) {
-            journal.add((DefaultPojo) BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(), pojo,
+            journal.add((DefaultPojo) BarbelMode.POJO.snapshotMaiden(BarbelHistoTestContext.INSTANCE.apply(DefaultPojo.class), pojo,
                     createPeriod(docId, effectiveDates, i)));
         }
         return journal;

@@ -46,7 +46,7 @@ public class BarbelHistoCore_Contracts_Test {
 
     @Test
     public void testSaveBitemporalVersion() throws Exception {
-        BarbelHisto<BitemporalVersion> core = BarbelHistoBuilder.barbel().build();
+        BarbelHisto<BitemporalVersion> core = BarbelHistoTestContext.INSTANCE.apply(BitemporalVersion.class).build();
         Exception exc = assertThrows(IllegalArgumentException.class,
                 () -> core.save(new BitemporalVersion(BitemporalStamp.createActive(), EnhancedRandom.random(DefaultPojo.class)), LocalDate.now(), LocalDate.MAX));
         assertTrue(exc.getMessage().contains("BitemporalVersion cannot be used in BarbelMode.POJO"));
@@ -54,7 +54,7 @@ public class BarbelHistoCore_Contracts_Test {
     
     @Test
     public void testSave_LocalDatesInvalid() throws Exception {
-        BarbelHisto<DefaultPojo> core = BarbelHistoBuilder.barbel().build();
+        BarbelHisto<DefaultPojo> core = BarbelHistoTestContext.INSTANCE.apply(DefaultPojo.class).build();
         Exception exc = assertThrows(IllegalArgumentException.class,
                 () -> core.save(EnhancedRandom.random(DefaultPojo.class), LocalDate.MAX, LocalDate.now()));
         assertTrue(exc.getMessage().contains("from date"));
@@ -62,7 +62,7 @@ public class BarbelHistoCore_Contracts_Test {
 
     @Test
     public void testSave_NoSerializer() throws Exception {
-        BarbelHisto<SomePojo> core = BarbelHistoBuilder.barbel()
+        BarbelHisto<SomePojo> core = BarbelHistoTestContext.INSTANCE.apply(SomePojo.class)
                 .withBackboneSupplier(() -> new ConcurrentIndexedCollection<SomePojo>(
                         DiskPersistence.onPrimaryKeyInFile(SomePojo.DOCUMENT_ID, new File("test.dat"))))
                 .build();

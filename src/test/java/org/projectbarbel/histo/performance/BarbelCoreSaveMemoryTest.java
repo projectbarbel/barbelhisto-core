@@ -16,8 +16,8 @@ import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.Test;
 import org.projectbarbel.histo.BarbelHisto;
-import org.projectbarbel.histo.BarbelHistoBuilder;
 import org.projectbarbel.histo.BarbelHistoCore;
+import org.projectbarbel.histo.BarbelHistoTestContext;
 import org.projectbarbel.histo.BarbelTestHelper;
 import org.projectbarbel.histo.model.DefaultPojo;
 
@@ -25,7 +25,7 @@ import io.github.benas.randombeans.api.EnhancedRandom;
 
 public class BarbelCoreSaveMemoryTest {
 
-    private final BarbelHisto<DefaultPojo> core = BarbelHistoBuilder.barbel().build();
+    private final BarbelHisto<DefaultPojo> core = BarbelHistoTestContext.INSTANCE.apply(DefaultPojo.class).build();
 
     static ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1); // no
     static ScheduledFuture<?> t;

@@ -24,7 +24,7 @@ public class BarbelHistoCore_JournalTimeshift_Test {
 
     @BeforeEach
     public void setup() {
-        core = BarbelHistoBuilder.barbel().build();
+        core = BarbelHistoTestContext.INSTANCE.apply(DefaultPojo.class).build();
         BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDate.of(2019, 2, 6).atStartOfDay());
     }
 

@@ -12,7 +12,7 @@ public class BarbelHistoCore_MultiUpdateTest {
     // @formatter:off
     @Test
     void embeddedOverlap_Local() throws Exception {
-        BarbelHisto<DefaultPojo> core = BarbelHistoBuilder.barbel().build();
+        BarbelHisto<DefaultPojo> core = BarbelHistoTestContext.INSTANCE.apply(DefaultPojo.class).build();
         DefaultPojo pojo = new DefaultPojo("someSome", "some data");
         
         // Now |---------------------------------| 20
@@ -129,7 +129,7 @@ public class BarbelHistoCore_MultiUpdateTest {
     }
     @Test
     void embeddedOverlap_Max() throws Exception {
-        BarbelHisto<DefaultPojo> core = BarbelHistoBuilder.barbel().build();
+        BarbelHisto<DefaultPojo> core = BarbelHistoTestContext.INSTANCE.apply(DefaultPojo.class).build();
         DefaultPojo pojo = new DefaultPojo("someSome", "some data");
         
         // Now |---------------------------------| MAX

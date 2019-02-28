@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.projectbarbel.histo.event.EventType.BarbelInitializedEvent;
-import org.projectbarbel.histo.event.EventType.InsertBitemporalEvent;
 import org.projectbarbel.histo.event.EventType.InactivationEvent;
+import org.projectbarbel.histo.event.EventType.InsertBitemporalEvent;
 import org.projectbarbel.histo.event.HistoEventFailedException;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
@@ -32,7 +32,7 @@ public class BarbelHistoCore_EventsFailing {
     @Order(1)
     @Test
     void shadowExternalTest() throws Exception {
-        BarbelHisto<DefaultDocument> barbel = BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL)
+        BarbelHisto<DefaultDocument> barbel = BarbelHistoTestContext.INSTANCE.apply(DefaultDocument.class).withMode(BarbelMode.BITEMPORAL)
                 .withSynchronousEventListener(new ShadowCollectionListeners()).build();
         DefaultDocument pojo = new DefaultDocument("someId", BitemporalStamp.createActive("someId"), "some data");
         barbel.save(pojo, LocalDate.now(), LocalDate.MAX);

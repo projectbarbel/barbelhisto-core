@@ -51,7 +51,7 @@ public class BarbelHistoCore_CQIndexing_Test {
     @ParameterizedTest
     @MethodSource("createPojos")
     public <T> void testSave(T pojo) throws IOException {
-        BarbelHisto<T> core = BarbelHistoBuilder.barbel()
+        BarbelHisto<T> core = BarbelHistoTestContext.INSTANCE.apply(pojo.getClass())
                 .withBackboneSupplier(()->{
                     IndexedCollection<T> backbone = new ConcurrentIndexedCollection<T>();
                     backbone.addIndex((Index<T>) NavigableIndex.onAttribute(VERSION_ID_PK));
@@ -69,7 +69,7 @@ public class BarbelHistoCore_CQIndexing_Test {
         Bitemporal record = (Bitemporal) core.retrieve(BarbelQueries.all()).stream().findFirst().get();
         assertNotNull(record.getBitemporalStamp().getDocumentId());
         core.unload(((Bitemporal)saved).getBitemporalStamp().getDocumentId());
-        assertEquals(0, core.retrieve(BarbelQueries.all()).stream().count());
+        assertEquals(0, ((BarbelHistoCore<?>)core).size());
     }
 
 }

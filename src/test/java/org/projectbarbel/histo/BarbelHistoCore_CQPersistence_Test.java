@@ -104,7 +104,7 @@ public class BarbelHistoCore_CQPersistence_Test {
 	@Test
 	public void testSave_PrimitivePrivatePojo_withUpdate() throws IOException {
 		PrimitivePrivatePojo pojo = EnhancedRandom.random(PrimitivePrivatePojo.class);
-		BarbelHisto<PrimitivePrivatePojo> core = BarbelHistoBuilder.barbel()
+		BarbelHisto<PrimitivePrivatePojo> core =BarbelHistoBuilder.barbel()
 				.withBackboneSupplier(() -> new ConcurrentIndexedCollection<PrimitivePrivatePojo>(
 						DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO, new File(FILENAME))))
 				.build();

@@ -46,7 +46,8 @@ public class BarbelHistoCore_JournalUpdate_Test {
     @Test
     public void testApply_wrongId() throws Exception {
         DefaultDocument doc = new DefaultDocument();
-        BarbelHistoContext context = BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL);
+        BarbelHistoContext context = BarbelHistoTestContext.INSTANCE.apply(DefaultDocument.class)
+                .withMode(BarbelMode.BITEMPORAL);
         Bitemporal bitemporal = BarbelMode.BITEMPORAL.snapshotMaiden(context, doc, BitemporalStamp.createActive());
         journal = DocumentJournal.create(ProcessingState.INTERNAL, context,
                 BarbelTestHelper.generateJournalOfManagedDefaultPojos("someId", Arrays.asList(LocalDate.of(2016, 1, 1),
@@ -216,11 +217,14 @@ public class BarbelHistoCore_JournalUpdate_Test {
             int countOfNewVersions, List<LocalDate> activeEffective, int inactiveCount,
             List<LocalDate> inactiveEffective) throws Exception {
         BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 10, 0));
-        BarbelHistoContext context = BarbelHistoBuilder.barbel().withMode(BarbelMode.POJO).withUser("testUser")
-                .withBackboneSupplier(() -> BarbelTestHelper.generateJournalOfManagedDefaultPojos("someId",
-                        Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1),
-                                LocalDate.of(2019, 1, 1))));
+        BarbelHistoContext context = BarbelHistoTestContext.INSTANCE.apply(DefaultPojo.class).withMode(BarbelMode.POJO)
+                .withUser("testUser");
         BarbelHisto<DefaultPojo> core = ((BarbelHistoBuilder) context).build();
+        DefaultPojo pojo = new DefaultPojo("someId", "some initial");
+        core.save(pojo, LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1));
+        core.save(pojo, LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1));
+        core.save(pojo, LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1));
+        core.save(pojo, LocalDate.of(2019, 1, 1), LocalDate.MAX);
         DefaultPojo update = new DefaultPojo();
         update.setDocumentId("someId");
         update.setData("some data");
@@ -240,11 +244,14 @@ public class BarbelHistoCore_JournalUpdate_Test {
             int countOfNewVersions, List<LocalDate> activeEffective, int inactiveCount,
             List<LocalDate> inactiveEffective) throws Exception {
         BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 10, 0));
-        BarbelHistoContext context = BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL).withUser("testUser")
-                .withBackboneSupplier(() -> BarbelTestHelper.generateJournalOfDefaultDocuments("someId",
-                        Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1),
-                                LocalDate.of(2019, 1, 1))));
+        BarbelHistoContext context = BarbelHistoTestContext.INSTANCE.apply(DefaultPojo.class).withMode(BarbelMode.POJO)
+                .withUser("testUser");
         BarbelHisto<DefaultDocument> core = ((BarbelHistoBuilder) context).build();
+        DefaultDocument pojo = new DefaultDocument("someId", BitemporalStamp.createActive(), "some initial");
+        core.save(pojo, LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1));
+        core.save(pojo, LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1));
+        core.save(pojo, LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1));
+        core.save(pojo, LocalDate.of(2019, 1, 1), LocalDate.MAX);
         DefaultDocument update = new DefaultDocument();
         update.setData("some data");
         update.setId("someId");
@@ -262,7 +269,8 @@ public class BarbelHistoCore_JournalUpdate_Test {
             int countOfNewVersions, List<LocalDate> activeEffective, int inactiveCount,
             List<LocalDate> inactiveEffective) throws Exception {
         BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 10, 0));
-        context = BarbelHistoBuilder.barbel().withMode(BarbelMode.POJO).withUser("testUser");
+        context = BarbelHistoTestContext.INSTANCE.apply(DefaultPojo.class).withMode(BarbelMode.POJO)
+                .withUser("testUser");
         journal = DocumentJournal.create(ProcessingState.INTERNAL, context,
                 BarbelTestHelper.generateJournalOfManagedDefaultPojos("someId", Arrays.asList(LocalDate.of(2016, 1, 1),
                         LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))),
@@ -280,7 +288,8 @@ public class BarbelHistoCore_JournalUpdate_Test {
             int countOfNewVersions, List<LocalDate> activeEffective, int inactiveCount,
             List<LocalDate> inactiveEffective) throws Exception {
         BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 10, 0));
-        context = BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL).withUser("testUser");
+        context = BarbelHistoTestContext.INSTANCE.apply(DefaultDocument.class).withMode(BarbelMode.BITEMPORAL)
+                .withUser("testUser");
         journal = DocumentJournal.create(ProcessingState.INTERNAL, context,
                 BarbelTestHelper.generateJournalOfDefaultDocuments("someId", Arrays.asList(LocalDate.of(2016, 1, 1),
                         LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))),
@@ -297,11 +306,11 @@ public class BarbelHistoCore_JournalUpdate_Test {
             LocalDate updateFrom, LocalDate updateUntil, JournalUpdateCase updateCase, int countOfNewVersions,
             List<LocalDate> activeEffective, int inactiveCount, List<LocalDate> inactiveEffective) throws Exception {
         BarbelHistoContext.getBarbelClock().useFixedClockAt(today);
-        BarbelHistoContext context = BarbelHistoBuilder.barbel().withMode(mode).withUser("testUser")
-                .withBackboneSupplier(() -> existingJournal);
-        BarbelHisto<T> core = ((BarbelHistoBuilder) context).build();
         T template = existingJournal.stream().findFirst().get();
         T object = (T) EnhancedRandom.random(template.getClass());
+        BarbelHistoContext context = BarbelHistoTestContext.INSTANCE.apply(template.getClass()).withMode(mode)
+                .withUser("testUser").withBackboneSupplier(() -> existingJournal);
+        BarbelHisto<T> core = ((BarbelHistoBuilder) context).build();
         if (template instanceof BarbelProxy)
             object = (T) EnhancedRandom.random(((BarbelProxy) template).getTarget().getClass());
         core.save(object, updateFrom, updateUntil);
@@ -370,7 +379,6 @@ public class BarbelHistoCore_JournalUpdate_Test {
 
         assertEquals(ZonedDateTime.of(LocalDateTime.of(2019, 1, 30, 10, 0), ZoneId.systemDefault()),
                 inactivated.getBitemporalStamp().getRecordTime().getCreatedAt());
-        assertEquals("SYSTEM", inactivated.getBitemporalStamp().getRecordTime().getCreatedBy());
         assertEquals(ZonedDateTime.of(LocalDateTime.of(2019, 1, 30, 10, 0), ZoneId.systemDefault()),
                 inactivated.getBitemporalStamp().getRecordTime().getInactivatedAt());
         assertEquals("testUser", inactivated.getBitemporalStamp().getRecordTime().getInactivatedBy());

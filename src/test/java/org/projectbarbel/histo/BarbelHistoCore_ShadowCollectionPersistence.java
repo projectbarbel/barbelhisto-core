@@ -33,7 +33,7 @@ public class BarbelHistoCore_ShadowCollectionPersistence {
     @Order(1)
     @Test
     void shadowExternalTest() throws Exception {
-        BarbelHisto<DefaultDocument> barbel = BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL)
+        BarbelHisto<DefaultDocument> barbel = BarbelHistoTestContext.INSTANCE.apply(DefaultDocument.class).withMode(BarbelMode.BITEMPORAL)
                 .withSynchronousEventListener(new ShadowCollectionListener()).build();
         DefaultDocument pojo = new DefaultDocument("someId", BitemporalStamp.createActive("someId"), "some data");
         barbel.save(pojo, LocalDate.now(), LocalDate.MAX);
@@ -53,7 +53,7 @@ public class BarbelHistoCore_ShadowCollectionPersistence {
         shadow.add(new DefaultDocument("barId", BitemporalStamp.createActive("barId"), "some data"));
 
         // retrieve data from BarbelHisto, which is empty at this point
-        BarbelHisto<DefaultDocument> core = BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL)
+        BarbelHisto<DefaultDocument> core = BarbelHistoTestContext.INSTANCE.apply(DefaultDocument.class).withMode(BarbelMode.BITEMPORAL)
                 .withSynchronousEventListener(new LazyLoadingListener()).build();
         List<DefaultDocument> docs = core.retrieve(BarbelQueries.all("someId"));
 
