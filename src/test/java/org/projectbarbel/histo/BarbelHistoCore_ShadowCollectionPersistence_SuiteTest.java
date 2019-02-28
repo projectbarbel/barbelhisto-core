@@ -26,7 +26,7 @@ import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.query.Query;
 
 @TestMethodOrder(OrderAnnotation.class)
-public class BarbelHistoCore_ShadowCollectionPersistence {
+public class BarbelHistoCore_ShadowCollectionPersistence_SuiteTest {
 
     private static IndexedCollection<DefaultDocument> shadow;
 

@@ -27,7 +27,7 @@ import com.googlecode.cqengine.query.option.QueryOptions;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
-public class BarbelHistoCore_Contracts_Test {
+public class BarbelHistoCore_Contracts_SuiteTest {
 
     @AfterEach
     public void tearDown() throws IOException {

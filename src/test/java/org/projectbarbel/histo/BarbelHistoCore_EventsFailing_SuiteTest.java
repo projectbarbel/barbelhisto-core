@@ -24,7 +24,7 @@ import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
 
 @TestMethodOrder(OrderAnnotation.class)
-public class BarbelHistoCore_EventsFailing {
+public class BarbelHistoCore_EventsFailing_SuiteTest {
 
     private static IndexedCollection<DefaultDocument> shadow;
     private static int replaceCounter = 0;

@@ -14,7 +14,7 @@ import org.projectbarbel.histo.model.DefaultPojo;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
-public class BarbelHistoCore_Journal_Test {
+public class BarbelHistoCore_Journal_SuiteTest {
 
     private BarbelHisto<DefaultPojo> core;
 

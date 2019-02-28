@@ -33,7 +33,7 @@ import com.googlecode.cqengine.IndexedCollection;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
-public class BarbelHistoCore_JournalUpdate_Test {
+public class BarbelHistoCore_JournalUpdate_SuiteTest {
 
     private DocumentJournal journal;
     private BarbelHistoContext context;

@@ -18,7 +18,7 @@ import org.projectbarbel.histo.model.DefaultPojo;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
-public class BarbelHistoCore_JournalTimeshift_Test {
+public class BarbelHistoCore_JournalTimeshift_SuiteTest {
 
     private BarbelHisto<DefaultPojo> core;
 

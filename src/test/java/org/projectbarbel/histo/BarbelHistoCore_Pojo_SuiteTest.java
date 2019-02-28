@@ -18,7 +18,7 @@ import org.projectbarbel.histo.pojos.PrimitivePrivatePojoPartialContructor;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
-public class BarbelHistoCore_Pojo_Test {
+public class BarbelHistoCore_Pojo_SuiteTest {
 
     @SuppressWarnings("unused")
     private static Stream<Arguments> createPojos() {

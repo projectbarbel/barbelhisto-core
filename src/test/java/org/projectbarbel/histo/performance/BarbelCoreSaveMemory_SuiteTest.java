@@ -23,7 +23,7 @@ import org.projectbarbel.histo.model.DefaultPojo;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
-public class BarbelCoreSaveMemoryTest {
+public class BarbelCoreSaveMemory_SuiteTest {
 
     private final BarbelHisto<DefaultPojo> core = BarbelHistoTestContext.INSTANCE.apply(DefaultPojo.class).build();
 

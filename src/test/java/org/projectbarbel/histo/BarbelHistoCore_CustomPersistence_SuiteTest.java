@@ -18,7 +18,7 @@ import org.projectbarbel.histo.model.RecordPeriod;
 import io.github.benas.randombeans.api.EnhancedRandom;
 import net.sf.cglib.proxy.Enhancer;
 
-public class BarbelHistoCore_CustomPersistence_Test {
+public class BarbelHistoCore_CustomPersistence_SuiteTest {
 
     @Test
     public void testCompleteCycle_Pojo() {

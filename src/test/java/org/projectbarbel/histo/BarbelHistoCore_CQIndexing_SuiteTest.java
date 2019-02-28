@@ -29,7 +29,7 @@ import com.googlecode.cqengine.query.option.QueryOptions;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
-public class BarbelHistoCore_CQIndexing_Test {
+public class BarbelHistoCore_CQIndexing_SuiteTest {
 
     public static final SimpleAttribute<Object, String> VERSION_ID_PK = new SimpleAttribute<Object, String>(
             "documentId") {
