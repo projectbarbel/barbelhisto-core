@@ -16,6 +16,7 @@ before_deploy:
 - mvn help:evaluate -N -Dexpression=project.version|grep -v '\['
 - export project_version=$(mvn help:evaluate -N -Dexpression=project.version|grep -v '\[')
 deploy:
+  overwrite: true
   provider: releases
   api_key:
     secure: T/KE9zhQwZyQze8EjOepNHAoagnBB57yLM+l35iRX6y/eZMIXBfuPBKRM3NIUk7YfTzYbFG4SdaGz4n7WwItqrCgjF7jglnXKy/aSm3PNZKf/wnNRQAQiHJmpkugeaC0EMS3ckKpfhEMhYxQRhcu0ih2h9PKzHtSbHJSS1bf/kb2Qdln8UG3dDBlOfmHR4IbNboo2eXUZUtVQObU1gLikPVYs6nEBZnmp/RNXhEFe4Fivm7tiF6I2qq56fasauyjyq2vAFqnfg0E1hAVzdF70PDBvJrWNjyqhSes2CAw/QnhxQ52wNYKfecfVTebbGIynnGIY8/xmPqRXMzw6ffW/NydpJeF4nUqmqEiYf5a7YrhFd9HPnZrYAgezlH2VO7iimccNaqWr/SUeBQPhCyUd+aovPlq/IVlv9ynlWZ/Ay6dzQFD6Wl2WYDecQXherHXiz045pGsB+NOFYjuWqsf40vYKTbfoQkxOKN1LSLoGotfpzblL60TESpYloiy+pJX9rRJ8d0o6oH6lXoqiVPUJK18WdkNkmLfOGAOXa2W6TzoOpaRDdE7XoXa2eoIVC8b95h8EUgNAfYZNs+ipDpNfeDvWrhM5QzF2VroOoamWFbdtWMxDY1w1BAviLjhk3JMe0rMxm2x3IFEZkbzlTnBWs4nq79MCOk5reJh5LsqU4s=
@@ -23,6 +24,7 @@ deploy:
       - target/barbelhisto-core-$project_version.jar
       - target/barbelhisto-core-$project_version-sources.jar
       - target/barbelhisto-core-$project_version-javadoc.jar
+  skip_cleanup: true
   on:
     repo: projectbarbel/barbelhisto-core
     tags: true
