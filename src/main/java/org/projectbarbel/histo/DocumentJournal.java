@@ -124,15 +124,9 @@ public final class DocumentJournal {
         newVersions.sort((v1, v2) -> v1.getBitemporalStamp().getEffectiveTime().until()
                 .isBefore(v2.getBitemporalStamp().getEffectiveTime().until()) ? -1 : 1);
         this.lastInserts.addAll(newVersions);
-        try {
-            EventType.INSERTBITEMPORAL.create().with(this)
-                    .with(InsertBitemporalEvent.NEWVERSIONS, copyList(newVersions)).postBothWay(context);
-            journal.addAll(newVersions);
-        } catch (Exception e) {
-            // undo last replacements
-            lastInactivations.stream().forEach(r -> replace(r.getObjectAdded(), r.getObjectRemoved()));
-            throw e;
-        }
+        EventType.INSERTBITEMPORAL.create().with(this).with(InsertBitemporalEvent.NEWVERSIONS, copyList(newVersions))
+                .postBothWay(context);
+        journal.addAll(newVersions);
     }
 
     public void inactivate(Bitemporal objectToInactivate, Bitemporal inactivatedCopy) {
@@ -141,20 +135,13 @@ public final class DocumentJournal {
                 "objects must match document id of journal");
         Validate.isTrue(inactivatedCopy.getBitemporalStamp().getDocumentId().equals(id),
                 "objects must match document id of journal");
-        try {
-            EventType.INACTIVATION.create().with(journal)
-                    .with(InactivationEvent.OBJECT_REMOVED,
-                            context.getMode().copyManagedBitemporal(context, objectToInactivate))
-                    .with(InactivationEvent.OBJECT_ADDED,
-                            context.getMode().copyManagedBitemporal(context, inactivatedCopy))
-                    .postBothWay(context);
-            if (lastInactivations.add(new Inactivation(objectToInactivate, inactivatedCopy)))
-                replace(objectToInactivate, inactivatedCopy);
-        } catch (Exception e) {
-            // undo last inserts
-            lastInserts.stream().forEach(journal::remove);
-            throw e;
-        }
+        EventType.INACTIVATION.create().with(journal)
+                .with(InactivationEvent.OBJECT_REMOVED,
+                        context.getMode().copyManagedBitemporal(context, objectToInactivate))
+                .with(InactivationEvent.OBJECT_ADDED, context.getMode().copyManagedBitemporal(context, inactivatedCopy))
+                .postBothWay(context);
+        if (lastInactivations.add(new Inactivation(objectToInactivate, inactivatedCopy)))
+            replace(objectToInactivate, inactivatedCopy);
     }
 
     private List<Bitemporal> copyList(List<Bitemporal> objectsToRemove) {

@@ -91,7 +91,8 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
                     return (T) mode.copyManagedBitemporal(context, newManagedBitemporal);
                 } finally {
                     EventType.UPDATEFINISHED.create().with(UpdateFinishedEvent.NEWVERSIONS, journal.getLastInsert())
-                            .with(UpdateFinishedEvent.INACTIVATIONS, journal.getLastInactivations()).postBothWay(context);
+                            .with(UpdateFinishedEvent.INACTIVATIONS, journal.getLastInactivations())
+                            .postBothWay(context);
                     EventType.RELEASELOCK.create().with(journal).postSynchronous(context);
                 }
             } finally {
@@ -135,10 +136,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     @Override
     public String prettyPrintJournal(Object id) {
         Validate.isTrue(id != null, NOTNULL);
-        if (journals.containsKey(id))
-            return context.getPrettyPrinter().apply(journals.get(id).list());
-        else
-            return "";
+        return context.getPrettyPrinter().apply(journals.computeIfAbsent(id, createJournal()).list());
     }
 
     public BarbelHistoContext getContext() {
@@ -175,7 +173,6 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
             Object id = documentIDs[i];
             collection.addAll(mode.managedBitemporalToCustomPersistenceObjects(id, backbone));
             backbone.removeAll(backbone.retrieve(BarbelQueries.all(id)).stream().collect(Collectors.toList()));
-            journals.remove(id);
         }
         return collection;
     }

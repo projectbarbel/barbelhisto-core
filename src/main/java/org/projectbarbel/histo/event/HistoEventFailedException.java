@@ -25,7 +25,7 @@ public class HistoEventFailedException extends RuntimeException {
         this.event = event;
     }
 
-    protected HistoEvent getEvent() {
+    public HistoEvent getEvent() {
         return event;
     }
 
