@@ -31,7 +31,6 @@ import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.query.Query;
 import com.googlecode.cqengine.query.option.QueryOptions;
-import com.googlecode.cqengine.resultset.ResultSet;
 import com.googlecode.cqengine.resultset.common.NoSuchObjectException;
 import com.googlecode.cqengine.resultset.common.NonUniqueObjectException;
 
@@ -203,7 +202,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
                 time.isBefore(BarbelHistoContext.getBarbelClock().now().toLocalDateTime())
                         || time.equals(BarbelHistoContext.getBarbelClock().now().toLocalDateTime()),
                 "timeshift only allowed in the past");
-        ResultSet<T> result = backbone.retrieve(BarbelQueries.journalAt(id, time));
+        List<T> result = retrieve(BarbelQueries.journalAt(id, time));
         IndexedCollection<Bitemporal> copiedAndActivatedBitemporals = result.stream()
                 .map(d -> mode.copyManagedBitemporal(context, (Bitemporal) d))
                 .collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
