@@ -230,8 +230,6 @@ public class BarbelHistoCore_JournalUpdate_SuiteTest {
         update.setData("some data");
         core.save(update, updateFrom, updateUntil);
         journal = ((BarbelHistoCore<DefaultPojo>) core).getDocumentJournal("someId");
-        if (updateCase.equals(JournalUpdateCase.EMBEDDEDINTERVAL))
-            System.out.println(core.prettyPrintJournal("someId"));
         assertEquals(countOfNewVersions, journal.getLastInsert().size());
         assertEquals(updateCase, journal.getLastUpdateCase());
         assertNewVersions(journal.getLastUpdateRequest(), journal.getLastInsert(), activeEffective);

@@ -78,9 +78,9 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
         Object id = mode.drawDocumentId(maiden);
         DocumentJournal journal = journals.computeIfAbsent(id, createJournal());
         if (journal.lockAcquired()) {
-            EventType.INITIALIZEJOURNAL.create().with(DocumentJournal.create(ProcessingState.EXTERNAL, context, id))
-                    .with(InitializeJournalEvent.BARBEL, this).postBothWay(context);
             try {
+                EventType.INITIALIZEJOURNAL.create().with(DocumentJournal.create(ProcessingState.EXTERNAL, context, id))
+                        .with(InitializeJournalEvent.BARBEL, this).postBothWay(context);
                 BitemporalStamp stamp = BitemporalStamp.of(context.getActivity(), id, EffectivePeriod.of(from, until),
                         RecordPeriod.createActive(context));
                 Bitemporal newManagedBitemporal = mode.snapshotMaiden(context, maiden, stamp);
@@ -136,7 +136,17 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     @Override
     public String prettyPrintJournal(Object id) {
         Validate.isTrue(id != null, NOTNULL);
-        return context.getPrettyPrinter().apply(journals.computeIfAbsent(id, createJournal()).list());
+        if (journals.computeIfAbsent(id, createJournal()).lockAcquired()) {
+            try {
+                EventType.INITIALIZEJOURNAL.create().with(DocumentJournal.create(ProcessingState.EXTERNAL, context, id))
+                        .with(InitializeJournalEvent.BARBEL, this).postBothWay(context);
+                return context.getPrettyPrinter().apply(journals.get(id).list());
+            } finally {
+                journals.get(id).unlock();
+            }
+        } else {
+            throw new ConcurrentModificationException("concurrent access on printing pretty journal: " + id);
+        }
     }
 
     public BarbelHistoContext getContext() {
