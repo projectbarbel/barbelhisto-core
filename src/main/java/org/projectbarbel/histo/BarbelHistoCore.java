@@ -78,6 +78,8 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
         Object id = mode.drawDocumentId(maiden);
         DocumentJournal journal = journals.computeIfAbsent(id, createJournal());
         if (journal.lockAcquired()) {
+            EventType.INITIALIZEJOURNAL.create().with(DocumentJournal.create(ProcessingState.EXTERNAL, context, id))
+                    .with(InitializeJournalEvent.BARBEL, this).postBothWay(context);
             try {
                 BitemporalStamp stamp = BitemporalStamp.of(context.getActivity(), id, EffectivePeriod.of(from, until),
                         RecordPeriod.createActive(context));
@@ -106,8 +108,6 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 
     private Function<Object, DocumentJournal> createJournal() {
         return id -> {
-            EventType.INITIALIZEJOURNAL.create().with(DocumentJournal.create(ProcessingState.EXTERNAL, context, id))
-                    .with(InitializeJournalEvent.BARBEL, this).postBothWay(context);
             return DocumentJournal.create(ProcessingState.INTERNAL, context, id);
         };
     }

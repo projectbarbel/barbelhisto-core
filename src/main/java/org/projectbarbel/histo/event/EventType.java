@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
  * 
  * <pre>
  * 1. {@link EventType#BARBELINITIALIZED} when {@link BarbelHisto} instance is created, only once per {@link BarbelHisto} session, both way
- * 2. {@link EventType#INITIALIZEJOURNAL} when journal is created, only once, both way
+ * 2. {@link EventType#INITIALIZEJOURNAL} when journal is created, on every update, both way
  * 3. {@link EventType#ACQUIRELOCK}, when {@link BarbelHisto} starts updating a document journal, synchronous post
  * 4. {@link EventType#INACTIVATION}, when versions are inactivated, both way
  * 5. {@link EventType#INSERTBITEMPORAL}, when new versions are inserted, both way
@@ -43,8 +43,7 @@ import lombok.extern.slf4j.Slf4j;
  * want to:
  * <ul>
  * <li>synchronize data in external data stores with
- * {@link EventType#INACTIVATION} and
- * {@link EventType#INSERTBITEMPORAL}</li>
+ * {@link EventType#INACTIVATION} and {@link EventType#INSERTBITEMPORAL}</li>
  * <li>lock journals stored in a database in complex distributed scenarios using
  * {@link EventType#ACQUIRELOCK} and {@link EventType#RELEASELOCK}</li>
  * <li>lazy load the backbone from external source depending on the data
@@ -89,9 +88,9 @@ public enum EventType implements PostableEvent {
 
     },
     /**
-     * Event fired when a journal is created on a
+     * Event fired when a journal updated is started on a
      * {@link BarbelHisto#save(Object, java.time.LocalDate, java.time.LocalDate)}
-     * operation. Posted only once per {@link BarbelHisto} session and document id.
+     * operation.
      */
     INITIALIZEJOURNAL {
 
@@ -182,7 +181,7 @@ public enum EventType implements PostableEvent {
         private final EventType eventType;
         private Throwable rootCause;
         private BarbelMode mode;
-        
+
         protected BarbelMode getMode() {
             return mode;
         }
@@ -302,22 +301,22 @@ public enum EventType implements PostableEvent {
     }
 
     public static class UpdateFinishedEvent extends AbstractBarbelEvent {
-        
+
         public static final String NEWVERSIONS = "#newVersions";
         public static final String INACTIVATIONS = "#lastinactivations";
-        
+
         public UpdateFinishedEvent(EventType eventType, Map<Object, Object> context) {
             super(eventType, context);
         }
-        
+
         @Override
         public Object getDocumentId() {
             return Optional.ofNullable(((DocumentJournal) eventContext.get(DocumentJournal.class)))
                     .orElse(DocumentJournal.EMPTYSAMPLE).getId();
         }
-        
+
     }
-    
+
     public static class RetrieveDataEvent extends AbstractBarbelEvent {
 
         public static final String QUERY = "#query";
