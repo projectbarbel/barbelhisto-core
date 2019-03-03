@@ -111,16 +111,16 @@ public class BarbelModeTest {
 	}
 
 	@Test
-	public void testValidateManagedType() throws Exception {
-		assertThrows(IllegalArgumentException.class, () -> BarbelMode.POJO
-				.validateManagedType(BarbelHistoBuilder.barbel(), BarbelTestHelper.random(BitemporalVersion.class)));
-	}
+    	public void testValidateMaidenCandidate() throws Exception {
+    		assertThrows(IllegalArgumentException.class, () -> BarbelMode.POJO
+    				.validateMaidenCandidate(BarbelHistoBuilder.barbel(), BarbelTestHelper.random(BitemporalVersion.class)));
+    	}
 
 	@Test
-	public void testValidateManagedType_MissingDocId() throws Exception {
-		assertThrows(IllegalArgumentException.class, () -> BarbelMode.POJO
-				.validateManagedType(BarbelHistoBuilder.barbel(), BarbelTestHelper.random(wodocid.class)));
-	}
+    	public void testValidateMaidenCandidate_MissingDocId() throws Exception {
+    		assertThrows(IllegalArgumentException.class, () -> BarbelMode.POJO
+    				.validateMaidenCandidate(BarbelHistoBuilder.barbel(), BarbelTestHelper.random(wodocid.class)));
+    	}
 
 	@SuppressWarnings("unused")
 	private static class wodocid {
@@ -254,16 +254,16 @@ public class BarbelModeTest {
 	}
 
 	@Test
-	public void testValidateManagedType_BitemporalMode() throws Exception {
-		assertThrows(IllegalArgumentException.class, () -> BarbelMode.BITEMPORAL
-				.validateManagedType(BarbelHistoBuilder.barbel(), BarbelTestHelper.random(DefaultPojo.class)));
-	}
+    	public void testValidateMaidenCandidate_BitemporalMode() throws Exception {
+    		assertThrows(IllegalArgumentException.class, () -> BarbelMode.BITEMPORAL
+    				.validateMaidenCandidate(BarbelHistoBuilder.barbel(), BarbelTestHelper.random(DefaultPojo.class)));
+    	}
 
 	@Test
-	public void testValidateManagedType_MissingDocId_BitemporalMode() throws Exception {
-		assertThrows(IllegalArgumentException.class, () -> BarbelMode.BITEMPORAL
-				.validateManagedType(BarbelHistoBuilder.barbel(), BarbelTestHelper.random(wodocid.class)));
-	}
+    	public void testValidateMaidenCandidate_MissingDocId_BitemporalMode() throws Exception {
+    		assertThrows(IllegalArgumentException.class, () -> BarbelMode.BITEMPORAL
+    				.validateMaidenCandidate(BarbelHistoBuilder.barbel(), BarbelTestHelper.random(wodocid.class)));
+    	}
 
 	@Test
 	public void testDrawMaiden_BitemporalMode() throws Exception {

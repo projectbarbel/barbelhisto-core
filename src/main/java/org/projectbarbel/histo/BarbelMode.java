@@ -60,7 +60,8 @@ public enum BarbelMode implements BarbelModeProcessor {
         @Override
         public <T> Collection<T> customPersistenceObjectsToManagedBitemporals(BarbelHistoContext context,
                 Collection<Bitemporal> bitemporals) {
-            Validate.isTrue(bitemporals.stream().filter(b->!(b instanceof BitemporalVersion)).count()==0, "loaded objects must be of type BitemporalVersion in BarbelMode.POJO");
+            Validate.isTrue(bitemporals.stream().filter(b -> !(b instanceof BitemporalVersion)).count() == 0,
+                    "loaded objects must be of type BitemporalVersion in BarbelMode.POJO");
             try {
                 IndexedCollection<Object> output = bitemporals.stream()
                         .map(b -> snapshotMaiden(context, ((BitemporalVersion) b).getObject(),
@@ -86,11 +87,13 @@ public enum BarbelMode implements BarbelModeProcessor {
         }
 
         @Override
-        public boolean validateManagedType(BarbelHistoContext context, Object candidate) {
+        public boolean validateMaidenCandidate(BarbelHistoContext context, Object candidate) {
             Validate.isTrue(!candidate.getClass().equals(BitemporalVersion.class),
                     "BitemporalVersion cannot be used in BarbelMode.POJO - set BarbelMode.BITEMPORAL and try again");
             Validate.isTrue(FieldUtils.getFieldsListWithAnnotation(candidate.getClass(), DocumentId.class).size() == 1,
                     "don't forget to add @DocumentId to the document id attribute to the pojo you want to manage");
+            Validate.isTrue(!(candidate instanceof Bitemporal),
+                    "don't use Bitemporal.class interface on objects when using BarbelMode.POJO");
             return true;
         }
 
@@ -165,9 +168,11 @@ public enum BarbelMode implements BarbelModeProcessor {
         }
 
         @Override
-        public boolean validateManagedType(BarbelHistoContext context, Object candidate) {
-            Validate.isTrue(Bitemporal.class.isAssignableFrom(candidate.getClass()),
+        public boolean validateMaidenCandidate(BarbelHistoContext context, Object candidate) {
+            Validate.isTrue(candidate instanceof Bitemporal,
                     "don't forget to implement Bitemporal.class interface on the type you want to manage when in mode BarbelMode.BITEMPORAL");
+            Validate.isTrue(FieldUtils.getFieldsListWithAnnotation(candidate.getClass(), DocumentId.class).size() == 1,
+                    "don't forget to add @DocumentId to the document id attribute to the pojo you want to manage");
             return true;
         }
 

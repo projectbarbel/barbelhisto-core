@@ -53,7 +53,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     private final BarbelHistoContext context;
     private final IndexedCollection<T> backbone;
     private final Map<Object, DocumentJournal> journals;
-    private static final Map<Object, Object> validTypes = new HashMap<>();
+    private final Map<Object, Object> validTypes = new HashMap<>();
     private final BarbelMode mode;
 
     @SuppressWarnings("unchecked")
@@ -75,7 +75,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
         Validate.notNull(newVersion, NOTNULL);
         Validate.isTrue(from.isBefore(until), "from date must be before until date");
         T maiden = mode.drawMaiden(context, newVersion);
-        validTypes.computeIfAbsent(maiden.getClass(), k -> mode.validateManagedType(context, maiden));
+        validTypes.computeIfAbsent(maiden.getClass(), k -> mode.validateMaidenCandidate(context, maiden));
         Object id = mode.drawDocumentId(maiden);
         DocumentJournal journal = journals.computeIfAbsent(id, createJournal());
         if (journal.lockAcquired()) {

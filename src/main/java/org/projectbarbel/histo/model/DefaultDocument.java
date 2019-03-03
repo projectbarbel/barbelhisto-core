@@ -28,6 +28,12 @@ public class DefaultDocument implements Bitemporal {
     private BitemporalStamp bitemporalStamp;
     private String data;
 
+    public DefaultDocument(String id, String data) {
+        super();
+        this.id = id;
+        this.data = data;
+    }
+
     @Override
     public BitemporalStamp getBitemporalStamp() {
         return bitemporalStamp;

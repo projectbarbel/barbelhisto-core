@@ -39,7 +39,7 @@ public interface BarbelModeProcessor {
 	<T> Collection<T> customPersistenceObjectsToManagedBitemporals(BarbelHistoContext context,
 			Collection<Bitemporal> bitemporals);
 
-	boolean validateManagedType(BarbelHistoContext context, Object candidate);
+	boolean validateMaidenCandidate(BarbelHistoContext context, Object candidate);
 
 	Class<?> getPersistenceObjectType(Class<?> objectType);
 

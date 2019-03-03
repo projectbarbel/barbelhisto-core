@@ -18,13 +18,14 @@ import org.projectbarbel.histo.suite.context.BTTestContext;
 
 public class BTSuiteExecutor {
 
-    SummaryGeneratingListener listener = new SummaryGeneratingListener();
-    int testcount = 0;
+    private SummaryGeneratingListener listener = new SummaryGeneratingListener();
+    private int testcount = 0;
+    private ClassNameFilter filter = ClassNameFilter.includeClassNamePatterns(".*SuiteTest");
 
     public void runNeutral() {
         LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
                 .selectors(DiscoverySelectors.selectPackage("org.projectbarbel.histo"))
-                .filters(ClassNameFilter.includeClassNamePatterns(".*SuiteTest"),
+                .filters(filter,
                         ClassNameFilter.excludeClassNamePatterns(".*StandardSuiteTest"))
                 .build();
 
@@ -52,4 +53,9 @@ public class BTSuiteExecutor {
         BTExecutionContext.INSTANCE.setTestContext(previousContext);
     }
 
+    public void test(BTTestContext context, Class<?> testClass) {
+        filter = ClassNameFilter.includeClassNamePatterns(testClass.getName());
+        test(context);
+    }
+    
 }

@@ -18,10 +18,12 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.projectbarbel.histo.BarbelHisto;
 import org.projectbarbel.histo.BarbelHistoBuilder;
+import org.projectbarbel.histo.BarbelMode;
 import org.projectbarbel.histo.BarbelQueries;
 import org.projectbarbel.histo.DocumentId;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.BitemporalVersion;
+import org.projectbarbel.histo.model.DefaultDocument;
 import org.projectbarbel.histo.model.DefaultPojo;
 import org.projectbarbel.histo.pojos.PrimitivePrivatePojo;
 import org.projectbarbel.histo.suite.BTExecutionContext;
@@ -61,6 +63,14 @@ public class BarbelHistoCore_Contracts_SuiteTest {
     }
     
     @Test
+    public void testSaveBitemporalInModePOJO() throws Exception {
+        BarbelHisto<DefaultDocument> core = BTExecutionContext.INSTANCE.barbel(DefaultDocument.class).build();
+        Exception exc = assertThrows(IllegalArgumentException.class,
+                () -> core.save(new DefaultDocument("some", "bitemporal"), LocalDate.now(), LocalDate.MAX));
+        assertTrue(exc.getMessage().contains("don't use Bitemporal.class"));
+    }
+    
+    @Test
     public void testSave_LocalDatesInvalid() throws Exception {
         BarbelHisto<DefaultPojo> core = BTExecutionContext.INSTANCE.barbel(DefaultPojo.class).build();
         Exception exc = assertThrows(IllegalArgumentException.class,
@@ -68,6 +78,15 @@ public class BarbelHistoCore_Contracts_SuiteTest {
         assertTrue(exc.getMessage().contains("from date"));
     }
 
+    @Test
+    public void testSavePojoInBitemporal() throws Exception {
+        BarbelHisto<DefaultPojo> core = BTExecutionContext.INSTANCE.barbel(DefaultPojo.class).withMode(BarbelMode.BITEMPORAL).build();
+        Exception exc = assertThrows(IllegalArgumentException.class,
+                () -> core.save(EnhancedRandom.random(DefaultPojo.class), LocalDate.now(), LocalDate.MAX));
+        assertTrue(exc.getMessage().contains("don't forget"));
+    }
+    
+    
     @Test
     public void testSave_NoSerializer() throws Exception {
         BarbelHisto<SomePojo> core = BTExecutionContext.INSTANCE.barbel(SomePojo.class)

@@ -31,7 +31,7 @@ public class BarbelHistoCore_MultiUpdate_SuiteTest {
     // @formatter:off
     @Order(1)
     @Test
-    void embeddedOverlap_Local_1() throws Exception {
+    void update_1() throws Exception {
         DefaultPojo pojo = new DefaultPojo("someSome", "some data");
         
         // Now |---------------------------------| 20
@@ -42,7 +42,7 @@ public class BarbelHistoCore_MultiUpdate_SuiteTest {
     
     @Order(2)
     @Test
-    void embeddedOverlap_Local_2() throws Exception {
+    void update_2() throws Exception {
     
         // Now |---------------------------------| 20
         //      1|---------------|10
@@ -56,7 +56,7 @@ public class BarbelHistoCore_MultiUpdate_SuiteTest {
     
     @Order(3)
     @Test
-    void embeddedOverlap_Local_3() throws Exception {
+    void update_3() throws Exception {
 
         //     |-|---------------|---------------| 20
         //      1|-------------------------------| 20
@@ -71,7 +71,7 @@ public class BarbelHistoCore_MultiUpdate_SuiteTest {
     
     @Order(4)
     @Test
-    void embeddedOverlap_Local_4() throws Exception {
+    void update_4() throws Exception {
         //     |-|-------------------------------| 20
         //      1|-------------------------------| 20
         //     |-|-------------------------------| 20
@@ -85,7 +85,7 @@ public class BarbelHistoCore_MultiUpdate_SuiteTest {
     
     @Order(5)
     @Test
-    void embeddedOverlap_Local_5() throws Exception {
+    void update_5() throws Exception {
         //     |-|-------------------------------| 20
         //     |---------------------------------| 20
         //     |---------------------------------| 20
@@ -98,7 +98,7 @@ public class BarbelHistoCore_MultiUpdate_SuiteTest {
     
     @Order(6)
     @Test
-    void embeddedOverlap_Local_6() throws Exception {
+    void update_6() throws Exception {
        //     |---------------------------------| 20
        //     |-----------------| 10
        //     |-----------------|---------------| 20
@@ -111,7 +111,7 @@ public class BarbelHistoCore_MultiUpdate_SuiteTest {
     
     @Order(7)
     @Test
-    void embeddedOverlap_Local_7() throws Exception {
+    void update_7() throws Exception {
         //     |-----------------|---------------| 20
         //     |--------------------------------------------------| 100
         //     |--------------------------------------------------| 100
@@ -124,7 +124,7 @@ public class BarbelHistoCore_MultiUpdate_SuiteTest {
     
     @Order(8)
     @Test
-    void embeddedOverlap_Local_8() throws Exception {
+    void update_8() throws Exception {
         //     |---------------------------------------------------| 100
         //     |-|-----------------------------------------------|-| 100
         //     |-|-----------------------------------------------|-| 100
@@ -137,7 +137,7 @@ public class BarbelHistoCore_MultiUpdate_SuiteTest {
     
     @Order(9)
     @Test
-    void embeddedOverlap_Local_9() throws Exception {
+    void update_9() throws Exception {
         //     |-|-----------------------------------------------|-| 100
         //       |--| 3
         //     |-|--|--------------------------------------------|-| 100
@@ -150,7 +150,7 @@ public class BarbelHistoCore_MultiUpdate_SuiteTest {
     
     @Order(10)
     @Test
-    void embeddedOverlap_Local_10() throws Exception {
+    void update_10() throws Exception {
         //     |-|--|--------------------------------------------|-| 100
         //         3|--|5
         //     |-|--|--|-----------------------------------------|-| 100
@@ -163,7 +163,7 @@ public class BarbelHistoCore_MultiUpdate_SuiteTest {
     
     @Order(11)
     @Test
-    void embeddedOverlap_Local_11() throws Exception {
+    void update_11() throws Exception {
         //     |-|--|--|-----------------------------------------|-| 100
         //            5|--|7
         //     |-|--|--|--|--------------------------------------|-| 100
@@ -176,7 +176,7 @@ public class BarbelHistoCore_MultiUpdate_SuiteTest {
     
     @Order(12)
     @Test
-    void embeddedOverlap_Local_12() throws Exception {
+    void update_12() throws Exception {
         //     |-|--|--|--|--------------------------------------|-| 100
         //                |----------------------------------------| 100
         //     |-|--|--|--|----------------------------------------| 100
@@ -189,7 +189,7 @@ public class BarbelHistoCore_MultiUpdate_SuiteTest {
     
     @Order(13)
     @Test
-    void embeddedOverlap_Local_13() throws Exception {
+    void update_13() throws Exception {
         //     |-|--|--|--|----------------------------------------| 100
         //        |------|
         //     |-||------||----------------------------------------| 100
@@ -202,7 +202,7 @@ public class BarbelHistoCore_MultiUpdate_SuiteTest {
         
     @Order(14)
     @Test
-    void embeddedOverlap_Local_14() throws Exception {
+    void update_14() throws Exception {
         //     |-||------||----------------------------------------| 100
         //        |-------|
         //     |-||-------|----------------------------------------| 100

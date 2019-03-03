@@ -15,8 +15,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.projectbarbel.histo.BarbelHisto;
 import org.projectbarbel.histo.BarbelHistoCore;
+import org.projectbarbel.histo.BarbelMode;
 import org.projectbarbel.histo.BarbelQueries;
 import org.projectbarbel.histo.model.Bitemporal;
+import org.projectbarbel.histo.model.DefaultDocument;
 import org.projectbarbel.histo.pojos.Adress;
 import org.projectbarbel.histo.pojos.BankAccount;
 import org.projectbarbel.histo.pojos.ComplexFieldsPrivatePojoPartialContructor;
@@ -71,10 +73,15 @@ public class BarbelHistoCore_CQIndexing_SuiteTest {
                 Arguments.of(EnhancedRandom.random(VehicleUsage.class)));
     }
 
+    @SuppressWarnings("unused")
+    private static Stream<Arguments> createBitemporals() {
+        return Stream.of(Arguments.of(new DefaultDocument("some", "bitemporal")));
+    }
+    
     @SuppressWarnings("unchecked")
     @ParameterizedTest
     @MethodSource("createPojos")
-    public <T> void testSave(T pojo) throws IOException {
+    public <T> void testSavePojo(T pojo) throws IOException {
         BarbelHisto<T> core = BTExecutionContext.INSTANCE.barbel(pojo.getClass())
                 .withBackboneSupplier(()->{
                     IndexedCollection<T> backbone = new ConcurrentIndexedCollection<T>();
@@ -96,4 +103,29 @@ public class BarbelHistoCore_CQIndexing_SuiteTest {
         assertEquals(0, ((BarbelHistoCore<?>)core).size());
     }
 
+    @SuppressWarnings("unchecked")
+    @ParameterizedTest
+    @MethodSource("createBitemporals")
+    public <T> void testSaveBitemporal(T pojo) throws IOException {
+        BarbelHisto<T> core = BTExecutionContext.INSTANCE.barbel(pojo.getClass())
+                .withBackboneSupplier(()->{
+                    IndexedCollection<T> backbone = new ConcurrentIndexedCollection<T>();
+                    backbone.addIndex((Index<T>) NavigableIndex.onAttribute(VERSION_ID_PK));
+                    return backbone;
+                }).withMode(BarbelMode.BITEMPORAL)
+                .build();
+        core.save(pojo, LocalDate.now(), LocalDate.MAX);
+        T saved = core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX);
+        assertEquals(3, core.retrieve(BarbelQueries.all()).stream().count());
+        Bitemporal object = (Bitemporal)core.retrieve(BarbelQueries.all()).stream().findFirst().get();
+        Bitemporal byPK = (Bitemporal)core.retrieve((Query<T>) equal(VERSION_ID_PK, (String)object.getBitemporalStamp().getVersionId())).stream().findFirst().get();
+        assertEquals(object, byPK);
+        assertEquals(object.getBitemporalStamp(), byPK.getBitemporalStamp());
+        assertNotSame(object.getBitemporalStamp(), byPK.getBitemporalStamp());
+        Bitemporal record = (Bitemporal) core.retrieve(BarbelQueries.all()).stream().findFirst().get();
+        assertNotNull(record.getBitemporalStamp().getDocumentId());
+        core.unload(((Bitemporal)saved).getBitemporalStamp().getDocumentId());
+        assertEquals(0, ((BarbelHistoCore<?>)core).size());
+    }
+    
 }
