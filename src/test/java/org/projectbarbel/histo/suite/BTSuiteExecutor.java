@@ -62,11 +62,10 @@ public class BTSuiteExecutor {
     }
 
     public void test(BTTestContext context) {
-        BTSuiteExecutor launcher = new BTSuiteExecutor();
         BTTestContext previousContext = BTExecutionContext.INSTANCE.getTestContext();
         BTExecutionContext.INSTANCE.setTestContext(context);
-        launcher.runNeutral();
-        TestExecutionSummary summary = launcher.listener.getSummary();
+        runNeutral();
+        TestExecutionSummary summary = listener.getSummary();
         summary.printTo(new PrintWriter(System.out));
         summary.printFailuresTo(new PrintWriter(System.out));
         assertEquals(0, summary.getFailures().size());
