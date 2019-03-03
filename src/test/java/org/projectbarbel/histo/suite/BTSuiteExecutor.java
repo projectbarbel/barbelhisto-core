@@ -41,26 +41,6 @@ public class BTSuiteExecutor {
         launcher.execute(request);
     }
 
-    public void runPersistent() {
-        LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
-                .selectors(DiscoverySelectors.selectPackage("org.projectbarbel.histo.suite"))
-                .filters(ClassNameFilter.includeClassNamePatterns(".*SuiteTest"),
-                        ClassNameFilter.excludeClassNamePatterns(".*StandardSuiteTest"))
-                .build();
-
-        Launcher launcher = LauncherFactory.create();
-
-        // Register a listener of your choice
-        launcher.registerTestExecutionListeners(listener, new TestExecutionListener() {
-            public void executionStarted(TestIdentifier testIdentifier) {
-                testcount++;
-                System.out.println("Starting test suite case [" + testcount + "]: " + testIdentifier.getDisplayName());
-            }
-        });
-
-        launcher.execute(request);
-    }
-
     public void test(BTTestContext context) {
         BTTestContext previousContext = BTExecutionContext.INSTANCE.getTestContext();
         BTExecutionContext.INSTANCE.setTestContext(context);

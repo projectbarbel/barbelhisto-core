@@ -98,6 +98,8 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
                             .postBothWay(context);
                     EventType.RELEASELOCK.create().with(journal).postSynchronous(context);
                 }
+            } catch (Exception e) {
+                throw e;
             } finally {
                 journal.unlock();
             }
@@ -178,6 +180,12 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
                 "BitemporalStamp must not be null");
         Validate.isTrue(bitemporals.stream().filter(b -> b.getBitemporalStamp().getDocumentId() == null).count() == 0,
                 "document id in BitemporalStamp must not be null");
+        Validate.isTrue(
+                bitemporals.stream()
+                        .filter(b -> mode.equals(BarbelMode.BITEMPORAL)
+                                && !b.getBitemporalStamp().getDocumentId().equals(mode.drawDocumentId(b)))
+                        .count() == 0,
+                "inconsistent state of passed bitemporal - document ids inconsistent");
         List<Object> documentIDs = bitemporals.stream().map(b -> b.getBitemporalStamp().getDocumentId())
                 .collect(Collectors.toList());
         for (Object documentId : documentIDs) {
@@ -194,12 +202,12 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     public Collection<Bitemporal> unload(Object... documentIDs) {
         Validate.notEmpty(documentIDs, "must pass at least one documentID");
         Validate.validState(!backbone.isEmpty(), "backbone is empty, nothing to unload");
-        EventType.UNONLOADOPERATION.create().with(UnLoadOperationEvent.DOCUMENT_IDs,
-                documentIDs).with(UnLoadOperationEvent.BARBEL, this).postBothWay(context);
-        return unloadInternal(documentIDs);
+        EventType.UNONLOADOPERATION.create().with(UnLoadOperationEvent.DOCUMENT_IDs, documentIDs)
+                .with(UnLoadOperationEvent.BARBEL, this).postBothWay(context);
+        return unloadQuiet(documentIDs);
     }
 
-    public Collection<Bitemporal> unloadInternal(Object... documentIDs) {
+    public Collection<Bitemporal> unloadQuiet(Object... documentIDs) {
         Collection<Bitemporal> collection = new HashSet<>();
         for (int i = 0; i < documentIDs.length; i++) {
             Object id = documentIDs[i];

@@ -4,21 +4,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDate;
 
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.projectbarbel.histo.BarbelHisto;
 import org.projectbarbel.histo.BarbelHistoCore;
 import org.projectbarbel.histo.model.DefaultPojo;
 import org.projectbarbel.histo.suite.BTExecutionContext;
 import org.projectbarbel.histo.suite.extensions.BTC_PersitenceListener;
-import org.projectbarbel.histo.suite.persistent.BarbelHistoCore_MultiUpdate_andQuery_SuiteTest;
+import org.projectbarbel.histo.suite.persistent.BarbelHistoCore_MultiUpdate_andQuery_Super;
 
 @ExtendWith(BTC_PersitenceListener.class)
-@TestMethodOrder(OrderAnnotation.class)
-public class BarbelHistoCore_MultiUpdate_andQuery_Listener_SuiteTest extends BarbelHistoCore_MultiUpdate_andQuery_SuiteTest {
+public class BarbelHistoCore_MultiUpdate_andQuery_Listener_SuiteTest extends BarbelHistoCore_MultiUpdate_andQuery_Super {
 
     @Order(11)
     @Test

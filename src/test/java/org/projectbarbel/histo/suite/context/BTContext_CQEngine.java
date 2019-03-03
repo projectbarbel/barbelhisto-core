@@ -11,6 +11,7 @@ import java.util.function.Function;
 
 import org.projectbarbel.histo.BarbelHistoBuilder;
 import org.projectbarbel.histo.model.Bitemporal;
+import org.projectbarbel.histo.model.BitemporalVersion;
 import org.projectbarbel.histo.model.DefaultDocument;
 import org.projectbarbel.histo.model.DefaultPojo;
 import org.projectbarbel.histo.pojos.Adress;
@@ -31,7 +32,6 @@ import org.projectbarbel.histo.pojos.VehicleUsage;
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.attribute.SimpleAttribute;
 import com.googlecode.cqengine.persistence.disk.DiskPersistence;
-import com.googlecode.cqengine.persistence.support.serialization.PersistenceConfig;
 import com.googlecode.cqengine.query.option.QueryOptions;
 
 public class BTContext_CQEngine implements BTTestContext {
@@ -106,6 +106,10 @@ public class BTContext_CQEngine implements BTTestContext {
         public String getValue(DefaultDocument object, QueryOptions queryOptions) {
             return (String) ((Bitemporal) object).getBitemporalStamp().getVersionId();
         }
+    }, new SimpleAttribute<BitemporalVersion, String>("versionId") {
+        public String getValue(BitemporalVersion object, QueryOptions queryOptions) {
+            return (String) ((Bitemporal) object).getBitemporalStamp().getVersionId();
+        }
     });
 
     private BarbelHistoBuilder context;
@@ -117,13 +121,8 @@ public class BTContext_CQEngine implements BTTestContext {
             @SuppressWarnings("unchecked")
             @Override
             public BarbelHistoBuilder apply(Class<?> managedType) {
-                if (managedType.isAnnotationPresent(PersistenceConfig.class)) {
-                    context = BarbelHistoBuilder.barbel().withBackboneSupplier(() -> new ConcurrentIndexedCollection<>(
-                            DiskPersistence.onPrimaryKeyInFile(getAttribute(managedType), new File("test.dat"))));
-                    return context;
-                } else {
-                    return BarbelHistoBuilder.barbel();
-                }
+                return BarbelHistoBuilder.barbel().withBackboneSupplier(() -> new ConcurrentIndexedCollection<>(
+                        DiskPersistence.onPrimaryKeyInFile(getAttribute(managedType), new File("test.dat"))));
             }
 
             @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -141,7 +140,8 @@ public class BTContext_CQEngine implements BTTestContext {
     @Override
     public void clearResources() {
         if (context != null)
-            Optional.ofNullable(context.getBackbone()).ifPresent(b->b.clear());;
+            Optional.ofNullable(context.getBackbone()).ifPresent(b -> b.clear());
+        ;
         try {
             Files.deleteIfExists(Paths.get("test.dat"));
             Files.deleteIfExists(Paths.get("test.dat-shm"));
