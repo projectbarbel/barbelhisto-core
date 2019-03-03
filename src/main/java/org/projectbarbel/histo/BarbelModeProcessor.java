@@ -34,14 +34,14 @@ public interface BarbelModeProcessor {
 	
 	<T> Collection<Bitemporal> managedBitemporalToCustomPersistenceObjects(Object id, IndexedCollection<T> objects);
 
-	Bitemporal managedBitemporalToCustomPersistenceObject(Bitemporal bitemporal);
+	Bitemporal managedBitemporalToPersistenceObject(Bitemporal bitemporal);
 
 	<T> Collection<T> customPersistenceObjectsToManagedBitemporals(BarbelHistoContext context,
 			Collection<Bitemporal> bitemporals);
 
 	boolean validateMaidenCandidate(BarbelHistoContext context, Object candidate);
 
-	Class<?> getPersistenceObjectType(Class<?> objectType);
+	Class<? extends Bitemporal> getPersistenceObjectType(Class<?> objectType);
 
 	default <T> Optional<Object> getIdValue(T candidate) {
 	    List<Field> fields = FieldUtils.getFieldsListWithAnnotation(candidate.getClass(), DocumentId.class);

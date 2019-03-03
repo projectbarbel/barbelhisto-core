@@ -104,12 +104,12 @@ public enum BarbelMode implements BarbelModeProcessor {
         }
 
         @Override
-        public Class<?> getPersistenceObjectType(Class<?> objectType) {
+        public Class<? extends Bitemporal> getPersistenceObjectType(Class<?> objectType) {
             return BitemporalVersion.class;
         }
 
         @Override
-        public Bitemporal managedBitemporalToCustomPersistenceObject(Bitemporal bitemporal) {
+        public Bitemporal managedBitemporalToPersistenceObject(Bitemporal bitemporal) {
             return new BitemporalVersion(bitemporal.getBitemporalStamp(), ((BarbelProxy) bitemporal).getTarget());
         }
 
@@ -181,13 +181,14 @@ public enum BarbelMode implements BarbelModeProcessor {
             return object;
         }
 
+        @SuppressWarnings("unchecked")
         @Override
-        public Class<?> getPersistenceObjectType(Class<?> objectType) {
-            return objectType;
+        public Class<? extends Bitemporal> getPersistenceObjectType(Class<?> objectType) {
+            return (Class<? extends Bitemporal>) objectType;
         }
 
         @Override
-        public Bitemporal managedBitemporalToCustomPersistenceObject(Bitemporal bitemporal) {
+        public Bitemporal managedBitemporalToPersistenceObject(Bitemporal bitemporal) {
             return bitemporal;
         }
 

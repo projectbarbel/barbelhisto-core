@@ -58,7 +58,7 @@ public final class BitemporalStamp {
                 .build();
     }
 
-    public Object getVersionId() {
+    public String getVersionId() {
         return versionId;
     }
 

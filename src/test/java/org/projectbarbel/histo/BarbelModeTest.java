@@ -165,7 +165,7 @@ public class BarbelModeTest {
     @Test
     public void testManagedBitemporalToCustomPersistenceObject_PojoMode_Failure() throws Exception {
         DefaultDocument doc = new DefaultDocument(BitemporalStamp.createActive(), "some data");
-        assertThrows(ClassCastException.class, ()->BarbelMode.POJO.managedBitemporalToCustomPersistenceObject(doc));
+        assertThrows(ClassCastException.class, ()->BarbelMode.POJO.managedBitemporalToPersistenceObject(doc));
     }
 
     @Test
@@ -173,7 +173,7 @@ public class BarbelModeTest {
         DefaultPojo pojo = new DefaultPojo("id","data");
         BitemporalStamp stamp = BitemporalStamp.createActive();
         Bitemporal doc = BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(), pojo, stamp);
-        assertEquals(new BitemporalVersion(stamp, pojo), BarbelMode.POJO.managedBitemporalToCustomPersistenceObject(doc));
+        assertEquals(new BitemporalVersion(stamp, pojo), BarbelMode.POJO.managedBitemporalToPersistenceObject(doc));
     }
     
 	@Test
@@ -291,7 +291,7 @@ public class BarbelModeTest {
     @Test
     public void testManagedBitemporalToCustomPersistenceObject_BitemporalMode() throws Exception {
         DefaultDocument doc = new DefaultDocument(BitemporalStamp.createActive(), "some data");
-        assertEquals(BarbelMode.BITEMPORAL.managedBitemporalToCustomPersistenceObject(doc), doc);
+        assertEquals(BarbelMode.BITEMPORAL.managedBitemporalToPersistenceObject(doc), doc);
     }
 
 }
