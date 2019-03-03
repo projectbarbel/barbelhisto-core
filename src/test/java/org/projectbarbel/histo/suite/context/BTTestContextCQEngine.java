@@ -34,7 +34,7 @@ import com.googlecode.cqengine.attribute.SimpleAttribute;
 import com.googlecode.cqengine.persistence.disk.DiskPersistence;
 import com.googlecode.cqengine.query.option.QueryOptions;
 
-public class BTContext_CQEngine implements BTTestContext {
+public class BTTestContextCQEngine implements BTTestContext {
 
     @SuppressWarnings("rawtypes")
     final List<SimpleAttribute> attributes = Arrays.asList(new SimpleAttribute<DefaultPojo, String>("versionId") {

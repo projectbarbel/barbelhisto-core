@@ -6,13 +6,13 @@ import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.projectbarbel.histo.suite.BTExecutionContext;
-import org.projectbarbel.histo.suite.context.BTContext_CQEngine;
+import org.projectbarbel.histo.suite.context.BTTestContextPersistenceListener;
 
-public class BTC_CQPersistence implements BeforeAllCallback, AfterAllCallback, ExecutionCondition {
+public class BTTestPersitenceListenerOnly implements ExecutionCondition, AfterAllCallback, BeforeAllCallback {
 
     @Override
     public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
-        if (BTExecutionContext.INSTANCE.getTestContext() instanceof BTContext_CQEngine)
+        if (BTExecutionContext.INSTANCE.getTestContext() instanceof BTTestContextPersistenceListener)
             return ConditionEvaluationResult.enabled("runs for listener context: "
                     + BTExecutionContext.INSTANCE.getTestContext().getClass().getName());
         else

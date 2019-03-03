@@ -29,11 +29,11 @@ import org.projectbarbel.histo.pojos.Risk;
 import org.projectbarbel.histo.pojos.Vehicle;
 import org.projectbarbel.histo.pojos.VehicleUsage;
 import org.projectbarbel.histo.suite.BTExecutionContext;
-import org.projectbarbel.histo.suite.extensions.BTC_Standard;
+import org.projectbarbel.histo.suite.extensions.BTTestStandard;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
-@ExtendWith(BTC_Standard.class)
+@ExtendWith(BTTestStandard.class)
 public class BarbelHistoCore_PojoVariants_SuiteTest {
 
     @BeforeEach

@@ -11,11 +11,11 @@ import org.projectbarbel.histo.BarbelHisto;
 import org.projectbarbel.histo.BarbelHistoCore;
 import org.projectbarbel.histo.model.DefaultPojo;
 import org.projectbarbel.histo.suite.BTExecutionContext;
-import org.projectbarbel.histo.suite.extensions.BTC_PersitenceListener;
-import org.projectbarbel.histo.suite.persistent.BarbelHistoCore_MultiUpdate_andQuery_Super;
+import org.projectbarbel.histo.suite.extensions.BTTestPersitenceListenerOnly;
+import org.projectbarbel.histo.suite.persistent.BarbelHistoCore_MultiUpdate_andQuery;
 
-@ExtendWith(BTC_PersitenceListener.class)
-public class BarbelHistoCore_MultiUpdate_andQuery_Listener_SuiteTest extends BarbelHistoCore_MultiUpdate_andQuery_Super {
+@ExtendWith(BTTestPersitenceListenerOnly.class)
+public class BarbelHistoCore_MultiUpdate_andQuery_Listener_SuiteTest extends BarbelHistoCore_MultiUpdate_andQuery {
 
     @Order(11)
     @Test

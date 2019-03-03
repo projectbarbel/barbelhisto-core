@@ -19,11 +19,11 @@ import org.projectbarbel.histo.BarbelHistoCore;
 import org.projectbarbel.histo.BarbelTestHelper;
 import org.projectbarbel.histo.pojos.Policy;
 import org.projectbarbel.histo.suite.BTExecutionContext;
-import org.projectbarbel.histo.suite.extensions.BTC_Standard;
+import org.projectbarbel.histo.suite.extensions.BTTestStandard;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
-@ExtendWith(BTC_Standard.class)
+@ExtendWith(BTTestStandard.class)
 public class BarbelHistoCore_Memory_Policy_SuiteTest {
 
     private final BarbelHisto<Policy> core = BTExecutionContext.INSTANCE.barbel(Policy.class).build();

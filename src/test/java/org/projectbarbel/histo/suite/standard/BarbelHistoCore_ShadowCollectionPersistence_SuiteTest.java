@@ -26,14 +26,14 @@ import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.DefaultDocument;
 import org.projectbarbel.histo.suite.BTExecutionContext;
-import org.projectbarbel.histo.suite.extensions.BTC_Standard;
+import org.projectbarbel.histo.suite.extensions.BTTestStandard;
 
 import com.google.common.eventbus.Subscribe;
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.query.Query;
 
-@ExtendWith(BTC_Standard.class)
+@ExtendWith(BTTestStandard.class)
 @TestMethodOrder(OrderAnnotation.class)
 public class BarbelHistoCore_ShadowCollectionPersistence_SuiteTest {
 

@@ -11,10 +11,10 @@ import org.projectbarbel.histo.BarbelHisto;
 import org.projectbarbel.histo.BarbelHistoCore;
 import org.projectbarbel.histo.model.DefaultPojo;
 import org.projectbarbel.histo.suite.BTExecutionContext;
-import org.projectbarbel.histo.suite.extensions.BTC_CQPersistence;
+import org.projectbarbel.histo.suite.extensions.BTTestCQPersistenceOnly;
 
-@ExtendWith(BTC_CQPersistence.class)
-public class BarbelHistoCore_MultiUpdate_andQuery_SuiteTest extends BarbelHistoCore_MultiUpdate_andQuery_Super{
+@ExtendWith(BTTestCQPersistenceOnly.class)
+public class BarbelHistoCore_MultiUpdate_andQuery_SuiteTest extends BarbelHistoCore_MultiUpdate_andQuery{
 
     @Order(11)
     @Test

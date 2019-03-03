@@ -1,11 +1,11 @@
 package org.projectbarbel.histo.suite;
 
 import org.projectbarbel.histo.BarbelHistoBuilder;
-import org.projectbarbel.histo.suite.context.BTContext_Standard;
+import org.projectbarbel.histo.suite.context.BTTestContextStandard;
 import org.projectbarbel.histo.suite.context.BTTestContext;
 
 public class BTExecutionContext {
-    private BTTestContext testContext = new BTContext_Standard();
+    private BTTestContext testContext = new BTTestContextStandard();
     public static final BTExecutionContext INSTANCE = new BTExecutionContext();
     private BTExecutionContext() {
     }

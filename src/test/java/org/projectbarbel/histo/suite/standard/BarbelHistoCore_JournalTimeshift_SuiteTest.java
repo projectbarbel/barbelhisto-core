@@ -23,11 +23,11 @@ import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalObjectState;
 import org.projectbarbel.histo.model.DefaultPojo;
 import org.projectbarbel.histo.suite.BTExecutionContext;
-import org.projectbarbel.histo.suite.extensions.BTC_Standard;
+import org.projectbarbel.histo.suite.extensions.BTTestStandard;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
-@ExtendWith(BTC_Standard.class)
+@ExtendWith(BTTestStandard.class)
 public class BarbelHistoCore_JournalTimeshift_SuiteTest {
 
     private BarbelHisto<DefaultPojo> core;

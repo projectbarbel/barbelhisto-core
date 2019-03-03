@@ -16,11 +16,11 @@ import org.projectbarbel.histo.model.DefaultPojo;
 import org.projectbarbel.histo.model.EffectivePeriod;
 import org.projectbarbel.histo.model.RecordPeriod;
 import org.projectbarbel.histo.suite.BTExecutionContext;
-import org.projectbarbel.histo.suite.extensions.BTC_PersitenceListener;
+import org.projectbarbel.histo.suite.extensions.BTTestPersitenceListenerOnly;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
-@ExtendWith(BTC_PersitenceListener.class)
+@ExtendWith(BTTestPersitenceListenerOnly.class)
 public class BarbelHistoCore_LoadDocIDTwice_PersistentListener_SuiteTest {
     @Test
     public void testPopulateBitemporalVersion_DocIDExistsPersistent() throws Exception {

@@ -25,7 +25,7 @@ import org.projectbarbel.histo.model.BitemporalVersion;
 import org.projectbarbel.histo.model.DefaultPojo;
 import org.projectbarbel.histo.pojos.PrimitivePrivatePojo;
 import org.projectbarbel.histo.suite.BTExecutionContext;
-import org.projectbarbel.histo.suite.extensions.BTC_Standard;
+import org.projectbarbel.histo.suite.extensions.BTTestStandard;
 
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.attribute.SimpleAttribute;
@@ -34,7 +34,7 @@ import com.googlecode.cqengine.query.option.QueryOptions;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
-@ExtendWith(BTC_Standard.class)
+@ExtendWith(BTTestStandard.class)
 public class BarbelHistoCore_Contracts_SuiteTest {
 
     @AfterEach

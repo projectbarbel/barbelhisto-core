@@ -38,13 +38,13 @@ import org.projectbarbel.histo.model.DefaultPojo;
 import org.projectbarbel.histo.model.EffectivePeriod;
 import org.projectbarbel.histo.model.RecordPeriod;
 import org.projectbarbel.histo.suite.BTExecutionContext;
-import org.projectbarbel.histo.suite.extensions.BTC_Standard;
+import org.projectbarbel.histo.suite.extensions.BTTestStandard;
 
 import com.googlecode.cqengine.IndexedCollection;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
-@ExtendWith(BTC_Standard.class)
+@ExtendWith(BTTestStandard.class)
 public class BarbelHistoCore_JournalUpdate_SuiteTest {
 
     private DocumentJournal journal;

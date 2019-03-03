@@ -15,11 +15,11 @@ import org.projectbarbel.histo.model.DefaultPojo;
 import org.projectbarbel.histo.model.EffectivePeriod;
 import org.projectbarbel.histo.model.RecordPeriod;
 import org.projectbarbel.histo.suite.BTExecutionContext;
-import org.projectbarbel.histo.suite.extensions.BTC_CQPersistence;
+import org.projectbarbel.histo.suite.extensions.BTTestCQPersistenceOnly;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
-@ExtendWith(BTC_CQPersistence.class)
+@ExtendWith(BTTestCQPersistenceOnly.class)
 public class BarbelHistoCore_LoadDocIDTwice_Persistent_SuiteTest {
 
     @Test

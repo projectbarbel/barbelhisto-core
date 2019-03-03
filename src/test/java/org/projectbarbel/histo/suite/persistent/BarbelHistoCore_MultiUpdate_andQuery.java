@@ -19,7 +19,7 @@ import org.projectbarbel.histo.suite.BTExecutionContext;
 import com.googlecode.cqengine.query.QueryFactory;
 
 @TestMethodOrder(OrderAnnotation.class)
-public class BarbelHistoCore_MultiUpdate_andQuery_Super {
+public class BarbelHistoCore_MultiUpdate_andQuery {
 
     // @formatter:off
     @Order(1)

@@ -11,9 +11,9 @@ import org.projectbarbel.histo.BarbelHistoCore;
 import org.projectbarbel.histo.BarbelQueries;
 import org.projectbarbel.histo.model.DefaultPojo;
 import org.projectbarbel.histo.suite.BTExecutionContext;
-import org.projectbarbel.histo.suite.extensions.BTC_Standard;
+import org.projectbarbel.histo.suite.extensions.BTTestStandard;
 
-@ExtendWith(BTC_Standard.class)
+@ExtendWith(BTTestStandard.class)
 public class BarbelHistoCore_MultiUpdate_MAX_TestSuite {
 
     @Test

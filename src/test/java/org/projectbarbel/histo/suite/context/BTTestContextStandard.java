@@ -4,7 +4,7 @@ import java.util.function.Function;
 
 import org.projectbarbel.histo.BarbelHistoBuilder;
 
-public class BTContext_Standard implements BTTestContext{
+public class BTTestContextStandard implements BTTestContext{
 
     @Override
     public Function<Class<?>, BarbelHistoBuilder> contextFunction() {
