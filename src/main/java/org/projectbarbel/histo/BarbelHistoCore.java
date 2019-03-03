@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -291,6 +292,64 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     @Override
     public boolean contains(Object documentId) {
         return !backbone.retrieve(BarbelQueries.all(documentId)).isEmpty();
+    }
+
+    public final static class PackageVisibleHelper {
+
+        private final PackageVisibleHelperFactory factory;
+
+        private PackageVisibleHelper(PackageVisibleHelperFactory factory) {
+            super();
+            this.factory = factory;
+        }
+
+        public void loadQuiet(BarbelHistoCore<?> core, List<Bitemporal> objects) {
+            if (factory == PackageVisibleHelperFactory.INSTANCE && !factory.isSampleHelper(this)) {
+                throw new IllegalAccessError("wrong PackageVisibleHelper ");
+            }
+            core.loadQuiet(objects);
+        }
+        
+        public void unloadQuiet(BarbelHistoCore<?> core, Object... documentIDs) {
+            if (factory == PackageVisibleHelperFactory.INSTANCE && !factory.isSampleHelper(this)) {
+                throw new IllegalAccessError("wrong PackageVisibleHelper ");
+            }
+            core.unloadQuiet(documentIDs);
+        }
+        
+    }
+
+    public final static class PackageVisibleHelperFactory {
+
+        public static final PackageVisibleHelperFactory INSTANCE = new PackageVisibleHelperFactory();
+
+        private static final PackageVisibleHelper HELPER = new PackageVisibleHelper(INSTANCE);
+
+        private static final List<String> accessRule = Arrays.asList(
+                "com.projectbarbel.histo.persistence.mongo.SimpleMongoLazyLoadingListener",
+                "com.projectbarbel.histo.persistence.mongo.SimpleMongoUpdateListenerTest");
+        @SuppressWarnings("rawtypes")
+        private static final Set<Class> frozened = new HashSet<>();
+        
+        private PackageVisibleHelperFactory() {
+            super();
+        }
+
+        public PackageVisibleHelper accessor(Class<?> clazz) {
+            Validate.isTrue(accessRule.contains(clazz.getName()));
+            if (frozened.contains(clazz)) {
+                throw new IllegalAccessError("please invoke before frozen!");
+            }
+            return HELPER;
+        }
+
+        public void freeze(Class<?> clazz) {
+            frozened.add(clazz);
+        }
+
+        public boolean isSampleHelper(PackageVisibleHelper helper) {
+            return HELPER.equals(helper);
+        }
     }
 
 }

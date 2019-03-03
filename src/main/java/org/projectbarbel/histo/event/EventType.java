@@ -34,8 +34,10 @@ import lombok.extern.slf4j.Slf4j;
  * 
  * The {@link EventType#RETRIEVEDATA} event is posted each time when clients
  * retrieve data from {@link BarbelHisto}. The {@link EventType#ONLOADOPERATION}
- * event is posted when the client performs a bulk load with
- * {@link BarbelHisto#load(java.util.Collection)}, it's posted both way.<br>
+ * and {@link EventType#UNONLOADOPERATION} events is posted when the client
+ * performs a bulk load and unload with
+ * {@link BarbelHisto#load(java.util.Collection)} and
+ * {@link BarbelHisto#unload(Object...)} respectively, both posted both way.<br>
  * <br>
  * "Both way" means that the event is published synchronously and
  * asynchronously, i.e. clients can register listeners in asynchronous and
@@ -185,7 +187,7 @@ public enum EventType implements PostableEvent {
         public HistoEvent create() {
             return new OnLoadOperationEvent(ONLOADOPERATION, new HashMap<>());
         }
-    },    
+    },
     /**
      * Event fired when client performs unload operation with
      * {@link BarbelHisto#unload(Object...)}. Posted both way.
@@ -194,7 +196,7 @@ public enum EventType implements PostableEvent {
 
         @Override
         public HistoEvent create() {
-            return new UnLoadOperationEvent(ONLOADOPERATION, new HashMap<>());
+            return new UnLoadOperationEvent(UNONLOADOPERATION, new HashMap<>());
         }
     };
 
@@ -384,14 +386,14 @@ public enum EventType implements PostableEvent {
     }
 
     public class UnLoadOperationEvent extends AbstractBarbelEvent {
-        
+
         public static final String DOCUMENT_IDs = "#documentIds";
         public static final String BARBEL = "#core";
-        
+
         public UnLoadOperationEvent(EventType eventType, Map<Object, Object> context) {
             super(eventType, context);
         }
-        
+
     }
-    
+
 }
