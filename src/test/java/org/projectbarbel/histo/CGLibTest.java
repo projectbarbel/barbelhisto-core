@@ -15,11 +15,20 @@ import org.objenesis.instantiator.ObjectInstantiator;
 import org.projectbarbel.histo.model.BarbelProxy;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
+import org.projectbarbel.histo.pojos.Adress;
+import org.projectbarbel.histo.pojos.BankAccount;
 import org.projectbarbel.histo.pojos.ComplexFieldsPrivatePojoPartialContructor;
 import org.projectbarbel.histo.pojos.ComplexFieldsPrivatePojoPartialContructorWithComplexType;
+import org.projectbarbel.histo.pojos.Driver;
 import org.projectbarbel.histo.pojos.NoPrimitivePrivatePojoPartialContructor;
+import org.projectbarbel.histo.pojos.Partner;
+import org.projectbarbel.histo.pojos.Policy;
 import org.projectbarbel.histo.pojos.PrimitivePrivatePojo;
 import org.projectbarbel.histo.pojos.PrimitivePrivatePojoPartialContructor;
+import org.projectbarbel.histo.pojos.RegisteredKeeper;
+import org.projectbarbel.histo.pojos.Risk;
+import org.projectbarbel.histo.pojos.Vehicle;
+import org.projectbarbel.histo.pojos.VehicleUsage;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 import net.sf.cglib.proxy.Callback;
@@ -35,7 +44,16 @@ public class CGLibTest {
                 Arguments.of(EnhancedRandom.random(PrimitivePrivatePojoPartialContructor.class)),
                 Arguments.of(EnhancedRandom.random(NoPrimitivePrivatePojoPartialContructor.class)),
                 Arguments.of(EnhancedRandom.random(ComplexFieldsPrivatePojoPartialContructorWithComplexType.class)),
-                Arguments.of(EnhancedRandom.random(ComplexFieldsPrivatePojoPartialContructor.class)));
+                Arguments.of(EnhancedRandom.random(ComplexFieldsPrivatePojoPartialContructor.class)),
+                Arguments.of(EnhancedRandom.random(Adress.class)),
+                Arguments.of(EnhancedRandom.random(Driver.class)),
+                Arguments.of(EnhancedRandom.random(Vehicle.class)),
+                Arguments.of(EnhancedRandom.random(RegisteredKeeper.class)),
+                Arguments.of(EnhancedRandom.random(Risk.class)),
+                Arguments.of(EnhancedRandom.random(Policy.class)),
+                Arguments.of(EnhancedRandom.random(BankAccount.class)),
+                Arguments.of(EnhancedRandom.random(Partner.class)),
+                Arguments.of(EnhancedRandom.random(VehicleUsage.class)));
     }
 
     @SuppressWarnings({ "unused", "rawtypes" })

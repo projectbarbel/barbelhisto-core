@@ -1,4 +1,4 @@
-package org.projectbarbel.histo;
+package org.projectbarbel.histo.suite.standard;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -12,13 +12,20 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.projectbarbel.histo.BarbelHisto;
+import org.projectbarbel.histo.BarbelHistoBuilder;
+import org.projectbarbel.histo.BarbelQueries;
+import org.projectbarbel.histo.DocumentId;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.BitemporalVersion;
 import org.projectbarbel.histo.model.DefaultPojo;
 import org.projectbarbel.histo.pojos.PrimitivePrivatePojo;
+import org.projectbarbel.histo.suite.BTExecutionContext;
+import org.projectbarbel.histo.suite.extensions.BTC_Standard;
 
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.attribute.SimpleAttribute;
@@ -27,6 +34,7 @@ import com.googlecode.cqengine.query.option.QueryOptions;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
+@ExtendWith(BTC_Standard.class)
 public class BarbelHistoCore_Contracts_SuiteTest {
 
     @AfterEach
@@ -46,7 +54,7 @@ public class BarbelHistoCore_Contracts_SuiteTest {
 
     @Test
     public void testSaveBitemporalVersion() throws Exception {
-        BarbelHisto<BitemporalVersion> core = BarbelHistoTestContext.INSTANCE.apply(BitemporalVersion.class).build();
+        BarbelHisto<BitemporalVersion> core = BTExecutionContext.INSTANCE.barbel(BitemporalVersion.class).build();
         Exception exc = assertThrows(IllegalArgumentException.class,
                 () -> core.save(new BitemporalVersion(BitemporalStamp.createActive(), EnhancedRandom.random(DefaultPojo.class)), LocalDate.now(), LocalDate.MAX));
         assertTrue(exc.getMessage().contains("BitemporalVersion cannot be used in BarbelMode.POJO"));
@@ -54,7 +62,7 @@ public class BarbelHistoCore_Contracts_SuiteTest {
     
     @Test
     public void testSave_LocalDatesInvalid() throws Exception {
-        BarbelHisto<DefaultPojo> core = BarbelHistoTestContext.INSTANCE.apply(DefaultPojo.class).build();
+        BarbelHisto<DefaultPojo> core = BTExecutionContext.INSTANCE.barbel(DefaultPojo.class).build();
         Exception exc = assertThrows(IllegalArgumentException.class,
                 () -> core.save(EnhancedRandom.random(DefaultPojo.class), LocalDate.MAX, LocalDate.now()));
         assertTrue(exc.getMessage().contains("from date"));
@@ -62,7 +70,7 @@ public class BarbelHistoCore_Contracts_SuiteTest {
 
     @Test
     public void testSave_NoSerializer() throws Exception {
-        BarbelHisto<SomePojo> core = BarbelHistoTestContext.INSTANCE.apply(SomePojo.class)
+        BarbelHisto<SomePojo> core = BTExecutionContext.INSTANCE.barbel(SomePojo.class)
                 .withBackboneSupplier(() -> new ConcurrentIndexedCollection<SomePojo>(
                         DiskPersistence.onPrimaryKeyInFile(SomePojo.DOCUMENT_ID, new File("test.dat"))))
                 .build();

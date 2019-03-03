@@ -20,7 +20,9 @@ import org.apache.commons.lang3.Validate;
 import org.projectbarbel.histo.DocumentJournal.ProcessingState;
 import org.projectbarbel.histo.event.EventType;
 import org.projectbarbel.histo.event.EventType.InitializeJournalEvent;
+import org.projectbarbel.histo.event.EventType.OnLoadOperationEvent;
 import org.projectbarbel.histo.event.EventType.RetrieveDataEvent;
+import org.projectbarbel.histo.event.EventType.UnLoadOperationEvent;
 import org.projectbarbel.histo.event.EventType.UpdateFinishedEvent;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
@@ -159,6 +161,18 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 
     @Override
     public void load(Collection<Bitemporal> bitemporals) {
+        validateLoadInternal(bitemporals);
+        EventType.ONLOADOPERATION.create().with(OnLoadOperationEvent.DATA,
+                mode.customPersistenceObjectsToManagedBitemporals(context, bitemporals)).postBothWay(context);
+        loadInternal(bitemporals);
+    }
+
+    public void loadQuiet(Collection<Bitemporal> bitemporals) {
+        validateLoadInternal(bitemporals);
+        loadInternal(bitemporals);
+    }
+
+    private void validateLoadInternal(Collection<Bitemporal> bitemporals) {
         Validate.isTrue(bitemporals != null, "bitemporals cannot be null");
         Validate.isTrue(bitemporals.stream().filter(b -> b.getBitemporalStamp() == null).count() == 0,
                 "BitemporalStamp must not be null");
@@ -170,6 +184,9 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
             Validate.validState(backbone.retrieve(BarbelQueries.all(documentId)).isEmpty(),
                     "backbone must not contain any versions of the passed document IDs");
         }
+    }
+
+    private void loadInternal(Collection<Bitemporal> bitemporals) {
         backbone.addAll(mode.customPersistenceObjectsToManagedBitemporals(context, bitemporals));
     }
 
@@ -177,6 +194,12 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     public Collection<Bitemporal> unload(Object... documentIDs) {
         Validate.notEmpty(documentIDs, "must pass at least one documentID");
         Validate.validState(!backbone.isEmpty(), "backbone is empty, nothing to unload");
+        EventType.UNONLOADOPERATION.create().with(UnLoadOperationEvent.DOCUMENT_IDs,
+                documentIDs).with(UnLoadOperationEvent.BARBEL, this).postBothWay(context);
+        return unloadInternal(documentIDs);
+    }
+
+    public Collection<Bitemporal> unloadInternal(Object... documentIDs) {
         Collection<Bitemporal> collection = new HashSet<>();
         for (int i = 0; i < documentIDs.length; i++) {
             Object id = documentIDs[i];

@@ -188,11 +188,11 @@ public final class DocumentJournal {
                 .stream().map(d -> processingState.expose(context, (Bitemporal) d)).collect(Collectors.toList());
     }
 
-    protected List<Bitemporal> getLastInsert() {
+    public List<Bitemporal> getLastInsert() {
         return lastInserts;
     }
 
-    protected Set<Inactivation> getLastInactivations() {
+    public Set<Inactivation> getLastInactivations() {
         return lastInactivations;
     }
 

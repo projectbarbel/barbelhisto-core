@@ -1,4 +1,4 @@
-package org.projectbarbel.histo;
+package org.projectbarbel.histo.suite.standard;
 
 import static com.googlecode.cqengine.query.QueryFactory.and;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -9,23 +9,38 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.projectbarbel.histo.BarbelHisto;
+import org.projectbarbel.histo.BarbelHistoContext;
+import org.projectbarbel.histo.BarbelQueries;
+import org.projectbarbel.histo.BarbelQueryOptions;
+import org.projectbarbel.histo.DocumentJournal;
 import org.projectbarbel.histo.model.BarbelProxy;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalObjectState;
 import org.projectbarbel.histo.model.DefaultPojo;
+import org.projectbarbel.histo.suite.BTExecutionContext;
+import org.projectbarbel.histo.suite.extensions.BTC_Standard;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
+@ExtendWith(BTC_Standard.class)
 public class BarbelHistoCore_JournalTimeshift_SuiteTest {
 
     private BarbelHisto<DefaultPojo> core;
 
     @BeforeEach
     public void setup() {
-        core = BarbelHistoTestContext.INSTANCE.apply(DefaultPojo.class).build();
+        core = BTExecutionContext.INSTANCE.barbel(DefaultPojo.class).build();
         BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDate.of(2019, 2, 6).atStartOfDay());
+    }
+
+    @AfterAll
+    public static void tearDown() {
+        BarbelHistoContext.getBarbelClock().useSystemDefaultZoneClock();
     }
 
     @Test

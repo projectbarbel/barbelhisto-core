@@ -6,11 +6,17 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.projectbarbel.histo.BarbelHistoBuilder;
 import org.projectbarbel.histo.BarbelHistoContext;
 
 public class RecordPeriodTest {
+
+    @AfterAll
+    public static void tearDown() {
+        BarbelHistoContext.getBarbelClock().useSystemDefaultZoneClock();
+    }
 
 	@Test
 	public void testCreateActive() throws Exception {

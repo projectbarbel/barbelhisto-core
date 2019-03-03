@@ -71,16 +71,16 @@ public class BarbelModeTest {
 		assertTrue(
 				BarbelMode.POJO
 						.managedBitemporalToCustomPersistenceObjects("some",
-								BarbelTestHelper.generateJournalOfManagedDefaultPojos("some",
+								BarbelTestHelper.generateJournalOfManagedDefaultPojos(BarbelHistoBuilder.barbel(),"some",
 										Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 3, 1))))
 						.size() == 2);
 	}
 
 	@Test
 	public void testManagedBitemporalToCustomPersistenceObjectsTwoJournals() throws Exception {
-		IndexedCollection<Object> bitemporals = BarbelTestHelper.generateJournalOfManagedDefaultPojos("some",
+		IndexedCollection<Object> bitemporals = BarbelTestHelper.generateJournalOfManagedDefaultPojos(BarbelHistoBuilder.barbel(),"some",
 				Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 3, 1)));
-		bitemporals.addAll(BarbelTestHelper.generateJournalOfManagedDefaultPojos("other",
+		bitemporals.addAll(BarbelTestHelper.generateJournalOfManagedDefaultPojos(BarbelHistoBuilder.barbel(),"other",
 				Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 3, 1))));
 		assertTrue(BarbelMode.POJO.managedBitemporalToCustomPersistenceObjects("some", bitemporals).size() == 2);
 	}
@@ -214,7 +214,7 @@ public class BarbelModeTest {
 		assertTrue(
 				BarbelMode.BITEMPORAL
 						.managedBitemporalToCustomPersistenceObjects("some",
-								BarbelTestHelper.generateJournalOfManagedDefaultPojos("some",
+								BarbelTestHelper.generateJournalOfManagedDefaultPojos(BarbelHistoBuilder.barbel(), "some",
 										Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 3, 1))))
 						.size() == 2);
 	}

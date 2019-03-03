@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.projectbarbel.histo.BarbelHistoContext;
@@ -29,6 +30,11 @@ public class BarbelQueries_effectiveAfterTest {
         journal = BarbelTestHelper.generateJournalOfDefaultDocuments("docid1",
                 Arrays.asList(LocalDate.of(2010, 12, 1), LocalDate.of(2017, 12, 1), LocalDate.of(2020, 1, 1)));
         BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 8, 0, 0));
+    }
+    
+    @AfterAll
+    public static void tearDown() {
+        BarbelHistoContext.getBarbelClock().useSystemDefaultZoneClock();
     }
 
     @Test

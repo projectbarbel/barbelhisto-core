@@ -60,6 +60,7 @@ public enum BarbelMode implements BarbelModeProcessor {
         @Override
         public <T> Collection<T> customPersistenceObjectsToManagedBitemporals(BarbelHistoContext context,
                 Collection<Bitemporal> bitemporals) {
+            Validate.isTrue(bitemporals.stream().filter(b->!(b instanceof BitemporalVersion)).count()==0, "loaded objects must be of type BitemporalVersion in BarbelMode.POJO");
             try {
                 IndexedCollection<Object> output = bitemporals.stream()
                         .map(b -> snapshotMaiden(context, ((BitemporalVersion) b).getObject(),

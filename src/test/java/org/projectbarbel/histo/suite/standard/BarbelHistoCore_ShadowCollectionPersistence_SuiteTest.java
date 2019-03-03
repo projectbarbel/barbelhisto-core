@@ -1,4 +1,4 @@
-package org.projectbarbel.histo;
+package org.projectbarbel.histo.suite.standard;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -11,6 +11,12 @@ import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.projectbarbel.histo.BarbelHisto;
+import org.projectbarbel.histo.BarbelHistoCore;
+import org.projectbarbel.histo.BarbelMode;
+import org.projectbarbel.histo.BarbelQueries;
+import org.projectbarbel.histo.DocumentJournal;
 import org.projectbarbel.histo.DocumentJournal.Inactivation;
 import org.projectbarbel.histo.event.EventType.BarbelInitializedEvent;
 import org.projectbarbel.histo.event.EventType.InitializeJournalEvent;
@@ -19,12 +25,15 @@ import org.projectbarbel.histo.event.EventType.UpdateFinishedEvent;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.DefaultDocument;
+import org.projectbarbel.histo.suite.BTExecutionContext;
+import org.projectbarbel.histo.suite.extensions.BTC_Standard;
 
 import com.google.common.eventbus.Subscribe;
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.query.Query;
 
+@ExtendWith(BTC_Standard.class)
 @TestMethodOrder(OrderAnnotation.class)
 public class BarbelHistoCore_ShadowCollectionPersistence_SuiteTest {
 
@@ -33,8 +42,8 @@ public class BarbelHistoCore_ShadowCollectionPersistence_SuiteTest {
     @Order(1)
     @Test
     void shadowExternalTest() throws Exception {
-        BarbelHisto<DefaultDocument> barbel = BarbelHistoTestContext.INSTANCE.apply(DefaultDocument.class).withMode(BarbelMode.BITEMPORAL)
-                .withSynchronousEventListener(new ShadowCollectionListener()).build();
+        BarbelHisto<DefaultDocument> barbel = BTExecutionContext.INSTANCE.barbel(DefaultDocument.class)
+                .withMode(BarbelMode.BITEMPORAL).withSynchronousEventListener(new ShadowCollectionListener()).build();
         DefaultDocument pojo = new DefaultDocument("someId", BitemporalStamp.createActive("someId"), "some data");
         barbel.save(pojo, LocalDate.now(), LocalDate.MAX);
         assertEquals(1, shadow.size());
@@ -53,8 +62,8 @@ public class BarbelHistoCore_ShadowCollectionPersistence_SuiteTest {
         shadow.add(new DefaultDocument("barId", BitemporalStamp.createActive("barId"), "some data"));
 
         // retrieve data from BarbelHisto, which is empty at this point
-        BarbelHisto<DefaultDocument> core = BarbelHistoTestContext.INSTANCE.apply(DefaultDocument.class).withMode(BarbelMode.BITEMPORAL)
-                .withSynchronousEventListener(new LazyLoadingListener()).build();
+        BarbelHisto<DefaultDocument> core = BTExecutionContext.INSTANCE.barbel(DefaultDocument.class)
+                .withMode(BarbelMode.BITEMPORAL).withSynchronousEventListener(new LazyLoadingListener()).build();
         List<DefaultDocument> docs = core.retrieve(BarbelQueries.all("someId"));
 
         // will contain the data from lazy loading event handler
@@ -94,7 +103,8 @@ public class BarbelHistoCore_ShadowCollectionPersistence_SuiteTest {
                     .get(RetrieveDataEvent.BARBEL);
             final String id = (String) BarbelQueries.returnIDForQuery(query);
             List<Bitemporal> docs = shadow.stream().filter(v -> v.getId().equals(id)).collect(Collectors.toList());
-            histo.load(docs);
+            if (!histo.contains(id))
+                histo.load(docs);
         }
 
         @Subscribe

@@ -1,0 +1,76 @@
+package org.projectbarbel.histo.suite;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.io.PrintWriter;
+
+import org.junit.platform.engine.discovery.ClassNameFilter;
+import org.junit.platform.engine.discovery.DiscoverySelectors;
+import org.junit.platform.launcher.Launcher;
+import org.junit.platform.launcher.LauncherDiscoveryRequest;
+import org.junit.platform.launcher.TestExecutionListener;
+import org.junit.platform.launcher.TestIdentifier;
+import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
+import org.junit.platform.launcher.core.LauncherFactory;
+import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
+import org.junit.platform.launcher.listeners.TestExecutionSummary;
+import org.projectbarbel.histo.suite.context.BTTestContext;
+
+public class BTSuiteExecutor {
+
+    SummaryGeneratingListener listener = new SummaryGeneratingListener();
+    int testcount = 0;
+
+    public void runNeutral() {
+        LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
+                .selectors(DiscoverySelectors.selectPackage("org.projectbarbel.histo"))
+                .filters(ClassNameFilter.includeClassNamePatterns(".*SuiteTest"),
+                        ClassNameFilter.excludeClassNamePatterns(".*StandardSuiteTest"))
+                .build();
+
+        Launcher launcher = LauncherFactory.create();
+
+        // Register a listener of your choice
+        launcher.registerTestExecutionListeners(listener, new TestExecutionListener() {
+            public void executionStarted(TestIdentifier testIdentifier) {
+                testcount++;
+                System.out.println("Starting test suite case [" + testcount + "]: " + testIdentifier.getDisplayName());
+            }
+        });
+
+        launcher.execute(request);
+    }
+
+    public void runPersistent() {
+        LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
+                .selectors(DiscoverySelectors.selectPackage("org.projectbarbel.histo.suite"))
+                .filters(ClassNameFilter.includeClassNamePatterns(".*SuiteTest"),
+                        ClassNameFilter.excludeClassNamePatterns(".*StandardSuiteTest"))
+                .build();
+
+        Launcher launcher = LauncherFactory.create();
+
+        // Register a listener of your choice
+        launcher.registerTestExecutionListeners(listener, new TestExecutionListener() {
+            public void executionStarted(TestIdentifier testIdentifier) {
+                testcount++;
+                System.out.println("Starting test suite case [" + testcount + "]: " + testIdentifier.getDisplayName());
+            }
+        });
+
+        launcher.execute(request);
+    }
+
+    public void test(BTTestContext context) {
+        BTSuiteExecutor launcher = new BTSuiteExecutor();
+        BTTestContext previousContext = BTExecutionContext.INSTANCE.getTestContext();
+        BTExecutionContext.INSTANCE.setTestContext(context);
+        launcher.runNeutral();
+        TestExecutionSummary summary = launcher.listener.getSummary();
+        summary.printTo(new PrintWriter(System.out));
+        summary.printFailuresTo(new PrintWriter(System.out));
+        assertEquals(0, summary.getFailures().size());
+        BTExecutionContext.INSTANCE.setTestContext(previousContext);
+    }
+
+}

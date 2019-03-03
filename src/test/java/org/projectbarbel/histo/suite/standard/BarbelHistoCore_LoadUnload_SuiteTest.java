@@ -1,4 +1,4 @@
-package org.projectbarbel.histo;
+package org.projectbarbel.histo.suite.standard;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -7,22 +7,35 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.projectbarbel.histo.BarbelHisto;
+import org.projectbarbel.histo.BarbelMode;
+import org.projectbarbel.histo.BarbelQueries;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.BitemporalVersion;
 import org.projectbarbel.histo.model.DefaultPojo;
 import org.projectbarbel.histo.model.EffectivePeriod;
 import org.projectbarbel.histo.model.RecordPeriod;
+import org.projectbarbel.histo.suite.BTExecutionContext;
+import org.projectbarbel.histo.suite.extensions.BTC_Standard;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 import net.sf.cglib.proxy.Enhancer;
 
-public class BarbelHistoCore_CustomPersistence_SuiteTest {
+@ExtendWith(BTC_Standard.class)
+public class BarbelHistoCore_LoadUnload_SuiteTest {
 
+    @BeforeEach
+    public void setUp() {
+        BTExecutionContext.INSTANCE.clearResources();
+    }
+    
     @Test
     public void testCompleteCycle_Pojo() {
-        BarbelHisto<DefaultPojo> histo = BarbelHistoTestContext.INSTANCE.apply(DefaultPojo.class).build();
+        BarbelHisto<DefaultPojo> histo = BTExecutionContext.INSTANCE.barbel(DefaultPojo.class).build();
         List<Bitemporal> bitemporals = Arrays.asList(
                 new BitemporalVersion(BitemporalStamp.of("test", "some", EffectivePeriod.nowToInfinite(), RecordPeriod.createActive()), EnhancedRandom.random(DefaultPojo.class)),
                 new BitemporalVersion(BitemporalStamp.of("test", "someOther", EffectivePeriod.nowToInfinite(), RecordPeriod.createActive()), EnhancedRandom.random(DefaultPojo.class)));
@@ -37,7 +50,7 @@ public class BarbelHistoCore_CustomPersistence_SuiteTest {
 
     @Test
     public void testPartialUnload_Pojo() {
-    	BarbelHisto<DefaultPojo> histo = BarbelHistoTestContext.INSTANCE.apply(DefaultPojo.class).build();
+    	BarbelHisto<DefaultPojo> histo = BTExecutionContext.INSTANCE.barbel(DefaultPojo.class).build();
     	List<Bitemporal> bitemporals = Arrays.asList(
     			new BitemporalVersion(BitemporalStamp.of("test", "some", EffectivePeriod.nowToInfinite(), RecordPeriod.createActive()), EnhancedRandom.random(DefaultPojo.class)),
     			new BitemporalVersion(BitemporalStamp.of("test", "someOther", EffectivePeriod.nowToInfinite(), RecordPeriod.createActive()), EnhancedRandom.random(DefaultPojo.class)));
@@ -52,7 +65,7 @@ public class BarbelHistoCore_CustomPersistence_SuiteTest {
     
     @Test
     public void testPartialUnloadAndCount_Pojo() {
-    	BarbelHisto<DefaultPojo> histo = BarbelHistoTestContext.INSTANCE.apply(DefaultPojo.class).build();
+    	BarbelHisto<DefaultPojo> histo = BTExecutionContext.INSTANCE.barbel(DefaultPojo.class).build();
     	List<Bitemporal> bitemporals = Arrays.asList(
     			new BitemporalVersion(BitemporalStamp.of("test", "some", EffectivePeriod.nowToInfinite(), RecordPeriod.createActive()), EnhancedRandom.random(DefaultPojo.class)),
     			new BitemporalVersion(BitemporalStamp.of("test", "someOther", EffectivePeriod.nowToInfinite(), RecordPeriod.createActive()), EnhancedRandom.random(DefaultPojo.class)));
@@ -67,19 +80,19 @@ public class BarbelHistoCore_CustomPersistence_SuiteTest {
     
     @Test
 	public void testPopulateBitemporalVersion_emptyArray() throws Exception {
-        BarbelHisto<DefaultPojo> histo = BarbelHistoTestContext.INSTANCE.apply(DefaultPojo.class).build();
+        BarbelHisto<DefaultPojo> histo = BTExecutionContext.INSTANCE.barbel(BitemporalVersion.class).build();
         assertThrows(IllegalArgumentException.class, ()->histo.unload());
 	}
 
 	@Test
 	public void testPopulateBitemporalVersion_emptyBackbone() throws Exception {
-        BarbelHisto<DefaultPojo> histo = BarbelHistoTestContext.INSTANCE.apply(DefaultPojo.class).build();
+        BarbelHisto<DefaultPojo> histo = BTExecutionContext.INSTANCE.barbel(BitemporalVersion.class).build();
         assertThrows(IllegalStateException.class, ()->histo.unload("some"));
 	}
 
 	@Test
 	public void testPopulateBitemporalVersion_DocIDExists() throws Exception {
-        BarbelHisto<DefaultPojo> histo = BarbelHistoTestContext.INSTANCE.apply(DefaultPojo.class).build();
+        BarbelHisto<DefaultPojo> histo = BTExecutionContext.INSTANCE.barbel(BitemporalVersion.class).build();
         List<Bitemporal> bitemporals = Arrays.asList(
                 new BitemporalVersion(BitemporalStamp.of("test", "some", EffectivePeriod.nowToInfinite(), RecordPeriod.createActive()), EnhancedRandom.random(DefaultPojo.class)),
                 new BitemporalVersion(BitemporalStamp.of("test", "someOther", EffectivePeriod.nowToInfinite(), RecordPeriod.createActive()), EnhancedRandom.random(DefaultPojo.class)));
@@ -89,7 +102,7 @@ public class BarbelHistoCore_CustomPersistence_SuiteTest {
 
 	@Test
     public void testCompleteCycle_Bitemporal() {
-        BarbelHisto<BitemporalVersion> histo = BarbelHistoTestContext.INSTANCE.apply(DefaultPojo.class).withMode(BarbelMode.BITEMPORAL).build();
+        BarbelHisto<BitemporalVersion> histo = BTExecutionContext.INSTANCE.barbel(BitemporalVersion.class).withMode(BarbelMode.BITEMPORAL).build();
         List<Bitemporal> bitemporals = Arrays.asList(
                 new BitemporalVersion(BitemporalStamp.of("test", "some", EffectivePeriod.nowToInfinite(), RecordPeriod.createActive()), EnhancedRandom.random(DefaultPojo.class)),
                 new BitemporalVersion(BitemporalStamp.of("test", "someOther", EffectivePeriod.nowToInfinite(), RecordPeriod.createActive()), EnhancedRandom.random(DefaultPojo.class)));

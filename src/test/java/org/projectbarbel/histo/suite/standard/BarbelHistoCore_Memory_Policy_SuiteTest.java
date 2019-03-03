@@ -1,6 +1,4 @@
-package org.projectbarbel.histo.performance;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
+package org.projectbarbel.histo.suite.standard;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -15,46 +13,53 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.projectbarbel.histo.BarbelHisto;
 import org.projectbarbel.histo.BarbelHistoCore;
-import org.projectbarbel.histo.BarbelHistoTestContext;
 import org.projectbarbel.histo.BarbelTestHelper;
-import org.projectbarbel.histo.model.DefaultPojo;
+import org.projectbarbel.histo.pojos.Policy;
+import org.projectbarbel.histo.suite.BTExecutionContext;
+import org.projectbarbel.histo.suite.extensions.BTC_Standard;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
-public class BarbelCoreSaveMemory_SuiteTest {
+@ExtendWith(BTC_Standard.class)
+public class BarbelHistoCore_Memory_Policy_SuiteTest {
 
-    private final BarbelHisto<DefaultPojo> core = BarbelHistoTestContext.INSTANCE.apply(DefaultPojo.class).build();
+    private final BarbelHisto<Policy> core = BTExecutionContext.INSTANCE.barbel(Policy.class).build();
 
-    static ScheduledThreadPoolExecutor executor; 
+    static ScheduledThreadPoolExecutor executor; // no
     static ScheduledFuture<?> t;
     private int pojoCount = 50;
-    private int maxVersions = 5000;
+    private int maxVersions = 500000;
     private boolean dump = false;
-
-    private long timeoutInSeconds = 10;    
+    private int cycles = 1;
+    private int timoutminutes = 5;
 
     static class MyTask implements Runnable {
-		private BarbelHisto<DefaultPojo> core;
+		private BarbelHisto<Policy> core;
 		private boolean dump;
 		private int pojoCount;
-        public MyTask(BarbelHisto<DefaultPojo> core, boolean dump, int maxVersions, int pojoCount) {
+        private int cycles;
+        private int counter = 0;
+        public MyTask(BarbelHisto<Policy> core, boolean dump, int maxVersions, int pojoCount, int cycles) {
 			this.core = core;
 			this.dump = dump;
 			this.pojoCount = pojoCount;
+            this.cycles = cycles;
         	
 		}
         @Override
         public void run() {
-            List<DefaultPojo> pojos = EnhancedRandom.randomListOf(pojoCount, DefaultPojo.class);
+            counter++;
+            List<Policy> pojos = EnhancedRandom.randomListOf(pojoCount, Policy.class);
             String id = EnhancedRandom.random(String.class);
-            for (DefaultPojo pojo : pojos) {
-                pojo.setDocumentId(id);
+            for (Policy pojo : pojos) {
+                pojo.setPolicyNumber(id);
             }
             long time = new Date().getTime();
             for (Object pojo : pojos) {
-                core.save((DefaultPojo) pojo,
+                core.save((Policy) pojo,
                         BarbelTestHelper.randomLocalDate(LocalDate.of(2010, 1, 1), LocalDate.of(2015, 1, 1)),
                         BarbelTestHelper.randomLocalDate(LocalDate.of(2015, 1, 2), LocalDate.of(2020, 1, 1)));
             }
@@ -66,8 +71,12 @@ public class BarbelCoreSaveMemory_SuiteTest {
             .round(new MathContext(4, RoundingMode.HALF_UP)) + " ms");
             printBarbelStatitics();
             if (dump)
-                ((BarbelHistoCore<DefaultPojo>)core).unloadAll();
+                ((BarbelHistoCore<Policy>)core).unloadAll();
             printMemory();
+            if (counter==cycles) {
+                executor.shutdown();
+                throw new IllegalStateException("interrupted");
+            }
         }
 
         @SuppressWarnings("rawtypes")
@@ -91,9 +100,8 @@ public class BarbelCoreSaveMemory_SuiteTest {
     @Test
     public void testMemory() throws InterruptedException, ExecutionException, TimeoutException {
         executor = new ScheduledThreadPoolExecutor(1);
-        t = executor.scheduleAtFixedRate(new MyTask(core, dump, maxVersions, pojoCount), 0, 2, TimeUnit.SECONDS);
-        assertThrows(TimeoutException.class, ()->t.get(timeoutInSeconds ,TimeUnit.SECONDS));
-        executor.shutdownNow();
+        t = executor.scheduleAtFixedRate(new MyTask(core, dump, maxVersions, pojoCount, cycles), 0, 2, TimeUnit.SECONDS);
+        executor.awaitTermination(timoutminutes, TimeUnit.MINUTES);
     }
     
 }

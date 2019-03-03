@@ -65,6 +65,7 @@ public class DocumentJournalTest {
 				doc.getBitemporalStamp().getDocumentId());
 		journal.insert(Arrays.asList(doc));
 		assertTrue(journal.list().size() == 1);
+		BarbelHistoContext.getBarbelClock().useSystemDefaultZoneClock();
 	}
 
 	@Test

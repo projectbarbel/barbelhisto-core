@@ -101,12 +101,12 @@ public class BarbelTestHelper {
         return journal;
     }
 
-    public static IndexedCollection<Object> generateJournalOfManagedDefaultPojos(String docId,
+    public static IndexedCollection<Object> generateJournalOfManagedDefaultPojos(BarbelHistoContext context, String docId,
             List<LocalDate> effectiveDates) {
         IndexedCollection<Object> journal = new ConcurrentIndexedCollection<Object>();
         DefaultPojo pojo = new DefaultPojo(docId, "first original");
         for (int i = 0; i < effectiveDates.size(); i++) {
-            journal.add((DefaultPojo) BarbelMode.POJO.snapshotMaiden(BarbelHistoTestContext.INSTANCE.apply(DefaultPojo.class), pojo,
+            journal.add((DefaultPojo) BarbelMode.POJO.snapshotMaiden(context, pojo,
                     createPeriod(docId, effectiveDates, i)));
         }
         return journal;
