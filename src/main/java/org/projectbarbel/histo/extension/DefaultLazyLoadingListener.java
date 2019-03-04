@@ -17,8 +17,16 @@ import com.googlecode.cqengine.IndexedCollection;
 public class DefaultLazyLoadingListener
         extends AbstractLazyLoadingListener<IndexedCollection<BitemporalVersion>, BitemporalVersion> {
 
-    public static IndexedCollection<BitemporalVersion> shadow;
+    private static IndexedCollection<BitemporalVersion> shadow;
 
+    public static void setShadow(IndexedCollection<BitemporalVersion> shadow) {
+        DefaultLazyLoadingListener.shadow = shadow;
+    }
+    
+    public static IndexedCollection<BitemporalVersion> getShadow() {
+        return DefaultLazyLoadingListener.shadow;
+    }
+    
     protected DefaultLazyLoadingListener(Class<?> managedType, Gson gson, boolean singletonContext,
             IndexedCollection<BitemporalVersion> shadow) {
         super(managedType, gson, singletonContext);

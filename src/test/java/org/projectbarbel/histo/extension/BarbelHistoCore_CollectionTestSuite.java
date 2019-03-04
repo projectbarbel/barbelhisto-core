@@ -37,7 +37,7 @@ public class BarbelHistoCore_CollectionTestSuite {
 
         @Override
         public void clearResources() {
-            DefaultLazyLoadingListener.shadow = new ConcurrentIndexedCollection<>();
+            DefaultLazyLoadingListener.setShadow(new ConcurrentIndexedCollection<>());
         }
 
     }

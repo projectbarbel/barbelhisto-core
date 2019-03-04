@@ -26,7 +26,7 @@ public class DefaultUpdateListener extends AbstractUpdateListener<IndexedCollect
 
     @Override
     public IndexedCollection<BitemporalVersion> getExternalDataResource() {
-        return DefaultLazyLoadingListener.shadow;
+        return DefaultLazyLoadingListener.getShadow();
     }
 
     @Override
@@ -43,7 +43,7 @@ public class DefaultUpdateListener extends AbstractUpdateListener<IndexedCollect
     @Override
     public long delete(String versionId) {
         return shadow.remove(shadow.stream().filter(bv -> bv.getBitemporalStamp().getVersionId().equals(versionId))
-                .findFirst().get()) ? 1 : 0;
+                .findFirst().orElseThrow(()->new IllegalStateException("cannot find version"))) ? 1 : 0;
     }
 
     @Override
