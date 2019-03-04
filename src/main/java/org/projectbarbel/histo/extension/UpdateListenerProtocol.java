@@ -2,11 +2,29 @@ package org.projectbarbel.histo.extension;
 
 import java.util.List;
 
+import org.projectbarbel.histo.event.EventType.BarbelInitializedEvent;
+import org.projectbarbel.histo.event.EventType.OnLoadOperationEvent;
+import org.projectbarbel.histo.event.EventType.UnLoadOperationEvent;
+import org.projectbarbel.histo.event.EventType.UpdateFinishedEvent;
 import org.projectbarbel.histo.model.Bitemporal;
 
-public interface UpdateListenerProtocol<R,T> {
+import com.google.common.eventbus.Subscribe;
 
-    R createResource();
+public interface UpdateListenerProtocol<R, T> {
+
+    @Subscribe
+    void handleUpdate(UpdateFinishedEvent event);
+    
+    @Subscribe
+    void handleUnLoadOperation(UnLoadOperationEvent event);
+    
+    @Subscribe
+    void handleLoadOperation(OnLoadOperationEvent event);
+    
+    @Subscribe
+    void handleInitialization(BarbelInitializedEvent event);
+    
+    R getExternalDataResource();
 
     long delete(String versionId);
 
@@ -15,11 +33,7 @@ public interface UpdateListenerProtocol<R,T> {
     void insertDocuments(List<T> documentsToInsert);
 
     Iterable<T> queryJournal(Object documentId);
-    
-    Bitemporal fromStoredDocumentToPersistedType(T storedDocument);    
 
-    T fromJsonToStoredDocument(String json);
-
-    String fromStroredDocumentToJson(T storedDocument);
+    Bitemporal fromStoredDocumentToPersistenceObject(T storedDocument);
 
 }

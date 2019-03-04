@@ -14,6 +14,7 @@ import org.projectbarbel.histo.event.EventType.BarbelInitializedEvent;
 import org.projectbarbel.histo.event.EventType.InitializeJournalEvent;
 import org.projectbarbel.histo.event.EventType.RetrieveDataEvent;
 import org.projectbarbel.histo.model.Bitemporal;
+import org.projectbarbel.histo.model.BitemporalVersion;
 
 import com.google.gson.Gson;
 import com.googlecode.cqengine.query.Query;
@@ -61,7 +62,7 @@ public abstract class AbstractLazyLoadingListener<R,T> implements LazyLoadingLis
 
     public void handleInitialization(BarbelInitializedEvent event) {
         try {
-            shadow = createResource();
+            shadow = getExternalDataResource();
         } catch (Exception e) {
             event.failed(e);
         }
@@ -77,7 +78,7 @@ public abstract class AbstractLazyLoadingListener<R,T> implements LazyLoadingLis
                     if (!histo.contains(id) || (histo.contains(id) && !singletonContext)) {
                         List<Bitemporal> docs = StreamSupport
                                 .stream(queryJournal(id).spliterator(), true)
-                                .map(d -> toPersistedType((T) d)).collect(Collectors.toList());
+                                .map(d -> fromStoreDocumentPersistenceObject((T) d)).collect(Collectors.toList());
                         if (histo.contains(id))
                             ((BarbelHistoCore<?>)histo).unloadQuiet(id);
                         ((BarbelHistoCore<?>)histo).loadQuiet(docs);
@@ -86,7 +87,7 @@ public abstract class AbstractLazyLoadingListener<R,T> implements LazyLoadingLis
             } else {
                 // literally the complete refresh with backbone data
                 List<Bitemporal> docs = StreamSupport.stream(queryAll().spliterator(), true)
-                        .map(d -> toPersistedType((T) d)).collect(Collectors.toList());
+                        .map(d -> fromStoreDocumentPersistenceObject((T) d)).collect(Collectors.toList());
                 histo.getContext().getBackbone().clear();
                 ((BarbelHistoCore<?>)histo).loadQuiet(docs);
             }
@@ -102,7 +103,7 @@ public abstract class AbstractLazyLoadingListener<R,T> implements LazyLoadingLis
             if (!histo.contains(journal.getId()) || (histo.contains(journal.getId()) && !singletonContext)) {
                 List<Bitemporal> docs = StreamSupport
                         .stream(queryJournal(journal.getId()).spliterator(), true)
-                        .map(d -> toPersistedType((T) d)).collect(Collectors.toList());
+                        .map(d -> fromStoreDocumentPersistenceObject((T) d)).collect(Collectors.toList());
                 if (histo.contains(journal.getId()))
                     ((BarbelHistoCore<?>)histo).unloadQuiet(journal.getId());
                 ((BarbelHistoCore<?>)histo).loadQuiet(docs);
@@ -112,12 +113,25 @@ public abstract class AbstractLazyLoadingListener<R,T> implements LazyLoadingLis
         }
     }
 
+    public Bitemporal fromStoreDocumentPersistenceObject(T document) {
+        String json = fromStoredDocumentToPersistenceObjectJson(document);
+        Object object = gson.fromJson(json, persistedType);
+        if (object instanceof BitemporalVersion) {
+            BitemporalVersion bv = (BitemporalVersion) object;
+            bv.setObject(gson.fromJson(gson.toJsonTree(bv.getObject()).toString(), managedType));
+        }
+        return (Bitemporal)object;
+    }
+
+    public abstract String fromStoredDocumentToPersistenceObjectJson(T document);
+
+    @Override
     public abstract Iterable<T> queryAll();
 
+    @Override
     public abstract Iterable<T> queryJournal(Object id);
 
-    public abstract R createResource();
-
-    public abstract Bitemporal toPersistedType(T document);
+    @Override
+    public abstract R getExternalDataResource();
 
 }

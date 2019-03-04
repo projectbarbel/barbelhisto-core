@@ -32,11 +32,11 @@ public interface BarbelModeProcessor {
 
 	Object drawDocumentId(Object pojo);
 	
-	<T> Collection<Bitemporal> managedBitemporalToCustomPersistenceObjects(Object id, IndexedCollection<T> objects);
+	<T> Collection<Bitemporal> managedBitemporalToPersistenceObjects(Object id, IndexedCollection<T> objects);
 
 	Bitemporal managedBitemporalToPersistenceObject(Bitemporal bitemporal);
 
-	<T> Collection<T> customPersistenceObjectsToManagedBitemporals(BarbelHistoContext context,
+	<T> Collection<T> persistenceObjectsToManagedBitemporals(BarbelHistoContext context,
 			Collection<Bitemporal> bitemporals);
 
 	boolean validateMaidenCandidate(BarbelHistoContext context, Object candidate);

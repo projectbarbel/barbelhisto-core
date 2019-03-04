@@ -19,7 +19,6 @@ import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.BitemporalVersion;
 
-import com.google.common.eventbus.Subscribe;
 import com.google.gson.Gson;
 
 /**
@@ -31,7 +30,7 @@ import com.google.gson.Gson;
  * @param <T> document type to store
  *
  */
-public abstract class AbstractMongoUpdateListener<R, T> implements UpdateListenerProtocol<R, T> {
+public abstract class AbstractUpdateListener<R, T> implements UpdateListenerProtocol<R, T> {
 
     protected static final String VERSION_ID = ".versionId";
     protected R shadow;
@@ -42,7 +41,7 @@ public abstract class AbstractMongoUpdateListener<R, T> implements UpdateListene
     protected final String documentIdFieldName;
     protected final Class<? extends Bitemporal> persistedType;
 
-    public AbstractMongoUpdateListener(Class<?> managedType, Gson gson) {
+    public AbstractUpdateListener(Class<?> managedType, Gson gson) {
         this.managedType = managedType;
         this.gson = gson;
         if (Bitemporal.class.isAssignableFrom(managedType)) {
@@ -56,16 +55,16 @@ public abstract class AbstractMongoUpdateListener<R, T> implements UpdateListene
         this.persistedType = mode.getPersistenceObjectType(managedType);
     }
 
-    @Subscribe
+    @Override
     public void handleInitialization(BarbelInitializedEvent event) {
         try {
-            shadow = createResource();
+            shadow = getExternalDataResource();
         } catch (Exception e) {
             event.failed(e);
         }
     }
 
-    @Subscribe
+    @Override
     public void handleLoadOperation(OnLoadOperationEvent event) {
         try {
             @SuppressWarnings("unchecked")
@@ -82,7 +81,7 @@ public abstract class AbstractMongoUpdateListener<R, T> implements UpdateListene
             List<T> documentsToInsert = managedBitemporalsToLoad.stream()
                     .map(mode::managedBitemporalToPersistenceObject) // to persistence object
                     .map(gson::toJson) // to json
-                    .map(d->fromJsonToStoredDocument(d)) // to mongo Document
+                    .map(d->fromPersistenceObjectJsonToStoredDocument(d)) // to mongo Document
                     .collect(Collectors.toList()); // to list
             // @formatter:on
             insertDocuments(documentsToInsert);
@@ -91,7 +90,7 @@ public abstract class AbstractMongoUpdateListener<R, T> implements UpdateListene
         }
     }
 
-    @Subscribe
+    @Override
     public void handleUnLoadOperation(UnLoadOperationEvent event) {
         try {
             BarbelHisto<?> histo = (BarbelHisto<?>) event.getEventContext().get(UnLoadOperationEvent.BARBEL);
@@ -99,7 +98,7 @@ public abstract class AbstractMongoUpdateListener<R, T> implements UpdateListene
             for (Object id : documentIds) {
                 List<Bitemporal> docs = StreamSupport
                         .stream(queryJournal(id).spliterator(), true)
-                        .map(d -> fromStoredDocumentToPersistedType(d)).collect(Collectors.toList());
+                        .map(d -> fromStoredDocumentToPersistenceObject(d)).collect(Collectors.toList());
                 if (histo.contains(id))
                     ((BarbelHistoCore<?>) histo).unloadQuiet(id);
                 ((BarbelHistoCore<?>) histo).loadQuiet(docs);
@@ -110,7 +109,7 @@ public abstract class AbstractMongoUpdateListener<R, T> implements UpdateListene
         }
     }
 
-    @Subscribe
+    @Override
     public void handleUpdate(UpdateFinishedEvent event) {
         try {
             @SuppressWarnings("unchecked")
@@ -132,12 +131,12 @@ public abstract class AbstractMongoUpdateListener<R, T> implements UpdateListene
             List<T> documentsToInsert = managedBitemporalsInserted.stream()
                     .map(mode::managedBitemporalToPersistenceObject) // to persistence object
                     .map(gson::toJson) // to json
-                    .map(json -> fromJsonToStoredDocument(json)) // to stored type
+                    .map(json -> fromPersistenceObjectJsonToStoredDocument(json)) // to stored type
                     .collect(Collectors.toList()); // to list
             List<T> documentsAddedOnReplacements = inactivations.stream()
                     .map(r -> mode.managedBitemporalToPersistenceObject(r.getObjectAdded())) // to persistence objects
                     .map(gson::toJson) // to json
-                    .map(json -> fromJsonToStoredDocument(json)) // to stored type
+                    .map(json -> fromPersistenceObjectJsonToStoredDocument(json)) // to stored type
                     .collect(Collectors.toList()); // to list
             documentsToInsert.addAll(documentsAddedOnReplacements);
             // @formatter:on
@@ -148,7 +147,7 @@ public abstract class AbstractMongoUpdateListener<R, T> implements UpdateListene
     }
 
     @Override
-    public abstract R createResource();
+    public abstract R getExternalDataResource();
     
     @Override
     public abstract void insertDocuments(List<T> documentsToInsert);
@@ -163,8 +162,8 @@ public abstract class AbstractMongoUpdateListener<R, T> implements UpdateListene
     public abstract long deleteJournal(Object id);
 
     @Override
-    public Bitemporal fromStoredDocumentToPersistedType(T document) {
-        String json = fromStroredDocumentToJson(document);
+    public Bitemporal fromStoredDocumentToPersistenceObject(T document) {
+        String json = fromStroredDocumentToPersistenceObjectJson(document);
         Bitemporal object = (Bitemporal)gson.fromJson(json, persistedType);
         if (object instanceof BitemporalVersion) {
             BitemporalVersion bv = (BitemporalVersion) object;
@@ -173,10 +172,8 @@ public abstract class AbstractMongoUpdateListener<R, T> implements UpdateListene
         return object;
     }
 
-    @Override
-    public abstract String fromStroredDocumentToJson(T document);
+    public abstract String fromStroredDocumentToPersistenceObjectJson(T document);
         
-    @Override
-    public abstract T fromJsonToStoredDocument(String json);
+    public abstract T fromPersistenceObjectJsonToStoredDocument(String json);
     
 }

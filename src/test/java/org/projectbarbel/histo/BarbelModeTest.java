@@ -70,7 +70,7 @@ public class BarbelModeTest {
 	public void testManagedBitemporalToCustomPersistenceObjects() throws Exception {
 		assertTrue(
 				BarbelMode.POJO
-						.managedBitemporalToCustomPersistenceObjects("some",
+						.managedBitemporalToPersistenceObjects("some",
 								BarbelTestHelper.generateJournalOfManagedDefaultPojos(BarbelHistoBuilder.barbel(),"some",
 										Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 3, 1))))
 						.size() == 2);
@@ -82,12 +82,12 @@ public class BarbelModeTest {
 				Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 3, 1)));
 		bitemporals.addAll(BarbelTestHelper.generateJournalOfManagedDefaultPojos(BarbelHistoBuilder.barbel(),"other",
 				Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 3, 1))));
-		assertTrue(BarbelMode.POJO.managedBitemporalToCustomPersistenceObjects("some", bitemporals).size() == 2);
+		assertTrue(BarbelMode.POJO.managedBitemporalToPersistenceObjects("some", bitemporals).size() == 2);
 	}
 
 	@Test
 	public void testCustomPersistenceObjectsToManagedBitemporals() throws Exception {
-		assertTrue(BarbelMode.POJO.customPersistenceObjectsToManagedBitemporals(BarbelHistoBuilder.barbel(),
+		assertTrue(BarbelMode.POJO.persistenceObjectsToManagedBitemporals(BarbelHistoBuilder.barbel(),
 				Arrays.asList(BarbelTestHelper.random(BitemporalVersion.class),
 						BarbelTestHelper.random(BitemporalVersion.class)))
 				.size() == 2);
@@ -96,7 +96,7 @@ public class BarbelModeTest {
 	@Test
 	public void testCustomPersistenceObjectsToManagedBitemporals_Wrongtype() throws Exception {
 		assertThrows(IllegalArgumentException.class,
-				() -> BarbelMode.POJO.customPersistenceObjectsToManagedBitemporals(BarbelHistoBuilder.barbel(),
+				() -> BarbelMode.POJO.persistenceObjectsToManagedBitemporals(BarbelHistoBuilder.barbel(),
 						Arrays.asList(BarbelTestHelper.random(DefaultDocument.class),
 								BarbelTestHelper.random(DefaultDocument.class))));
 	}
@@ -213,7 +213,7 @@ public class BarbelModeTest {
 	public void testManagedBitemporalToCustomPersistenceObjects_BitemporalMode() throws Exception {
 		assertTrue(
 				BarbelMode.BITEMPORAL
-						.managedBitemporalToCustomPersistenceObjects("some",
+						.managedBitemporalToPersistenceObjects("some",
 								BarbelTestHelper.generateJournalOfManagedDefaultPojos(BarbelHistoBuilder.barbel(), "some",
 										Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 3, 1))))
 						.size() == 2);
@@ -225,12 +225,12 @@ public class BarbelModeTest {
 				Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 3, 1)));
 		bitemporals.addAll(BarbelTestHelper.generateJournalOfDefaultDocuments("other",
 				Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 3, 1))));
-		assertTrue(BarbelMode.BITEMPORAL.managedBitemporalToCustomPersistenceObjects("some", bitemporals).size() == 2);
+		assertTrue(BarbelMode.BITEMPORAL.managedBitemporalToPersistenceObjects("some", bitemporals).size() == 2);
 	}
 	
 	@Test
 	public void testCustomPersistenceObjectsToManagedBitemporals_BitemporalMode() throws Exception {
-		assertTrue(BarbelMode.BITEMPORAL.customPersistenceObjectsToManagedBitemporals(BarbelHistoBuilder.barbel(),
+		assertTrue(BarbelMode.BITEMPORAL.persistenceObjectsToManagedBitemporals(BarbelHistoBuilder.barbel(),
 				Arrays.asList(BarbelTestHelper.random(BitemporalVersion.class),
 						BarbelTestHelper.random(BitemporalVersion.class)))
 				.size() == 2);
@@ -239,7 +239,7 @@ public class BarbelModeTest {
 	@Test
 	public void testCustomPersistenceObjectsToManagedBitemporals_Wrongtype_BitemporalMode() throws Exception {
 		assertTrue(BarbelMode.BITEMPORAL
-				.customPersistenceObjectsToManagedBitemporals(BarbelHistoBuilder.barbel(), Arrays.asList(
+				.persistenceObjectsToManagedBitemporals(BarbelHistoBuilder.barbel(), Arrays.asList(
 						BarbelTestHelper.random(DefaultDocument.class), BarbelTestHelper.random(DefaultDocument.class)))
 				.size() == 2);
 	}

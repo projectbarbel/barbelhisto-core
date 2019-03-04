@@ -165,7 +165,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     public void load(Collection<Bitemporal> bitemporals) {
         validateLoadInternal(bitemporals);
         EventType.ONLOADOPERATION.create().with(OnLoadOperationEvent.DATA,
-                mode.customPersistenceObjectsToManagedBitemporals(context, bitemporals)).postBothWay(context);
+                mode.persistenceObjectsToManagedBitemporals(context, bitemporals)).postBothWay(context);
         loadInternal(bitemporals);
     }
 
@@ -195,7 +195,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     }
 
     private void loadInternal(Collection<Bitemporal> bitemporals) {
-        backbone.addAll(mode.customPersistenceObjectsToManagedBitemporals(context, bitemporals));
+        backbone.addAll(mode.persistenceObjectsToManagedBitemporals(context, bitemporals));
     }
 
     @Override
@@ -211,7 +211,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
         Collection<Bitemporal> collection = new HashSet<>();
         for (int i = 0; i < documentIDs.length; i++) {
             Object id = documentIDs[i];
-            collection.addAll(mode.managedBitemporalToCustomPersistenceObjects(id, backbone));
+            collection.addAll(mode.managedBitemporalToPersistenceObjects(id, backbone));
             backbone.removeAll(backbone.retrieve(BarbelQueries.all(id)).stream().collect(Collectors.toList()));
         }
         return collection;

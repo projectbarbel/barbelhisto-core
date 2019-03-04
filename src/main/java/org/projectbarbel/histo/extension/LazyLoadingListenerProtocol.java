@@ -9,14 +9,6 @@ import com.google.common.eventbus.Subscribe;
 
 public interface LazyLoadingListenerProtocol<R, T> {
     
-    Iterable<T> queryJournal(Object id);
-
-    R createResource();
-
-    Iterable<T> queryAll();
-    
-    Bitemporal toPersistedType(T document);
-    
     @Subscribe
     void handleInitialization(BarbelInitializedEvent event);
     
@@ -25,5 +17,13 @@ public interface LazyLoadingListenerProtocol<R, T> {
     
     @Subscribe
     void handleInitializeJournal(InitializeJournalEvent event);
+    
+    Iterable<T> queryJournal(Object id);
+
+    R getExternalDataResource();
+
+    Iterable<T> queryAll();
+    
+    Bitemporal fromStoreDocumentPersistenceObject(T document);
     
 }

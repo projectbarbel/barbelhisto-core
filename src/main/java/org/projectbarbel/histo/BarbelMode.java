@@ -48,7 +48,7 @@ public enum BarbelMode implements BarbelModeProcessor {
         }
 
         @Override
-        public <T> Collection<Bitemporal> managedBitemporalToCustomPersistenceObjects(Object id,
+        public <T> Collection<Bitemporal> managedBitemporalToPersistenceObjects(Object id,
                 IndexedCollection<T> objects) {
             // used on unload, that's why no copy is ok
             return objects.retrieve(BarbelQueries.all(id)).stream().map(
@@ -58,7 +58,7 @@ public enum BarbelMode implements BarbelModeProcessor {
 
         @SuppressWarnings("unchecked")
         @Override
-        public <T> Collection<T> customPersistenceObjectsToManagedBitemporals(BarbelHistoContext context,
+        public <T> Collection<T> persistenceObjectsToManagedBitemporals(BarbelHistoContext context,
                 Collection<Bitemporal> bitemporals) {
             Validate.isTrue(bitemporals.stream().filter(b -> !(b instanceof BitemporalVersion)).count() == 0,
                     "loaded objects must be of type BitemporalVersion in BarbelMode.POJO");
@@ -148,7 +148,7 @@ public enum BarbelMode implements BarbelModeProcessor {
         }
 
         @Override
-        public <T> Collection<Bitemporal> managedBitemporalToCustomPersistenceObjects(Object id,
+        public <T> Collection<Bitemporal> managedBitemporalToPersistenceObjects(Object id,
                 IndexedCollection<T> objects) {
             return objects.retrieve(BarbelQueries.all(id)).stream().map(o -> (Bitemporal) o)
                     .collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
@@ -156,7 +156,7 @@ public enum BarbelMode implements BarbelModeProcessor {
 
         @SuppressWarnings("unchecked")
         @Override
-        public <T> Collection<T> customPersistenceObjectsToManagedBitemporals(BarbelHistoContext context,
+        public <T> Collection<T> persistenceObjectsToManagedBitemporals(BarbelHistoContext context,
                 Collection<Bitemporal> bitemporals) {
             return (Collection<T>) bitemporals.stream().map(b -> (Object) b)
                     .collect(Collectors.toCollection(ConcurrentIndexedCollection::new));
