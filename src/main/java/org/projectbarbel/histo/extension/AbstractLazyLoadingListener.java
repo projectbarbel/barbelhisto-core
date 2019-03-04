@@ -80,8 +80,8 @@ public abstract class AbstractLazyLoadingListener<R,T> implements LazyLoadingLis
                                 .stream(queryJournal(id).spliterator(), true)
                                 .map(d -> fromStoreDocumentPersistenceObject((T) d)).collect(Collectors.toList());
                         if (histo.contains(id))
-                            ((BarbelHistoCore<?>)histo).unloadQuiet(id);
-                        ((BarbelHistoCore<?>)histo).loadQuiet(docs);
+                            histo.unloadQuiet(id);
+                        histo.loadQuiet(docs);
                     }
                 }
             } else {
@@ -89,7 +89,7 @@ public abstract class AbstractLazyLoadingListener<R,T> implements LazyLoadingLis
                 List<Bitemporal> docs = StreamSupport.stream(queryAll().spliterator(), true)
                         .map(d -> fromStoreDocumentPersistenceObject((T) d)).collect(Collectors.toList());
                 histo.getContext().getBackbone().clear();
-                ((BarbelHistoCore<?>)histo).loadQuiet(docs);
+                histo.loadQuiet(docs);
             }
         } catch (Exception e) {
             event.failed(e);
@@ -124,14 +124,5 @@ public abstract class AbstractLazyLoadingListener<R,T> implements LazyLoadingLis
     }
 
     public abstract String fromStoredDocumentToPersistenceObjectJson(T document);
-
-    @Override
-    public abstract Iterable<T> queryAll();
-
-    @Override
-    public abstract Iterable<T> queryJournal(Object id);
-
-    @Override
-    public abstract R getExternalDataResource();
 
 }

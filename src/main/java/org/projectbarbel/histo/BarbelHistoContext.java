@@ -5,7 +5,6 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -101,13 +100,10 @@ public interface BarbelHistoContext {
     }
 
     static AsyncEventBus getDefaultAsynchronousEventBus() {
-        return new AsyncEventBus(Executors.newFixedThreadPool(4,
-        new ThreadFactory() {
-            public Thread newThread(Runnable r) {
-                Thread t = Executors.defaultThreadFactory().newThread(r);
-                t.setDaemon(true);
-                return t;
-            }
+        return new AsyncEventBus(Executors.newFixedThreadPool(4, (r) -> {
+            Thread t = Executors.defaultThreadFactory().newThread(r);
+            t.setDaemon(true);
+            return t;
         }), new DefaultSubscriberExceptionHandler());
     }
 

@@ -1,5 +1,7 @@
 package org.projectbarbel.histo.suite.standard;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -102,6 +104,7 @@ public class BarbelHistoCore_Memory_Policy_SuiteTest {
         executor = new ScheduledThreadPoolExecutor(1);
         t = executor.scheduleAtFixedRate(new MyTask(core, dump, maxVersions, pojoCount, cycles), 0, 2, TimeUnit.SECONDS);
         executor.awaitTermination(timoutminutes, TimeUnit.MINUTES);
+        assertTrue(executor.isTerminated());
     }
     
 }

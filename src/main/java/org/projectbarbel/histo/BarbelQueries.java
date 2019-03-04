@@ -125,12 +125,10 @@ public final class BarbelQueries {
                 return returnIDForQuery((Query)iterator.next());
             }
         }
-        if (query instanceof SimpleQuery) {
-            if (query instanceof Equal) {
-                Equal equal = (Equal) query;
-                if (DOCUMENT_ID.equals(equal.getAttribute()))
-                    return equal.getValue();
-            }
+        if ((query instanceof SimpleQuery)&&(query instanceof Equal)) {
+             Equal equal = (Equal) query;
+             if (DOCUMENT_ID.equals(equal.getAttribute()))
+                 return equal.getValue();
         }
         return null;
     }
@@ -142,13 +140,11 @@ public final class BarbelQueries {
                 returnIDsForQuery((Query)iterator.next(), ids);
             }
         }
-        if (query instanceof SimpleQuery) {
-            if (query instanceof Equal) {
-                Equal equal = (Equal) query;
-                if (DOCUMENT_ID.equals(equal.getAttribute())) {
-                    ids.add(equal.getValue());
-                    return ids;
-                }
+        if ((query instanceof SimpleQuery)&&(query instanceof Equal)) {
+             Equal equal = (Equal) query;
+             if (DOCUMENT_ID.equals(equal.getAttribute())) {
+                 ids.add(equal.getValue());
+                 return ids;
             }
         }
         return ids;

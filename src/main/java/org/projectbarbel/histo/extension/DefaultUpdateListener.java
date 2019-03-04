@@ -3,7 +3,6 @@ package org.projectbarbel.histo.extension;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.projectbarbel.histo.BarbelHistoContext;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalVersion;
 
@@ -17,8 +16,8 @@ import com.googlecode.cqengine.IndexedCollection;
  * @author Niklas Schlimm
  *
  */
-public class DefaultUpdateListener extends AbstractUpdateListener<IndexedCollection<BitemporalVersion>, BitemporalVersion> {
-    private Gson gson = BarbelHistoContext.getDefaultGson();
+public class DefaultUpdateListener
+        extends AbstractUpdateListener<IndexedCollection<BitemporalVersion>, BitemporalVersion> {
 
     public DefaultUpdateListener(Class<?> managedType, Gson gson) {
         super(managedType, gson);
@@ -43,7 +42,7 @@ public class DefaultUpdateListener extends AbstractUpdateListener<IndexedCollect
     @Override
     public long delete(String versionId) {
         return shadow.remove(shadow.stream().filter(bv -> bv.getBitemporalStamp().getVersionId().equals(versionId))
-                .findFirst().orElseThrow(()->new IllegalStateException("cannot find version"))) ? 1 : 0;
+                .findFirst().orElseThrow(() -> new IllegalStateException("cannot find version"))) ? 1 : 0;
     }
 
     @Override
@@ -58,7 +57,7 @@ public class DefaultUpdateListener extends AbstractUpdateListener<IndexedCollect
 
     @Override
     public BitemporalVersion fromPersistenceObjectJsonToStoredDocument(String json) {
-        Bitemporal object = (Bitemporal) gson.fromJson(json, mode.getPersistenceObjectType(managedType));
+        Bitemporal object = gson.fromJson(json, mode.getPersistenceObjectType(managedType));
         return new BitemporalVersion(object.getBitemporalStamp(), object);
     }
 }

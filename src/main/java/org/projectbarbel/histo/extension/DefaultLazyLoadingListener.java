@@ -17,36 +17,36 @@ import com.googlecode.cqengine.IndexedCollection;
 public class DefaultLazyLoadingListener
         extends AbstractLazyLoadingListener<IndexedCollection<BitemporalVersion>, BitemporalVersion> {
 
-    private static IndexedCollection<BitemporalVersion> shadow;
+    private static IndexedCollection<BitemporalVersion> shadowCollection;
 
     public static void setShadow(IndexedCollection<BitemporalVersion> shadow) {
-        DefaultLazyLoadingListener.shadow = shadow;
+        DefaultLazyLoadingListener.shadowCollection = shadow;
     }
     
     public static IndexedCollection<BitemporalVersion> getShadow() {
-        return DefaultLazyLoadingListener.shadow;
+        return DefaultLazyLoadingListener.shadowCollection;
     }
     
     protected DefaultLazyLoadingListener(Class<?> managedType, Gson gson, boolean singletonContext,
             IndexedCollection<BitemporalVersion> shadow) {
         super(managedType, gson, singletonContext);
-        DefaultLazyLoadingListener.shadow = shadow;
+        DefaultLazyLoadingListener.shadowCollection = shadow;
     }
 
     @Override
     public Iterable<BitemporalVersion> queryAll() {
-        return shadow;
+        return shadowCollection;
     }
 
     @Override
     public Iterable<BitemporalVersion> queryJournal(Object id) {
-        return shadow.stream().filter(d -> d.getBitemporalStamp().getDocumentId().equals(id))
+        return shadowCollection.stream().filter(d -> d.getBitemporalStamp().getDocumentId().equals(id))
                 .collect(Collectors.toList());
     }
 
     @Override
     public IndexedCollection<BitemporalVersion> getExternalDataResource() {
-        return shadow;
+        return shadowCollection;
     }
 
     @Override

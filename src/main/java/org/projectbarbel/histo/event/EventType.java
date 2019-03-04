@@ -387,7 +387,7 @@ public enum EventType implements PostableEvent {
 
     public class UnLoadOperationEvent extends AbstractBarbelEvent {
 
-        public static final String DOCUMENT_IDs = "#documentIds";
+        public static final String DOCUMENT_IDS = "#documentIds";
         public static final String BARBEL = "#core";
 
         public UnLoadOperationEvent(EventType eventType, Map<Object, Object> context) {

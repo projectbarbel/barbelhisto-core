@@ -70,7 +70,7 @@ public abstract class AbstractUpdateListener<R, T> implements UpdateListenerProt
             @SuppressWarnings("unchecked")
             Collection<Bitemporal> managedBitemporalsToLoad = (Collection<Bitemporal>) event.getEventContext()
                     .get(OnLoadOperationEvent.DATA);
-            if (managedBitemporalsToLoad.size() == 0)
+            if (managedBitemporalsToLoad.isEmpty())
                 return;
             for (Bitemporal bitemporal : managedBitemporalsToLoad) {
                 if (queryJournal(bitemporal.getBitemporalStamp().getDocumentId()).iterator().hasNext())
@@ -81,7 +81,7 @@ public abstract class AbstractUpdateListener<R, T> implements UpdateListenerProt
             List<T> documentsToInsert = managedBitemporalsToLoad.stream()
                     .map(mode::managedBitemporalToPersistenceObject) // to persistence object
                     .map(gson::toJson) // to json
-                    .map(d->fromPersistenceObjectJsonToStoredDocument(d)) // to mongo Document
+                    .map(this::fromPersistenceObjectJsonToStoredDocument) // to mongo Document
                     .collect(Collectors.toList()); // to list
             // @formatter:on
             insertDocuments(documentsToInsert);
@@ -94,11 +94,11 @@ public abstract class AbstractUpdateListener<R, T> implements UpdateListenerProt
     public void handleUnLoadOperation(UnLoadOperationEvent event) {
         try {
             BarbelHisto<?> histo = (BarbelHisto<?>) event.getEventContext().get(UnLoadOperationEvent.BARBEL);
-            Object[] documentIds = (Object[]) event.getEventContext().get(UnLoadOperationEvent.DOCUMENT_IDs);
+            Object[] documentIds = (Object[]) event.getEventContext().get(UnLoadOperationEvent.DOCUMENT_IDS);
             for (Object id : documentIds) {
                 List<Bitemporal> docs = StreamSupport
                         .stream(queryJournal(id).spliterator(), true)
-                        .map(d -> fromStoredDocumentToPersistenceObject(d)).collect(Collectors.toList());
+                        .map(this::fromStoredDocumentToPersistenceObject).collect(Collectors.toList());
                 if (histo.contains(id))
                     ((BarbelHistoCore<?>) histo).unloadQuiet(id);
                 ((BarbelHistoCore<?>) histo).loadQuiet(docs);
@@ -131,12 +131,12 @@ public abstract class AbstractUpdateListener<R, T> implements UpdateListenerProt
             List<T> documentsToInsert = managedBitemporalsInserted.stream()
                     .map(mode::managedBitemporalToPersistenceObject) // to persistence object
                     .map(gson::toJson) // to json
-                    .map(json -> fromPersistenceObjectJsonToStoredDocument(json)) // to stored type
+                    .map(this::fromPersistenceObjectJsonToStoredDocument) // to stored type
                     .collect(Collectors.toList()); // to list
             List<T> documentsAddedOnReplacements = inactivations.stream()
                     .map(r -> mode.managedBitemporalToPersistenceObject(r.getObjectAdded())) // to persistence objects
                     .map(gson::toJson) // to json
-                    .map(json -> fromPersistenceObjectJsonToStoredDocument(json)) // to stored type
+                    .map(this::fromPersistenceObjectJsonToStoredDocument) // to stored type
                     .collect(Collectors.toList()); // to list
             documentsToInsert.addAll(documentsAddedOnReplacements);
             // @formatter:on
@@ -147,24 +147,9 @@ public abstract class AbstractUpdateListener<R, T> implements UpdateListenerProt
     }
 
     @Override
-    public abstract R getExternalDataResource();
-    
-    @Override
-    public abstract void insertDocuments(List<T> documentsToInsert);
-    
-    @Override
-    public abstract Iterable<T> queryJournal(Object documentId);
-    
-    @Override
-    public abstract long delete(String versionId);
-
-    @Override
-    public abstract long deleteJournal(Object id);
-
-    @Override
     public Bitemporal fromStoredDocumentToPersistenceObject(T document) {
         String json = fromStroredDocumentToPersistenceObjectJson(document);
-        Bitemporal object = (Bitemporal)gson.fromJson(json, persistedType);
+        Bitemporal object = gson.fromJson(json, persistedType);
         if (object instanceof BitemporalVersion) {
             BitemporalVersion bv = (BitemporalVersion) object;
             bv.setObject(gson.fromJson(gson.toJsonTree(bv.getObject()).toString(), managedType));
