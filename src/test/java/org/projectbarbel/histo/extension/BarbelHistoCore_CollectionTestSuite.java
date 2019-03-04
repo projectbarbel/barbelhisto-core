@@ -1,13 +1,14 @@
 package org.projectbarbel.histo.extension;
 
-import java.util.ArrayList;
 import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
 import org.projectbarbel.histo.BarbelHistoBuilder;
 import org.projectbarbel.histo.BarbelHistoContext;
 import org.projectbarbel.histo.suite.BTSuiteExecutor;
-import org.projectbarbel.histo.suite.context.BTTestContextPersistenceListener;
+import org.projectbarbel.histo.suite.context.BTTestContext;
+
+import com.googlecode.cqengine.ConcurrentIndexedCollection;
 
 public class BarbelHistoCore_CollectionTestSuite {
 
@@ -17,7 +18,7 @@ public class BarbelHistoCore_CollectionTestSuite {
         executor.test(new CollectionContext());
     }
 
-    public static class CollectionContext implements BTTestContextPersistenceListener {
+    public static class CollectionContext implements BTTestContext {
 
         @Override
         public Function<Class<?>, BarbelHistoBuilder> contextFunction() {
@@ -26,7 +27,7 @@ public class BarbelHistoCore_CollectionTestSuite {
                 @Override
                 public BarbelHistoBuilder apply(Class<?> t) {
                     DefaultLazyLoadingListener loader = new DefaultLazyLoadingListener(t,
-                            BarbelHistoContext.getDefaultGson(), false);
+                            BarbelHistoContext.getDefaultGson(), false, new ConcurrentIndexedCollection<>());
                     DefaultUpdateListener updater = new DefaultUpdateListener(t,
                             BarbelHistoContext.getDefaultGson());
                     return BarbelHistoBuilder.barbel().withSynchronousEventListener(loader).withSynchronousEventListener(updater);
@@ -36,7 +37,7 @@ public class BarbelHistoCore_CollectionTestSuite {
 
         @Override
         public void clearResources() {
-            DefaultLazyLoadingListener.shadow = new ArrayList<>();
+            DefaultLazyLoadingListener.shadow = new ConcurrentIndexedCollection<>();
         }
 
     }

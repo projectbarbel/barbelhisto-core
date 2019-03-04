@@ -8,8 +8,16 @@ import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalVersion;
 
 import com.google.gson.Gson;
+import com.googlecode.cqengine.IndexedCollection;
 
-public class DefaultUpdateListener extends AbstractUpdateListener<List<BitemporalVersion>, BitemporalVersion> {
+/**
+ * Default listener implementation. Can be used to shadow backbone into a
+ * persistent {@link IndexedCollection}.
+ * 
+ * @author Niklas Schlimm
+ *
+ */
+public class DefaultUpdateListener extends AbstractUpdateListener<IndexedCollection<BitemporalVersion>, BitemporalVersion> {
     private Gson gson = BarbelHistoContext.getDefaultGson();
 
     public DefaultUpdateListener(Class<?> managedType, Gson gson) {
@@ -17,7 +25,7 @@ public class DefaultUpdateListener extends AbstractUpdateListener<List<Bitempora
     }
 
     @Override
-    public List<BitemporalVersion> getExternalDataResource() {
+    public IndexedCollection<BitemporalVersion> getExternalDataResource() {
         return DefaultLazyLoadingListener.shadow;
     }
 
