@@ -4,8 +4,8 @@ import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.projectbarbel.histo.suite.BTExecutionContext;
-import org.projectbarbel.histo.suite.context.BTTestContextStandard;
 import org.projectbarbel.histo.suite.context.BTTestContext;
+import org.projectbarbel.histo.suite.context.BTTestContextStandard;
 
 public class BTTestStandard implements BeforeAllCallback, AfterAllCallback {
 

@@ -16,10 +16,10 @@ import org.projectbarbel.histo.BarbelHistoContext;
 import org.projectbarbel.histo.DocumentJournal;
 import org.projectbarbel.histo.DocumentJournal.ProcessingState;
 import org.projectbarbel.histo.event.EventType.AcquireLockEvent;
+import org.projectbarbel.histo.event.EventType.InactivationEvent;
 import org.projectbarbel.histo.event.EventType.InitializeJournalEvent;
 import org.projectbarbel.histo.event.EventType.InsertBitemporalEvent;
 import org.projectbarbel.histo.event.EventType.ReleaseLockEvent;
-import org.projectbarbel.histo.event.EventType.InactivationEvent;
 import org.projectbarbel.histo.event.EventType.RetrieveDataEvent;
 import org.projectbarbel.histo.event.EventType.UpdateFinishedEvent;
 

@@ -1,8 +1,8 @@
 package org.projectbarbel.histo.suite;
 
 import org.projectbarbel.histo.BarbelHistoBuilder;
-import org.projectbarbel.histo.suite.context.BTTestContextStandard;
 import org.projectbarbel.histo.suite.context.BTTestContext;
+import org.projectbarbel.histo.suite.context.BTTestContextStandard;
 
 public class BTExecutionContext {
     private BTTestContext testContext = new BTTestContextStandard();

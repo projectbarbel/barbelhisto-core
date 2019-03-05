@@ -29,7 +29,7 @@ public class DefaultLazyLoadingListener
     
     protected DefaultLazyLoadingListener(Class<?> managedType, Gson gson, boolean singletonContext,
             IndexedCollection<BitemporalVersion> shadow) {
-        super(managedType, gson, singletonContext);
+        super(managedType, gson, singletonContext, true);
         DefaultLazyLoadingListener.shadowCollection = shadow;
     }
 

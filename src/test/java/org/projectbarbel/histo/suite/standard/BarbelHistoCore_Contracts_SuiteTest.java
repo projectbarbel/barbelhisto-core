@@ -95,9 +95,8 @@ public class BarbelHistoCore_Contracts_SuiteTest {
                 .build();
         SomePojo pojo = EnhancedRandom.random(SomePojo.class);
         core.save(pojo, LocalDate.now(), LocalDate.MAX);
-        Exception exc = assertThrows(RuntimeException.class,
-                () -> core.retrieve(BarbelQueries.all()));
-        assertTrue(exc.getMessage().contains("@PersistenceConfig"));
+        assertThrows(RuntimeException.class,
+                () -> core.retrieve(BarbelQueries.all(pojo.id)));
     }
     
     
