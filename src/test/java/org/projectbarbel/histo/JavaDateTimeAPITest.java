@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
  * 2019-01-13T18:46:00.000 UTC Difference betweent Local und UTC Instant: -3600
  * 
  * 
- * @author niklasschlimm
+ * @author Niklas Schlimm
  *
  */
 public class JavaDateTimeAPITest {

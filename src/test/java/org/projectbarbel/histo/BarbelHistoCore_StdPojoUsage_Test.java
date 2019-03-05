@@ -30,7 +30,7 @@ public class BarbelHistoCore_StdPojoUsage_Test {
 
     	// save one
         BarbelHisto<Employee> core = BarbelHistoBuilder.barbel().build();
-        Employee employee = new Employee("somePersonelNumber", "Niklas", "Schlimm");
+        Employee employee = new Employee("somePersonelNumber", "Martin", "Smith");
         core.save(employee, LocalDate.now(), LocalDate.MAX);
         
         // get the effective version today

@@ -20,7 +20,7 @@ public class BarbelHistoCore_DZone_Article1_Test {
 	public void testDSoneTest() {
 
 		BarbelHisto<Client> barbel = BarbelHistoBuilder.barbel().build();
-		Client client = new Client("1234", "Niklas", "Schlimm");
+		Client client = new Client("1234", "Martin", "Smith");
 		barbel.save(client, LocalDate.now(), LocalDate.MAX);
 
 		Client effectiveNow = barbel.retrieveOne(BarbelQueries.effectiveNow("1234"));

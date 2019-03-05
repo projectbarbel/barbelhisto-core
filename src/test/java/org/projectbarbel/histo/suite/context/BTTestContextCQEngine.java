@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 
 import org.projectbarbel.histo.BarbelHistoBuilder;
@@ -37,7 +36,7 @@ import com.googlecode.cqengine.query.option.QueryOptions;
 public class BTTestContextCQEngine implements BTTestContext {
 
     @SuppressWarnings("rawtypes")
-    final List<SimpleAttribute> attributes = Arrays.asList(new SimpleAttribute<DefaultPojo, String>("versionId") {
+    static final public List<SimpleAttribute> attributes = Arrays.asList(new SimpleAttribute<DefaultPojo, String>("versionId") {
         public String getValue(DefaultPojo object, QueryOptions queryOptions) {
             return (String) ((Bitemporal) object).getBitemporalStamp().getVersionId();
         }
@@ -112,8 +111,6 @@ public class BTTestContextCQEngine implements BTTestContext {
         }
     });
 
-    private BarbelHistoBuilder context;
-
     @Override
     public Function<Class<?>, BarbelHistoBuilder> contextFunction() {
         return new Function<Class<?>, BarbelHistoBuilder>() {
@@ -125,23 +122,21 @@ public class BTTestContextCQEngine implements BTTestContext {
                         DiskPersistence.onPrimaryKeyInFile(getAttribute(managedType), new File("test.dat"))));
             }
 
-            @SuppressWarnings({ "rawtypes", "unchecked" })
-            private <O> SimpleAttribute getAttribute(Class<O> managedType) {
-                for (SimpleAttribute<O, ?> simpleAttribute : attributes) {
-                    if (simpleAttribute.getObjectType().equals(managedType))
-                        return simpleAttribute;
-                }
-                throw new IllegalStateException(
-                        "undefined pojo for test suite with cqengine persistence config: " + managedType.getName());
-            }
         };
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public static <O> SimpleAttribute getAttribute(Class<O> managedType) {
+        for (SimpleAttribute<O, ?> simpleAttribute : attributes) {
+            if (simpleAttribute.getObjectType().equals(managedType))
+                return simpleAttribute;
+        }
+        throw new IllegalStateException(
+                "undefined pojo for test suite with cqengine persistence config: " + managedType.getName());
+    }
+    
     @Override
     public void clearResources() {
-        if (context != null)
-            Optional.ofNullable(context.getBackbone()).ifPresent(b -> b.clear());
-        ;
         try {
             Files.deleteIfExists(Paths.get("test.dat"));
             Files.deleteIfExists(Paths.get("test.dat-shm"));
