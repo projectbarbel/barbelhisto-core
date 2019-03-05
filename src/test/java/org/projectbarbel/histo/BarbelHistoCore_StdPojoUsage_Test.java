@@ -57,7 +57,7 @@ public class BarbelHistoCore_StdPojoUsage_Test {
         effectiveEmployeeVersion = core.retrieveOne(BarbelQueries.effectiveNow(employee.getId()));
         effectiveIn10Days = core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, LocalDate.now().plusDays(10)));
 
-        assertTrue(effectiveEmployeeVersion.getLastname().equals("Schlimm"));
+        assertTrue(effectiveEmployeeVersion.getLastname().equals("Smith"));
         assertTrue(effectiveIn10Days.getLastname().equals("changedLastName"));
 
         System.out.println(core.prettyPrintJournal(employee.getId()));
