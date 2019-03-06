@@ -6,12 +6,19 @@ import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.projectbarbel.histo.suite.BTExecutionContext;
+import org.projectbarbel.histo.suite.context.BTTestContext;
 import org.projectbarbel.histo.suite.context.BTTestContextCQEngine;
+import org.projectbarbel.histo.suite.context.BTTestContextStandard;
 
 public class BTTestCQPersistenceOnly implements BeforeAllCallback, AfterAllCallback, ExecutionCondition {
 
+    private BTTestContext previousContext;
+
     @Override
     public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
+        previousContext = BTExecutionContext.INSTANCE.getTestContext();
+        if (previousContext instanceof BTTestContextStandard) 
+            BTExecutionContext.INSTANCE.setTestContext(new BTTestContextCQEngine());
         if (BTExecutionContext.INSTANCE.getTestContext() instanceof BTTestContextCQEngine)
             return ConditionEvaluationResult.enabled("runs for listener context: "
                     + BTExecutionContext.INSTANCE.getTestContext().getClass().getName());
@@ -22,6 +29,7 @@ public class BTTestCQPersistenceOnly implements BeforeAllCallback, AfterAllCallb
     @Override
     public void afterAll(ExtensionContext context) throws Exception {
         BTExecutionContext.INSTANCE.getTestContext().clearResources();
+        BTExecutionContext.INSTANCE.setTestContext(previousContext);
     }
 
     @Override

@@ -12,6 +12,7 @@ import org.projectbarbel.histo.model.BitemporalVersion;
 
 import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
+import com.googlecode.cqengine.persistence.support.serialization.PersistenceConfig;
 
 import net.sf.cglib.proxy.Enhancer;
 
@@ -94,7 +95,32 @@ public enum BarbelMode implements BarbelModeProcessor {
                     "don't forget to add @DocumentId to the document id attribute to the pojo you want to manage");
             Validate.isTrue(!(candidate instanceof Bitemporal),
                     "don't use Bitemporal.class interface on objects when using BarbelMode.POJO");
+            if (isPersitent(context, candidate)) {
+                Validate.isTrue(candidate.getClass().getAnnotation(PersistenceConfig.class) != null,
+                        "need to specify @PersistenceConfig(serializer = BarbelPojoSerializer.class, polymorphic = true) on your POJO if collection is persistent");
+            }
             return true;
+        }
+
+        private boolean isPersitent(BarbelHistoContext context, Object candidate) {
+            try {
+                IndexedCollection<?> backbone = context.getBackboneSupplier().get();
+                if (!backbone.isEmpty())
+                    return true;
+                // maiden collection check
+                Bitemporal bitemporal = snapshotMaiden(context, candidate, BitemporalStamp.createActive());
+                context.getBackbone().add(bitemporal);
+                if (backbone.iterator().hasNext()) {
+                    context.getBackbone().clear();
+                    return true;
+                }
+                context.getBackbone().clear();
+                return false;
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new IllegalStateException(
+                        "validation of maiden candidate failed - cannot analyze persistency of collection", e);
+            }
         }
 
         @SuppressWarnings("unchecked")

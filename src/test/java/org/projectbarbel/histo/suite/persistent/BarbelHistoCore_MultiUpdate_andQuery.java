@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -16,12 +15,12 @@ import org.projectbarbel.histo.BarbelQueries;
 import org.projectbarbel.histo.model.DefaultPojo;
 import org.projectbarbel.histo.model.EffectivePeriod;
 import org.projectbarbel.histo.suite.BTExecutionContext;
-import org.projectbarbel.histo.suite.extensions.BTPersistenceOnly;
+import org.projectbarbel.histo.suite.extensions.BTTestNotStandAlone;
 
 import com.googlecode.cqengine.query.QueryFactory;
 
+@BTTestNotStandAlone
 @TestMethodOrder(OrderAnnotation.class)
-@ExtendWith(BTPersistenceOnly.class)
 public class BarbelHistoCore_MultiUpdate_andQuery {
 
     // @formatter:off

@@ -20,6 +20,7 @@ import org.projectbarbel.histo.pojos.ComplexFieldsPrivatePojoPartialContructorWi
 import org.projectbarbel.histo.pojos.Driver;
 import org.projectbarbel.histo.pojos.NoPrimitivePrivatePojoPartialContructor;
 import org.projectbarbel.histo.pojos.Partner;
+import org.projectbarbel.histo.pojos.PojoWOPersistenceConfig;
 import org.projectbarbel.histo.pojos.Policy;
 import org.projectbarbel.histo.pojos.PrimitivePrivatePojo;
 import org.projectbarbel.histo.pojos.PrimitivePrivatePojoPartialContructor;
@@ -107,6 +108,10 @@ public class BTTestContextCQEngine implements BTTestContext {
         }
     }, new SimpleAttribute<BitemporalVersion, String>("versionId") {
         public String getValue(BitemporalVersion object, QueryOptions queryOptions) {
+            return (String) ((Bitemporal) object).getBitemporalStamp().getVersionId();
+        }
+    }, new SimpleAttribute<PojoWOPersistenceConfig, String>("versionId") {
+        public String getValue(PojoWOPersistenceConfig object, QueryOptions queryOptions) {
             return (String) ((Bitemporal) object).getBitemporalStamp().getVersionId();
         }
     });

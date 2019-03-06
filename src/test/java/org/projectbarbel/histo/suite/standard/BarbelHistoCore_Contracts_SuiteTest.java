@@ -19,7 +19,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.projectbarbel.histo.BarbelHisto;
 import org.projectbarbel.histo.BarbelHistoBuilder;
 import org.projectbarbel.histo.BarbelMode;
-import org.projectbarbel.histo.BarbelQueries;
 import org.projectbarbel.histo.DocumentId;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.BitemporalVersion;
@@ -94,9 +93,9 @@ public class BarbelHistoCore_Contracts_SuiteTest {
                         DiskPersistence.onPrimaryKeyInFile(SomePojo.DOCUMENT_ID, new File("test.dat"))))
                 .build();
         SomePojo pojo = EnhancedRandom.random(SomePojo.class);
-        core.save(pojo, LocalDate.now(), LocalDate.MAX);
-        assertThrows(RuntimeException.class,
-                () -> core.retrieve(BarbelQueries.all(pojo.id)));
+        Exception exc = assertThrows(IllegalArgumentException.class,
+                () -> core.save(pojo, LocalDate.now(), LocalDate.MAX));
+        assertTrue(exc.getMessage().contains("@PersistenceConfig"));
     }
     
     
