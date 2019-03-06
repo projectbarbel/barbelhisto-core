@@ -16,12 +16,12 @@ import org.projectbarbel.histo.BarbelQueries;
 import org.projectbarbel.histo.model.DefaultDocument;
 import org.projectbarbel.histo.model.EffectivePeriod;
 import org.projectbarbel.histo.suite.BTExecutionContext;
-import org.projectbarbel.histo.suite.extensions.BTTestNotStandAlone;
+import org.projectbarbel.histo.suite.extensions.BTNotStandAlone;
 
 import com.googlecode.cqengine.query.QueryFactory;
 
 @TestMethodOrder(OrderAnnotation.class)
-@BTTestNotStandAlone
+@BTNotStandAlone
 public class BarbelHistoCore_MultiUpdate_andQueryBitemporal {
 
     // @formatter:off

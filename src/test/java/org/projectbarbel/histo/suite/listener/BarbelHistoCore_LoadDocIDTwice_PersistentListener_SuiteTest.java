@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.projectbarbel.histo.BarbelHisto;
 import org.projectbarbel.histo.event.HistoEventFailedException;
 import org.projectbarbel.histo.model.Bitemporal;
@@ -16,11 +15,11 @@ import org.projectbarbel.histo.model.DefaultPojo;
 import org.projectbarbel.histo.model.EffectivePeriod;
 import org.projectbarbel.histo.model.RecordPeriod;
 import org.projectbarbel.histo.suite.BTExecutionContext;
-import org.projectbarbel.histo.suite.extensions.BTTestPersitenceListenerOnly;
+import org.projectbarbel.histo.suite.extensions.BTPersistenceListenerOnly;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
-@ExtendWith(BTTestPersitenceListenerOnly.class)
+@BTPersistenceListenerOnly
 public class BarbelHistoCore_LoadDocIDTwice_PersistentListener_SuiteTest {
     @Test
     public void testPopulateBitemporalVersion_DocIDExistsPersistent() throws Exception {

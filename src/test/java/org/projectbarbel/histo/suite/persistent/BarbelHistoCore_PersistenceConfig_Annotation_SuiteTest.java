@@ -6,15 +6,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.projectbarbel.histo.BarbelHisto;
 import org.projectbarbel.histo.pojos.PojoWOPersistenceConfig;
 import org.projectbarbel.histo.suite.BTExecutionContext;
-import org.projectbarbel.histo.suite.extensions.BTTestCQPersistenceOnly;
+import org.projectbarbel.histo.suite.extensions.BTCQPersistenceOnly;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
-@ExtendWith(BTTestCQPersistenceOnly.class)
+@BTCQPersistenceOnly
 public class BarbelHistoCore_PersistenceConfig_Annotation_SuiteTest {
 
     @Test

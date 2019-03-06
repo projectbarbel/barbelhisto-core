@@ -10,5 +10,5 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @Target({ ElementType.TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 @ExtendWith(OnlyEndsWithTest.class)
-public @interface BTTestNotStandAlone {
+public @interface BTNotStandAlone {
 }

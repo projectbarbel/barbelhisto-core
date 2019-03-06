@@ -2,6 +2,7 @@ package org.projectbarbel.histo.suite.standard;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 import java.time.LocalDate;
 import java.util.stream.Stream;
@@ -13,6 +14,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.projectbarbel.histo.BarbelHisto;
 import org.projectbarbel.histo.BarbelQueries;
+import org.projectbarbel.histo.model.BarbelProxy;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.pojos.Adress;
 import org.projectbarbel.histo.pojos.BankAccount;
@@ -64,6 +66,8 @@ public class BarbelHistoCore_PojoVariants_SuiteTest {
         core.save(pojo, LocalDate.now(), LocalDate.MAX);
         assertEquals(1, core.retrieve(BarbelQueries.all()).stream().count());
         Bitemporal record = (Bitemporal) core.retrieve(BarbelQueries.all()).stream().findFirst().get();
+        assertEquals(((BarbelProxy)record).getTarget(), pojo);
+        assertNotSame(((BarbelProxy)record).getTarget(), pojo);
         assertNotNull(record.getBitemporalStamp().getDocumentId());
     }
 

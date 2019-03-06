@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.projectbarbel.histo.BarbelHisto;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
@@ -15,11 +14,11 @@ import org.projectbarbel.histo.model.DefaultPojo;
 import org.projectbarbel.histo.model.EffectivePeriod;
 import org.projectbarbel.histo.model.RecordPeriod;
 import org.projectbarbel.histo.suite.BTExecutionContext;
-import org.projectbarbel.histo.suite.extensions.BTTestCQPersistenceOnly;
+import org.projectbarbel.histo.suite.extensions.BTCQPersistenceOnly;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
-@ExtendWith(BTTestCQPersistenceOnly.class)
+@BTCQPersistenceOnly
 public class BarbelHistoCore_LoadDocIDTwice_Persistent_SuiteTest {
 
     @Test

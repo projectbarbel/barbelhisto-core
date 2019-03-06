@@ -15,11 +15,11 @@ import org.projectbarbel.histo.BarbelQueries;
 import org.projectbarbel.histo.model.DefaultPojo;
 import org.projectbarbel.histo.model.EffectivePeriod;
 import org.projectbarbel.histo.suite.BTExecutionContext;
-import org.projectbarbel.histo.suite.extensions.BTTestNotStandAlone;
+import org.projectbarbel.histo.suite.extensions.BTNotStandAlone;
 
 import com.googlecode.cqengine.query.QueryFactory;
 
-@BTTestNotStandAlone
+@BTNotStandAlone
 @TestMethodOrder(OrderAnnotation.class)
 public class BarbelHistoCore_MultiUpdate_andQuery {
 

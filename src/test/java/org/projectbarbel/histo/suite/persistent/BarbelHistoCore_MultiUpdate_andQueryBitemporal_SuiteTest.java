@@ -6,15 +6,14 @@ import java.time.LocalDate;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.projectbarbel.histo.BarbelHisto;
 import org.projectbarbel.histo.BarbelHistoCore;
 import org.projectbarbel.histo.BarbelMode;
 import org.projectbarbel.histo.model.DefaultDocument;
 import org.projectbarbel.histo.suite.BTExecutionContext;
-import org.projectbarbel.histo.suite.extensions.BTTestCQPersistenceOnly;
+import org.projectbarbel.histo.suite.extensions.BTCQPersistenceOnly;
 
-@ExtendWith(BTTestCQPersistenceOnly.class)
+@BTCQPersistenceOnly
 public class BarbelHistoCore_MultiUpdate_andQueryBitemporal_SuiteTest
         extends BarbelHistoCore_MultiUpdate_andQueryBitemporal {
 

@@ -39,5 +39,12 @@ public class PrimitivePrivatePojo {
                 && Float.floatToIntBits(someFloat) == Float.floatToIntBits(other.someFloat) && someInt == other.someInt
                 && someLong == other.someLong && someShort == other.someShort;
     }
+    @Override
+    public String toString() {
+        return "PrimitivePrivatePojo [id=" + id + ", someBoolean=" + someBoolean + ", somByte=" + somByte
+                + ", someShort=" + someShort + ", someChar=" + someChar + ", someInt=" + someInt + ", someFloat="
+                + someFloat + ", someLong=" + someLong + ", someDouble=" + someDouble + "]";
+    }
 	
+    
 }
