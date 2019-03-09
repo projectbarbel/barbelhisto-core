@@ -68,7 +68,7 @@ public class BarbelHistoCore_StdPojoUsage_Test {
     public void loadUnload() {
         BarbelHisto<Employee> core = BarbelHistoBuilder.barbel().build();
         Employee employee = new Employee("somePersonelNumber", "Niklas", "Schlimm");
-        Employee effectiveEmployeeVersion = core.save(employee, LocalDate.now(), LocalDate.MAX);
+        Employee effectiveEmployeeVersion = (Employee)core.save(employee, LocalDate.now(), LocalDate.MAX).getUpdateRequest();
         effectiveEmployeeVersion.setLastname("changedLastName");
         core.save(effectiveEmployeeVersion, LocalDate.now().plusDays(10), LocalDate.MAX);
         Collection<Bitemporal> unloadVersionData = core.unload("somePersonelNumber");

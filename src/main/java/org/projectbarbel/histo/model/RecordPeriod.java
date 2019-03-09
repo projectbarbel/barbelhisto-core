@@ -19,11 +19,15 @@ public class RecordPeriod {
             ZoneId.of("Z"));
     public static final String NOBODY = "NOBODY";
 
-    private final ZonedDateTime createdAt;
-    private final String createdBy;
+    private ZonedDateTime createdAt;
+    private String createdBy;
     private ZonedDateTime inactivatedAt;
     private String inactivatedBy;
     private BitemporalObjectState state;
+
+    public RecordPeriod() {
+        super();
+    }
 
     private RecordPeriod(Builder builder) {
         this.createdAt = builder.createdAt != null ? builder.createdAt : BarbelHistoContext.getBarbelClock().now();

@@ -13,11 +13,15 @@ import org.projectbarbel.histo.BarbelHistoContext;
  */
 public final class BitemporalStamp {
 
-    protected final String versionId;
-    protected final Object documentId;
-    protected final String activity;
-    protected final EffectivePeriod effectiveTime;
-    protected final RecordPeriod recordTime;
+    protected String versionId;
+    protected Object documentId;
+    protected String activity;
+    protected EffectivePeriod effectiveTime;
+    protected RecordPeriod recordTime;
+
+    public BitemporalStamp() {
+        super();
+    }
 
     private BitemporalStamp(Builder builder) {
         this.versionId = builder.versionId != null ? builder.versionId

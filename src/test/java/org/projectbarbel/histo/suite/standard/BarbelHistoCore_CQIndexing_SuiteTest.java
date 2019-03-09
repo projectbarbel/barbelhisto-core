@@ -90,7 +90,7 @@ public class BarbelHistoCore_CQIndexing_SuiteTest {
                 })
                 .build();
         core.save(pojo, LocalDate.now(), LocalDate.MAX);
-        T saved = core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX);
+        T saved = (T)core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX).getUpdateRequest();
         assertEquals(3, core.retrieve(BarbelQueries.all()).stream().count());
         Bitemporal object = (Bitemporal)core.retrieve(BarbelQueries.all()).stream().findFirst().get();
         Bitemporal byPK = (Bitemporal)core.retrieve((Query<T>) equal(VERSION_ID_PK, (String)object.getBitemporalStamp().getVersionId())).stream().findFirst().get();
@@ -115,7 +115,7 @@ public class BarbelHistoCore_CQIndexing_SuiteTest {
                 }).withMode(BarbelMode.BITEMPORAL)
                 .build();
         core.save(pojo, LocalDate.now(), LocalDate.MAX);
-        T saved = core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX);
+        T saved = (T)core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX).getUpdateRequest();
         assertEquals(3, core.retrieve(BarbelQueries.all()).stream().count());
         Bitemporal object = (Bitemporal)core.retrieve(BarbelQueries.all()).stream().findFirst().get();
         Bitemporal byPK = (Bitemporal)core.retrieve((Query<T>) equal(VERSION_ID_PK, (String)object.getBitemporalStamp().getVersionId())).stream().findFirst().get();

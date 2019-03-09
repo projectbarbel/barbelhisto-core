@@ -5,7 +5,7 @@
 
 	<groupId>org.projectbarbel</groupId>
 	<artifactId>barbelhisto</artifactId>
-	<version>1.6.4</version>
+	<version>1.6.4-SNAPSHOT</version>
 	<name>BarbelHisto java library</name>
 	<url>http://www.projectbarbel.org</url>
 	<description>BarbelHisto - Java library to manage bitemporal data</description>
@@ -229,11 +229,6 @@
 			<version>27.0-jre</version>
 		</dependency>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.25</version>
-		</dependency>
-		<dependency>
 			<groupId>uk.com.robust-it</groupId>
 			<artifactId>cloning</artifactId>
 			<version>1.9.12</version>
@@ -243,11 +238,6 @@
 			<artifactId>lombok</artifactId>
 			<version>1.18.6</version>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>1.2.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.objenesis</groupId>

@@ -9,6 +9,7 @@ import java.util.NoSuchElementException;
 
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
+import org.projectbarbel.histo.model.BitemporalUpdate;
 import org.projectbarbel.histo.model.BitemporalVersion;
 import org.projectbarbel.histo.model.DefaultDocument;
 
@@ -152,9 +153,9 @@ public interface BarbelHisto<T> {
 	 * @param newVersion the object state to save
 	 * @param from       effective date of object state
 	 * @param until      effective until of the state
-	 * @return the saved object including the version data
+	 * @return the {@link BitemporalUpdate} performed by this save operation
 	 */
-	T save(T newVersion, LocalDate from, LocalDate until);
+	BitemporalUpdate<T> save(T newVersion, LocalDate from, LocalDate until);
 
 	/**
 	 * Retrieve data from {@link BarbelHisto} using cqengine like queries. Clients

@@ -13,8 +13,6 @@ import com.google.common.eventbus.SubscriberExceptionContext;
 import com.google.common.eventbus.SubscriberExceptionHandler;
 import com.googlecode.cqengine.query.Query;
 
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * Enum that contains all events thrown by {@link BarbelHisto}. <br>
  * <br>
@@ -355,14 +353,11 @@ public enum EventType implements PostableEvent {
 
     }
 
-    @Slf4j
     public static class DefaultSubscriberExceptionHandler implements SubscriberExceptionHandler {
 
         @Override
         public void handleException(Throwable exception, SubscriberExceptionContext context) {
-            log.error("an exception was thrown while executing event handler: "
-                    + context.getSubscriberMethod().getDeclaringClass().getName() + "."
-                    + context.getSubscriberMethod().getName(), exception);
+            throw new HistoEventFailedException("unexpected exception in event handling", exception, null);
         }
 
     }

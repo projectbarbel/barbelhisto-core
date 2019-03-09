@@ -1,4 +1,4 @@
-package org.projectbarbel.histo.suite.extensions;
+package org.projectbarbel.histo.suite.context;
 
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.projectbarbel.histo.suite.BTExecutionContext;
-import org.projectbarbel.histo.suite.context.BTTestContextPersistenceListener;
 
 public class BTTestPersitenceListenerOnly implements ExecutionCondition, AfterAllCallback, BeforeAllCallback {
 

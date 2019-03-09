@@ -12,6 +12,9 @@ import org.projectbarbel.histo.BarbelHistoContext;
  *
  */
 public final class EffectivePeriod {
+    
+    public static final LocalDate INFINITE = LocalDate.of(2199, 12, 31);
+    
     private final LocalDate until;
     private final LocalDate from;
 

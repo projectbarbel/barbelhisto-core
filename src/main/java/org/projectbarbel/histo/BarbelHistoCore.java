@@ -26,6 +26,7 @@ import org.projectbarbel.histo.event.EventType.UnLoadOperationEvent;
 import org.projectbarbel.histo.event.EventType.UpdateFinishedEvent;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
+import org.projectbarbel.histo.model.BitemporalUpdate;
 import org.projectbarbel.histo.model.EffectivePeriod;
 import org.projectbarbel.histo.model.RecordPeriod;
 
@@ -70,7 +71,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public T save(T newVersion, LocalDate from, LocalDate until) {
+    public BitemporalUpdate<T> save(T newVersion, LocalDate from, LocalDate until) {
         Validate.noNullElements(Arrays.asList(newVersion, from, until), NOTNULL);
         Validate.notNull(newVersion, NOTNULL);
         Validate.isTrue(from.isBefore(until), "from date must be before until date");
@@ -89,11 +90,17 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
                         .apply(context);
                 try {
                     EventType.ACQUIRELOCK.create().with(journal).postSynchronous(context);
-                    journal.setLastUpdateRequest(newManagedBitemporal);
                     updateStrategy.accept(journal, newManagedBitemporal);
-                    return (T) mode.copyManagedBitemporal(context, newManagedBitemporal);
+                    return new BitemporalUpdate<T>(newManagedBitemporal, journal.getLastUpdateCase(), (List<T>) journal
+                            .getLastInserts().stream()
+                            .map(i -> mode.managedBitemporalToPersistenceObject(mode.copyManagedBitemporal(context, i)))
+                            .collect(Collectors.toList()),
+                            (List<T>) journal.getLastInactivations().stream()
+                                    .map(i -> mode.managedBitemporalToPersistenceObject(
+                                            mode.copyManagedBitemporal(context, i.getObjectAdded())))
+                                    .collect(Collectors.toList()));
                 } finally {
-                    EventType.UPDATEFINISHED.create().with(UpdateFinishedEvent.NEWVERSIONS, journal.getLastInsert())
+                    EventType.UPDATEFINISHED.create().with(UpdateFinishedEvent.NEWVERSIONS, journal.getLastInserts())
                             .with(UpdateFinishedEvent.INACTIVATIONS, journal.getLastInactivations())
                             .postBothWay(context);
                     EventType.RELEASELOCK.create().with(journal).postSynchronous(context);

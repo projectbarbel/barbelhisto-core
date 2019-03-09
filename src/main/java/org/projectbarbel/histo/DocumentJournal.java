@@ -72,8 +72,7 @@ public final class DocumentJournal {
     private final ProcessingState processingState;
     private final Set<Inactivation> lastInactivations = new HashSet<>();
     private JournalUpdateCase lastUpdateCase;
-    private Bitemporal lastUpdateRequest;
-
+    
     private DocumentJournal(ProcessingState processingState, BarbelHistoContext context, IndexedCollection backbone,
             Object id) {
         super();
@@ -188,7 +187,7 @@ public final class DocumentJournal {
                 .stream().map(d -> processingState.expose(context, (Bitemporal) d)).collect(Collectors.toList());
     }
 
-    public List<Bitemporal> getLastInsert() {
+    public List<Bitemporal> getLastInserts() {
         return lastInserts;
     }
 
@@ -223,7 +222,6 @@ public final class DocumentJournal {
             lastInserts.clear();
             lastInactivations.clear();
             lastUpdateCase = null;
-            lastUpdateRequest = null;
             return true;
         } else
             return false;
@@ -240,14 +238,6 @@ public final class DocumentJournal {
     public void setLastUpdateCase(JournalUpdateCase lastUpdateCase) {
         Validate.validState(ProcessingState.INTERNAL.equals(processingState), FORBIDDEN_OPERATION);
         this.lastUpdateCase = lastUpdateCase;
-    }
-
-    public Bitemporal getLastUpdateRequest() {
-        return lastUpdateRequest;
-    }
-
-    protected void setLastUpdateRequest(Bitemporal lastUpdateRequest) {
-        this.lastUpdateRequest = lastUpdateRequest;
     }
 
     public static class Inactivation {
