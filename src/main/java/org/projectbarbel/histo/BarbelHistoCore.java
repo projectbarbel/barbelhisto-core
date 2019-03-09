@@ -91,14 +91,11 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
                 try {
                     EventType.ACQUIRELOCK.create().with(journal).postSynchronous(context);
                     updateStrategy.accept(journal, newManagedBitemporal);
-                    return new BitemporalUpdate<T>(newManagedBitemporal, journal.getLastUpdateCase(), (List<T>) journal
-                            .getLastInserts().stream()
-                            .map(i -> mode.managedBitemporalToPersistenceObject(mode.copyManagedBitemporal(context, i)))
-                            .collect(Collectors.toList()),
-                            (List<T>) journal.getLastInactivations().stream()
-                                    .map(i -> mode.managedBitemporalToPersistenceObject(
-                                            mode.copyManagedBitemporal(context, i.getObjectAdded())))
-                                    .collect(Collectors.toList()));
+                    return new BitemporalUpdate<T>(newManagedBitemporal, journal.getLastUpdateCase(),
+                            (List<T>) journal.getLastInserts().stream().map(this::toPersistenceObject)
+                                    .collect(Collectors.toList()),
+                            (List<T>) journal.getLastInactivations().stream().map(i -> i.getObjectAdded())
+                                    .map(this::toPersistenceObject).collect(Collectors.toList()));
                 } finally {
                     EventType.UPDATEFINISHED.create().with(UpdateFinishedEvent.NEWVERSIONS, journal.getLastInserts())
                             .with(UpdateFinishedEvent.INACTIVATIONS, journal.getLastInactivations())
@@ -112,6 +109,10 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
             throw new ConcurrentModificationException(
                     "the journal for id=" + id.toString() + " is locked - try again later");
         }
+    }
+
+    private Bitemporal toPersistenceObject(Bitemporal bitemporal) {
+        return mode.managedBitemporalToPersistenceObject(mode.copyManagedBitemporal(context, bitemporal));
     }
 
     private Function<Object, DocumentJournal> createJournal() {

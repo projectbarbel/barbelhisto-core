@@ -23,7 +23,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.projectbarbel.histo.BarbelHisto;
 import org.projectbarbel.histo.BarbelHistoBuilder;
 import org.projectbarbel.histo.BarbelHistoContext;
-import org.projectbarbel.histo.BarbelHistoCore;
 import org.projectbarbel.histo.BarbelMode;
 import org.projectbarbel.histo.BarbelTestHelper;
 import org.projectbarbel.histo.DocumentJournal;
@@ -44,7 +43,6 @@ import org.projectbarbel.histo.suite.extensions.BTTestStandard;
 @ExtendWith(BTTestStandard.class)
 public class BarbelHistoCore_JournalUpdate_SuiteTest {
 
-    private DocumentJournal journal;
     private BarbelHistoContext context;
 
     @BeforeAll
@@ -68,7 +66,7 @@ public class BarbelHistoCore_JournalUpdate_SuiteTest {
         BarbelHistoContext context = BTExecutionContext.INSTANCE.barbel(DefaultDocument.class)
                 .withMode(BarbelMode.BITEMPORAL);
         Bitemporal bitemporal = BarbelMode.BITEMPORAL.snapshotMaiden(context, doc, BitemporalStamp.createActive());
-        journal = DocumentJournal.create(ProcessingState.INTERNAL, context,
+        DocumentJournal journal = DocumentJournal.create(ProcessingState.INTERNAL, context,
                 BarbelTestHelper.generateJournalOfManagedDefaultPojos(
                         BTExecutionContext.INSTANCE.barbel(DefaultDocument.class), "someId",
                         Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1),
@@ -233,14 +231,15 @@ public class BarbelHistoCore_JournalUpdate_SuiteTest {
         update.setData("some data");
         @SuppressWarnings("rawtypes")
         BitemporalUpdate bitemporalUpdate = core.save(update, updateFrom, updateUntil);
-        journal = ((BarbelHistoCore<DefaultPojo>) core).getDocumentJournal("someId");
         assertEquals(countOfNewVersions, bitemporalUpdate.getInserts().size());
         assertEquals(updateCase, bitemporalUpdate.getUpdateCase());
-        assertNewVersions((Bitemporal)bitemporalUpdate.getUpdateRequest(), bitemporalUpdate.getInserts(), activeEffective);
-        assertInactivatedVersions(inactiveCount, inactiveEffective);
+        assertNewVersions((Bitemporal) bitemporalUpdate.getUpdateRequest(), bitemporalUpdate.getInserts(),
+                activeEffective);
+        bitemporalUpdate.getInactivations().sort((v1, v2) -> ((Bitemporal) v1).getBitemporalStamp().getEffectiveTime()
+                .until().isBefore(((Bitemporal) v2).getBitemporalStamp().getEffectiveTime().until()) ? -1 : 1);
+        assertInactivatedVersions(inactiveCount, inactiveEffective, bitemporalUpdate.getInactivations());
     }
 
-    @SuppressWarnings("unchecked")
     @ParameterizedTest
     @MethodSource({ "createJournalUpdateCases", "createJournalEdgeCases" })
     public void testCoreSave_Bitemporal(LocalDate updateFrom, LocalDate updateUntil, JournalUpdateCase updateCase,
@@ -257,13 +256,13 @@ public class BarbelHistoCore_JournalUpdate_SuiteTest {
         DefaultDocument update = new DefaultDocument();
         update.setData("some data");
         update.setId("someId");
-        @SuppressWarnings("rawtypes")
-        BitemporalUpdate bitemporalUpdate = core.save(update, updateFrom, updateUntil);
-        journal = ((BarbelHistoCore<DefaultDocument>) core).getDocumentJournal("someId");
+        BitemporalUpdate<? extends Bitemporal> bitemporalUpdate = core.save(update, updateFrom, updateUntil);
         assertEquals(countOfNewVersions, bitemporalUpdate.getInserts().size());
         assertEquals(updateCase, bitemporalUpdate.getUpdateCase());
         assertNewVersions(bitemporalUpdate.getUpdateRequest(), bitemporalUpdate.getInserts(), activeEffective);
-        assertInactivatedVersions(inactiveCount, inactiveEffective);
+        bitemporalUpdate.getInactivations().sort((v1, v2) -> v1.getBitemporalStamp().getEffectiveTime().until()
+                .isBefore(v2.getBitemporalStamp().getEffectiveTime().until()) ? -1 : 1);
+        assertInactivatedVersions(inactiveCount, inactiveEffective, bitemporalUpdate.getInactivations());
     }
 
     @ParameterizedTest
@@ -272,17 +271,17 @@ public class BarbelHistoCore_JournalUpdate_SuiteTest {
             int countOfNewVersions, List<LocalDate> activeEffective, int inactiveCount,
             List<LocalDate> inactiveEffective) throws Exception {
         context = BTExecutionContext.INSTANCE.barbel(DefaultPojo.class).withMode(BarbelMode.POJO).withUser("testUser");
-        journal = DocumentJournal.create(ProcessingState.INTERNAL, context,
+        DocumentJournal journal = DocumentJournal.create(ProcessingState.INTERNAL, context,
                 BarbelTestHelper.generateJournalOfManagedDefaultPojos(
                         BTExecutionContext.INSTANCE.barbel(DefaultPojo.class), "someId",
                         Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1),
                                 LocalDate.of(2019, 1, 1))),
                 "someId");
-        UpdateReturn updatReturn = performUpdate_Pojo(updateFrom, updateUntil);
+        UpdateReturn updatReturn = performUpdate_Pojo(updateFrom, updateUntil, journal);
         assertTrue(updatReturn.newVersions.size() == countOfNewVersions);
         assertEquals(updateCase, updatReturn.function.getActualCase());
         assertNewVersions(updatReturn.bitemporal, updatReturn.newVersions, activeEffective);
-        assertInactivatedVersions(inactiveCount, inactiveEffective);
+        assertInactivatedVersions(inactiveCount, inactiveEffective, journal.read().inactiveVersions());
     }
 
     @ParameterizedTest
@@ -292,27 +291,27 @@ public class BarbelHistoCore_JournalUpdate_SuiteTest {
             List<LocalDate> inactiveEffective) throws Exception {
         context = BTExecutionContext.INSTANCE.barbel(DefaultDocument.class).withMode(BarbelMode.BITEMPORAL)
                 .withUser("testUser");
-        journal = DocumentJournal.create(ProcessingState.INTERNAL, context,
+        DocumentJournal journal = DocumentJournal.create(ProcessingState.INTERNAL, context,
                 BarbelTestHelper.generateJournalOfDefaultDocuments("someId", Arrays.asList(LocalDate.of(2016, 1, 1),
                         LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))),
                 "someId");
-        UpdateReturn updatReturn = performUpdate_Bitemporal(updateFrom, updateUntil);
+        UpdateReturn updatReturn = performUpdate_Bitemporal(updateFrom, updateUntil, journal);
         assertTrue(updatReturn.newVersions.size() == countOfNewVersions);
         assertEquals(updateCase, updatReturn.function.getActualCase());
         assertNewVersions(updatReturn.bitemporal, updatReturn.newVersions, activeEffective);
-        assertInactivatedVersions(inactiveCount, inactiveEffective);
+        assertInactivatedVersions(inactiveCount, inactiveEffective, journal.read().inactiveVersions());
     }
 
-    private void assertInactivatedVersions(int inactiveCount, List<LocalDate> inactiveEffective) {
-        List<Bitemporal> inactivated = journal.read().inactiveVersions();
-        assertEquals(inactiveCount, inactivated.size());
-        for (int i = 0; i < inactivated.size(); i++) {
-            assertInactivatedVersion(inactivated.get(i), inactiveEffective.get(i * 2),
+    private void assertInactivatedVersions(int inactiveCount, List<LocalDate> inactiveEffective,
+            List<? extends Bitemporal> inactivatedVersions) {
+        assertEquals(inactiveCount, inactivatedVersions.size());
+        for (int i = 0; i < inactivatedVersions.size(); i++) {
+            assertInactivatedVersion(inactivatedVersions.get(i), inactiveEffective.get(i * 2),
                     inactiveEffective.get(i * 2 + 1));
         }
     }
 
-    private UpdateReturn performUpdate_Pojo(LocalDate from, LocalDate until) {
+    private UpdateReturn performUpdate_Pojo(LocalDate from, LocalDate until, DocumentJournal journal) {
         DefaultPojo update = new DefaultPojo();
         update.setDocumentId("someId");
         update.setData("some data");
@@ -323,7 +322,7 @@ public class BarbelHistoCore_JournalUpdate_SuiteTest {
         return new UpdateReturn(journal.getLastInserts(), bitemporal, updateStrategy);
     }
 
-    private UpdateReturn performUpdate_Bitemporal(LocalDate from, LocalDate until) {
+    private UpdateReturn performUpdate_Bitemporal(LocalDate from, LocalDate until, DocumentJournal journal) {
         DefaultDocument doc = new DefaultDocument();
         Bitemporal bitemporal = BarbelMode.BITEMPORAL.snapshotMaiden(context, doc,
                 BitemporalStamp.createActive(context, "someId", EffectivePeriod.of(from, until)));
@@ -334,7 +333,7 @@ public class BarbelHistoCore_JournalUpdate_SuiteTest {
         return new UpdateReturn(list, bitemporal, function);
     }
 
-    private void assertNewVersions(Bitemporal insertedBitemporal, List<Bitemporal> newVersions,
+    private void assertNewVersions(Bitemporal insertedBitemporal, List<? extends Bitemporal> newVersions,
             List<LocalDate> activeEffective) {
 
         for (int i = 0; i < newVersions.size(); i++) {
