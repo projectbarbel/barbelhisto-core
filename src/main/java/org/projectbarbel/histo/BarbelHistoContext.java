@@ -100,7 +100,7 @@ public interface BarbelHistoContext {
     }
 
     static AsyncEventBus getDefaultAsynchronousEventBus() {
-        return new AsyncEventBus(Executors.newFixedThreadPool(4, (r) -> {
+        return new AsyncEventBus(Executors.newFixedThreadPool(4, r -> {
             Thread t = Executors.defaultThreadFactory().newThread(r);
             t.setDaemon(true);
             return t;
