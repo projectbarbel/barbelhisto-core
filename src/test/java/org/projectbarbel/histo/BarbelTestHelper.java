@@ -2,9 +2,10 @@ package org.projectbarbel.histo;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,18 +37,18 @@ public class BarbelTestHelper {
             public String get() {
                 return UUID.randomUUID().toString();
             }
-        }).randomize(LocalDate.class, new Supplier<LocalDate>() {
+        }).randomize(ZonedDateTime.class, new Supplier<ZonedDateTime>() {
 
             @Override
-            public LocalDate get() {
-                return BarbelTestHelper.randomLocalDate(2000, 2020);
+            public ZonedDateTime get() {
+                return BarbelTestHelper.randomLocalTime(2000, 2020);
             }
         }).randomize(EffectivePeriod.class, new Supplier<EffectivePeriod>() {
 
             @Override
             public EffectivePeriod get() {
-                LocalDate effectiveFrom = randomLocalDate(2000, 2020);
-                return EffectivePeriod.of(effectiveFrom, randomLocalDate(effectiveFrom.plusDays(1), 2020));
+                ZonedDateTime effectiveFrom = randomLocalTime(2000, 2020);
+                return EffectivePeriod.of(effectiveFrom, randomLocalTime(effectiveFrom.plusSeconds(1), 2020));
             }
         }).randomize(RecordPeriod.class, new Supplier<RecordPeriod>() {
 
@@ -74,7 +75,7 @@ public class BarbelTestHelper {
                 .build().nextObject(clazz, excludedFields);
     }
 
-    public static List<BitemporalStamp> generateListOfBitemporals(String docId, List<LocalDate> effectiveDates) {
+    public static List<BitemporalStamp> generateListOfBitemporals(String docId, List<ZonedDateTime> effectiveDates) {
         List<BitemporalStamp> journal = new ArrayList<BitemporalStamp>();
         for (int i = 0; i < effectiveDates.size(); i++) {
             journal.add(createPeriod(docId, effectiveDates, i));
@@ -82,17 +83,17 @@ public class BarbelTestHelper {
         return journal;
     }
 
-    private static BitemporalStamp createPeriod(String docId, List<LocalDate> effectiveDates, int listPointer) {
+    private static BitemporalStamp createPeriod(String docId, List<ZonedDateTime> effectiveDates, int listPointer) {
         return BitemporalStamp.builder().withDocumentId(docId)
                 .withEffectiveTime(effectiveDates.size() - 1 == listPointer
-                        ? EffectivePeriod.of(effectiveDates.get(listPointer), LocalDate.MAX)
+                        ? EffectivePeriod.of(effectiveDates.get(listPointer), EffectivePeriod.INFINITE)
                         : EffectivePeriod.of(effectiveDates.get(listPointer), effectiveDates.get(listPointer + 1)))
                 .withRecordTime(RecordPeriod.builder().build()).build();
     }
 
     @SuppressWarnings("unchecked")
     public static <T> IndexedCollection<T> generateJournalOfDefaultDocuments(String docId,
-            List<LocalDate> effectiveDates) {
+            List<ZonedDateTime> effectiveDates) {
         IndexedCollection<T> journal = new ConcurrentIndexedCollection<T>();
         for (int i = 0; i < effectiveDates.size(); i++) {
             journal.add((T) DefaultDocument.builder().withBitemporalStamp(createPeriod(docId, effectiveDates, i))
@@ -102,7 +103,7 @@ public class BarbelTestHelper {
     }
 
     public static IndexedCollection<Object> generateJournalOfManagedDefaultPojos(BarbelHistoContext context, String docId,
-            List<LocalDate> effectiveDates) {
+            List<ZonedDateTime> effectiveDates) {
         IndexedCollection<Object> journal = new ConcurrentIndexedCollection<Object>();
         DefaultPojo pojo = new DefaultPojo(docId, "first original");
         for (int i = 0; i < effectiveDates.size(); i++) {
@@ -119,25 +120,30 @@ public class BarbelTestHelper {
         return collection;
     }
 
-    public static LocalDate randomLocalDate(int startYear, int endYear) {
-        long minDay = LocalDate.of(startYear, 1, 1).toEpochDay();
-        long maxDay = LocalDate.of(endYear, 12, 31).toEpochDay();
-        long randomDay = ThreadLocalRandom.current().nextLong(minDay, maxDay);
-        return LocalDate.ofEpochDay(randomDay);
+    public static ZonedDateTime randomLocalTime(int startYear, int endYear) {
+        long minTime = LocalDateTime.of(startYear, 1, 1,0,0,0).atZone(ZoneId.of("Z")).toEpochSecond();
+        long maxTime = LocalDateTime.of(endYear, 12, 31,23,59,59).atZone(ZoneId.of("Z")).toEpochSecond();
+        long randomTime = ThreadLocalRandom.current().nextLong(minTime, maxTime);
+        return epochSecondToZonedDateTime(randomTime);
     }
 
-    public static LocalDate randomLocalDate(LocalDate low, int highYear) {
-        long minDay = low.toEpochDay();
-        long maxDay = LocalDate.of(highYear, 12, 31).toEpochDay();
-        long randomDay = ThreadLocalRandom.current().nextLong(minDay, maxDay);
-        return LocalDate.ofEpochDay(randomDay);
+    public static ZonedDateTime randomLocalTime(ZonedDateTime low, int highYear) {
+        long minTime = low.toEpochSecond();
+        long maxTime = LocalDateTime.of(highYear, 12, 31,23,59,59).atZone(ZoneId.of("Z")).toEpochSecond();
+        long randomTime = ThreadLocalRandom.current().nextLong(minTime, maxTime);
+        return epochSecondToZonedDateTime(randomTime);
     }
 
-    public static LocalDate randomLocalDate(LocalDate low, LocalDate high) {
-        long minDay = low.toEpochDay();
-        long maxDay = high.toEpochDay();
-        long randomDay = ThreadLocalRandom.current().nextLong(minDay, maxDay);
-        return LocalDate.ofEpochDay(randomDay);
+    public static ZonedDateTime randomLocalTime(ZonedDateTime low, ZonedDateTime high) {
+        long minSecond = low.toEpochSecond();
+        long maxSecond = high.toEpochSecond();
+        long randomTime = ThreadLocalRandom.current().nextLong(minSecond, maxSecond);
+        return epochSecondToZonedDateTime(randomTime);
+    }
+
+    private static ZonedDateTime epochSecondToZonedDateTime(long epochSecond) {
+        return ZonedDateTime.of(LocalDateTime
+                .ofEpochSecond(epochSecond, ThreadLocalRandom.current().nextInt(0, 999999999), ZoneOffset.UTC), ZoneId.of("Z"));
     }
 
     public static Instant randomInstant(int startYear, int endYear) {

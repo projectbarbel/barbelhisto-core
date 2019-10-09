@@ -2,12 +2,13 @@ package org.projectbarbel.histo;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.projectbarbel.histo.model.EffectivePeriod;
 
 public class BarbelHistoCore_DZone_Article1_Test {
 
@@ -21,11 +22,11 @@ public class BarbelHistoCore_DZone_Article1_Test {
 
 		BarbelHisto<Client> barbel = BarbelHistoBuilder.barbel().build();
 		Client client = new Client("1234", "Martin", "Smith");
-		barbel.save(client, LocalDate.now(), LocalDate.MAX);
+		barbel.save(client);
 
 		Client effectiveNow = barbel.retrieveOne(BarbelQueries.effectiveNow("1234"));
 		effectiveNow.getAdresses().add(new Adress("Barbel Street 10", "Houston"));
-		barbel.save(effectiveNow, LocalDate.of(2019, 3, 1), LocalDate.MAX);
+		barbel.save(effectiveNow, ZonedDateTime.parse("2019-03-01T00:00:00Z"), EffectivePeriod.INFINITE);
 
 		System.out.println(barbel.prettyPrintJournal("1234"));
 

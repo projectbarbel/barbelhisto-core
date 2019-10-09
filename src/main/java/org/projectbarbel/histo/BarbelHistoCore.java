@@ -1,7 +1,6 @@
 package org.projectbarbel.histo;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
@@ -71,7 +70,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public BitemporalUpdate<T> save(T newVersion, LocalDate from, LocalDate until) {
+    public BitemporalUpdate<T> save(T newVersion, ZonedDateTime from, ZonedDateTime until) {
         Validate.noNullElements(Arrays.asList(newVersion, from, until), NOTNULL);
         Validate.notNull(newVersion, NOTNULL);
         Validate.isTrue(from.isBefore(until), "from date must be before until date");
@@ -232,11 +231,11 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
     }
 
     @Override
-    public DocumentJournal timeshift(Object id, LocalDateTime time) {
+    public DocumentJournal timeshift(Object id, ZonedDateTime time) {
         Validate.isTrue(id != null && time != null, NOTNULL);
         Validate.isTrue(
-                time.isBefore(BarbelHistoContext.getBarbelClock().now().toLocalDateTime())
-                        || time.equals(BarbelHistoContext.getBarbelClock().now().toLocalDateTime()),
+                time.isBefore(BarbelHistoContext.getBarbelClock().now())
+                        || time.equals(BarbelHistoContext.getBarbelClock().now()),
                 "timeshift only allowed in the past");
         List<T> result = retrieve(BarbelQueries.journalAt(id, time));
         IndexedCollection<Bitemporal> copiedAndActivatedBitemporals = result.stream()

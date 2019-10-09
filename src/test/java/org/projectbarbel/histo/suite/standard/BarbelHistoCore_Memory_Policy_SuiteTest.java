@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -62,8 +62,8 @@ public class BarbelHistoCore_Memory_Policy_SuiteTest {
             long time = new Date().getTime();
             for (Object pojo : pojos) {
                 core.save((Policy) pojo,
-                        BarbelTestHelper.randomLocalDate(LocalDate.of(2010, 1, 1), LocalDate.of(2015, 1, 1)),
-                        BarbelTestHelper.randomLocalDate(LocalDate.of(2015, 1, 2), LocalDate.of(2020, 1, 1)));
+                        BarbelTestHelper.randomLocalTime(ZonedDateTime.parse("2010-01-01T00:00:00Z"), ZonedDateTime.parse("2015-01-01T00:00:00Z")),
+                        BarbelTestHelper.randomLocalTime(ZonedDateTime.parse("2015-01-02T00:00:00Z"), ZonedDateTime.parse("2020-01-01T00:00:00Z")));
             }
             System.out.println("######### Barbel-Statistics #########");
             BigDecimal timetaken = new BigDecimal((new Date().getTime() - time)).divide(new BigDecimal(1000))

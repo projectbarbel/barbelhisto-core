@@ -1,6 +1,5 @@
 package org.projectbarbel.histo.model;
 
-import java.time.LocalDate;
 import java.util.Objects;
 
 import org.projectbarbel.histo.BarbelHistoContext;
@@ -37,7 +36,7 @@ public final class BitemporalStamp {
         return builder().withActivity(BarbelHistoContext.getDefaultActivity())
                 .withDocumentId((String) BarbelHistoContext.getDefaultDocumentIDGenerator().get())
                 .withVersionId(BarbelHistoContext.getDefaultVersionIDGenerator().get())
-                .withEffectiveTime(EffectivePeriod.of(BarbelHistoContext.getBarbelClock().today(), LocalDate.MAX))
+                .withEffectiveTime(EffectivePeriod.nowToInfinite())
                 .withRecordTime(RecordPeriod.builder().build()).build();
     }
 
@@ -45,7 +44,7 @@ public final class BitemporalStamp {
         return builder().withActivity(BarbelHistoContext.getDefaultActivity())
                 .withDocumentId(id)
                 .withVersionId(BarbelHistoContext.getDefaultVersionIDGenerator().get())
-                .withEffectiveTime(EffectivePeriod.of(BarbelHistoContext.getBarbelClock().today(), LocalDate.MAX))
+                .withEffectiveTime(EffectivePeriod.nowToInfinite())
                 .withRecordTime(RecordPeriod.builder().build()).build();
     }
     

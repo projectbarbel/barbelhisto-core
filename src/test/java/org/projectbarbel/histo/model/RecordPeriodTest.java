@@ -20,10 +20,10 @@ public class RecordPeriodTest {
 
 	@Test
 	public void testCreateActive() throws Exception {
-		LocalDateTime now = LocalDateTime.now();
+		ZonedDateTime now = LocalDateTime.now().atZone(ZoneId.of("Z"));
 		BarbelHistoContext.getBarbelClock().useFixedClockAt(now);
 		RecordPeriod period = RecordPeriod.createActive(BarbelHistoBuilder.barbel());
-		assertEquals(period.getCreatedAt(), ZonedDateTime.of(now, ZoneId.systemDefault()));
+		assertEquals(period.getCreatedAt(), now);
 		assertEquals(BarbelHistoBuilder.SYSTEM, period.getCreatedBy());
 		assertEquals(RecordPeriod.NOT_INACTIVATED, period.getInactivatedAt());
 		assertEquals(RecordPeriod.NOBODY, period.getInactivatedBy());
@@ -44,7 +44,7 @@ public class RecordPeriodTest {
 
 	@Test
 	public void testEquals() throws Exception {
-		LocalDateTime now = LocalDateTime.now();
+		ZonedDateTime now = LocalDateTime.now().atZone(ZoneId.of("Z"));
 		BarbelHistoContext.getBarbelClock().useFixedClockAt(now);
 		RecordPeriod period1 = RecordPeriod.createActive(BarbelHistoBuilder.barbel());
 		RecordPeriod period2 = RecordPeriod.createActive(BarbelHistoBuilder.barbel());

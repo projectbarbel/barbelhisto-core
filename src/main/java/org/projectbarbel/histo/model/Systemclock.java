@@ -1,7 +1,6 @@
 package org.projectbarbel.histo.model;
 
 import java.time.Clock;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -25,12 +24,8 @@ public class Systemclock {
         return ZonedDateTime.now(clock);
     }
 
-    public LocalDate today() {
-        return ZonedDateTime.now(clock).toLocalDate();
-    }
-
-    public Systemclock useFixedClockAt(LocalDateTime date) {
-        clock = Clock.fixed(date.atZone(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault());
+    public Systemclock useFixedClockAt(ZonedDateTime time) {
+        clock = Clock.fixed(time.toInstant(),time.getZone());
         return this;
     }
 

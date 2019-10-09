@@ -3,8 +3,9 @@ package org.projectbarbel.histo.functions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.AfterAll;
@@ -26,8 +27,8 @@ public class BarbelQueries_effectiveBetween {
     @BeforeEach
     public void setUp() {
         journal = BarbelTestHelper.generateJournalOfDefaultDocuments("docid1",
-                Arrays.asList(LocalDate.of(2010, 12, 1), LocalDate.of(2017, 12, 1), LocalDate.of(2020, 1, 1)));
-        BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 8, 0, 0));
+                Arrays.asList(ZonedDateTime.parse("2010-12-01T00:00:00Z"), ZonedDateTime.parse("2017-12-01T00:00:00Z"), ZonedDateTime.parse("2020-01-01T00:00:00Z")));
+        BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 8, 0, 0).atZone(ZoneId.of("Z")));
     }
 
     @AfterAll
@@ -38,16 +39,16 @@ public class BarbelQueries_effectiveBetween {
     @Test
     public void testApply_threeRecord_onePeriodBetween() throws Exception {
         ResultSet<DefaultDocument> documents = journal.retrieve(BarbelQueries.effectiveBetween("docid1",
-                EffectivePeriod.of(LocalDate.of(2010, 12, 2), LocalDate.of(2020, 1, 2))));
+                EffectivePeriod.of(ZonedDateTime.parse("2010-12-02T00:00:00Z"), ZonedDateTime.parse("2020-01-02T00:00:00Z"))));
         assertTrue(documents.size() == 1);
         assertEquals(documents.iterator().next().getBitemporalStamp().getEffectiveTime().from(),
-                LocalDate.of(2017, 12, 1));
+                ZonedDateTime.parse("2017-12-01T00:00:00Z"));
     }
 
     @Test
     public void testApply_threeRecord_allBetween() throws Exception {
         ResultSet<DefaultDocument> documents = journal.retrieve(BarbelQueries.effectiveBetween("docid1",
-                EffectivePeriod.of(LocalDate.of(2010, 11, 1), BarbelHistoContext.getInfiniteDate())));
+                EffectivePeriod.of(ZonedDateTime.parse("2010-11-01T00:00:00Z"), EffectivePeriod.INFINITE)));
         assertTrue(documents.size() == 3);
     }
 

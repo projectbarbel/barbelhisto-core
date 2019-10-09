@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -47,7 +46,7 @@ public class BarbelHistoCore_JournalUpdate_SuiteTest {
 
     @BeforeAll
     public static void beforeAll() {
-        BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 10, 0));
+        BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 10, 0).atZone(ZoneId.of("Z")));
     }
 
     @AfterAll
@@ -69,8 +68,8 @@ public class BarbelHistoCore_JournalUpdate_SuiteTest {
         DocumentJournal journal = DocumentJournal.create(ProcessingState.INTERNAL, context,
                 BarbelTestHelper.generateJournalOfManagedDefaultPojos(
                         BTExecutionContext.INSTANCE.barbel(DefaultDocument.class), "someId",
-                        Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1),
-                                LocalDate.of(2019, 1, 1))),
+                        Arrays.asList(ZonedDateTime.parse("2016-01-01T00:00:00Z"), ZonedDateTime.parse("2017-01-01T00:00:00Z"), ZonedDateTime.parse("2018-01-01T00:00:00Z"),
+                                ZonedDateTime.parse("2019-01-01T00:00:00Z"))),
                 "someId");
         assertThrows(IllegalArgumentException.class,
                 () -> new EmbeddingJournalUpdateStrategy(context).accept(journal, bitemporal));
@@ -87,63 +86,83 @@ public class BarbelHistoCore_JournalUpdate_SuiteTest {
         return Stream.of(
                 // A     |------------------|------------------|------------------|----------> Infinite
                 // U |-----------|
-                Arguments.of(LocalDate.of(2015, 7, 1), LocalDate.of(2016, 7, 1), JournalUpdateCase.PREOVERLAPPING, 2,
-                        Arrays.asList(LocalDate.of(2015, 7, 1), LocalDate.of(2016, 7, 1), LocalDate.of(2016, 7, 1),
-                                LocalDate.of(2017, 1, 1)),
-                        1, Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1))),
+                Arguments.of(ZonedDateTime.parse("2015-07-01T00:00:00Z"), ZonedDateTime.parse("2016-07-01T00:00:00Z"), JournalUpdateCase.PREOVERLAPPING, 2,
+                        Arrays.asList(ZonedDateTime.parse("2015-07-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2016-07-01T00:00:00Z"), ZonedDateTime.parse("2016-07-01T00:00:00Z"),
+                                ZonedDateTime.parse("2017-01-01T00:00:00Z")),
+                        1, Arrays.asList(ZonedDateTime.parse("2016-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2017-01-01T00:00:00Z"))),
 
                 //     A |------------------|------------------|------------------|--------------------->
                 //                                                                   U |---------------->
-                Arguments.of(LocalDate.of(2019, 1, 25), LocalDate.MAX, JournalUpdateCase.POSTOVERLAPPING, 2,
-                        Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 25), LocalDate.of(2019, 1, 25),
-                                LocalDate.MAX),
-                        1, Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.MAX)),
+                Arguments.of(ZonedDateTime.parse("2019-01-25T00:00:00Z"), EffectivePeriod.INFINITE, JournalUpdateCase.POSTOVERLAPPING, 2,
+                        Arrays.asList(ZonedDateTime.parse("2019-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2019-01-25T00:00:00Z"), ZonedDateTime.parse("2019-01-25T00:00:00Z"),
+                                EffectivePeriod.INFINITE),
+                        1, Arrays.asList(ZonedDateTime.parse("2019-01-01T00:00:00Z"), EffectivePeriod.INFINITE)),
                 //     A |------------------|------------------|------------------|---------->
                 //                                                    U |------|
-                Arguments.of(LocalDate.of(2018, 7, 1), LocalDate.of(2018, 10, 1), JournalUpdateCase.EMBEDDEDINTERVAL, 3,
-                        Arrays.asList(LocalDate.of(2018, 1, 1), LocalDate.of(2018, 7, 1), LocalDate.of(2018, 7, 1),
-                                LocalDate.of(2018, 10, 1), LocalDate.of(2018, 10, 1), LocalDate.of(2019, 1, 1)),
-                        1, Arrays.asList(LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))),
+                Arguments.of(ZonedDateTime.parse("2018-07-01T00:00:00Z"), ZonedDateTime.parse("2018-10-01T00:00:00Z"), JournalUpdateCase.EMBEDDEDINTERVAL, 3,
+                        Arrays.asList(ZonedDateTime.parse("2018-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2018-07-01T00:00:00Z"), ZonedDateTime.parse("2018-07-01T00:00:00Z"),
+                                ZonedDateTime.parse("2018-10-01T00:00:00Z"), ZonedDateTime.parse(
+                                        "2018-10-01T00:00:00Z"), ZonedDateTime.parse("2019-01-01T00:00:00Z")),
+                        1, Arrays.asList(ZonedDateTime.parse("2018-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2019-01-01T00:00:00Z"))),
                 //     A |------------------|------------------|------------------|---------->
                 //                                      U |--------|
-                Arguments.of(LocalDate.of(2017, 10, 1), LocalDate.of(2018, 3, 1), JournalUpdateCase.EMBEDDEDOVERLAP, 3,
-                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2017, 10, 1), LocalDate.of(2017, 10, 1),
-                                LocalDate.of(2018, 3, 1), LocalDate.of(2018, 3, 1), LocalDate.of(2019, 1, 1)),
+                Arguments.of(ZonedDateTime.parse("2017-10-01T00:00:00Z"), ZonedDateTime.parse("2018-03-01T00:00:00Z"), JournalUpdateCase.EMBEDDEDOVERLAP, 3,
+                        Arrays.asList(ZonedDateTime.parse("2017-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2017-10-01T00:00:00Z"), ZonedDateTime.parse("2017-10-01T00:00:00Z"),
+                                ZonedDateTime.parse("2018-03-01T00:00:00Z"), ZonedDateTime.parse(
+                                        "2018-03-01T00:00:00Z"), ZonedDateTime.parse("2019-01-01T00:00:00Z")),
                         2,
-                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2018, 1, 1),
-                                LocalDate.of(2019, 1, 1))),
+                        Arrays.asList(ZonedDateTime.parse("2017-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2018-01-01T00:00:00Z"), ZonedDateTime.parse("2018-01-01T00:00:00Z"),
+                                ZonedDateTime.parse("2019-01-01T00:00:00Z"))),
                 //     A |------------------|------------------|------------------|--------------> Infinite
                 // U |---------------------------------------------------------------------------> Infinite
-                Arguments.of(LocalDate.of(2015, 10, 1), LocalDate.MAX, JournalUpdateCase.OVERLAY, 1,
-                        Arrays.asList(LocalDate.of(2015, 10, 1), LocalDate.MAX), 4,
-                        Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2017, 1, 1),
-                                LocalDate.of(2018, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1),
-                                LocalDate.of(2019, 1, 1), LocalDate.MAX)),
+                Arguments.of(ZonedDateTime.parse("2015-10-01T00:00:00Z"), EffectivePeriod.INFINITE, JournalUpdateCase.OVERLAY, 1,
+                        Arrays.asList(ZonedDateTime.parse("2015-10-01T00:00:00Z"), EffectivePeriod.INFINITE), 4,
+                        Arrays.asList(ZonedDateTime.parse("2016-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2017-01-01T00:00:00Z"), ZonedDateTime.parse("2017-01-01T00:00:00Z"),
+                                ZonedDateTime.parse("2018-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                        "2018-01-01T00:00:00Z"), ZonedDateTime.parse("2019-01-01T00:00:00Z"),
+                                ZonedDateTime.parse("2019-01-01T00:00:00Z"), EffectivePeriod.INFINITE)),
                 //    A |------------------|------------------|------------------|---------->
                 //             U |--------------------------------------|
-                Arguments.of(LocalDate.of(2016, 7, 1), LocalDate.of(2018, 7, 1), JournalUpdateCase.EMBEDDEDOVERLAY, 3,
-                        Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2016, 7, 1), LocalDate.of(2016, 7, 1),
-                                LocalDate.of(2018, 7, 1), LocalDate.of(2018, 7, 1), LocalDate.of(2019, 1, 1)),
+                Arguments.of(ZonedDateTime.parse("2016-07-01T00:00:00Z"), ZonedDateTime.parse("2018-07-01T00:00:00Z"), JournalUpdateCase.EMBEDDEDOVERLAY, 3,
+                        Arrays.asList(ZonedDateTime.parse("2016-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2016-07-01T00:00:00Z"), ZonedDateTime.parse("2016-07-01T00:00:00Z"),
+                                ZonedDateTime.parse("2018-07-01T00:00:00Z"), ZonedDateTime.parse(
+                                        "2018-07-01T00:00:00Z"), ZonedDateTime.parse("2019-01-01T00:00:00Z")),
                         3,
-                        Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2017, 1, 1),
-                                LocalDate.of(2018, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))),
+                        Arrays.asList(ZonedDateTime.parse("2016-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2017-01-01T00:00:00Z"), ZonedDateTime.parse("2017-01-01T00:00:00Z"),
+                                ZonedDateTime.parse("2018-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                        "2018-01-01T00:00:00Z"), ZonedDateTime.parse("2019-01-01T00:00:00Z"))),
                 //   A |------------------|------------------|------------------|---------->
                 //                                                U|----------------------->
-                Arguments.of(LocalDate.of(2018, 7, 1), LocalDate.MAX, JournalUpdateCase.POSTOVERLAPPING_OVERLAY, 2,
-                        Arrays.asList(LocalDate.of(2018, 1, 1), LocalDate.of(2018, 7, 1), LocalDate.of(2018, 7, 1),
-                                LocalDate.MAX),
+                Arguments.of(ZonedDateTime.parse("2018-07-01T00:00:00Z"), EffectivePeriod.INFINITE, JournalUpdateCase.POSTOVERLAPPING_OVERLAY, 2,
+                        Arrays.asList(ZonedDateTime.parse("2018-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2018-07-01T00:00:00Z"), ZonedDateTime.parse("2018-07-01T00:00:00Z"),
+                                EffectivePeriod.INFINITE),
                         2,
-                        Arrays.asList(LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 1),
-                                LocalDate.MAX)),
+                        Arrays.asList(ZonedDateTime.parse("2018-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2019-01-01T00:00:00Z"), ZonedDateTime.parse("2019-01-01T00:00:00Z"),
+                                EffectivePeriod.INFINITE)),
                 //   A |------------------|------------------|------------------|---------->
                 // U |------------------------------|
-                Arguments.of(LocalDate.of(2015, 10, 1), LocalDate.of(2017, 3, 1),
+                Arguments.of(ZonedDateTime.parse("2015-10-01T00:00:00Z"), ZonedDateTime.parse("2017-03-01T00:00:00Z"),
                         JournalUpdateCase.PREOVERLAPPING_OVERLAY, 2,
-                        Arrays.asList(LocalDate.of(2015, 10, 1), LocalDate.of(2017, 3, 1), LocalDate.of(2017, 3, 1),
-                                LocalDate.of(2018, 1, 1), LocalDate.of(2018, 3, 1), LocalDate.of(2019, 1, 1),
-                                LocalDate.of(2019, 1, 1), LocalDate.MAX),
-                        2, Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2017, 1, 1),
-                                LocalDate.of(2018, 1, 1))));
+                        Arrays.asList(ZonedDateTime.parse("2015-10-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2017-03-01T00:00:00Z"), ZonedDateTime.parse("2017-03-01T00:00:00Z"),
+                                ZonedDateTime.parse("2018-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                        "2018-03-01T00:00:00Z"), ZonedDateTime.parse("2019-01-01T00:00:00Z"),
+                                ZonedDateTime.parse("2019-01-01T00:00:00Z"), EffectivePeriod.INFINITE),
+                        2, Arrays.asList(ZonedDateTime.parse("2016-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2017-01-01T00:00:00Z"), ZonedDateTime.parse("2017-01-01T00:00:00Z"),
+                                ZonedDateTime.parse("2018-01-01T00:00:00Z"))));
 
     }
     // @formatter:on
@@ -158,39 +177,50 @@ public class BarbelHistoCore_JournalUpdate_SuiteTest {
         return Stream.of(
                 //    A |------------------|------------------|------------------|---------->
                 // U|---|
-                Arguments.of(LocalDate.of(2015, 7, 1), LocalDate.of(2016, 1, 1), JournalUpdateCase.STRAIGHTINSERT, 1,
-                        Arrays.asList(LocalDate.of(2015, 7, 1), LocalDate.of(2016, 1, 1)), 0, Arrays.asList()),
+                Arguments.of(ZonedDateTime.parse("2015-07-01T00:00:00Z"), ZonedDateTime.parse("2016-01-01T00:00:00Z"), JournalUpdateCase.STRAIGHTINSERT, 1,
+                        Arrays.asList(ZonedDateTime.parse("2015-07-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2016-01-01T00:00:00Z")), 0, Arrays.asList()),
 
                 //    A |------------------|------------------|------------------|----------------------------->
                 //                                                                   U |-------|
-                Arguments.of(LocalDate.of(2019, 7, 1), LocalDate.of(2019, 8, 1), JournalUpdateCase.EMBEDDEDINTERVAL, 3,
-                        Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 7, 1), LocalDate.of(2019, 7, 1),
-                                LocalDate.of(2019, 8, 1), LocalDate.of(2019, 8, 1), LocalDate.MAX),
-                        1, Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.MAX)),
+                Arguments.of(ZonedDateTime.parse("2019-07-01T00:00:00Z"), ZonedDateTime.parse("2019-08-01T00:00:00Z"), JournalUpdateCase.EMBEDDEDINTERVAL, 3,
+                        Arrays.asList(ZonedDateTime.parse("2019-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2019-07-01T00:00:00Z"), ZonedDateTime.parse("2019-07-01T00:00:00Z"),
+                                ZonedDateTime.parse("2019-08-01T00:00:00Z"), ZonedDateTime.parse(
+                                        "2019-08-01T00:00:00Z"), EffectivePeriod.INFINITE),
+                        1, Arrays.asList(ZonedDateTime.parse("2019-01-01T00:00:00Z"), EffectivePeriod.INFINITE)),
                 //    A |------------------|------------------|------------------|---------->
                 //                       U |------------------|
-                Arguments.of(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), JournalUpdateCase.EMBEDDEDINTERVAL, 1,
-                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1)), 1,
-                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1))),
+                Arguments.of(ZonedDateTime.parse("2017-01-01T00:00:00Z"), ZonedDateTime.parse("2018-01-01T00:00:00Z"), JournalUpdateCase.EMBEDDEDINTERVAL, 1,
+                        Arrays.asList(ZonedDateTime.parse("2017-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2018-01-01T00:00:00Z")), 1,
+                        Arrays.asList(ZonedDateTime.parse("2017-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2018-01-01T00:00:00Z"))),
                 //    A |------------------|------------------|------------------|---------->
                 //                       U |--------------|
-                Arguments.of(LocalDate.of(2017, 1, 1), LocalDate.of(2017, 10, 1), JournalUpdateCase.EMBEDDEDINTERVAL, 2,
-                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2017, 10, 1), LocalDate.of(2017, 10, 1),
-                                LocalDate.of(2018, 1, 1)),
-                        1, Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1))),
+                Arguments.of(ZonedDateTime.parse("2017-01-01T00:00:00Z"), ZonedDateTime.parse("2017-10-01T00:00:00Z"), JournalUpdateCase.EMBEDDEDINTERVAL, 2,
+                        Arrays.asList(ZonedDateTime.parse("2017-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2017-10-01T00:00:00Z"), ZonedDateTime.parse("2017-10-01T00:00:00Z"),
+                                ZonedDateTime.parse("2018-01-01T00:00:00Z")),
+                        1, Arrays.asList(ZonedDateTime.parse("2017-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2018-01-01T00:00:00Z"))),
                 //    A |------------------|------------------|------------------|---------->
                 //                       U |-------------------------------------|
-                Arguments.of(LocalDate.of(2017, 1, 1), LocalDate.of(2019, 1, 1), JournalUpdateCase.EMBEDDEDOVERLAY, 1,
-                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2019, 1, 1)), 2,
-                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2018, 1, 1),
-                                LocalDate.of(2019, 1, 1))),
+                Arguments.of(ZonedDateTime.parse("2017-01-01T00:00:00Z"), ZonedDateTime.parse("2019-01-01T00:00:00Z"), JournalUpdateCase.EMBEDDEDOVERLAY, 1,
+                        Arrays.asList(ZonedDateTime.parse("2017-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2019-01-01T00:00:00Z")), 2,
+                        Arrays.asList(ZonedDateTime.parse("2017-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2018-01-01T00:00:00Z"), ZonedDateTime.parse("2018-01-01T00:00:00Z"),
+                                ZonedDateTime.parse("2019-01-01T00:00:00Z"))),
                 //    A |------------------|------------------|------------------|------------>
                 //    U |--------------------------------------------------------------------->
-                Arguments.of(LocalDate.of(2016, 1, 1), LocalDate.MAX, JournalUpdateCase.POSTOVERLAPPING_OVERLAY, 1,
-                        Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.MAX), 4,
-                        Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2017, 1, 1),
-                                LocalDate.of(2018, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1),
-                                LocalDate.of(2019, 1, 1), LocalDate.MAX)));
+                Arguments.of(ZonedDateTime.parse("2016-01-01T00:00:00Z"), EffectivePeriod.INFINITE, JournalUpdateCase.POSTOVERLAPPING_OVERLAY, 1,
+                        Arrays.asList(ZonedDateTime.parse("2016-01-01T00:00:00Z"), EffectivePeriod.INFINITE), 4,
+                        Arrays.asList(ZonedDateTime.parse("2016-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2017-01-01T00:00:00Z"), ZonedDateTime.parse("2017-01-01T00:00:00Z"),
+                                ZonedDateTime.parse("2018-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                        "2018-01-01T00:00:00Z"), ZonedDateTime.parse("2019-01-01T00:00:00Z"),
+                                ZonedDateTime.parse("2019-01-01T00:00:00Z"), EffectivePeriod.INFINITE)));
     }
 
     // @formatter:on
@@ -205,9 +235,11 @@ public class BarbelHistoCore_JournalUpdate_SuiteTest {
         return Stream.of(
                 // A |------------------|------------------|------------------|---------->
                 // U |------------------|
-                Arguments.of(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), JournalUpdateCase.EMBEDDEDINTERVAL, 1,
-                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1)), 1,
-                        Arrays.asList(LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1))));
+                Arguments.of(ZonedDateTime.parse("2017-01-01T00:00:00Z"), ZonedDateTime.parse("2018-01-01T00:00:00Z"), JournalUpdateCase.EMBEDDEDINTERVAL, 1,
+                        Arrays.asList(ZonedDateTime.parse("2017-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2018-01-01T00:00:00Z")), 1,
+                        Arrays.asList(ZonedDateTime.parse("2017-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2018-01-01T00:00:00Z"))));
 
     }
     // @formatter:on
@@ -215,17 +247,17 @@ public class BarbelHistoCore_JournalUpdate_SuiteTest {
     @SuppressWarnings("unchecked")
     @ParameterizedTest
     @MethodSource({ "createJournalUpdateCases", "createJournalEdgeCases" })
-    public void testCoreSave_Pojo(LocalDate updateFrom, LocalDate updateUntil, JournalUpdateCase updateCase,
-            int countOfNewVersions, List<LocalDate> activeEffective, int inactiveCount,
-            List<LocalDate> inactiveEffective) throws Exception {
+    public void testCoreSave_Pojo(ZonedDateTime updateFrom, ZonedDateTime updateUntil, JournalUpdateCase updateCase,
+            int countOfNewVersions, List<ZonedDateTime> activeEffective, int inactiveCount,
+            List<ZonedDateTime> inactiveEffective) throws Exception {
         BarbelHistoContext context = BTExecutionContext.INSTANCE.barbel(DefaultPojo.class).withMode(BarbelMode.POJO)
                 .withUser("testUser");
         BarbelHisto<DefaultPojo> core = ((BarbelHistoBuilder) context).build();
         DefaultPojo pojo = new DefaultPojo("someId", "some initial");
-        core.save(pojo, LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1));
-        core.save(pojo, LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1));
-        core.save(pojo, LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1));
-        core.save(pojo, LocalDate.of(2019, 1, 1), LocalDate.MAX);
+        core.save(pojo, ZonedDateTime.parse("2016-01-01T00:00:00Z"), ZonedDateTime.parse("2017-01-01T00:00:00Z"));
+        core.save(pojo, ZonedDateTime.parse("2017-01-01T00:00:00Z"), ZonedDateTime.parse("2018-01-01T00:00:00Z"));
+        core.save(pojo, ZonedDateTime.parse("2018-01-01T00:00:00Z"), ZonedDateTime.parse("2019-01-01T00:00:00Z"));
+        core.save(pojo, ZonedDateTime.parse("2019-01-01T00:00:00Z"), EffectivePeriod.INFINITE);
         DefaultPojo update = new DefaultPojo();
         update.setDocumentId("someId");
         update.setData("some data");
@@ -242,17 +274,17 @@ public class BarbelHistoCore_JournalUpdate_SuiteTest {
 
     @ParameterizedTest
     @MethodSource({ "createJournalUpdateCases", "createJournalEdgeCases" })
-    public void testCoreSave_Bitemporal(LocalDate updateFrom, LocalDate updateUntil, JournalUpdateCase updateCase,
-            int countOfNewVersions, List<LocalDate> activeEffective, int inactiveCount,
-            List<LocalDate> inactiveEffective) throws Exception {
+    public void testCoreSave_Bitemporal(ZonedDateTime updateFrom, ZonedDateTime updateUntil, JournalUpdateCase updateCase,
+            int countOfNewVersions, List<ZonedDateTime> activeEffective, int inactiveCount,
+            List<ZonedDateTime> inactiveEffective) throws Exception {
         BarbelHistoContext context = BTExecutionContext.INSTANCE.barbel(DefaultDocument.class)
                 .withMode(BarbelMode.BITEMPORAL).withUser("testUser");
         BarbelHisto<DefaultDocument> core = ((BarbelHistoBuilder) context).build();
         DefaultDocument pojo = new DefaultDocument("someId", BitemporalStamp.createActive(), "some initial");
-        core.save(pojo, LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1));
-        core.save(pojo, LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1));
-        core.save(pojo, LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1));
-        core.save(pojo, LocalDate.of(2019, 1, 1), LocalDate.MAX);
+        core.save(pojo, ZonedDateTime.parse("2016-01-01T00:00:00Z"), ZonedDateTime.parse("2017-01-01T00:00:00Z"));
+        core.save(pojo, ZonedDateTime.parse("2017-01-01T00:00:00Z"), ZonedDateTime.parse("2018-01-01T00:00:00Z"));
+        core.save(pojo, ZonedDateTime.parse("2018-01-01T00:00:00Z"), ZonedDateTime.parse("2019-01-01T00:00:00Z"));
+        core.save(pojo, ZonedDateTime.parse("2019-01-01T00:00:00Z"), EffectivePeriod.INFINITE);
         DefaultDocument update = new DefaultDocument();
         update.setData("some data");
         update.setId("someId");
@@ -267,15 +299,16 @@ public class BarbelHistoCore_JournalUpdate_SuiteTest {
 
     @ParameterizedTest
     @MethodSource({ "createJournalUpdateCases", "createJournalEdgeCases" })
-    public void testFunctionAccept_Pojo(LocalDate updateFrom, LocalDate updateUntil, JournalUpdateCase updateCase,
-            int countOfNewVersions, List<LocalDate> activeEffective, int inactiveCount,
-            List<LocalDate> inactiveEffective) throws Exception {
+    public void testFunctionAccept_Pojo(ZonedDateTime updateFrom, ZonedDateTime updateUntil, JournalUpdateCase updateCase,
+            int countOfNewVersions, List<ZonedDateTime> activeEffective, int inactiveCount,
+            List<ZonedDateTime> inactiveEffective) throws Exception {
         context = BTExecutionContext.INSTANCE.barbel(DefaultPojo.class).withMode(BarbelMode.POJO).withUser("testUser");
         DocumentJournal journal = DocumentJournal.create(ProcessingState.INTERNAL, context,
                 BarbelTestHelper.generateJournalOfManagedDefaultPojos(
                         BTExecutionContext.INSTANCE.barbel(DefaultPojo.class), "someId",
-                        Arrays.asList(LocalDate.of(2016, 1, 1), LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1),
-                                LocalDate.of(2019, 1, 1))),
+                        Arrays.asList(ZonedDateTime.parse("2016-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2017-01-01T00:00:00Z"), ZonedDateTime.parse("2018-01-01T00:00:00Z"),
+                                ZonedDateTime.parse("2019-01-01T00:00:00Z"))),
                 "someId");
         UpdateReturn updatReturn = performUpdate_Pojo(updateFrom, updateUntil, journal);
         assertTrue(updatReturn.newVersions.size() == countOfNewVersions);
@@ -286,14 +319,16 @@ public class BarbelHistoCore_JournalUpdate_SuiteTest {
 
     @ParameterizedTest
     @MethodSource({ "createJournalUpdateCases", "createJournalEdgeCases" })
-    public void testFunctionAccept_Bitemporal(LocalDate updateFrom, LocalDate updateUntil, JournalUpdateCase updateCase,
-            int countOfNewVersions, List<LocalDate> activeEffective, int inactiveCount,
-            List<LocalDate> inactiveEffective) throws Exception {
+    public void testFunctionAccept_Bitemporal(ZonedDateTime updateFrom, ZonedDateTime updateUntil, JournalUpdateCase updateCase,
+            int countOfNewVersions, List<ZonedDateTime> activeEffective, int inactiveCount,
+            List<ZonedDateTime> inactiveEffective) throws Exception {
         context = BTExecutionContext.INSTANCE.barbel(DefaultDocument.class).withMode(BarbelMode.BITEMPORAL)
                 .withUser("testUser");
         DocumentJournal journal = DocumentJournal.create(ProcessingState.INTERNAL, context,
-                BarbelTestHelper.generateJournalOfDefaultDocuments("someId", Arrays.asList(LocalDate.of(2016, 1, 1),
-                        LocalDate.of(2017, 1, 1), LocalDate.of(2018, 1, 1), LocalDate.of(2019, 1, 1))),
+                BarbelTestHelper.generateJournalOfDefaultDocuments("someId", Arrays.asList(
+                        ZonedDateTime.parse("2016-01-01T00:00:00Z"),
+                        ZonedDateTime.parse("2017-01-01T00:00:00Z"), ZonedDateTime.parse("2018-01-01T00:00:00Z"), ZonedDateTime.parse(
+                                "2019-01-01T00:00:00Z"))),
                 "someId");
         UpdateReturn updatReturn = performUpdate_Bitemporal(updateFrom, updateUntil, journal);
         assertTrue(updatReturn.newVersions.size() == countOfNewVersions);
@@ -302,7 +337,7 @@ public class BarbelHistoCore_JournalUpdate_SuiteTest {
         assertInactivatedVersions(inactiveCount, inactiveEffective, journal.read().inactiveVersions());
     }
 
-    private void assertInactivatedVersions(int inactiveCount, List<LocalDate> inactiveEffective,
+    private void assertInactivatedVersions(int inactiveCount, List<ZonedDateTime> inactiveEffective,
             List<? extends Bitemporal> inactivatedVersions) {
         assertEquals(inactiveCount, inactivatedVersions.size());
         for (int i = 0; i < inactivatedVersions.size(); i++) {
@@ -311,7 +346,7 @@ public class BarbelHistoCore_JournalUpdate_SuiteTest {
         }
     }
 
-    private UpdateReturn performUpdate_Pojo(LocalDate from, LocalDate until, DocumentJournal journal) {
+    private UpdateReturn performUpdate_Pojo(ZonedDateTime from, ZonedDateTime until, DocumentJournal journal) {
         DefaultPojo update = new DefaultPojo();
         update.setDocumentId("someId");
         update.setData("some data");
@@ -322,7 +357,7 @@ public class BarbelHistoCore_JournalUpdate_SuiteTest {
         return new UpdateReturn(journal.getLastInserts(), bitemporal, updateStrategy);
     }
 
-    private UpdateReturn performUpdate_Bitemporal(LocalDate from, LocalDate until, DocumentJournal journal) {
+    private UpdateReturn performUpdate_Bitemporal(ZonedDateTime from, ZonedDateTime until, DocumentJournal journal) {
         DefaultDocument doc = new DefaultDocument();
         Bitemporal bitemporal = BarbelMode.BITEMPORAL.snapshotMaiden(context, doc,
                 BitemporalStamp.createActive(context, "someId", EffectivePeriod.of(from, until)));
@@ -334,7 +369,7 @@ public class BarbelHistoCore_JournalUpdate_SuiteTest {
     }
 
     private void assertNewVersions(Bitemporal insertedBitemporal, List<? extends Bitemporal> newVersions,
-            List<LocalDate> activeEffective) {
+            List<ZonedDateTime> activeEffective) {
 
         for (int i = 0; i < newVersions.size(); i++) {
             assertEquals(activeEffective.get(i * 2), newVersions.get(i).getBitemporalStamp().getEffectiveTime().from());
@@ -353,7 +388,7 @@ public class BarbelHistoCore_JournalUpdate_SuiteTest {
 
     }
 
-    private void assertInactivatedVersion(Bitemporal inactivated, LocalDate from, LocalDate until) {
+    private void assertInactivatedVersion(Bitemporal inactivated, ZonedDateTime from, ZonedDateTime until) {
 
         assertEquals(from, inactivated.getBitemporalStamp().getEffectiveTime().from());
         assertEquals(until, inactivated.getBitemporalStamp().getEffectiveTime().until());

@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
@@ -72,16 +72,16 @@ public class BarbelModeTest {
 				BarbelMode.POJO
 						.managedBitemporalToPersistenceObjects("some",
 								BarbelTestHelper.generateJournalOfManagedDefaultPojos(BarbelHistoBuilder.barbel(),"some",
-										Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 3, 1))))
+										Arrays.asList(ZonedDateTime.parse("2019-01-01T00:00:00Z"), ZonedDateTime.parse("2019-03-01T00:00:00Z"))))
 						.size() == 2);
 	}
 
 	@Test
 	public void testManagedBitemporalToCustomPersistenceObjectsTwoJournals() throws Exception {
 		IndexedCollection<Object> bitemporals = BarbelTestHelper.generateJournalOfManagedDefaultPojos(BarbelHistoBuilder.barbel(),"some",
-				Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 3, 1)));
+				Arrays.asList(ZonedDateTime.parse("2019-01-01T00:00:00Z"), ZonedDateTime.parse("2019-03-01T00:00:00Z")));
 		bitemporals.addAll(BarbelTestHelper.generateJournalOfManagedDefaultPojos(BarbelHistoBuilder.barbel(),"other",
-				Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 3, 1))));
+				Arrays.asList(ZonedDateTime.parse("2019-01-01T00:00:00Z"), ZonedDateTime.parse("2019-03-01T00:00:00Z"))));
 		assertTrue(BarbelMode.POJO.managedBitemporalToPersistenceObjects("some", bitemporals).size() == 2);
 	}
 
@@ -175,7 +175,7 @@ public class BarbelModeTest {
         Bitemporal doc = BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(), pojo, stamp);
         assertEquals(new BitemporalVersion(stamp, pojo), BarbelMode.POJO.managedBitemporalToPersistenceObject(doc));
     }
-    
+
 	@Test
 	public void testSnapshotManagedBitemporal_BitemporalMode() throws Exception {
 		Bitemporal managed = BarbelMode.BITEMPORAL.snapshotMaiden(BarbelHistoBuilder.barbel(),
@@ -215,19 +215,19 @@ public class BarbelModeTest {
 				BarbelMode.BITEMPORAL
 						.managedBitemporalToPersistenceObjects("some",
 								BarbelTestHelper.generateJournalOfManagedDefaultPojos(BarbelHistoBuilder.barbel(), "some",
-										Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 3, 1))))
+										Arrays.asList(ZonedDateTime.parse("2019-01-01T00:00:00Z"), ZonedDateTime.parse("2019-03-01T00:00:00Z"))))
 						.size() == 2);
 	}
 
 	@Test
 	public void testManagedBitemporalToCustomPersistenceObjectsTwoJournals_BitemporalMode() throws Exception {
 		IndexedCollection<Object> bitemporals = BarbelTestHelper.generateJournalOfDefaultDocuments("some",
-				Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 3, 1)));
+				Arrays.asList(ZonedDateTime.parse("2019-01-01T00:00:00Z"), ZonedDateTime.parse("2019-03-01T00:00:00Z")));
 		bitemporals.addAll(BarbelTestHelper.generateJournalOfDefaultDocuments("other",
-				Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 3, 1))));
+				Arrays.asList(ZonedDateTime.parse("2019-01-01T00:00:00Z"), ZonedDateTime.parse("2019-03-01T00:00:00Z"))));
 		assertTrue(BarbelMode.BITEMPORAL.managedBitemporalToPersistenceObjects("some", bitemporals).size() == 2);
 	}
-	
+
 	@Test
 	public void testCustomPersistenceObjectsToManagedBitemporals_BitemporalMode() throws Exception {
 		assertTrue(BarbelMode.BITEMPORAL.persistenceObjectsToManagedBitemporals(BarbelHistoBuilder.barbel(),

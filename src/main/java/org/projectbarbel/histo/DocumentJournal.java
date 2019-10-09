@@ -4,7 +4,7 @@ import static com.googlecode.cqengine.query.QueryFactory.ascending;
 import static com.googlecode.cqengine.query.QueryFactory.orderBy;
 import static com.googlecode.cqengine.query.QueryFactory.queryOptions;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -328,25 +328,25 @@ public final class DocumentJournal {
         }
 
         @SuppressWarnings("unchecked")
-        public <O> Optional<O> effectiveAt(LocalDate day) {
+        public <O> Optional<O> effectiveAt(ZonedDateTime time) {
             return journal.journal
-                    .retrieve(BarbelQueries.effectiveAt(journal.id, day),
+                    .retrieve(BarbelQueries.effectiveAt(journal.id, time),
                             queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM))))
                     .stream().map(d -> journal.processingState.expose(journal.context, (Bitemporal) d)).findFirst()
                     .flatMap(o -> Optional.of((Bitemporal) o));
         }
 
         /**
-         * The active versions after the given date. If due date is set to today, the
+         * The active versions after the given time. If due time is set to now, the
          * query returns all the future versions that will become effective.
          * 
-         * @param day the due date
+         * @param time the due time
          * @return the active versions
          */
         @SuppressWarnings("unchecked")
-        public <O> List<O> effectiveAfter(LocalDate day) {
+        public <O> List<O> effectiveAfter(ZonedDateTime time) {
             return (List<O>) journal.journal
-                    .retrieve(BarbelQueries.effectiveAfter(journal.id, day),
+                    .retrieve(BarbelQueries.effectiveAfter(journal.id, time),
                             queryOptions(orderBy(ascending(BarbelQueries.EFFECTIVE_FROM))))
                     .stream().map(d -> journal.processingState.expose(journal.context, (Bitemporal) d))
                     .collect(Collectors.toList());

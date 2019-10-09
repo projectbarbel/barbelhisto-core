@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 
-import java.time.LocalDate;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -42,7 +41,7 @@ public class BarbelHistoCore_PojoVariants_SuiteTest {
     public void setUp() {
         BTExecutionContext.INSTANCE.clearResources();
     }
-    
+
     @SuppressWarnings("unused")
     private static Stream<Arguments> createPojos() {
         return Stream.of(Arguments.of(EnhancedRandom.random(PrimitivePrivatePojo.class)),
@@ -63,7 +62,7 @@ public class BarbelHistoCore_PojoVariants_SuiteTest {
     @MethodSource("createPojos")
     public <T> void testSave(T pojo) {
         BarbelHisto<T> core = BTExecutionContext.INSTANCE.barbel(pojo.getClass()).build();
-        core.save(pojo, LocalDate.now(), LocalDate.MAX);
+        core.save(pojo);
         assertEquals(1, core.retrieve(BarbelQueries.all()).stream().count());
         Bitemporal record = (Bitemporal) core.retrieve(BarbelQueries.all()).stream().findFirst().get();
         assertEquals(((BarbelProxy)record).getTarget(), pojo);

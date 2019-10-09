@@ -1,6 +1,6 @@
 package org.projectbarbel.histo.functions;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,9 +43,9 @@ public class EmbeddingJournalUpdateStrategy implements BiConsumer<DocumentJourna
         Validate.isTrue(journal.getId().equals(update.getBitemporalStamp().getDocumentId()),
                 "update and journal must have same document id");
         Validate.isTrue(update.getBitemporalStamp().isActive(), "only active bitemporals are allowed here");
-        LocalDate rightBound = update.getBitemporalStamp().getEffectiveTime().until().equals(LocalDate.MAX)
-                ? LocalDate.MAX
-                : update.getBitemporalStamp().getEffectiveTime().until().minusDays(1);
+        ZonedDateTime rightBound = update.getBitemporalStamp().getEffectiveTime().isInfinite()
+                ? EffectivePeriod.INFINITE
+                : update.getBitemporalStamp().getEffectiveTime().until().minusNanos(1000000); //we substract one millisecond
         Optional<Bitemporal> interruptedLeftVersion = journal.read()
                 .effectiveAt(update.getBitemporalStamp().getEffectiveTime().from());
         Optional<Bitemporal> interruptedRightVersion = journal.read().effectiveAt(rightBound);

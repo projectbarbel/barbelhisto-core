@@ -60,6 +60,7 @@ public interface BarbelHistoContext {
         return BarbelHistoBuilder.SYSTEMACTIVITY;
     }
 
+    @Deprecated
     static LocalDate getInfiniteDate() {
         return LocalDate.MAX;
     }

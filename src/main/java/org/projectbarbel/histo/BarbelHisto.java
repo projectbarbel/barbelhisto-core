@@ -1,7 +1,7 @@
 package org.projectbarbel.histo;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.List;
@@ -16,6 +16,7 @@ import org.projectbarbel.histo.model.DefaultDocument;
 import com.googlecode.cqengine.query.Query;
 import com.googlecode.cqengine.query.QueryFactory;
 import com.googlecode.cqengine.query.option.QueryOptions;
+import org.projectbarbel.histo.model.EffectivePeriod;
 
 /**
  * The main abstraction of {@link BarbelHisto} that provides the client API.
@@ -80,10 +81,10 @@ import com.googlecode.cqengine.query.option.QueryOptions;
  * stamp. This is completely managed by {@link BarbelHisto}. Clients only need
  * to take care that their primary key is properly set.<br>
  * <br>
- * Use the {@link #save(Object, LocalDate, LocalDate)} method to save objects to
+ * Use the {@link #save(Object, ZonedDateTime, ZonedDateTime)} method to save objects to
  * {@link BarbelHisto}. The from/until period entered describes when the object
  * data should become effective, and until it should be effective. Clients use
- * {@link LocalDate#MAX} to express that the object stored is valid until
+ * {@link org.projectbarbel.histo.model.EffectivePeriod#INFINITE} to express that the object stored is valid until
  * infinite. <br>
  * <br>
  * To retrieve data stored into {@link BarbelHisto} clients can use
@@ -104,7 +105,7 @@ import com.googlecode.cqengine.query.option.QueryOptions;
  * {@link BarbelHisto}. To restore the journal later to continue bitemporal data
  * processing use {@link BarbelHisto#load(Collection)}. <br>
  * <br>
- * Use {@link #timeshift(Object, LocalDateTime)} to turn back time and see how
+ * Use {@link #timeshift(Object, ZonedDateTime)} to turn back time and see how
  * document journals looked like in the past. Time shift is one of the core
  * functionalities of {@link BarbelHisto}. Clients can turn back time to see how
  * the document journals for a document Id looked like at that given time. This
@@ -151,11 +152,72 @@ public interface BarbelHisto<T> {
 	 * read the version data.
 	 * 
 	 * @param newVersion the object state to save
-	 * @param from       effective date of object state
+	 * @param from       effective time of object state
 	 * @param until      effective until of the state
 	 * @return the {@link BitemporalUpdate} performed by this save operation
 	 */
-	BitemporalUpdate<T> save(T newVersion, LocalDate from, LocalDate until);
+	BitemporalUpdate<T> save(T newVersion, ZonedDateTime from, ZonedDateTime until);
+
+	/**
+	 * Save objects to {@link BarbelHisto}. Creates snapshots of state. Clients can
+	 * safely continue to work on passed instances. Thread safe, applies lock to
+	 * journals of document IDs (not the complete backbone). This allows concurrent
+	 * work on different document IDs. If clients try to update the same document
+	 * Id, this method throws {@link ConcurrentModificationException}.
+	 *
+	 * The method returns a copy of the object saved including the version data. In
+	 * in {@link BarbelMode#POJO} cast the returned object to {@link Bitemporal} to
+	 * read the version data.
+	 *
+	 * @param newVersion the object state to save
+	 * @param period     effective time period of object state
+	 * @return the {@link BitemporalUpdate} performed by this save operation
+	 */
+	default BitemporalUpdate<T> save(T newVersion, EffectivePeriod period){
+		return save(newVersion, period.from(), period.until());
+	}
+
+	/**
+	 * Save objects to {@link BarbelHisto}. Creates snapshots of state. Clients can
+	 * safely continue to work on passed instances. Thread safe, applies lock to
+	 * journals of document IDs (not the complete backbone). This allows concurrent
+	 * work on different document IDs. If clients try to update the same document
+	 * Id, this method throws {@link ConcurrentModificationException}.
+	 *
+	 * The method returns a copy of the object saved including the version data. In
+	 * in {@link BarbelMode#POJO} cast the returned object to {@link Bitemporal} to
+	 * read the version data.
+	 *
+	 * This method assumes that the object is effective infinitely, starting from the
+	 * provided {@param from}.
+	 *
+	 * @param newVersion the object state to save
+	 * @param from       effective time of object state
+	 * @return the {@link BitemporalUpdate} performed by this save operation
+	 */
+	default BitemporalUpdate<T> save(T newVersion, ZonedDateTime from){
+		return save(newVersion, from, EffectivePeriod.INFINITE);
+	}
+
+	/**
+	 * Save objects to {@link BarbelHisto}. Creates snapshots of state. Clients can
+	 * safely continue to work on passed instances. Thread safe, applies lock to
+	 * journals of document IDs (not the complete backbone). This allows concurrent
+	 * work on different document IDs. If clients try to update the same document
+	 * Id, this method throws {@link ConcurrentModificationException}.
+	 *
+	 * The method returns a copy of the object saved including the version data. In
+	 * in {@link BarbelMode#POJO} cast the returned object to {@link Bitemporal} to
+	 * read the version data.
+	 *
+	 * This method assumes that the object is effective from now to infinity.
+	 *
+	 * @param newVersion the object state to save
+	 * @return the {@link BitemporalUpdate} performed by this save operation
+	 */
+	default BitemporalUpdate<T> save(T newVersion){
+		return save(newVersion, EffectivePeriod.nowToInfinite());
+	}
 
 	/**
 	 * Retrieve data from {@link BarbelHisto} using cqengine like queries. Clients
@@ -224,7 +286,7 @@ public interface BarbelHisto<T> {
 	 * @param time the time, must be in the past
 	 * @return the document journal at that given time
 	 */
-	DocumentJournal timeshift(Object id, LocalDateTime time);
+	DocumentJournal timeshift(Object id, ZonedDateTime time);
 
 	/**
 	 * Pretty print the journal for the given document ID.

@@ -1,6 +1,8 @@
 package org.projectbarbel.histo.model;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 
 import org.projectbarbel.histo.BarbelHistoContext;
@@ -12,34 +14,35 @@ import org.projectbarbel.histo.BarbelHistoContext;
  *
  */
 public final class EffectivePeriod {
-    
-    public static final LocalDate INFINITE = LocalDate.of(2199, 12, 31);
-    
-    private final LocalDate until;
-    private final LocalDate from;
 
-    private EffectivePeriod(LocalDate from, LocalDate until) {
+    public static final ZonedDateTime INFINITE = ZonedDateTime.of(LocalDateTime.of(2199, 12, 31, 23, 59),
+            ZoneId.of("Z"));
+
+    private final ZonedDateTime until;
+    private final ZonedDateTime from;
+
+    private EffectivePeriod(ZonedDateTime from, ZonedDateTime until) {
         this.from = Objects.requireNonNull(from);
         this.until = Objects.requireNonNull(until);
     }
 
-    public static EffectivePeriod of(LocalDate from, LocalDate until) {
+    public static EffectivePeriod of(ZonedDateTime from, ZonedDateTime until) {
         return new EffectivePeriod(from, until);
     }
 
     public static EffectivePeriod nowToInfinite() {
-    	return new EffectivePeriod(BarbelHistoContext.getBarbelClock().now().toLocalDate(), LocalDate.MAX);
+    	return new EffectivePeriod(BarbelHistoContext.getBarbelClock().now(), INFINITE);
     }
     
     public boolean isInfinite() {
-        return until.equals(BarbelHistoContext.getInfiniteDate());
+        return until.equals(INFINITE);
     }
 
-    public LocalDate from() {
+    public ZonedDateTime from() {
         return from;
     }
 
-    public LocalDate until() {
+    public ZonedDateTime until() {
         return until;
     }
 

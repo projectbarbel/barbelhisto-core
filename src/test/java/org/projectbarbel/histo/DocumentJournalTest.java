@@ -5,8 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ public class DocumentJournalTest {
 	public void testCreate_withList() {
 		DocumentJournal journal = DocumentJournal.create(ProcessingState.INTERNAL, BarbelHistoBuilder.barbel(),
 				BarbelTestHelper.generateJournalOfDefaultDocuments("#12345",
-						Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 4, 1))),
+						Arrays.asList(ZonedDateTime.parse("2019-01-01T00:00:00Z"), ZonedDateTime.parse("2019-04-01T00:00:00Z"))),
 				"#12345");
 		assertEquals(2, journal.size());
 	}
@@ -56,7 +57,7 @@ public class DocumentJournalTest {
 	@Test
 	public void testUpdate() throws Exception {
 		IndexedCollection<Object> coll = new ConcurrentIndexedCollection<Object>();
-		BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.of(2019, 2, 1, 8, 0));
+		BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.of(2019, 2, 1, 8, 0).atZone(ZoneId.of("Z")));
 		DefaultDocument doc = DefaultDocument.builder().withData("some data")
 				.withBitemporalStamp(BitemporalStamp.createActive()).build();
 		coll.add(doc);
@@ -73,10 +74,10 @@ public class DocumentJournalTest {
 		DocumentJournal journal = DocumentJournal.create(ProcessingState.INTERNAL,
 				BarbelHistoBuilder.barbel().withMode(BarbelMode.BITEMPORAL),
 				BarbelTestHelper.generateJournalOfDefaultDocuments("#12345",
-						Arrays.asList(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 4, 1))),
+						Arrays.asList(ZonedDateTime.parse("2019-01-01T00:00:00Z"), ZonedDateTime.parse("2019-04-01T00:00:00Z"))),
 				"#12345");
 		assertEquals(((Bitemporal) journal.list().get(0)).getBitemporalStamp().getEffectiveTime().from(),
-				LocalDate.of(2019, 1, 1));
+				ZonedDateTime.parse("2019-01-01T00:00:00Z"));
 	}
 
 }

@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
@@ -24,6 +24,7 @@ import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.BitemporalVersion;
 import org.projectbarbel.histo.model.DefaultDocument;
 import org.projectbarbel.histo.model.DefaultPojo;
+import org.projectbarbel.histo.model.EffectivePeriod;
 import org.projectbarbel.histo.pojos.PrimitivePrivatePojo;
 import org.projectbarbel.histo.suite.BTExecutionContext;
 import org.projectbarbel.histo.suite.extensions.BTTestStandard;
@@ -49,7 +50,7 @@ public class BarbelHistoCore_Contracts_SuiteTest {
     public void testSave() throws Exception {
         BarbelHisto<String> core = BarbelHistoBuilder.barbel().build();
         Exception exc = assertThrows(IllegalArgumentException.class,
-                () -> core.save("some", LocalDate.now(), LocalDate.MAX));
+                () -> core.save("some"));
         assertTrue(exc.getMessage().contains("@DocumentId"));
     }
 
@@ -57,7 +58,7 @@ public class BarbelHistoCore_Contracts_SuiteTest {
     public void testSaveBitemporalVersion() throws Exception {
         BarbelHisto<BitemporalVersion> core = BTExecutionContext.INSTANCE.barbel(BitemporalVersion.class).build();
         Exception exc = assertThrows(IllegalArgumentException.class,
-                () -> core.save(new BitemporalVersion(BitemporalStamp.createActive(), EnhancedRandom.random(DefaultPojo.class)), LocalDate.now(), LocalDate.MAX));
+                () -> core.save(new BitemporalVersion(BitemporalStamp.createActive(), EnhancedRandom.random(DefaultPojo.class))));
         assertTrue(exc.getMessage().contains("BitemporalVersion cannot be used in BarbelMode.POJO"));
     }
     
@@ -65,7 +66,7 @@ public class BarbelHistoCore_Contracts_SuiteTest {
     public void testSaveBitemporalInModePOJO() throws Exception {
         BarbelHisto<DefaultDocument> core = BTExecutionContext.INSTANCE.barbel(DefaultDocument.class).build();
         Exception exc = assertThrows(IllegalArgumentException.class,
-                () -> core.save(new DefaultDocument("some", "bitemporal"), LocalDate.now(), LocalDate.MAX));
+                () -> core.save(new DefaultDocument("some", "bitemporal")));
         assertTrue(exc.getMessage().contains("don't use Bitemporal.class"));
     }
     
@@ -73,7 +74,7 @@ public class BarbelHistoCore_Contracts_SuiteTest {
     public void testSave_LocalDatesInvalid() throws Exception {
         BarbelHisto<DefaultPojo> core = BTExecutionContext.INSTANCE.barbel(DefaultPojo.class).build();
         Exception exc = assertThrows(IllegalArgumentException.class,
-                () -> core.save(EnhancedRandom.random(DefaultPojo.class), LocalDate.MAX, LocalDate.now()));
+                () -> core.save(EnhancedRandom.random(DefaultPojo.class),EffectivePeriod.INFINITE,ZonedDateTime.now()));
         assertTrue(exc.getMessage().contains("from date"));
     }
 
@@ -81,7 +82,7 @@ public class BarbelHistoCore_Contracts_SuiteTest {
     public void testSavePojoInBitemporal() throws Exception {
         BarbelHisto<DefaultPojo> core = BTExecutionContext.INSTANCE.barbel(DefaultPojo.class).withMode(BarbelMode.BITEMPORAL).build();
         Exception exc = assertThrows(IllegalArgumentException.class,
-                () -> core.save(EnhancedRandom.random(DefaultPojo.class), LocalDate.now(), LocalDate.MAX));
+                () -> core.save(EnhancedRandom.random(DefaultPojo.class)));
         assertTrue(exc.getMessage().contains("don't forget"));
     }
     
@@ -94,7 +95,7 @@ public class BarbelHistoCore_Contracts_SuiteTest {
                 .build();
         SomePojo pojo = EnhancedRandom.random(SomePojo.class);
         Exception exc = assertThrows(IllegalArgumentException.class,
-                () -> core.save(pojo, LocalDate.now(), LocalDate.MAX));
+                () -> core.save(pojo));
         assertTrue(exc.getMessage().contains("@PersistenceConfig"));
     }
     
@@ -102,16 +103,16 @@ public class BarbelHistoCore_Contracts_SuiteTest {
     @SuppressWarnings("unused")
     private static Stream<Arguments> nullableParameters() {
         return Stream.of(
-                Arguments.of(EnhancedRandom.random(PrimitivePrivatePojo.class), LocalDate.now(), null),
-                Arguments.of(EnhancedRandom.random(PrimitivePrivatePojo.class), null, LocalDate.now()),
-                Arguments.of(null, LocalDate.now(), LocalDate.MAX),
-                Arguments.of(new PrimitivePrivatePojo(), LocalDate.now(), LocalDate.MAX)
+                Arguments.of(EnhancedRandom.random(PrimitivePrivatePojo.class), ZonedDateTime.now(), null),
+                Arguments.of(EnhancedRandom.random(PrimitivePrivatePojo.class), null, ZonedDateTime.now()),
+                Arguments.of(null, ZonedDateTime.now(), EffectivePeriod.INFINITE),
+                Arguments.of(new PrimitivePrivatePojo(), ZonedDateTime.now(), EffectivePeriod.INFINITE)
                 );
     }
     
     @ParameterizedTest
     @MethodSource("nullableParameters")
-    public <T> void testSaveParameter(T pojo, LocalDate from, LocalDate until) {
+    public <T> void testSaveParameter(T pojo, ZonedDateTime from, ZonedDateTime until) {
         BarbelHisto<T> core = BarbelHistoBuilder.barbel().build();
         assertThrows(IllegalArgumentException.class, ()->core.save(pojo, from, until));
     }

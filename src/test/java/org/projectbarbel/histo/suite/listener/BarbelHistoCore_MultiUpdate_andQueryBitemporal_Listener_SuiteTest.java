@@ -2,8 +2,6 @@ package org.projectbarbel.histo.suite.listener;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.time.LocalDate;
-
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.projectbarbel.histo.BarbelHisto;
@@ -24,7 +22,7 @@ public class BarbelHistoCore_MultiUpdate_andQueryBitemporal_Listener_SuiteTest
         BarbelHisto<DefaultDocument> core = BTExecutionContext.INSTANCE.barbel(DefaultDocument.class)
                 .withMode(BarbelMode.BITEMPORAL).build();
         DefaultDocument pojo = new DefaultDocument("someOther", "some data");
-        core.save(pojo, LocalDate.now(), LocalDate.MAX);
+        core.save(pojo);
         assertEquals(1, ((BarbelHistoCore<DefaultDocument>) core).size());
     }
 

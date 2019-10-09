@@ -2,14 +2,18 @@ package org.projectbarbel.histo.suite.persistent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.projectbarbel.histo.BarbelHisto;
+import org.projectbarbel.histo.BarbelHistoContext;
 import org.projectbarbel.histo.BarbelHistoCore;
 import org.projectbarbel.histo.BarbelMode;
 import org.projectbarbel.histo.BarbelQueries;
@@ -24,15 +28,25 @@ import com.googlecode.cqengine.query.QueryFactory;
 @BTNotStandAlone
 public class BarbelHistoCore_MultiUpdate_andQueryBitemporal {
 
+
+    @BeforeAll
+    public static void setFixedClock(){
+        BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.now().atZone(ZoneId.of("Z")));
+    }
+
+    @AfterAll
+    public static void resetClock(){
+        BarbelHistoContext.getBarbelClock().useSystemDefaultZoneClock();
+    }
     // @formatter:off
     @Order(1)
     @Test
     void embeddedOverlap_Extrapolate() throws Exception {
         BarbelHisto<DefaultDocument> core = BTExecutionContext.INSTANCE.barbel(DefaultDocument.class).withMode(BarbelMode.BITEMPORAL).build();
         DefaultDocument pojo = new DefaultDocument("someSome", "some data");
-        
+        ZonedDateTime now = BarbelHistoContext.getBarbelClock().now();
         // Now |---------------------------------| 20
-        core.save(pojo, LocalDate.now(), LocalDate.now().plusDays(20));
+        core.save(pojo, now, now.plusDays(20));
         assertEquals(1, core.retrieve(BarbelQueries.allActive("someSome")).size());
         assertEquals(0, core.retrieve(BarbelQueries.allInactive("someSome")).size());
                 
@@ -40,7 +54,7 @@ public class BarbelHistoCore_MultiUpdate_andQueryBitemporal {
         //      1|---------------|10
         //     |-|---------------|---------------| 20
         pojo = new DefaultDocument("someSome", "changed");
-        core.save(pojo, LocalDate.now().plusDays(1), LocalDate.now().plusDays(10));
+        core.save(pojo, now.plusDays(1), now.plusDays(10));
         assertEquals(4,((BarbelHistoCore<DefaultDocument>)core).size());
         assertEquals(3, core.retrieve(BarbelQueries.allActive("someSome")).size());
         assertEquals(1, core.retrieve(BarbelQueries.allInactive("someSome")).size());
@@ -49,7 +63,7 @@ public class BarbelHistoCore_MultiUpdate_andQueryBitemporal {
         //      1|-------------------------------| 20
         //     |-|-------------------------------| 20
         pojo = new DefaultDocument("someSome", "changed again");
-        core.save(pojo, LocalDate.now().plusDays(1), LocalDate.now().plusDays(20));
+        core.save(pojo, now.plusDays(1), now.plusDays(20));
         assertEquals(5,((BarbelHistoCore<DefaultDocument>)core).size());
         assertEquals(2, core.retrieve(BarbelQueries.allActive("someSome")).size());
         assertEquals(3, core.retrieve(BarbelQueries.allInactive("someSome")).size());
@@ -57,7 +71,7 @@ public class BarbelHistoCore_MultiUpdate_andQueryBitemporal {
         //     |-|-------------------------------| 20
         //      1|-------------------------------| 20
         //     |-|-------------------------------| 20
-        core.save(pojo, LocalDate.now().plusDays(1), LocalDate.now().plusDays(20));
+        core.save(pojo, now.plusDays(1), now.plusDays(20));
         assertEquals(6,((BarbelHistoCore<DefaultDocument>)core).size());
         assertEquals(2, core.retrieve(BarbelQueries.allActive("someSome")).size());
         assertEquals(4, core.retrieve(BarbelQueries.allInactive("someSome")).size());
@@ -65,7 +79,7 @@ public class BarbelHistoCore_MultiUpdate_andQueryBitemporal {
         //     |-|-------------------------------| 20
         //     |---------------------------------| 20
         //     |---------------------------------| 20
-        core.save(pojo, LocalDate.now(), LocalDate.now().plusDays(20));
+        core.save(pojo, now, now.plusDays(20));
         assertEquals(7,((BarbelHistoCore<DefaultDocument>)core).size());
         assertEquals(1, core.retrieve(BarbelQueries.allActive("someSome")).size());
         assertEquals(6, core.retrieve(BarbelQueries.allInactive("someSome")).size());
@@ -73,7 +87,7 @@ public class BarbelHistoCore_MultiUpdate_andQueryBitemporal {
         //     |---------------------------------| 20
         //     |-----------------| 10
         //     |-----------------|---------------| 20
-        core.save(pojo, LocalDate.now(), LocalDate.now().plusDays(10));
+        core.save(pojo, now, now.plusDays(10));
         assertEquals(9,((BarbelHistoCore<DefaultDocument>)core).size());
         assertEquals(2, core.retrieve(BarbelQueries.allActive("someSome")).size());
         assertEquals(7, core.retrieve(BarbelQueries.allInactive("someSome")).size());
@@ -81,7 +95,7 @@ public class BarbelHistoCore_MultiUpdate_andQueryBitemporal {
         //     |-----------------|---------------| 20
         //     |--------------------------------------------------| 100
         //     |--------------------------------------------------| 100
-        core.save(pojo, LocalDate.now(), LocalDate.now().plusDays(100));
+        core.save(pojo, now, now.plusDays(100));
         assertEquals(10,((BarbelHistoCore<DefaultDocument>)core).size());
         assertEquals(1, core.retrieve(BarbelQueries.allActive("someSome")).size());
         assertEquals(9, core.retrieve(BarbelQueries.allInactive("someSome")).size());
@@ -89,7 +103,7 @@ public class BarbelHistoCore_MultiUpdate_andQueryBitemporal {
         //     |---------------------------------------------------| 100
         //     |-|-----------------------------------------------|-| 100
         //     |-|-----------------------------------------------|-| 100
-        core.save(pojo, LocalDate.now().plusDays(1), LocalDate.now().plusDays(99));
+        core.save(pojo, now.plusDays(1), now.plusDays(99));
         assertEquals(13,((BarbelHistoCore<DefaultDocument>)core).size());
         assertEquals(3, core.retrieve(BarbelQueries.allActive("someSome")).size());
         assertEquals(10, core.retrieve(BarbelQueries.allInactive("someSome")).size());
@@ -97,7 +111,7 @@ public class BarbelHistoCore_MultiUpdate_andQueryBitemporal {
         //     |-|-----------------------------------------------|-| 100
         //       |--| 3
         //     |-|--|--------------------------------------------|-| 100
-        core.save(pojo, LocalDate.now().plusDays(1), LocalDate.now().plusDays(3));
+        core.save(pojo, now.plusDays(1), now.plusDays(3));
         assertEquals(15,((BarbelHistoCore<DefaultDocument>)core).size());
         assertEquals(4, core.retrieve(BarbelQueries.allActive("someSome")).size());
         assertEquals(11, core.retrieve(BarbelQueries.allInactive("someSome")).size());
@@ -105,7 +119,7 @@ public class BarbelHistoCore_MultiUpdate_andQueryBitemporal {
         //     |-|--|--------------------------------------------|-| 100
         //         3|--|5
         //     |-|--|--|-----------------------------------------|-| 100
-        core.save(pojo, LocalDate.now().plusDays(3), LocalDate.now().plusDays(5));
+        core.save(pojo, now.plusDays(3), now.plusDays(5));
         assertEquals(17,((BarbelHistoCore<DefaultDocument>)core).size());
         assertEquals(5, core.retrieve(BarbelQueries.allActive("someSome")).size());
         assertEquals(12, core.retrieve(BarbelQueries.allInactive("someSome")).size());
@@ -113,7 +127,7 @@ public class BarbelHistoCore_MultiUpdate_andQueryBitemporal {
         //     |-|--|--|-----------------------------------------|-| 100
         //            5|--|7
         //     |-|--|--|--|--------------------------------------|-| 100
-        core.save(pojo, LocalDate.now().plusDays(5), LocalDate.now().plusDays(7));
+        core.save(pojo, now.plusDays(5), now.plusDays(7));
         assertEquals(19,((BarbelHistoCore<DefaultDocument>)core).size());
         assertEquals(6, core.retrieve(BarbelQueries.allActive("someSome")).size());
         assertEquals(13, core.retrieve(BarbelQueries.allInactive("someSome")).size());
@@ -121,7 +135,7 @@ public class BarbelHistoCore_MultiUpdate_andQueryBitemporal {
         //     |-|--|--|--|--------------------------------------|-| 100
         //                |----------------------------------------| 100
         //     |-|--|--|--|----------------------------------------| 100
-        core.save(pojo, LocalDate.now().plusDays(7), LocalDate.now().plusDays(100));
+        core.save(pojo, now.plusDays(7), now.plusDays(100));
         assertEquals(20,((BarbelHistoCore<DefaultDocument>)core).size());
         assertEquals(5, core.retrieve(BarbelQueries.allActive("someSome")).size());
         assertEquals(15, core.retrieve(BarbelQueries.allInactive("someSome")).size());
@@ -129,7 +143,7 @@ public class BarbelHistoCore_MultiUpdate_andQueryBitemporal {
         //     |-|--|--|--|----------------------------------------| 100
         //        |------|
         //     |-||------||----------------------------------------| 100
-        core.save(pojo, LocalDate.now().plusDays(2), LocalDate.now().plusDays(6));
+        core.save(pojo, now.plusDays(2), now.plusDays(6));
         assertEquals(23,((BarbelHistoCore<DefaultDocument>)core).size());
         assertEquals(5, core.retrieve(BarbelQueries.allActive("someSome")).size());
         assertEquals(18, core.retrieve(BarbelQueries.allInactive("someSome")).size());
@@ -137,7 +151,7 @@ public class BarbelHistoCore_MultiUpdate_andQueryBitemporal {
         //     |-||------||----------------------------------------| 100
         //        |-------|
         //     |-||-------|----------------------------------------| 100
-        core.save(pojo, LocalDate.now().plusDays(2), LocalDate.now().plusDays(7));
+        core.save(pojo, now.plusDays(2), now.plusDays(7));
         assertEquals(24,((BarbelHistoCore<DefaultDocument>)core).size());
         assertEquals(4, core.retrieve(BarbelQueries.allActive("someSome")).size());
         assertEquals(20, core.retrieve(BarbelQueries.allInactive("someSome")).size());
@@ -166,13 +180,13 @@ public class BarbelHistoCore_MultiUpdate_andQueryBitemporal {
     @Test
     void allOtherQueries_preFetch_effectiveAfter() throws Exception {
         BarbelHisto<DefaultDocument> core = BTExecutionContext.INSTANCE.barbel(DefaultDocument.class).withMode(BarbelMode.BITEMPORAL).build();
-        assertEquals(2, core.retrieve(BarbelQueries.effectiveAfter("someSome", LocalDate.now().plusDays(2))).size());
+        assertEquals(2, core.retrieve(BarbelQueries.effectiveAfter("someSome", BarbelHistoContext.getBarbelClock().now().plusDays(2))).size());
     }
     @Order(7)
     @Test
     void allOtherQueries_preFetch_effectiveBetween() throws Exception {
         BarbelHisto<DefaultDocument> core = BTExecutionContext.INSTANCE.barbel(DefaultDocument.class).withMode(BarbelMode.BITEMPORAL).build();
-        assertEquals(4, core.retrieve(BarbelQueries.effectiveBetween("someSome", EffectivePeriod.of(LocalDate.now(), LocalDate.MAX))).size());
+        assertEquals(4, core.retrieve(BarbelQueries.effectiveBetween("someSome", EffectivePeriod.of(BarbelHistoContext.getBarbelClock().now(), EffectivePeriod.INFINITE))).size());
     }
     @Order(8)
     @Test
@@ -185,7 +199,7 @@ public class BarbelHistoCore_MultiUpdate_andQueryBitemporal {
     @Test
     void allOtherQueries_preFetch_journalAt() throws Exception {
         BarbelHisto<DefaultDocument> core = BTExecutionContext.INSTANCE.barbel(DefaultDocument.class).withMode(BarbelMode.BITEMPORAL).build();
-        assertEquals(4, core.retrieve(BarbelQueries.journalAt("someSome", LocalDateTime.now())).size());
+        assertEquals(4, core.retrieve(BarbelQueries.journalAt("someSome", BarbelHistoContext.getBarbelClock().now())).size());
     }
     @Order(10)
     @Test

@@ -2,7 +2,6 @@ package org.projectbarbel.histo.suite.standard;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -13,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.projectbarbel.histo.BarbelHisto;
+import org.projectbarbel.histo.BarbelHistoContext;
 import org.projectbarbel.histo.BarbelHistoCore;
 import org.projectbarbel.histo.BarbelMode;
 import org.projectbarbel.histo.BarbelQueries;
@@ -25,6 +25,7 @@ import org.projectbarbel.histo.event.EventType.UpdateFinishedEvent;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.DefaultDocument;
+import org.projectbarbel.histo.model.EffectivePeriod;
 import org.projectbarbel.histo.suite.BTExecutionContext;
 import org.projectbarbel.histo.suite.extensions.BTTestStandard;
 
@@ -45,10 +46,10 @@ public class BarbelHistoCore_ShadowCollectionPersistence_SuiteTest {
         BarbelHisto<DefaultDocument> barbel = BTExecutionContext.INSTANCE.barbel(DefaultDocument.class)
                 .withMode(BarbelMode.BITEMPORAL).withSynchronousEventListener(new ShadowCollectionListener()).build();
         DefaultDocument pojo = new DefaultDocument("someId", BitemporalStamp.createActive("someId"), "some data");
-        barbel.save(pojo, LocalDate.now(), LocalDate.MAX);
+        barbel.save(pojo);
         assertEquals(1, shadow.size());
         pojo.setData("some changes");
-        barbel.save(pojo, LocalDate.now().plusDays(2), LocalDate.MAX);
+        barbel.save(pojo, BarbelHistoContext.getBarbelClock().now().plusDays(2), EffectivePeriod.INFINITE);
         assertEquals(3, shadow.size());
     }
 

@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 import java.io.IOException;
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.projectbarbel.histo.BarbelHisto;
+import org.projectbarbel.histo.BarbelHistoContext;
 import org.projectbarbel.histo.BarbelHistoCore;
 import org.projectbarbel.histo.BarbelMode;
 import org.projectbarbel.histo.BarbelQueries;
@@ -89,8 +90,9 @@ public class BarbelHistoCore_CQIndexing_SuiteTest {
                     return backbone;
                 })
                 .build();
-        core.save(pojo, LocalDate.now(), LocalDate.MAX);
-        T saved = (T)core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX).getUpdateRequest();
+        ZonedDateTime from = BarbelHistoContext.getBarbelClock().now();
+        core.save(pojo,from);
+        T saved = (T)core.save(pojo, from.plusDays(1)).getUpdateRequest();
         assertEquals(3, core.retrieve(BarbelQueries.all()).stream().count());
         Bitemporal object = (Bitemporal)core.retrieve(BarbelQueries.all()).stream().findFirst().get();
         Bitemporal byPK = (Bitemporal)core.retrieve((Query<T>) equal(VERSION_ID_PK, (String)object.getBitemporalStamp().getVersionId())).stream().findFirst().get();
@@ -114,8 +116,9 @@ public class BarbelHistoCore_CQIndexing_SuiteTest {
                     return backbone;
                 }).withMode(BarbelMode.BITEMPORAL)
                 .build();
-        core.save(pojo, LocalDate.now(), LocalDate.MAX);
-        T saved = (T)core.save(pojo, LocalDate.now().plusDays(1), LocalDate.MAX).getUpdateRequest();
+        ZonedDateTime from = BarbelHistoContext.getBarbelClock().now();
+        core.save(pojo, from);
+        T saved = (T)core.save(pojo, from.plusDays(1)).getUpdateRequest();
         assertEquals(3, core.retrieve(BarbelQueries.all()).stream().count());
         Bitemporal object = (Bitemporal)core.retrieve(BarbelQueries.all()).stream().findFirst().get();
         Bitemporal byPK = (Bitemporal)core.retrieve((Query<T>) equal(VERSION_ID_PK, (String)object.getBitemporalStamp().getVersionId())).stream().findFirst().get();

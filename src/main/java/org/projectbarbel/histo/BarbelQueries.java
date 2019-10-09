@@ -7,11 +7,9 @@ import static com.googlecode.cqengine.query.QueryFactory.greaterThanOrEqualTo;
 import static com.googlecode.cqengine.query.QueryFactory.lessThan;
 import static com.googlecode.cqengine.query.QueryFactory.lessThanOrEqualTo;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.chrono.ChronoLocalDate;
+
 import java.util.Iterator;
 import java.util.List;
 
@@ -52,17 +50,17 @@ public final class BarbelQueries {
         }
     };
 
-    public static final Attribute<Object, ChronoLocalDate> EFFECTIVE_FROM = new SimpleAttribute<Object, ChronoLocalDate>(
+    public static final Attribute<Object, Long> EFFECTIVE_FROM = new SimpleAttribute<Object, Long>(
             "effectiveFrom") {
-        public LocalDate getValue(Object object, QueryOptions queryOptions) {
-            return ((Bitemporal) object).getBitemporalStamp().getEffectiveTime().from();
+        public Long getValue(Object object, QueryOptions queryOptions) {
+            return ((Bitemporal) object).getBitemporalStamp().getEffectiveTime().from().withZoneSameInstant(ZoneId.systemDefault()).toInstant().toEpochMilli();
         }
     };
 
-    public static final Attribute<Object, ChronoLocalDate> EFFECTIVE_UNTIL = new SimpleAttribute<Object, ChronoLocalDate>(
+    public static final Attribute<Object, Long> EFFECTIVE_UNTIL = new SimpleAttribute<Object, Long>(
             "effectiveUntil") {
-        public LocalDate getValue(Object object, QueryOptions queryOptions) {
-            return ((Bitemporal) object).getBitemporalStamp().getEffectiveTime().until();
+        public Long getValue(Object object, QueryOptions queryOptions) {
+            return ((Bitemporal) object).getBitemporalStamp().getEffectiveTime().until().withZoneSameInstant(ZoneId.systemDefault()).toInstant().toEpochMilli();
         }
     };
 
@@ -171,33 +169,33 @@ public final class BarbelQueries {
     @SuppressWarnings("unchecked")
     public static <T> Query<T> effectiveNow(Object id) {
         return (Query<T>) and(allActive(id),
-                lessThanOrEqualTo(EFFECTIVE_FROM, BarbelHistoContext.getBarbelClock().now().toLocalDate()),
-                greaterThan(EFFECTIVE_UNTIL, BarbelHistoContext.getBarbelClock().now().toLocalDate()));
+                lessThanOrEqualTo(EFFECTIVE_FROM, BarbelHistoContext.getBarbelClock().now().withZoneSameInstant(ZoneId.systemDefault()).toInstant().toEpochMilli()),
+                greaterThan(EFFECTIVE_UNTIL, BarbelHistoContext.getBarbelClock().now().withZoneSameInstant(ZoneId.systemDefault()).toInstant().toEpochMilli()));
     }
 
     /**
-     * Get the version effective at given day. Unique object result. Valid query for
+     * Get the version effective at given time. Unique object result. Valid query for
      * {@link BarbelHisto#retrieveOne(Query)}.
      * 
      * @param id  the document
-     * @param day effective-at date
+     * @param time effective-at time
      * @return the unique result
      */
     @SuppressWarnings("unchecked")
-    public static <T> Query<T> effectiveAt(Object id, LocalDate day) {
-        return (Query<T>) and(allActive(id), lessThanOrEqualTo(EFFECTIVE_FROM, day), greaterThan(EFFECTIVE_UNTIL, day));
+    public static <T> Query<T> effectiveAt(Object id, ZonedDateTime time) {
+        return (Query<T>) and(allActive(id), lessThanOrEqualTo(EFFECTIVE_FROM, time.withZoneSameInstant(ZoneId.systemDefault()).toInstant().toEpochMilli()), greaterThan(EFFECTIVE_UNTIL, time.withZoneSameInstant(ZoneId.systemDefault()).toInstant().toEpochMilli()));
     }
 
     /**
      * Get the versions effective on or after a given day.
      * 
      * @param id  the document
-     * @param day the effective-after date
+     * @param time the effective-after time
      * @return the unique result
      */
     @SuppressWarnings("unchecked")
-    public static <T> Query<T> effectiveAfter(Object id, LocalDate day) {
-        return (Query<T>) and(allActive(id), greaterThanOrEqualTo(EFFECTIVE_FROM, day));
+    public static <T> Query<T> effectiveAfter(Object id, ZonedDateTime time) {
+        return (Query<T>) and(allActive(id), greaterThanOrEqualTo(EFFECTIVE_FROM, time.withZoneSameInstant(ZoneId.systemDefault()).toInstant().toEpochMilli()));
     }
 
     /**
@@ -209,12 +207,12 @@ public final class BarbelQueries {
      */
     @SuppressWarnings("unchecked")
     public static <T> Query<T> effectiveBetween(Object id, EffectivePeriod period) {
-        if (period.until().equals(LocalDate.MAX))
-            return (Query<T>) and(allActive(id), greaterThanOrEqualTo(EFFECTIVE_FROM, period.from()),
-                    lessThanOrEqualTo(EFFECTIVE_UNTIL, period.until()));
+        if (period.isInfinite())
+            return (Query<T>) and(allActive(id), greaterThanOrEqualTo(EFFECTIVE_FROM, period.from().withZoneSameInstant(ZoneId.systemDefault()).toInstant().toEpochMilli()),
+                    lessThanOrEqualTo(EFFECTIVE_UNTIL, period.until().withZoneSameInstant(ZoneId.systemDefault()).toInstant().toEpochMilli()));
         else
-            return (Query<T>) and(allActive(id), greaterThanOrEqualTo(EFFECTIVE_FROM, period.from()),
-                    lessThan(EFFECTIVE_UNTIL, period.until()));
+            return (Query<T>) and(allActive(id), greaterThanOrEqualTo(EFFECTIVE_FROM, period.from().withZoneSameInstant(ZoneId.systemDefault()).toInstant().toEpochMilli()),
+                    lessThan(EFFECTIVE_UNTIL, period.until().withZoneSameInstant(ZoneId.systemDefault()).toInstant().toEpochMilli()));
     }
 
     /**
@@ -226,11 +224,11 @@ public final class BarbelQueries {
      * @return the list of versions active at the given time
      */
     @SuppressWarnings("unchecked")
-    public static <T> Query<T> journalAt(Object id, LocalDateTime time) {
+    public static <T> Query<T> journalAt(Object id, ZonedDateTime time) {
         return (Query<T>) and(all(id),
                 lessThanOrEqualTo(CREATED_AT,
-                        ZonedDateTime.of(time, ZoneId.systemDefault()).toInstant().toEpochMilli()),
-                greaterThan(INACTIVATED_AT, ZonedDateTime.of(time, ZoneId.systemDefault()).toInstant().toEpochMilli()));
+                        time.toInstant().toEpochMilli()),
+                greaterThan(INACTIVATED_AT, time.toInstant().toEpochMilli()));
     }
 
     // @formatter:on
