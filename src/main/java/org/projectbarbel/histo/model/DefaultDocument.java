@@ -2,8 +2,6 @@ package org.projectbarbel.histo.model;
 
 import java.util.Objects;
 
-import javax.annotation.Generated;
-
 import org.projectbarbel.histo.BarbelHisto;
 import org.projectbarbel.histo.BarbelMode;
 import org.projectbarbel.histo.DocumentId;
@@ -82,7 +80,6 @@ public class DefaultDocument implements Bitemporal {
         return data;
     }
     
-    @Generated("SparkTools")
     private DefaultDocument(Builder builder) {
         this.bitemporalStamp = builder.bitemporalStamp;
         this.data = builder.data;
@@ -99,7 +96,6 @@ public class DefaultDocument implements Bitemporal {
      * 
      * @return created builder
      */
-    @Generated("SparkTools")
     public static Builder builder() {
         return new Builder();
     }
@@ -125,7 +121,6 @@ public class DefaultDocument implements Bitemporal {
     /**
      * Builder to build {@link DefaultDocument}.
      */
-    @Generated("SparkTools")
     public static final class Builder {
         private BitemporalStamp bitemporalStamp;
         private String data;
