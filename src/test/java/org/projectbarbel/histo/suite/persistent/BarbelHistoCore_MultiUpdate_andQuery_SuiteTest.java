@@ -22,6 +22,7 @@ public class BarbelHistoCore_MultiUpdate_andQuery_SuiteTest extends BarbelHistoC
     @BeforeAll
     public static void setUp() {
         BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.of(2019, 1, 30, 8, 0, 0).atZone(ZoneId.of("Z")));
+        now = BarbelHistoContext.getBarbelClock().now();
     }
     
     @AfterAll

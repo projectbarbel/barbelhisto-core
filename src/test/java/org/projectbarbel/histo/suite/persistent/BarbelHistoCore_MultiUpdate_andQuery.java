@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.time.ZonedDateTime;
 
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -23,13 +25,25 @@ import com.googlecode.cqengine.query.QueryFactory;
 @TestMethodOrder(OrderAnnotation.class)
 public class BarbelHistoCore_MultiUpdate_andQuery {
 
+    static ZonedDateTime now;
+    
+    @BeforeAll
+    public static void setup() {
+        now = BarbelHistoContext.getBarbelClock().now();
+        BarbelHistoContext.getBarbelClock().useFixedClockAt(now);
+    }
+    
+    @AfterAll
+    public static void teardown() {
+        BarbelHistoContext.getBarbelClock().useSystemDefaultZoneClock();
+    }
+    
     // @formatter:off
     @Order(1)
     @Test
     void embeddedOverlap_Extrapolate() throws Exception {
         BarbelHisto<DefaultPojo> core = BTExecutionContext.INSTANCE.barbel(DefaultPojo.class).build();
         DefaultPojo pojo = new DefaultPojo("someSome", "some data");
-        ZonedDateTime now = BarbelHistoContext.getBarbelClock().now();
         // Now |---------------------------------| 20
         core.save(pojo, now, now.plusDays(20));
         assertEquals(1, core.retrieve(BarbelQueries.allActive("someSome")).size());
@@ -165,7 +179,7 @@ public class BarbelHistoCore_MultiUpdate_andQuery {
     @Test
     void allOtherQueries_preFetch_effectiveAfter() throws Exception {
         BarbelHisto<DefaultPojo> core = BTExecutionContext.INSTANCE.barbel(DefaultPojo.class).build();
-        assertEquals(2, core.retrieve(BarbelQueries.effectiveAfter("someSome", BarbelHistoContext.getBarbelClock().now().plusDays(2))).size());
+        assertEquals(2, core.retrieve(BarbelQueries.effectiveAfter("someSome", now.plusDays(2))).size());
     }
     @Order(7)
     @Test

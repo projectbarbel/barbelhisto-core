@@ -22,7 +22,7 @@ import org.projectbarbel.histo.model.EffectivePeriod;
  * The main abstraction of {@link BarbelHisto} that provides the client API.
  * Clients should perform all operations with this interface. <br>
  * <br>
- * Create an instance as follows: <br>
+ * Create an instance as  follows: <br>
  * <br>
  * <code> BarbelHisto histo = BarbelHistoBuilder.barbel().build(); </code> <br>
  * <br>
