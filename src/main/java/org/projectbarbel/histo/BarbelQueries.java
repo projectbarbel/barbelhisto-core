@@ -86,6 +86,7 @@ public final class BarbelQueries {
     /**
      * Get all versions from the backbone.
      * 
+     * @param <T> the POJO type
      * @return all versions stored
      */
     @SuppressWarnings("unchecked")
@@ -96,6 +97,7 @@ public final class BarbelQueries {
     /**
      * Get all versions for one document id.
      * 
+     * @param <T> the POJO type
      * @param id the document id
      * @return the versions
      */
@@ -108,6 +110,7 @@ public final class BarbelQueries {
      * Get all active (valid) versions. These will have distinct (non-overlapping)
      * effective periods.
      * 
+     * @param <T> the POJO type
      * @param id the document id
      * @return the active versions
      */
@@ -151,6 +154,7 @@ public final class BarbelQueries {
     /**
      * Get all versions for a document id, that have been inactivated.
      * 
+     * @param <T> the POJO type
      * @param id the document id
      * @return the inactivated versions
      */
@@ -163,6 +167,7 @@ public final class BarbelQueries {
      * Get the version effective today. Unique object result. Valid query for
      * {@link BarbelHisto#retrieveOne(Query)}.
      * 
+     * @param <T> the POJO type
      * @param id the document
      * @return the unique result
      */
@@ -177,6 +182,7 @@ public final class BarbelQueries {
      * Get the version effective at given time. Unique object result. Valid query for
      * {@link BarbelHisto#retrieveOne(Query)}.
      * 
+     * @param <T> the POJO type
      * @param id  the document
      * @param time effective-at time
      * @return the unique result
@@ -189,6 +195,7 @@ public final class BarbelQueries {
     /**
      * Get the versions effective on or after a given day.
      * 
+     * @param <T> the POJO type
      * @param id  the document
      * @param time the effective-after time
      * @return the unique result
@@ -201,6 +208,7 @@ public final class BarbelQueries {
     /**
      * Get effective versions in a certain period of time.
      * 
+     * @param <T> the POJO type
      * @param id     the dicument id
      * @param period the period
      * @return the list of effective versions
@@ -219,6 +227,7 @@ public final class BarbelQueries {
      * Get the list of active records at a given <b>record</b> time. These will have
      * distinct (non-overlapping) effective periods.
      * 
+     * @param <T> the POJO type
      * @param id   the document id
      * @param time the point in time, must be in the past
      * @return the list of versions active at the given time
