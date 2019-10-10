@@ -1,8 +1,6 @@
 package org.projectbarbel.histo.model;
 
 import java.time.Clock;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 import org.projectbarbel.histo.BarbelHisto;

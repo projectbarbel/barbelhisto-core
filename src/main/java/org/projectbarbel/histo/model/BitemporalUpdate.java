@@ -7,7 +7,7 @@ import org.projectbarbel.histo.functions.EmbeddingJournalUpdateStrategy.JournalU
 
 /**
  * Class that describes the result of a successful invocation of
- * {@link BarbelHisto#save(Object, java.time.LocalDate, java.time.LocalDate)}
+ * {@link BarbelHisto#save(Object, java.time.ZonedDateTime, java.time.ZonedDateTime)}
  * method.
  * 
  * @author Niklas Schlimm

@@ -14,7 +14,6 @@ import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.projectbarbel.histo.functions.TableJournalPrettyPrinter;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.EffectivePeriod;
@@ -80,7 +79,7 @@ public class BarbelHistoCore_StdPojoUsage_Test {
     @Test
     public void timeshift() {
 
-        BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.of(2019, 2, 1, 0, 0).atZone(ZoneId.of("Z")));
+        BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.of(2019, 2, 1, 0, 0).atZone(ZoneId.systemDefault()));
 
         BarbelHisto<Employee> core = BarbelHistoBuilder.barbel().build();
         Employee employee = new Employee("somePersonelNumber", "Niklas", "Schlimm");
@@ -91,7 +90,7 @@ public class BarbelHistoCore_StdPojoUsage_Test {
 
         System.out.println(core.prettyPrintJournal(employee.getId()));
 
-        BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.now().atZone(ZoneId.of("Z")));
+        BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.now().atZone(ZoneId.systemDefault()));
 
         Employee effectiveEmployeeVersion = core.retrieveOne(BarbelQueries.effectiveNow(employee.getId()));
         effectiveEmployeeVersion.setLastname("changedLastName");
@@ -99,14 +98,20 @@ public class BarbelHistoCore_StdPojoUsage_Test {
 
         effectiveEmployeeVersion = core.retrieveOne(BarbelQueries.effectiveNow(employee.getId()));
         effectiveIn10Days = core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, BarbelHistoContext.getBarbelClock().now().plusDays(10)));
+        Employee effectiveYesterday = core.retrieveOne(BarbelQueries.effectiveAt(employee.personnelNumber, BarbelHistoContext.getBarbelClock().now().minusDays(1)));
 
-        assertTrue(effectiveEmployeeVersion.getLastname().equals("Schlimm"));
+        assertTrue(effectiveEmployeeVersion.getLastname().equals("changedLastName"));
         assertTrue(effectiveIn10Days.getLastname().equals("changedLastName"));
+        assertEquals("Schlimm", effectiveYesterday.getLastname());
 
         System.out.println(core.prettyPrintJournal(employee.getId()));
 
+        BarbelHistoContext.getBarbelClock().useSystemDefaultZoneClock();
+
         DocumentJournal journal = core.timeshift("somePersonelNumber", BarbelHistoContext.getBarbelClock().now().minusDays(1).withHour(0).withMinute(0).withSecond(0));
-        System.out.println(new TableJournalPrettyPrinter().apply(journal.list()));
+
+        assertTrue(journal.size()==1);
+        assertEquals(((Employee)journal.list().get(0)).getLastname(), "Schlimm");
 
     }
 

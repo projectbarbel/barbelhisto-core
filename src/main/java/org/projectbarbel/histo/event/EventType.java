@@ -17,7 +17,7 @@ import com.googlecode.cqengine.query.Query;
  * Enum that contains all events thrown by {@link BarbelHisto}. <br>
  * <br>
  * Lifecycle when calling
- * {@link BarbelHisto#save(Object, java.time.LocalDate, java.time.LocalDate)} as
+ * {@link BarbelHisto#save(Object, java.time.ZonedDateTime, java.time.ZonedDateTime)} as
  * follows:
  * 
  * <pre>
@@ -91,7 +91,7 @@ public enum EventType implements PostableEvent {
     },
     /**
      * Event fired when a journal updated is started on a
-     * {@link BarbelHisto#save(Object, java.time.LocalDate, java.time.LocalDate)}
+     * {@link BarbelHisto#save(Object, java.time.ZonedDateTime, java.time.ZonedDateTime)}
      * operation.
      */
     INITIALIZEJOURNAL {

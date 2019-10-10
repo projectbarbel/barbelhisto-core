@@ -189,7 +189,7 @@ public interface BarbelHisto<T> {
 	 * read the version data.
 	 *
 	 * This method assumes that the object is effective infinitely, starting from the
-	 * provided {@param from}.
+	 * provided from-Date.
 	 *
 	 * @param newVersion the object state to save
 	 * @param from       effective time of object state

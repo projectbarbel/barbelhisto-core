@@ -375,7 +375,7 @@ public class BarbelHistoCore_JournalUpdate_SuiteTest {
             assertEquals(activeEffective.get(i * 2), newVersions.get(i).getBitemporalStamp().getEffectiveTime().from());
             assertEquals(activeEffective.get(i * 2 + 1),
                     newVersions.get(i).getBitemporalStamp().getEffectiveTime().until());
-            assertEquals(ZonedDateTime.of(LocalDateTime.of(2019, 1, 30, 10, 0), ZoneId.systemDefault()),
+            assertEquals(ZonedDateTime.of(LocalDateTime.of(2019, 1, 30, 10, 0), ZoneId.of("Z")),
                     newVersions.get(i).getBitemporalStamp().getRecordTime().getCreatedAt());
             assertEquals("testUser", newVersions.get(i).getBitemporalStamp().getRecordTime().getCreatedBy());
             assertEquals(RecordPeriod.NOT_INACTIVATED,
@@ -393,9 +393,9 @@ public class BarbelHistoCore_JournalUpdate_SuiteTest {
         assertEquals(from, inactivated.getBitemporalStamp().getEffectiveTime().from());
         assertEquals(until, inactivated.getBitemporalStamp().getEffectiveTime().until());
 
-        assertEquals(ZonedDateTime.of(LocalDateTime.of(2019, 1, 30, 10, 0), ZoneId.systemDefault()),
+        assertEquals(ZonedDateTime.of(LocalDateTime.of(2019, 1, 30, 10, 0), ZoneId.of("Z")),
                 inactivated.getBitemporalStamp().getRecordTime().getCreatedAt());
-        assertEquals(ZonedDateTime.of(LocalDateTime.of(2019, 1, 30, 10, 0), ZoneId.systemDefault()),
+        assertEquals(ZonedDateTime.of(LocalDateTime.of(2019, 1, 30, 10, 0), ZoneId.of("Z")),
                 inactivated.getBitemporalStamp().getRecordTime().getInactivatedAt());
         assertEquals("testUser", inactivated.getBitemporalStamp().getRecordTime().getInactivatedBy());
         assertEquals(BitemporalObjectState.INACTIVE, inactivated.getBitemporalStamp().getRecordTime().getState());
