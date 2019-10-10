@@ -166,6 +166,7 @@ public final class DocumentJournal {
     /**
      * Get the complete archive for the current document id as list.
      * 
+     * @param <T> the type to manage
      * @return the archive
      */
     @SuppressWarnings("unchecked")
@@ -178,6 +179,7 @@ public final class DocumentJournal {
     /**
      * Get the complete archive for the current document id as collection.
      * 
+     * @param <T> the type to manage
      * @return the archive
      */
     @SuppressWarnings("unchecked")
@@ -290,6 +292,7 @@ public final class DocumentJournal {
         /**
          * Get the versions currently active.
          * 
+         * @param <O> the type to manage
          * @return the active versions
          */
         @SuppressWarnings("unchecked")
@@ -304,6 +307,7 @@ public final class DocumentJournal {
          * Get the inactivated versions. Versions get inactivated when new versions are
          * posted and there versions cross their effective periods.
          * 
+         * @param <O> the type to manage
          * @return the inactive versions
          */
         @SuppressWarnings("unchecked")
@@ -316,6 +320,7 @@ public final class DocumentJournal {
         /**
          * The active version effective today. The "current" state of the object.
          * 
+         * @param <O> the type to manage
          * @return the effective version
          */
         @SuppressWarnings("unchecked")
@@ -340,6 +345,7 @@ public final class DocumentJournal {
          * The active versions after the given time. If due time is set to now, the
          * query returns all the future versions that will become effective.
          * 
+         * @param <O> the type to manage
          * @param time the due time
          * @return the active versions
          */
@@ -355,6 +361,7 @@ public final class DocumentJournal {
         /**
          * Get the active versions effective within the given {@link EffectivePeriod}.
          * 
+         * @param <O> the type to manage
          * @param period the intervall
          * @return the active versions
          */
