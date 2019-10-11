@@ -74,6 +74,8 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
         Validate.noNullElements(Arrays.asList(newVersion, from, until), NOTNULL);
         Validate.notNull(newVersion, NOTNULL);
         Validate.isTrue(from.isBefore(until), "from date must be before until date");
+        from = stripNanos(from);
+        until = stripNanos(until);
         T maiden = mode.drawMaiden(context, newVersion);
         validTypes.computeIfAbsent(maiden.getClass(), k -> mode.validateMaidenCandidate(context, maiden));
         Object id = mode.drawDocumentId(maiden);
@@ -108,6 +110,17 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
             throw new ConcurrentModificationException(
                     "the journal for id=" + id.toString() + " is locked - try again later");
         }
+    }
+
+    private ZonedDateTime stripNanos(ZonedDateTime zdt) {
+        ZonedDateTime newFrom = ZonedDateTime.of(zdt.getYear(), zdt.getMonthValue(), zdt.getDayOfMonth(), zdt.getHour(), zdt.getMinute(), zdt.getSecond(), zdt.getNano()-nanos(zdt), zdt.getZone());
+        return newFrom;
+    }
+
+    private int nanos(ZonedDateTime from) {
+        int nanofrom = from.getNano();
+        int restfrom = nanofrom % 1000000;
+        return restfrom;
     }
 
     private Bitemporal toPersistenceObject(Bitemporal bitemporal) {
