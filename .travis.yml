@@ -27,3 +27,6 @@ deploy:
   - target/barbelhisto-core-$project_version-sources.jar
   - target/barbelhisto-core-$project_version-javadoc.jar
   name: $project_version
+cache:
+  directories:
+  - $HOME/.m2
