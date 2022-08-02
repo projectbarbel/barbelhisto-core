@@ -20,7 +20,15 @@ public class Policy {
 
     @DocumentId
     private String policyNumber;
-    private Partner insurant;
+    public String getPolicyNumber() {
+		return policyNumber;
+	}
+
+	public void setPolicyNumber(String policyNumber) {
+		this.policyNumber = policyNumber;
+	}
+
+	private Partner insurant;
     private BankAccount account;
     private PaymentMethod paymentMethod;
     private Risk risk;
