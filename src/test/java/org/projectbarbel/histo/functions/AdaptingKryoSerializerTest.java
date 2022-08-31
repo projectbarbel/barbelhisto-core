@@ -43,7 +43,6 @@ import io.github.benas.randombeans.api.EnhancedRandom;
 
 public class AdaptingKryoSerializerTest {
 
-    @SuppressWarnings("unused")
     private static Stream<Arguments> createPojos() {
         return Stream.of(Arguments.of(EnhancedRandom.random(PrimitivePrivatePojo.class)),
                 Arguments.of(EnhancedRandom.random(PrimitivePrivatePojoPartialContructor.class)),
@@ -61,11 +60,11 @@ public class AdaptingKryoSerializerTest {
 
     @ParameterizedTest
     @MethodSource("createPojos")
-    public void testValidateObjectIsRoundTripSerializable(Object pojo) throws Exception {
+    public void testValidateObjectIsRoundTripSerializable(Object pojo) {
         AdaptingKryoSerializer.validateObjectIsRoundTripSerializable(BarbelHistoBuilder.barbel(), pojo);
     }
 
-    private HashMap<String, Object> options = new HashMap<String, Object>();
+    private HashMap<String, Object> options = new HashMap<>();
     private BarbelHistoContext context = BarbelHistoBuilder.barbel().withContextOptions(options);
     private PersistenceConfig config = new PersistenceConfig() {
 
