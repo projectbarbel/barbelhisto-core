@@ -92,7 +92,7 @@ public final class BarbelHistoCore<T> implements BarbelHisto<T> {
                 try {
                     EventType.ACQUIRELOCK.create().with(journal).postSynchronous(context);
                     updateStrategy.accept(journal, newManagedBitemporal);
-                    return new BitemporalUpdate<T>(newManagedBitemporal, journal.getLastUpdateCase(),
+                    return new BitemporalUpdate<>(newManagedBitemporal, journal.getLastUpdateCase(),
                             (List<T>) journal.getLastInserts().stream().map(this::toPersistenceObject)
                                     .collect(Collectors.toList()),
                             (List<T>) journal.getLastInactivations().stream().map(i -> i.getObjectAdded())

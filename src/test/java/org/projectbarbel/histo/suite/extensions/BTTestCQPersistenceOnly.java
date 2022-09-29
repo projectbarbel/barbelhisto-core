@@ -28,8 +28,8 @@ public class BTTestCQPersistenceOnly implements BeforeAllCallback, AfterAllCallb
 
     @Override
     public void afterAll(ExtensionContext context) throws Exception {
-        BTExecutionContext.INSTANCE.getTestContext().clearResources();
         BTExecutionContext.INSTANCE.setTestContext(previousContext);
+        BTExecutionContext.INSTANCE.getTestContext().clearResources();
     }
 
     @Override

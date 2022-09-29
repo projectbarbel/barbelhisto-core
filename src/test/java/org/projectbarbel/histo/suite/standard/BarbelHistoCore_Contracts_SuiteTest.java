@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterEach;
@@ -29,7 +29,6 @@ import org.projectbarbel.histo.pojos.PrimitivePrivatePojo;
 import org.projectbarbel.histo.suite.BTExecutionContext;
 import org.projectbarbel.histo.suite.extensions.BTTestStandard;
 
-import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.attribute.SimpleAttribute;
 import com.googlecode.cqengine.persistence.disk.DiskPersistence;
 import com.googlecode.cqengine.query.option.QueryOptions;
@@ -39,11 +38,21 @@ import io.github.benas.randombeans.api.EnhancedRandom;
 @ExtendWith(BTTestStandard.class)
 public class BarbelHistoCore_Contracts_SuiteTest {
 
+    DiskPersistence<SomePojo, ?> pers = DiskPersistence.onPrimaryKeyInFile(SomePojo.DOCUMENT_ID, new File("test.dat"));
+
     @AfterEach
     public void tearDown() throws IOException {
-        Files.deleteIfExists(Paths.get("test.dat"));
-        Files.deleteIfExists(Paths.get("test.dat-wal"));
-        Files.deleteIfExists(Paths.get("test.dat-shm"));
+        Optional.ofNullable(pers).ifPresent(pers -> getConnection(pers));
+        Optional.ofNullable(pers).ifPresent(pers -> pers.getFile().delete());
+    }
+
+    private void getConnection(DiskPersistence<?, ?> pers) {
+        try {
+            pers.getConnection(null, null).close();
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -84,19 +93,6 @@ public class BarbelHistoCore_Contracts_SuiteTest {
         Exception exc = assertThrows(IllegalArgumentException.class,
                 () -> core.save(EnhancedRandom.random(DefaultPojo.class)));
         assertTrue(exc.getMessage().contains("don't forget"));
-    }
-    
-    
-    @Test
-    public void testSave_NoSerializer() throws Exception {
-        BarbelHisto<SomePojo> core = BTExecutionContext.INSTANCE.barbel(SomePojo.class)
-                .withBackboneSupplier(() -> new ConcurrentIndexedCollection<SomePojo>(
-                        DiskPersistence.onPrimaryKeyInFile(SomePojo.DOCUMENT_ID, new File("test.dat"))))
-                .build();
-        SomePojo pojo = EnhancedRandom.random(SomePojo.class);
-        Exception exc = assertThrows(IllegalArgumentException.class,
-                () -> core.save(pojo));
-        assertTrue(exc.getMessage().contains("@PersistenceConfig"));
     }
     
     

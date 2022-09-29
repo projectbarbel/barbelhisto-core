@@ -7,8 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Collections;
 
 import org.junit.jupiter.api.AfterEach;
@@ -28,9 +26,6 @@ public class CQEnginePersistenceTest {
 
     @AfterEach
     public void tearDown() throws IOException {
-        Files.deleteIfExists(Paths.get("def.dat"));
-        Files.deleteIfExists(Paths.get("def.dat-shm"));
-        Files.deleteIfExists(Paths.get("def.dat-wal"));
     }
     
     public static final SimpleAttribute<PrimitivePrivatePojoNoPersistence, String> DOCUMENT_ID_PK = new SimpleAttribute<PrimitivePrivatePojoNoPersistence, String>("documentId") {
@@ -84,6 +79,7 @@ public class CQEnginePersistenceTest {
         assertEquals(0, col.size());
     }
     
+    @SuppressWarnings("resource")
     @Test
     public void pojo() throws IOException {
         DiskPersistence<PrimitivePrivatePojoNoPersistence, String> pers = DiskPersistence.onPrimaryKeyInFile(DOCUMENT_ID_PK_POJO, new File("def.dat"));

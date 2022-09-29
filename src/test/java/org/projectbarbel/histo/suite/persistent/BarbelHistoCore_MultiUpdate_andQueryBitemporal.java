@@ -32,6 +32,7 @@ public class BarbelHistoCore_MultiUpdate_andQueryBitemporal {
     @BeforeAll
     public static void setFixedClock(){
         BarbelHistoContext.getBarbelClock().useFixedClockAt(LocalDateTime.now().atZone(ZoneId.of("Z")));
+        BTExecutionContext.INSTANCE.getTestContext().clearResources();
     }
 
     @AfterAll

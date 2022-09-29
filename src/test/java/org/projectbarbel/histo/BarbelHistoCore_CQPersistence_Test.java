@@ -5,8 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.Optional;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,24 +68,24 @@ public class BarbelHistoCore_CQPersistence_Test {
 
     @AfterEach
     public void tearDown() throws IOException {
-        Files.delete(Paths.get(FILENAME));
-        Files.delete(Paths.get(FILENAME + "-shm"));
-        Files.delete(Paths.get(FILENAME + "-wal"));
+        Optional.ofNullable(pers).ifPresent(pers->pers.getFile().delete());
     }
 
     @BeforeEach
     public void setUp() throws IOException {
-        Files.deleteIfExists(Paths.get(FILENAME));
-        Files.deleteIfExists(Paths.get(FILENAME + "-shm"));
-        Files.deleteIfExists(Paths.get(FILENAME + "-wal"));
+        Optional.ofNullable(pers).ifPresent(pers->pers.getFile().delete());
     }
 
+    DiskPersistence<PrimitivePrivatePojo, ?> pers;
+    
     @Test
     public void testSave_PrimitivePrivatePojo() throws IOException {
         PrimitivePrivatePojo pojo = EnhancedRandom.random(PrimitivePrivatePojo.class);
+        pers = DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO, new File(FILENAME));
+        ConcurrentIndexedCollection<PrimitivePrivatePojo> col = new ConcurrentIndexedCollection<PrimitivePrivatePojo>(pers);
+        col.clear();
         BarbelHisto<PrimitivePrivatePojo> core = BarbelHistoBuilder.barbel()
-                .withBackboneSupplier(() -> new ConcurrentIndexedCollection<PrimitivePrivatePojo>(
-                        DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO, new File(FILENAME))))
+                .withBackboneSupplier(() -> col)
                 .build();
         core.save(pojo);
         core = BarbelHistoBuilder.barbel()
@@ -104,14 +103,14 @@ public class BarbelHistoCore_CQPersistence_Test {
     @Test
     public void testSave_PrimitivePrivatePojo_withUpdate() throws IOException {
         PrimitivePrivatePojo pojo = EnhancedRandom.random(PrimitivePrivatePojo.class);
+        pers = DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO, new File(FILENAME));
         BarbelHisto<PrimitivePrivatePojo> core = BarbelHistoBuilder.barbel()
-                .withBackboneSupplier(() -> new ConcurrentIndexedCollection<PrimitivePrivatePojo>(
-                        DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO, new File(FILENAME))))
+                .withBackboneSupplier(() -> new ConcurrentIndexedCollection<PrimitivePrivatePojo>(pers))
                 .build();
         core.save(pojo);
+        pers = DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO, new File(FILENAME));
         core = BarbelHistoBuilder.barbel()
-                .withBackboneSupplier(() -> new ConcurrentIndexedCollection<PrimitivePrivatePojo>(
-                        DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO, new File(FILENAME))))
+                .withBackboneSupplier(() -> new ConcurrentIndexedCollection<PrimitivePrivatePojo>(pers))
                 .build();
         pojo.someDouble = 123d;
         core.save(pojo, BarbelHistoContext.getBarbelClock().now().plusDays(1), EffectivePeriod.INFINITE); // save changed double to persistence
@@ -119,9 +118,9 @@ public class BarbelHistoCore_CQPersistence_Test {
                 .retrieveOne(BarbelQueries.effectiveAt(pojo.id, BarbelHistoContext.getBarbelClock().now().plusDays(2)));
         assertEquals(123d, ((PrimitivePrivatePojo) effectiveIn2Days.getTarget()).someDouble);
         // reopen to check whether change was made persistent
+        pers = DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO, new File(FILENAME));
         core = BarbelHistoBuilder.barbel()
-                .withBackboneSupplier(() -> new ConcurrentIndexedCollection<PrimitivePrivatePojo>(
-                        DiskPersistence.onPrimaryKeyInFile(VERSION_ID_PK_PRIMITIVE_PRIVATE_POJO, new File(FILENAME))))
+                .withBackboneSupplier(() -> new ConcurrentIndexedCollection<PrimitivePrivatePojo>(pers))
                 .build();
         effectiveIn2Days = (BarbelProxy) core
                 .retrieveOne(BarbelQueries.effectiveAt(pojo.id, BarbelHistoContext.getBarbelClock().now().plusDays(2)));
