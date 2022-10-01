@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 public class SimpleGsonPojoCopier implements UnaryOperator<Object> {
 
     private Gson gson = BarbelHistoContext.getDefaultGson();
+    public static final SimpleGsonPojoCopier INSTANCE = new SimpleGsonPojoCopier();
 
     public void setGson(Gson gson) {
         this.gson = gson;

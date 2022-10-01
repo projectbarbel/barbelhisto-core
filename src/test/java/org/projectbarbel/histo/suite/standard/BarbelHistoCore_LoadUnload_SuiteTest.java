@@ -26,7 +26,6 @@ import org.projectbarbel.histo.suite.BTExecutionContext;
 import org.projectbarbel.histo.suite.extensions.BTTestStandard;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
-import net.sf.cglib.proxy.Enhancer;
 
 @ExtendWith(BTTestStandard.class)
 public class BarbelHistoCore_LoadUnload_SuiteTest {
@@ -48,7 +47,6 @@ public class BarbelHistoCore_LoadUnload_SuiteTest {
         histo.load(bitemporals);
         histo.load(histo.unload("some", "someOther"));
         assertEquals(count, histo.retrieve(BarbelQueries.all()).size());
-        assertTrue(Enhancer.isEnhanced(histo.retrieve(BarbelQueries.all()).stream().findFirst().get().getClass()));
         assertTrue(((BitemporalVersion) bitemporals.iterator().next()).getObject().getClass()
                 .isAssignableFrom(histo.retrieve(BarbelQueries.all()).stream().findFirst().get().getClass()));
     }
@@ -65,7 +63,6 @@ public class BarbelHistoCore_LoadUnload_SuiteTest {
         histo.load(bitemporals);
         histo.load(histo.unload("some"));
         assertEquals(count, histo.retrieve(BarbelQueries.all()).size());
-        assertTrue(Enhancer.isEnhanced(histo.retrieve(BarbelQueries.all()).stream().findFirst().get().getClass()));
         assertTrue(((BitemporalVersion) bitemporals.iterator().next()).getObject().getClass()
                 .isAssignableFrom(histo.retrieve(BarbelQueries.all()).stream().findFirst().get().getClass()));
     }
@@ -82,7 +79,6 @@ public class BarbelHistoCore_LoadUnload_SuiteTest {
         assertEquals(2, histo.retrieve(BarbelQueries.all()).size());
         histo.unload("some");
         assertEquals(1, histo.retrieve(BarbelQueries.all()).size());
-        assertTrue(Enhancer.isEnhanced(histo.retrieve(BarbelQueries.all()).stream().findFirst().get().getClass()));
         assertTrue(((BitemporalVersion) bitemporals.iterator().next()).getObject().getClass()
                 .isAssignableFrom(histo.retrieve(BarbelQueries.all()).stream().findFirst().get().getClass()));
     }
@@ -122,7 +118,6 @@ public class BarbelHistoCore_LoadUnload_SuiteTest {
         Collection<Bitemporal> docs = histo.unload("some", "someOther");
         histo.load(docs);
         assertEquals(count, histo.retrieve(BarbelQueries.all()).size());
-        assertTrue(!Enhancer.isEnhanced(histo.retrieve(BarbelQueries.all()).stream().findFirst().get().getClass()));
         assertTrue(((DefaultDocument) bitemporals.iterator().next()).getClass()
                 .isAssignableFrom(histo.retrieve(BarbelQueries.all()).stream().findFirst().get().getClass()));
     }

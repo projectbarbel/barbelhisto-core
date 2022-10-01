@@ -1,6 +1,7 @@
 package org.projectbarbel.histo.functions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.stream.Stream;
 
@@ -12,6 +13,7 @@ import org.projectbarbel.histo.model.BarbelProxy;
 import org.projectbarbel.histo.model.Bitemporal;
 import org.projectbarbel.histo.model.BitemporalStamp;
 import org.projectbarbel.histo.model.DefaultPojo;
+import org.projectbarbel.histo.pojos.Adress;
 import org.projectbarbel.histo.pojos.ComplexFieldsPrivatePojoPartialContructor;
 import org.projectbarbel.histo.pojos.ComplexFieldsPrivatePojoPartialContructorWithComplexType;
 import org.projectbarbel.histo.pojos.NoPrimitivePrivatePojoPartialContructor;
@@ -20,9 +22,9 @@ import org.projectbarbel.histo.pojos.PrimitivePrivatePojoPartialContructor;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 
-public class CachingCGLibProxyingFunctionTest {
+public class CachingByteBuddyProxyingFunctionTest {
 
-    private CachingCGLibProxyingFunction proxying = CachingCGLibProxyingFunction.INSTANCE;
+    private CachingByteBuddyProxyingFunction proxying = CachingByteBuddyProxyingFunction.INSTANCE;
     
     @Test
     public void testApply_setBitemporal() throws Exception {
@@ -71,7 +73,33 @@ public class CachingCGLibProxyingFunctionTest {
         assertEquals(pojo.getDocumentId(), proxy.getDocumentId());
     }
 
-    @SuppressWarnings("unused")
+    @Test
+    public void testApply_checkSetData() throws Exception {
+        DefaultPojo pojo = EnhancedRandom.random(DefaultPojo.class);
+        BitemporalStamp stamp = BitemporalStamp.createActive();
+        DefaultPojo proxy = (DefaultPojo)proxying.apply(pojo, stamp);
+        assertEquals(pojo.getData(), proxy.getData());
+        proxy.setData("blas");
+        assertEquals("blas", proxy.getData());
+    }
+    
+    @Test
+    public void testApply_Adresse_checkProxy() throws Exception {
+        Adress pojo = EnhancedRandom.random(Adress.class);
+        BitemporalStamp stamp = BitemporalStamp.createActive();
+        Adress proxy = (Adress)proxying.apply(pojo, stamp);
+        assertTrue(proxy instanceof Bitemporal);
+        assertTrue(proxy instanceof BarbelProxy);
+    }
+    
+    @Test
+    public void testApply_Adresse_checkData() throws Exception {
+        Adress pojo = EnhancedRandom.random(Adress.class);
+        BitemporalStamp stamp = BitemporalStamp.createActive();
+        Adress proxy = (Adress)proxying.apply(pojo, stamp);
+        assertEquals(pojo.getCity(), proxy.getCity());
+    }
+    
     private static Stream<Arguments> createPojos() {
         return Stream.of(Arguments.of(EnhancedRandom.random(PrimitivePrivatePojo.class)),
                 Arguments.of(EnhancedRandom.random(PrimitivePrivatePojoPartialContructor.class)),

@@ -17,7 +17,7 @@ import org.projectbarbel.histo.event.EventType;
 import org.projectbarbel.histo.event.HistoEvent;
 import org.projectbarbel.histo.functions.AdaptingKryoSerializer;
 import org.projectbarbel.histo.functions.BarbelPojoSerializer;
-import org.projectbarbel.histo.functions.CachingCGLibProxyingFunction;
+import org.projectbarbel.histo.functions.CachingByteBuddyProxyingFunction;
 import org.projectbarbel.histo.functions.EmbeddingJournalUpdateStrategy;
 import org.projectbarbel.histo.functions.RitsClonerCopyFunction;
 import org.projectbarbel.histo.functions.SimpleGsonPojoCopier;
@@ -334,7 +334,7 @@ public final class BarbelHistoBuilder implements BarbelHistoContext {
 
     /**
      * Customize the proxying in {@link BarbelMode#POJO}. Default is
-     * {@link CachingCGLibProxyingFunction}. Clients may want to use more specific
+     * {@link CachingByteBuddyProxyingFunction}. Clients may want to use more specific
      * proxying functions with their POJOs.
      * 
      * @param proxyingFunction the custom proxying function

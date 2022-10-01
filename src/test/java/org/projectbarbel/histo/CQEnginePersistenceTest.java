@@ -62,8 +62,10 @@ public class CQEnginePersistenceTest {
     public void bitemporal() throws IOException {
         DiskPersistence<Bitemporal, String> pers = DiskPersistence.onPrimaryKeyInFile(DOCUMENT_ID_PK_BITEMPORAL, new File("def.dat"));
         final ConcurrentIndexedCollection<Bitemporal> col = new ConcurrentIndexedCollection<Bitemporal>(pers);
-        col.add(DefaultDocument.builder().withBitemporalStamp(BitemporalStamp.createActive()).withData("some").build());
-        assertThrows(InstantiationError.class, ()->((DefaultDocument)col.retrieve(BarbelQueries.all()).stream().findFirst().get()).getData());
+        DefaultDocument doc = DefaultDocument.builder().withBitemporalStamp(BitemporalStamp.createActive()).withData("some").build();
+        col.add(doc);
+        assertThrows(IllegalStateException.class, ()->((DefaultDocument)col.retrieve(BarbelQueries.all()).stream().findFirst().get()).getData());
+        col.clear();
     }
     
     @Test
@@ -77,6 +79,7 @@ public class CQEnginePersistenceTest {
         col.clear();
         col = new ConcurrentIndexedCollection<DefaultDocument>(pers);
         assertEquals(0, col.size());
+        col.clear();
     }
     
     @SuppressWarnings("resource")
@@ -102,6 +105,8 @@ public class CQEnginePersistenceTest {
     	col2.update(Collections.singletonList(pojo), Collections.singletonList(pojo));
     	ConcurrentIndexedCollection<PrimitivePrivatePojoNoPersistence> col3 = new ConcurrentIndexedCollection<PrimitivePrivatePojoNoPersistence>(pers);
     	assertEquals("changed",((PrimitivePrivatePojoNoPersistence)col3.retrieve(equal(DOCUMENT_ID_PK_POJO, "id")).stream().findFirst().get()).getData());
+        col1.clear();
+        col2.clear();
     }
     
     @Test
@@ -111,7 +116,7 @@ public class CQEnginePersistenceTest {
         PrimitivePrivatePojoNoPersistence memproxy = (PrimitivePrivatePojoNoPersistence)BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(), new PrimitivePrivatePojoNoPersistence("id","some"), BitemporalStamp.createActive());
         col.add(memproxy);
         PrimitivePrivatePojoNoPersistence pojoproxy = (PrimitivePrivatePojoNoPersistence)col.retrieve(equal(DOCUMENT_ID_PK_POJO, "id")).stream().findFirst().get();
-        assertNotEquals("some",pojoproxy.getData());
+        assertEquals("some",pojoproxy.getData());
         col.clear();
     }
     

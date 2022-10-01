@@ -14,8 +14,6 @@ import com.googlecode.cqengine.ConcurrentIndexedCollection;
 import com.googlecode.cqengine.IndexedCollection;
 import com.googlecode.cqengine.persistence.support.serialization.PersistenceConfig;
 
-import net.sf.cglib.proxy.Enhancer;
-
 /**
  * The two modes available in {@link BarbelHisto}. The class contains the modes
  * as well as the mode specific behavior.
@@ -29,7 +27,6 @@ public enum BarbelMode implements BarbelModeProcessor {
         public Bitemporal snapshotManagedBitemporal(BarbelHistoContext context, Bitemporal pojo,
                 BitemporalStamp stamp) {
             Validate.isTrue(pojo instanceof BarbelProxy, "pojo must be instance of BarbelProxy in BarbelMode.POJO");
-            Validate.isTrue(Enhancer.isEnhanced(pojo.getClass()), "pojo must be CGLib proxy type in BarbelMode.POJO");
             Object newVersion = context.getPojoCopyFunctionSupplier().get().apply(((BarbelProxy) pojo).getTarget());
             Object newBitemporal = context.getPojoProxyingFunctionSupplier().get().apply(newVersion, stamp);
             return (Bitemporal) newBitemporal;
@@ -42,7 +39,7 @@ public enum BarbelMode implements BarbelModeProcessor {
 
         @Override
         public Bitemporal snapshotMaiden(BarbelHistoContext context, Object pojo, BitemporalStamp stamp) {
-            Validate.isTrue(!Enhancer.isEnhanced(pojo.getClass()), CGLIB_TYPE_REQUIRED);
+            Validate.isTrue(!(pojo instanceof BarbelProxy),PROXY_TYPE_FORBIDDEN);
             Object copy = context.getPojoCopyFunctionSupplier().get().apply(pojo);
             Object proxy = context.getPojoProxyingFunctionSupplier().get().apply(copy, stamp);
             return (Bitemporal) proxy;
@@ -151,7 +148,6 @@ public enum BarbelMode implements BarbelModeProcessor {
         public Bitemporal snapshotManagedBitemporal(BarbelHistoContext context, Bitemporal pojo,
                 BitemporalStamp stamp) {
             Validate.isTrue(!(pojo instanceof BarbelProxy), "pojo must not be instance of BarbelProxy");
-            Validate.isTrue(!Enhancer.isEnhanced(pojo.getClass()), CGLIB_TYPE_REQUIRED);
             Object newVersion = context.getPojoCopyFunctionSupplier().get().apply(pojo);
             ((Bitemporal) newVersion).setBitemporalStamp(stamp);
             return (Bitemporal) newVersion;
@@ -167,7 +163,6 @@ public enum BarbelMode implements BarbelModeProcessor {
             Validate.isTrue(pojo instanceof Bitemporal,
                     "must inherit interface Bitemporal.class when running bitemporal mode");
             Validate.isTrue(!(pojo instanceof BarbelProxy), "pojo must not be instance of BarbelProxy");
-            Validate.isTrue(!Enhancer.isEnhanced(pojo.getClass()), CGLIB_TYPE_REQUIRED);
             Object copy = context.getPojoCopyFunctionSupplier().get().apply(pojo);
             ((Bitemporal) copy).setBitemporalStamp(stamp);
             return (Bitemporal) copy;
@@ -226,6 +221,6 @@ public enum BarbelMode implements BarbelModeProcessor {
     };
 
     private static final String DOCUMENT_ID = ".documentId";
-    private static final String CGLIB_TYPE_REQUIRED = "pojo must not be CGLib proxy type";
+    private static final String PROXY_TYPE_FORBIDDEN = "pojo must not be proxy type";
 
 }

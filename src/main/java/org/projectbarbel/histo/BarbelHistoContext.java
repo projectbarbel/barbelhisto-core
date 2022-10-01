@@ -14,8 +14,9 @@ import java.util.function.UnaryOperator;
 import org.projectbarbel.histo.event.EventType.DefaultSubscriberExceptionHandler;
 import org.projectbarbel.histo.event.HistoEvent;
 import org.projectbarbel.histo.functions.AdaptingKryoSerializer;
-import org.projectbarbel.histo.functions.CachingCGLibProxyingFunction;
+import org.projectbarbel.histo.functions.CachingByteBuddyProxyingFunction;
 import org.projectbarbel.histo.functions.RitsClonerCopyFunction;
+import org.projectbarbel.histo.functions.SimpleGsonPojoCopier;
 import org.projectbarbel.histo.functions.TableJournalPrettyPrinter;
 import org.projectbarbel.histo.functions.UUIDGenerator;
 import org.projectbarbel.histo.model.Bitemporal;
@@ -82,7 +83,7 @@ public interface BarbelHistoContext {
     }
 
     static Supplier<BiFunction<Object, BitemporalStamp, Object>> getDefaultProxyingFunctionSupplier() {
-        return () -> CachingCGLibProxyingFunction.INSTANCE;
+        return () -> CachingByteBuddyProxyingFunction.INSTANCE;
     }
 
     static Gson getDefaultGson() {
