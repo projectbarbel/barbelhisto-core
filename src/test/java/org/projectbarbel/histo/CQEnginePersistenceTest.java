@@ -116,7 +116,7 @@ public class CQEnginePersistenceTest {
         PrimitivePrivatePojoNoPersistence memproxy = (PrimitivePrivatePojoNoPersistence)BarbelMode.POJO.snapshotMaiden(BarbelHistoBuilder.barbel(), new PrimitivePrivatePojoNoPersistence("id","some"), BitemporalStamp.createActive());
         col.add(memproxy);
         PrimitivePrivatePojoNoPersistence pojoproxy = (PrimitivePrivatePojoNoPersistence)col.retrieve(equal(DOCUMENT_ID_PK_POJO, "id")).stream().findFirst().get();
-        assertEquals("some",pojoproxy.getData());
+        assertNotEquals("some",pojoproxy.getData());
         col.clear();
     }
     

@@ -5,3 +5,6 @@ bin/
 .project
 .settings/
 target/
+*.dat
+*.dat-shm
+*.dat-wal

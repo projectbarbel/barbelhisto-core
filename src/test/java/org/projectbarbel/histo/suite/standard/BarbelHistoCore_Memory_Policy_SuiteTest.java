@@ -14,7 +14,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.projectbarbel.histo.BarbelHisto;
 import org.projectbarbel.histo.BarbelHistoCore;
@@ -99,7 +98,6 @@ public class BarbelHistoCore_Memory_Policy_SuiteTest {
         }
     }
 
-    @Test
     public void testMemory() throws InterruptedException, ExecutionException, TimeoutException {
         executor = new ScheduledThreadPoolExecutor(1);
         t = executor.scheduleAtFixedRate(new MyTask(core, dump, maxVersions, pojoCount, cycles), 0, 2, TimeUnit.SECONDS);

@@ -116,4 +116,5 @@ public class CachingByteBuddyProxyingFunctionTest {
         assertEquals(pojo, ((BarbelProxy)proxy).getTarget());
         assertEquals(stamp, ((Bitemporal)proxy).getBitemporalStamp());
     }
+
 }
