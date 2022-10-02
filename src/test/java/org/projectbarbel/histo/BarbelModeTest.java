@@ -49,7 +49,7 @@ public class BarbelModeTest {
 				BitemporalStamp.createActive());
 		Bitemporal bitemporal = BarbelMode.POJO.snapshotManagedBitemporal(BarbelHistoBuilder.barbel(), managed,
 				BitemporalStamp.createActive());
-		assertEquals(managed, bitemporal); // stamps differ
+		assertNotEquals(managed, bitemporal); // stamps differ
 		assertEquals(((BarbelProxy) managed).getTarget(), ((BarbelProxy) bitemporal).getTarget());
 	}
 
