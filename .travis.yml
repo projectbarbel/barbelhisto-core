@@ -1,1 +1,24 @@
 language: java
+install: mvn --settings .maven.xml install -DskipTests=true -Dgpg.skip -Dmaven.javadoc.skip=true -B -V
+before_script:
+- mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
+script: mvn clean deploy --settings .maven.xml -DskipTests=true -B -U -P release
+before_deploy:
+- mvn help:evaluate -N -Dexpression=project.version|grep -v '\['
+- export project_version=$(mvn help:evaluate -N -Dexpression=project.version|grep -v '\[')
+deploy:
+  provider: releases
+  api_key: $GITHUB_TOKEN
+  skip_cleanup: true
+  true:
+    repo: projectbarbel/barbelhisto-core
+    tags: true
+  overwrite: true
+  file:
+  - target/barbelhisto-core-$project_version.jar
+  - target/barbelhisto-core-$project_version-sources.jar
+  - target/barbelhisto-core-$project_version-javadoc.jar
+  name: $project_version
+cache:
+  directories:
+  - $HOME/.m2
