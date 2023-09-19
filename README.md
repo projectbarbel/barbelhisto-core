@@ -30,8 +30,8 @@ Download the [actual snapshot releases](https://github.com/projectbarbel/barbelh
 Or clone this git repository to try some of the features of `BarbelHisto`.
 
 # Getting started with POJOs
-[Get started with Spring turorial](https://dzone.com/articles/integrating-bi-temporal-data-in-spring-boot-applic)
-[Get started with Mongo turorial](https://dzone.com/articles/setting-up-mongodb-for-bi-temporal-data-in-5-minut)
+- [Get started with Spring turorial](https://dzone.com/articles/integrating-bi-temporal-data-in-spring-boot-applic)
+- [Get started with Mongo turorial](https://dzone.com/articles/setting-up-mongodb-for-bi-temporal-data-in-5-minut)
 
 # Memory analysis
 Memory analysis results. One hour run, 5000 Objects saved every 10 seconds. `OnHeapPersistence`. 
